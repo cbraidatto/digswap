@@ -1,38 +1,72 @@
 import Link from "next/link";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 
 export default function Home() {
 	return (
-		<div className="flex min-h-screen flex-col items-center justify-center px-4">
-			<h1 className="font-heading text-[28px] font-normal leading-[1.1] tracking-[-0.03em] sm:text-[36px]">
-				Dig<span className="text-primary">Swap</span>
+		<div className="flex min-h-screen flex-col items-center justify-center px-6 relative overflow-hidden">
+			{/* Background dot grid */}
+			<div
+				className="absolute inset-0 opacity-[0.03] pointer-events-none"
+				style={{
+					backgroundImage: "radial-gradient(#6fdd78 1px, transparent 1px)",
+					backgroundSize: "32px 32px",
+				}}
+			/>
+
+			{/* Terminal prompt line */}
+			<div className="mb-8 flex items-center gap-2 text-primary font-mono text-xs">
+				<span className="material-symbols-outlined text-sm">terminal</span>
+				<span>CYBER-DIGGER_v1.0.0</span>
+				<span className="w-2 h-4 bg-primary blink inline-block" />
+			</div>
+
+			{/* Logo */}
+			<h1 className="font-heading text-4xl md:text-6xl font-extrabold tracking-tighter text-on-surface mb-4 text-center">
+				CYBER-<span className="text-primary">DIGGER</span>
 			</h1>
 
-			<p className="mt-2 text-muted-foreground">A social network for vinyl diggers</p>
+			<p className="text-on-surface-variant font-sans text-sm md:text-base text-center w-full max-w-md mb-12">
+				A social network for vinyl diggers. Import your Discogs library, discover who has what
+				you&apos;re hunting for, and trade audio rips via secure P2P connections.
+			</p>
 
-			<Card className="mt-8 w-full max-w-[420px]">
-				<CardHeader>
-					<CardTitle className="font-heading text-[24px] font-semibold leading-[1.2] tracking-[-0.02em]">
-						Welcome
-					</CardTitle>
-					<CardDescription>
-						Import your Discogs library, discover who has what you are looking for, and trade audio
-						rips via secure peer-to-peer connections.
-					</CardDescription>
-				</CardHeader>
-				<CardContent className="flex flex-col gap-3">
-					<Link href="/signup" className="inline-flex w-full items-center justify-center rounded-lg bg-primary px-2.5 h-9 text-sm font-medium text-primary-foreground transition-all">
-						Get Started
-					</Link>
-					<Button variant="secondary" size="lg" className="w-full">
-						Learn More
-					</Button>
-				</CardContent>
-			</Card>
+			{/* CTA card */}
+			<div className="w-full max-w-[420px] bg-surface-container-low rounded-xl overflow-hidden shadow-2xl border border-outline-variant/10">
+				<div className="h-1 bg-primary" />
+				<div className="p-6">
+					<div className="font-mono text-[10px] text-on-surface-variant mb-6 space-y-1">
+						<div>
+							<span className="text-tertiary">MISSION</span>
+							<span className="text-on-surface"> =&gt; </span>
+							<span className="text-secondary">&quot;find the record you&apos;ve been hunting&quot;</span>
+						</div>
+						<div>
+							<span className="text-tertiary">STATUS</span>
+							<span className="text-on-surface"> =&gt; </span>
+							<span className="text-primary">[BETA_ACTIVE]</span>
+						</div>
+					</div>
 
-			<p className="mt-6 text-sm text-muted-foreground">
-				Gamified rankings reward both collection rarity and community contribution.
+					<div className="flex flex-col gap-3">
+						<Link
+							href="/signup"
+							className="w-full bg-primary-container text-on-primary-container font-mono font-bold py-3 rounded text-sm hover:brightness-110 transition-all flex items-center justify-center gap-2"
+						>
+							<span className="material-symbols-outlined text-sm">add_circle</span>
+							INITIALIZE_ACCOUNT
+						</Link>
+						<Link
+							href="/signin"
+							className="w-full bg-transparent text-on-surface-variant font-mono text-sm py-3 rounded hover:bg-surface-container-high transition-all flex items-center justify-center gap-2 border border-outline-variant/20"
+						>
+							<span className="material-symbols-outlined text-sm">login</span>
+							AUTHENTICATE
+						</Link>
+					</div>
+				</div>
+			</div>
+
+			<p className="mt-8 text-[10px] font-mono text-on-surface-variant/50 text-center">
+				Gamified rankings · P2P audio · Discogs integration
 			</p>
 		</div>
 	);
