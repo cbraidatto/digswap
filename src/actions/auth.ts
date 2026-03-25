@@ -3,8 +3,13 @@
 import { headers } from "next/headers";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { authRateLimit } from "@/lib/rate-limit";
-import { signUpSchema, signInSchema } from "@/lib/validations/auth";
+import { authRateLimit, resetRateLimit } from "@/lib/rate-limit";
+import {
+	signUpSchema,
+	signInSchema,
+	forgotPasswordSchema,
+	resetPasswordSchema,
+} from "@/lib/validations/auth";
 
 /**
  * Generic auth error message per OWASP guidelines.
@@ -229,4 +234,125 @@ export async function resendVerification(
 
 	// Always return success to prevent email enumeration
 	return { success: true };
+}
+
+/**
+ * Request a password reset email.
+ *
+ * OWASP: ALWAYS returns success regardless of whether the email exists.
+ * This prevents email enumeration attacks.
+ *
+ * Rate limited: 3 requests per 15 minutes per email (per D-16).
+ */
+export async function forgotPassword(
+	formData: FormData,
+): Promise<{ success: boolean; message: string; errors?: Record<string, string[]> }> {
+	const rawData = {
+		email: formData.get("email"),
+	};
+
+	// Validate input
+	const parsed = forgotPasswordSchema.safeParse(rawData);
+	if (!parsed.success) {
+		return {
+			success: false,
+			message: "Please enter a valid email address.",
+			errors: parsed.error.flatten().fieldErrors,
+		};
+	}
+
+	const { email } = parsed.data;
+
+	// Rate limit by email (3 per 15 min)
+	const { success: withinLimit } = await resetRateLimit.limit(
+		email.toLowerCase(),
+	);
+	if (!withinLimit) {
+		return {
+			success: false,
+			message: "Too many attempts. Please wait a moment before trying again.",
+		};
+	}
+
+	const supabase = await createClient();
+	const siteUrl =
+		process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
+
+	// Send reset email -- errors are intentionally swallowed (OWASP)
+	await supabase.auth.resetPasswordForEmail(email, {
+		redirectTo: `${siteUrl}/api/auth/callback?next=/reset-password`,
+	});
+
+	// ALWAYS return success to prevent email enumeration
+	return {
+		success: true,
+		message: `Check your inbox. We sent a reset link to ${email}.`,
+	};
+}
+
+/**
+ * Update user password (called from reset password page).
+ *
+ * The user reaches this page via the email link, which exchanges the
+ * recovery token for a session through the OAuth callback route.
+ * At this point the user has a valid session with a recovery token.
+ *
+ * Rate limited by IP using authRateLimit (5 per 60 seconds).
+ */
+export async function resetPassword(
+	formData: FormData,
+): Promise<{ success: boolean; message: string; errors?: Record<string, string[]> }> {
+	const rawData = {
+		password: formData.get("password"),
+		confirmPassword: formData.get("confirmPassword"),
+	};
+
+	// Validate input (same strength rules as signup per D-18)
+	const parsed = resetPasswordSchema.safeParse(rawData);
+	if (!parsed.success) {
+		return {
+			success: false,
+			message: "Please fix the errors below.",
+			errors: parsed.error.flatten().fieldErrors,
+		};
+	}
+
+	// Rate limit by IP
+	const ip = await getClientIp();
+	const { success: withinLimit } = await authRateLimit.limit(ip);
+	if (!withinLimit) {
+		return {
+			success: false,
+			message: "Too many attempts. Please wait a moment before trying again.",
+		};
+	}
+
+	const supabase = await createClient();
+
+	const { error } = await supabase.auth.updateUser({
+		password: parsed.data.password,
+	});
+
+	if (error) {
+		// Handle expired/invalid recovery link
+		if (
+			error.message?.toLowerCase().includes("expired") ||
+			error.status === 403
+		) {
+			return {
+				success: false,
+				message: "This reset link has expired. Request a new one.",
+			};
+		}
+
+		return {
+			success: false,
+			message: "Something went wrong. Please try again.",
+		};
+	}
+
+	return {
+		success: true,
+		message: "Password updated. You can now sign in with your new password.",
+	};
 }
