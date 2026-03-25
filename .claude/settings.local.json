@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(unzip -o \"C:\\\\Users\\\\INTEL\\\\Desktop\\\\get-shit-done-main.zip\" -d .)",
+      "Bash(node bin/install.js --claude)",
+      "Skill(update-config)"
+    ]
+  }
+}
