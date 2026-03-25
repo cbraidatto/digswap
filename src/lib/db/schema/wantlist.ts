@@ -1,6 +1,7 @@
 import {
   pgTable,
   uuid,
+  varchar,
   text,
   timestamp,
   integer,
@@ -18,6 +19,7 @@ export const wantlistItems = pgTable(
     releaseId: uuid("release_id").references(() => releases.id),
     notes: text("notes"),
     priority: integer("priority").default(0).notNull(),
+    addedVia: varchar("added_via", { length: 20 }), // "discogs" or "manual"
     createdAt: timestamp("created_at", { withTimezone: true })
       .defaultNow()
       .notNull(),
