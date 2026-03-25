@@ -74,9 +74,9 @@ Plans:
   5. User can disconnect their Discogs account and all imported data is removed
 **Plans**: 6 plans
 Plans:
-- [ ] 03-01-PLAN.md -- Schema additions, dependency install, type contracts, Zustand store, and Wave 0 test scaffolds
+- [x] 03-01-PLAN.md -- Schema additions, dependency install, type contracts, Zustand store, and Wave 0 test scaffolds
 - [x] 03-02-PLAN.md -- OAuth 1.0a flow: helpers, callback route, server action, onboarding button activation
-- [ ] 03-03-PLAN.md -- Background import pipeline: worker, API route, Realtime broadcast, self-invocation chain
+- [x] 03-03-PLAN.md -- Background import pipeline: worker, API route, Realtime broadcast, self-invocation chain
 - [ ] 03-04-PLAN.md -- Import progress UI: progress page, sticky banner, shadcn components
 - [ ] 03-05-PLAN.md -- Settings Discogs section: sync, disconnect, re-import with confirmation dialogs
 - [ ] 03-06-PLAN.md -- Test implementations and visual verification checkpoint
