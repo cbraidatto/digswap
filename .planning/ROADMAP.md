@@ -14,7 +14,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 
 - [ ] **Phase 1: Foundation + Authentication** - Project scaffolding, Supabase auth, database schema, retro/analog design system
 - [ ] **Phase 2: UI Shell + Navigation** - 4-tab navigation (Feed, Perfil, Explorar, Comunidade) with per-tab routing
-- [ ] **Phase 3: Discogs Integration** - OAuth 1.0a connection, collection/wantlist import, async pipeline with progress
+- [x] **Phase 3: Discogs Integration** - OAuth 1.0a connection, collection/wantlist import, async pipeline with progress (completed 2026-03-25)
 - [ ] **Phase 4: Collection Management** - Public collection profiles, rarity scoring, filtering, sorting, manual entry
 - [ ] **Phase 5: Social Layer** - Follow system, activity feed, collection comparison, public profiles
 - [ ] **Phase 6: Discovery + Notifications** - Cross-collection search, wantlist matching, in-app/email/push notifications
@@ -79,7 +79,7 @@ Plans:
 - [x] 03-03-PLAN.md -- Background import pipeline: worker, API route, Realtime broadcast, self-invocation chain
 - [x] 03-04-PLAN.md -- Import progress UI: progress page, sticky banner, shadcn components
 - [x] 03-05-PLAN.md -- Settings Discogs section: sync, disconnect, re-import with confirmation dialogs
-- [ ] 03-06-PLAN.md -- Test implementations and visual verification checkpoint
+- [x] 03-06-PLAN.md -- Test implementations and visual verification checkpoint
 **UI hint**: yes
 
 ### Phase 4: Collection Management
@@ -190,7 +190,7 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7 -> 8 -> 9 -> 10
 |-------|----------------|--------|-----------|
 | 1. Foundation + Authentication | 0/8 | Planning complete | - |
 | 2. UI Shell + Navigation | 0/2 | Planning complete | - |
-| 3. Discogs Integration | 5/6 | In Progress|  |
+| 3. Discogs Integration | 6/6 | Complete   | 2026-03-25 |
 | 4. Collection Management | 0/TBD | Not started | - |
 | 5. Social Layer | 0/TBD | Not started | - |
 | 6. Discovery + Notifications | 0/TBD | Not started | - |
