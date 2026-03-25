@@ -5,6 +5,7 @@ import { db } from "@/lib/db";
 import { collectionItems } from "@/lib/db/schema/collections";
 import { profiles } from "@/lib/db/schema/users";
 import { createClient } from "@/lib/supabase/server";
+import { AddRecordFAB } from "./_components/add-record-fab";
 
 function getRankTitle(collectionCount: number): string {
 	if (collectionCount >= 500) return "Record Archaeologist";
@@ -249,6 +250,9 @@ export default async function PerfilPage() {
 					</div>
 				)}
 			</section>
+
+			{/* Floating Action Button for adding records */}
+			<AddRecordFAB />
 		</div>
 	);
 }
