@@ -71,11 +71,11 @@ export async function getSessions(): Promise<{
 
 	const userId = data.user.id;
 
-	// Get current session identifier to mark "current" session
-	const {
-		data: { session: currentSession },
-	} = await supabase.auth.getSession();
-	const currentSessionId = currentSession?.access_token?.slice(-32) || "";
+	// Get current session identifier to mark "current" session.
+	// Uses getClaims() (not getSession()) per project convention — reads session_id
+	// from the validated JWT claims without an extra server round-trip.
+	const { data: claimsData } = await supabase.auth.getClaims();
+	const currentSessionId = claimsData?.claims?.session_id || "";
 
 	try {
 		const sessions = await db
