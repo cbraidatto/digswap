@@ -2,7 +2,7 @@ import Link from "next/link";
 
 export default function Home() {
 	return (
-		<div className="flex min-h-screen flex-col items-center justify-center px-6 relative overflow-hidden">
+		<div className="min-h-screen flex flex-col justify-center px-6 py-12 relative overflow-hidden">
 			{/* Background dot grid */}
 			<div
 				className="absolute inset-0 opacity-[0.03] pointer-events-none"
@@ -12,25 +12,26 @@ export default function Home() {
 				}}
 			/>
 
-			{/* Terminal prompt line */}
-			<div className="mb-8 flex items-center gap-2 text-primary font-mono text-xs">
-				<span className="material-symbols-outlined text-sm">terminal</span>
-				<span>CYBER-DIGGER_v1.0.0</span>
-				<span className="w-2 h-4 bg-primary blink inline-block" />
-			</div>
+			<div className="relative z-10 w-full max-w-md mx-auto flex flex-col items-center">
+				{/* Terminal prompt line */}
+				<div className="mb-8 flex items-center gap-2 text-primary font-mono text-xs">
+					<span className="material-symbols-outlined text-sm">terminal</span>
+					<span>CYBER-DIGGER_v1.0.0</span>
+					<span className="w-2 h-4 bg-primary blink inline-block" />
+				</div>
 
-			{/* Logo */}
-			<h1 className="font-heading text-4xl md:text-6xl font-extrabold tracking-tighter text-on-surface mb-4 text-center">
-				CYBER-<span className="text-primary">DIGGER</span>
-			</h1>
+				{/* Logo */}
+				<h1 className="font-heading text-4xl md:text-6xl font-extrabold tracking-tighter text-on-surface mb-4 text-center">
+					CYBER-<span className="text-primary">DIGGER</span>
+				</h1>
 
-			<p className="text-on-surface-variant font-sans text-sm md:text-base text-center w-full max-w-md mb-12">
-				A social network for vinyl diggers. Import your Discogs library, discover who has what
-				you&apos;re hunting for, and trade audio rips via secure P2P connections.
-			</p>
+				<p className="text-on-surface-variant font-sans text-sm md:text-base text-center mb-12">
+					A social network for vinyl diggers. Import your Discogs library, discover who has what
+					you&apos;re hunting for, and trade audio rips via secure P2P connections.
+				</p>
 
-			{/* CTA card */}
-			<div className="w-full max-w-[420px] bg-surface-container-low rounded-xl overflow-hidden shadow-2xl border border-outline-variant/10">
+				{/* CTA card */}
+				<div className="w-full bg-surface-container-low rounded-xl overflow-hidden shadow-2xl border border-outline-variant/10">
 				<div className="h-1 bg-primary" />
 				<div className="p-6">
 					<div className="font-mono text-[10px] text-on-surface-variant mb-6 space-y-1">
@@ -63,11 +64,12 @@ export default function Home() {
 						</Link>
 					</div>
 				</div>
-			</div>
+				</div>
 
-			<p className="mt-8 text-[10px] font-mono text-on-surface-variant/50 text-center">
-				Gamified rankings · P2P audio · Discogs integration
-			</p>
+				<p className="mt-8 text-[10px] font-mono text-on-surface-variant/50 text-center">
+					Gamified rankings · P2P audio · Discogs integration
+				</p>
+			</div>
 		</div>
 	);
 }
