@@ -1,5 +1,3 @@
-"use server";
-
 import { randomBytes } from "node:crypto";
 import bcrypt from "bcryptjs";
 import { eq, and } from "drizzle-orm";
