@@ -162,27 +162,81 @@
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| AUTH-01 through AUTH-06 | Phase 1 | Pending |
-| NAV-01 through NAV-03 | Phase 2 | Pending |
-| DISC-01 through DISC-06 | Phase 3 | Pending |
-| COLL-01 through COLL-06 | Phase 4 | Pending |
-| SOCL-01 through SOCL-05 | Phase 5 | Pending |
-| COMM-01 through COMM-05 | Phase 5 | Pending |
-| DISC2-01 through DISC2-02 | Phase 6 | Pending |
-| DISC2-03 through DISC2-04 | Phase 7 | Pending |
-| NOTF-01 through NOTF-04 | Phase 7 | Pending |
-| REV-01 through REV-03 | Phase 8 | Pending |
-| GAME-01 through GAME-06 | Phase 9 | Pending |
-| P2P-01 through P2P-07 | Phase 10 | Pending |
-| SEC-05 through SEC-07 | Phase 10 | Pending |
-| MON-01 through MON-07 | Phase 11 | Pending |
-| SEC-01 through SEC-04 | Phase 12 | Pending |
+| AUTH-01 | Phase 1: Foundation + Authentication | Pending |
+| AUTH-02 | Phase 1: Foundation + Authentication | Pending |
+| AUTH-03 | Phase 1: Foundation + Authentication | Pending |
+| AUTH-04 | Phase 1: Foundation + Authentication | Pending |
+| AUTH-05 | Phase 1: Foundation + Authentication | Pending |
+| AUTH-06 | Phase 1: Foundation + Authentication | Pending |
+| SEC-01 | Phase 1: Foundation + Authentication | Pending |
+| NAV-01 | Phase 2: UI Shell + Navigation | Pending |
+| NAV-02 | Phase 2: UI Shell + Navigation | Pending |
+| NAV-03 | Phase 2: UI Shell + Navigation | Pending |
+| DISC-01 | Phase 3: Discogs Integration | Pending |
+| DISC-02 | Phase 3: Discogs Integration | Pending |
+| DISC-03 | Phase 3: Discogs Integration | Pending |
+| DISC-04 | Phase 3: Discogs Integration | Pending |
+| DISC-05 | Phase 3: Discogs Integration | Pending |
+| DISC-06 | Phase 3: Discogs Integration | Pending |
+| COLL-01 | Phase 4: Collection Management | Pending |
+| COLL-02 | Phase 4: Collection Management | Pending |
+| COLL-03 | Phase 4: Collection Management | Pending |
+| COLL-04 | Phase 4: Collection Management | Pending |
+| COLL-05 | Phase 4: Collection Management | Pending |
+| COLL-06 | Phase 4: Collection Management | Pending |
+| SOCL-01 | Phase 5: Social Layer | Pending |
+| SOCL-02 | Phase 5: Social Layer | Pending |
+| SOCL-03 | Phase 5: Social Layer | Pending |
+| SOCL-04 | Phase 5: Social Layer | Pending |
+| SOCL-05 | Phase 5: Social Layer | Pending |
+| DISC2-01 | Phase 6: Discovery + Notifications | Pending |
+| DISC2-02 | Phase 6: Discovery + Notifications | Pending |
+| DISC2-03 | Phase 6: Discovery + Notifications | Pending |
+| DISC2-04 | Phase 6: Discovery + Notifications | Pending |
+| NOTF-01 | Phase 6: Discovery + Notifications | Pending |
+| NOTF-02 | Phase 6: Discovery + Notifications | Pending |
+| NOTF-03 | Phase 6: Discovery + Notifications | Pending |
+| NOTF-04 | Phase 6: Discovery + Notifications | Pending |
+| COMM-01 | Phase 7: Community + Reviews | Pending |
+| COMM-02 | Phase 7: Community + Reviews | Pending |
+| COMM-03 | Phase 7: Community + Reviews | Pending |
+| COMM-04 | Phase 7: Community + Reviews | Pending |
+| COMM-05 | Phase 7: Community + Reviews | Pending |
+| REV-01 | Phase 7: Community + Reviews | Pending |
+| REV-02 | Phase 7: Community + Reviews | Pending |
+| REV-03 | Phase 7: Community + Reviews | Pending |
+| GAME-01 | Phase 8: Gamification + Rankings | Pending |
+| GAME-02 | Phase 8: Gamification + Rankings | Pending |
+| GAME-03 | Phase 8: Gamification + Rankings | Pending |
+| GAME-04 | Phase 8: Gamification + Rankings | Pending |
+| GAME-05 | Phase 8: Gamification + Rankings | Pending |
+| GAME-06 | Phase 8: Gamification + Rankings | Pending |
+| P2P-01 | Phase 9: P2P Audio Trading | Pending |
+| P2P-02 | Phase 9: P2P Audio Trading | Pending |
+| P2P-03 | Phase 9: P2P Audio Trading | Pending |
+| P2P-04 | Phase 9: P2P Audio Trading | Pending |
+| P2P-05 | Phase 9: P2P Audio Trading | Pending |
+| P2P-06 | Phase 9: P2P Audio Trading | Pending |
+| P2P-07 | Phase 9: P2P Audio Trading | Pending |
+| SEC-05 | Phase 9: P2P Audio Trading | Pending |
+| SEC-06 | Phase 9: P2P Audio Trading | Pending |
+| SEC-07 | Phase 9: P2P Audio Trading | Pending |
+| MON-01 | Phase 10: Monetization | Pending |
+| MON-02 | Phase 10: Monetization | Pending |
+| MON-03 | Phase 10: Monetization | Pending |
+| MON-04 | Phase 10: Monetization | Pending |
+| MON-05 | Phase 10: Monetization | Pending |
+| MON-06 | Phase 10: Monetization | Pending |
+| MON-07 | Phase 10: Monetization | Pending |
+| SEC-02 | Phase 11: Security Hardening | Pending |
+| SEC-03 | Phase 11: Security Hardening | Pending |
+| SEC-04 | Phase 11: Security Hardening | Pending |
 
 **Coverage:**
-- v1 requirements: 57 total
-- Mapped to phases: 57
-- Unmapped: 0 ✓
+- v1 requirements: 69 total (corrected from prior count of 57)
+- Mapped to phases: 69
+- Unmapped: 0
 
 ---
 *Requirements defined: 2026-03-25*
-*Last updated: 2026-03-25 after initial definition*
+*Last updated: 2026-03-25 after roadmap creation*
