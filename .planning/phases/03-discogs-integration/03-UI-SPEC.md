@@ -286,16 +286,16 @@ Uses `alert-dialog` (shadcn) for destructive confirmation pattern.
 |       will not be affected."            |
 |                                         |
 |  AlertDialogFooter                      |
-|    [Cancel] (outline variant)           |
+|    [Keep Discogs] (outline variant)     |
 |    [Disconnect] (destructive variant)   |
 +-----------------------------------------+
 ```
 
 - Title: Fraunces 16px medium (uses existing `DialogTitle` size from dialog.tsx)
 - Description: DM Sans 14px muted-foreground
-- Cancel: outline variant, auto-closes dialog
+- Keep Discogs: outline variant, auto-closes dialog
 - Disconnect: destructive variant, triggers `disconnectDiscogs` server action
-- During disconnect: "Disconnect" button shows spinner, disabled. Cancel also disabled.
+- During disconnect: "Disconnect" button shows spinner, disabled. "Keep Discogs" also disabled.
 - On success: dialog closes, settings card transitions to disconnected state, toast: "Discogs disconnected"
 
 ---
@@ -314,7 +314,7 @@ Same pattern as disconnect dialog.
 |       fresh import from Discogs."       |
 |                                         |
 |  AlertDialogFooter                      |
-|    [Cancel] (outline variant)           |
+|    [Keep Collection] (outline variant)  |
 |    [Re-import] (destructive variant)    |
 +-----------------------------------------+
 ```
@@ -453,10 +453,10 @@ No visual layout changes to the component itself. The Disc3 icon (48px in primar
 
 ### Destructive Action Confirmations
 
-| Action | Dialog Title | Dialog Body | Cancel CTA | Confirm CTA |
-|--------|-------------|-------------|------------|-------------|
-| Disconnect Discogs (D-15) | "Disconnect Discogs?" | "Your imported collection and wantlist will be removed from VinylDig. Records added manually will not be affected." | "Cancel" | "Disconnect" |
-| Reset and re-import (D-12) | "Reset and re-import?" | "This will remove your current imported collection and start a fresh import from Discogs." | "Cancel" | "Re-import" |
+| Action | Dialog Title | Dialog Body | Dismiss CTA | Confirm CTA |
+|--------|-------------|-------------|-------------|-------------|
+| Disconnect Discogs (D-15) | "Disconnect Discogs?" | "Your imported collection and wantlist will be removed from VinylDig. Records added manually will not be affected." | "Keep Discogs" | "Disconnect" |
+| Reset and re-import (D-12) | "Reset and re-import?" | "This will remove your current imported collection and start a fresh import from Discogs." | "Keep Collection" | "Re-import" |
 
 ---
 
@@ -518,7 +518,7 @@ No new breakpoint behavior introduced. Follows Phase 2 pattern: content max-widt
 | Reduced motion | All animations (Disc3 spin, progress bar transition, skeleton shimmer) respect `prefers-reduced-motion: reduce` |
 | Button loading states | `aria-busy="true"` and `aria-disabled="true"` when loading |
 | Color contrast | All text/background combinations exceed WCAG AA 4.5:1 (verified in Phase 1) |
-| Focus management | On dialog open: focus moves to cancel button. On dialog close: focus returns to trigger button. |
+| Focus management | On dialog open: focus moves to dismiss button. On dialog close: focus returns to trigger button. |
 
 ---
 
