@@ -36,7 +36,16 @@ Decimal phases appear between their surrounding integers in numeric order.
   3. User can reset a forgotten password via email link and log in with the new password
   4. User can enable 2FA (TOTP), log out, and be required to enter a TOTP code on next login
   5. All auth surfaces pass OWASP Top 10 checks (rate limiting, input validation, secure headers)
-**Plans**: TBD
+**Plans**: 8 plans
+Plans:
+- [ ] 01-PLAN-01.md -- Scaffold Next.js 15 project with dark-warm design system and security headers
+- [ ] 01-PLAN-02.md -- Define complete application database schema with Drizzle ORM and RLS policies
+- [ ] 01-PLAN-03.md -- Create Supabase auth infrastructure, validation schemas, and rate limiters
+- [ ] 01-PLAN-04.md -- Build sign-up, sign-in, and email verification pages with server actions
+- [ ] 01-PLAN-05.md -- Build OAuth callback, forgot password, and reset password flows
+- [ ] 01-PLAN-06.md -- Implement TOTP 2FA enrollment, challenge, and backup codes
+- [ ] 01-PLAN-07.md -- Build multi-step onboarding wizard
+- [ ] 01-PLAN-08.md -- Session management UI and security/auth test suite
 **UI hint**: yes
 
 ### Phase 2: UI Shell + Navigation
@@ -168,7 +177,7 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7 -> 8 -> 9 -> 10
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Foundation + Authentication | 0/TBD | Not started | - |
+| 1. Foundation + Authentication | 0/8 | Planning complete | - |
 | 2. UI Shell + Navigation | 0/TBD | Not started | - |
 | 3. Discogs Integration | 0/TBD | Not started | - |
 | 4. Collection Management | 0/TBD | Not started | - |
