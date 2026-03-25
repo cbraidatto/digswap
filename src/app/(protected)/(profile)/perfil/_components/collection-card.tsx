@@ -4,18 +4,14 @@ import Image from "next/image";
 import { Badge } from "@/components/ui/badge";
 import type { CollectionItem } from "@/lib/collection/queries";
 import { getRarityTier, getRarityBadgeVariant } from "@/lib/collection/rarity";
+import { ConditionEditor } from "./condition-editor";
 
 interface CollectionCardProps {
 	item: CollectionItem;
 	isOwner: boolean;
-	onConditionEdit?: (itemId: string) => void;
 }
 
-export function CollectionCard({
-	item,
-	isOwner,
-	onConditionEdit,
-}: CollectionCardProps) {
+export function CollectionCard({ item, isOwner }: CollectionCardProps) {
 	const tier = getRarityTier(item.rarityScore);
 
 	return (
@@ -38,20 +34,6 @@ export function CollectionCard({
 					</div>
 				)}
 
-				{/* Owner edit overlay */}
-				{isOwner && onConditionEdit && (
-					<button
-						type="button"
-						onClick={() => onConditionEdit(item.id)}
-						className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity bg-surface-dim/80 p-1.5 rounded"
-						aria-label="Edit condition grade"
-					>
-						<span className="material-symbols-outlined text-sm text-on-surface">
-							edit
-						</span>
-					</button>
-				)}
-
 				{/* Rarity badge */}
 				{tier && (
 					<div className="absolute bottom-2 left-2">
@@ -67,7 +49,14 @@ export function CollectionCard({
 				<h3 className="font-heading text-sm font-bold text-on-surface truncate">
 					{item.title}
 				</h3>
-				<p className="text-xs text-on-surface-variant truncate">{item.artist}</p>
+				<p className="text-xs text-on-surface-variant truncate mb-2">{item.artist}</p>
+				{/* Condition editor — only visible to owner */}
+				{isOwner && (
+					<ConditionEditor
+						collectionItemId={item.id}
+						currentGrade={item.conditionGrade ?? null}
+					/>
+				)}
 			</div>
 		</div>
 	);

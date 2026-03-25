@@ -17,6 +17,7 @@ import { CollectionGrid } from "./_components/collection-grid";
 import { CollectionSkeleton } from "./_components/collection-skeleton";
 import { FilterBar } from "./_components/filter-bar";
 import { Pagination } from "./_components/pagination";
+import { AddRecordFAB } from "./_components/add-record-fab";
 
 function getRankTitle(collectionCount: number): string {
 	if (collectionCount >= 500) return "Record Archaeologist";
@@ -249,6 +250,9 @@ export default async function PerfilPage({ searchParams }: PerfilPageProps) {
 					/>
 				)}
 			</section>
+
+			{/* Floating Action Button for adding records */}
+			<AddRecordFAB />
 		</div>
 	);
 }
