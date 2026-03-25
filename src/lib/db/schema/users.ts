@@ -19,6 +19,7 @@ export const profiles = pgTable(
     bio: text("bio"),
     discogsUsername: varchar("discogs_username", { length: 100 }),
     discogsConnected: boolean("discogs_connected").default(false).notNull(),
+    lastSyncedAt: timestamp("last_synced_at", { withTimezone: true }),
     onboardingCompleted: boolean("onboarding_completed")
       .default(false)
       .notNull(),
