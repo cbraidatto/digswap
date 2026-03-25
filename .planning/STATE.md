@@ -2,16 +2,16 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-status: verifying
-stopped_at: Phase 02 plans verified
-last_updated: "2026-03-25T10:48:19.066Z"
+status: executing
+stopped_at: Completed 02-01-PLAN.md
+last_updated: "2026-03-25T10:55:55Z"
 last_activity: 2026-03-25
 progress:
   total_phases: 11
   completed_phases: 1
   total_plans: 10
-  completed_plans: 8
-  percent: 0
+  completed_plans: 9
+  percent: 9
 ---
 
 # Project State
@@ -21,16 +21,16 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-25)
 
 **Core value:** A digger opens the app and immediately finds who has the record they've been hunting -- and sees where they stand in the community.
-**Current focus:** Phase 01 — foundation-authentication
+**Current focus:** Phase 02 — ui-shell-navigation
 
 ## Current Position
 
 Phase: 2
-Plan: Not started
-Status: Phase complete — ready for verification
+Plan: 1 of 2
+Status: Executing phase
 Last activity: 2026-03-25
 
-Progress: [░░░░░░░░░░] 0%
+Progress: [█░░░░░░░░░] 9%
 
 ## Performance Metrics
 
@@ -60,6 +60,7 @@ Progress: [░░░░░░░░░░] 0%
 | Phase 01 P06 | 5min | 2 tasks | 8 files |
 | Phase 01 P07 | 5min | 3 tasks | 9 files |
 | Phase 01 P08 | 5min | 2 tasks | 9 files |
+| Phase 02 P01 | 5min | 2 tasks | 15 files |
 
 ## Accumulated Context
 
@@ -89,6 +90,9 @@ Recent decisions affecting current work:
 - [Phase 01]: Discogs Connect step intentionally disabled as Phase 3 placeholder in onboarding
 - [Phase 01]: Security header tests use static analysis of next.config.ts (no running server needed)
 - [Phase 01]: Playwright configured Chromium-only for solo dev speed; multi-browser testing deferred to Phase 11
+- [Phase 02]: AppShell uses client-side pathname checking for conditional shell rendering (excludes /onboarding, /settings)
+- [Phase 02]: Protected layout fetches profile via Drizzle, passes to client AppShell -- server/client composition pattern
+- [Phase 02]: All redirect chains updated from "/" to "/feed" as default authenticated landing page
 
 ### Pending Todos
 
@@ -102,6 +106,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-25T10:48:19.062Z
-Stopped at: Phase 02 plans verified
-Resume file: .planning/phases/02-ui-shell-navigation/02-01-PLAN.md
+Last session: 2026-03-25T10:55:55Z
+Stopped at: Completed 02-01-PLAN.md
+Resume file: .planning/phases/02-ui-shell-navigation/02-02-PLAN.md

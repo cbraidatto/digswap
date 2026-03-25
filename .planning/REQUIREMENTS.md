@@ -16,9 +16,9 @@
 
 ### Navigation
 
-- [ ] **NAV-01**: App has 4 primary tabs: Feed, Perfil, Explorar, Comunidade
-- [ ] **NAV-02**: Active tab is visually indicated and persists on navigation
-- [ ] **NAV-03**: Each tab has its own navigation stack (deep links work within tabs)
+- [x] **NAV-01**: App has 4 primary tabs: Feed, Perfil, Explorar, Comunidade
+- [x] **NAV-02**: Active tab is visually indicated and persists on navigation
+- [x] **NAV-03**: Each tab has its own navigation stack (deep links work within tabs)
 
 ### Discogs Integration
 
@@ -169,9 +169,9 @@
 | AUTH-05 | Phase 1: Foundation + Authentication | Complete |
 | AUTH-06 | Phase 1: Foundation + Authentication | Complete |
 | SEC-01 | Phase 1: Foundation + Authentication | Complete |
-| NAV-01 | Phase 2: UI Shell + Navigation | Pending |
-| NAV-02 | Phase 2: UI Shell + Navigation | Pending |
-| NAV-03 | Phase 2: UI Shell + Navigation | Pending |
+| NAV-01 | Phase 2: UI Shell + Navigation | Complete |
+| NAV-02 | Phase 2: UI Shell + Navigation | Complete |
+| NAV-03 | Phase 2: UI Shell + Navigation | Complete |
 | DISC-01 | Phase 3: Discogs Integration | Pending |
 | DISC-02 | Phase 3: Discogs Integration | Pending |
 | DISC-03 | Phase 3: Discogs Integration | Pending |
