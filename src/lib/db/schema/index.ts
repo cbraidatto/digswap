@@ -1,1 +1,12 @@
-// Schema barrel export -- populated in Task 2
+export * from "./users";
+export * from "./sessions";
+export * from "./collections";
+export * from "./releases";
+export * from "./social";
+export * from "./trades";
+export * from "./notifications";
+export * from "./gamification";
+export * from "./subscriptions";
+export * from "./wantlist";
+export * from "./reviews";
+export * from "./groups";
