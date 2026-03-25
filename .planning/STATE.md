@@ -2,15 +2,15 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-status: executing
-stopped_at: Completed 04-01-PLAN.md
-last_updated: "2026-03-25T22:18:08.364Z"
+status: verifying
+stopped_at: Completed 04-02-PLAN.md
+last_updated: "2026-03-25T22:25:49.653Z"
 last_activity: 2026-03-25
 progress:
   total_phases: 11
   completed_phases: 3
   total_plans: 20
-  completed_plans: 17
+  completed_plans: 18
   percent: 9
 ---
 
@@ -27,7 +27,7 @@ See: .planning/PROJECT.md (updated 2026-03-25)
 
 Phase: 3
 Plan: 6 of 6
-Status: Ready to execute
+Status: Phase complete — ready for verification
 Last activity: 2026-03-25
 
 Progress: [█░░░░░░░░░] 9%
@@ -67,6 +67,7 @@ Progress: [█░░░░░░░░░] 9%
 | Phase 03 P05 | 3min | 2 tasks | 5 files |
 | Phase 03 P06 | 12min | 2 tasks | 7 files |
 | Phase 04 P01 | 5min | 2 tasks | 17 files |
+| Phase 04 P02 | 4min | 2 tasks | 10 files |
 
 ## Accumulated Context
 
@@ -116,6 +117,10 @@ Recent decisions affecting current work:
 - [Phase 04]: Username column nullable initially, with one-time migration script for existing profiles
 - [Phase 04]: IDOR prevention in updateConditionGrade via .eq(user_id, user.id) ownership check
 - [Phase 04]: Collection queries use Drizzle db client with innerJoin, not Supabase client
+- [Phase 04]: URL-based filtering with searchParams for shareable/bookmarkable collection URLs
+- [Phase 04]: Public profile layout uses minimal header (no AppShell) for unauthenticated visitors
+- [Phase 04]: Middleware exact-path matching for /perfil protection (pathname === '/perfil') vs startsWith
+- [Phase 04]: Added Discogs image domains to next.config.ts remotePatterns for Next.js Image optimization
 
 ### Pending Todos
 
@@ -129,6 +134,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-25T22:18:08.360Z
-Stopped at: Completed 04-01-PLAN.md
+Last session: 2026-03-25T22:25:49.649Z
+Stopped at: Completed 04-02-PLAN.md
 Resume file: None

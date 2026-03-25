@@ -95,7 +95,7 @@ Plans:
 **Plans**: 4 plans
 Plans:
 - [x] 04-01-PLAN.md -- Schema migration (username column), rarity formula fix, utility library, server actions, Wave 0 test scaffolds
-- [ ] 04-02-PLAN.md -- Collection grid UI, public profile route, filter bar, pagination, own profile rewrite
+- [x] 04-02-PLAN.md -- Collection grid UI, public profile route, filter bar, pagination, own profile rewrite
 - [ ] 04-03-PLAN.md -- Add Record FAB, Discogs search dialog, condition grade editor
 - [ ] 04-04-PLAN.md -- Test implementations and human verification checkpoint
 **UI hint**: yes
