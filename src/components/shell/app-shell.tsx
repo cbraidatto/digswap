@@ -11,10 +11,11 @@ interface AppShellProps {
 		displayName: string | null;
 		avatarUrl: string | null;
 	};
+	banner?: React.ReactNode;
 	children: React.ReactNode;
 }
 
-export function AppShell({ user, children }: AppShellProps) {
+export function AppShell({ user, banner, children }: AppShellProps) {
 	const pathname = usePathname();
 	const showShell = !SHELL_EXCLUDED_PREFIXES.some((p) => pathname.startsWith(p));
 
@@ -25,6 +26,7 @@ export function AppShell({ user, children }: AppShellProps) {
 	return (
 		<>
 			<AppHeader displayName={user.displayName} avatarUrl={user.avatarUrl} />
+			{banner}
 			<main
 				className="pt-14 px-4"
 				style={{
