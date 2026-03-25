@@ -1,8 +1,8 @@
 "use client";
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
 import { Loader2, PartyPopper } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
 import { toast } from "sonner";
 
 import { completeOnboarding } from "@/actions/onboarding";
@@ -26,14 +26,12 @@ export function OnboardingComplete() {
 		const result = await completeOnboarding();
 
 		if (!result.success) {
-			toast.error(
-				result.error ?? "Failed to complete onboarding. Please try again.",
-			);
+			toast.error(result.error ?? "Failed to complete onboarding. Please try again.");
 			setIsSubmitting(false);
 			return;
 		}
 
-		router.push(result.redirectTo ?? "/");
+		router.push(result.redirectTo ?? "/feed");
 	}
 
 	return (
@@ -43,12 +41,8 @@ export function OnboardingComplete() {
 					<PartyPopper className="size-8 text-primary" />
 				</div>
 				<div className="text-center">
-					<h3 className="font-heading text-lg font-semibold text-foreground">
-						You&apos;re In
-					</h3>
-					<p className="mt-1 text-sm text-muted-foreground">
-						Welcome to VinylDig. Start digging.
-					</p>
+					<h3 className="font-heading text-lg font-semibold text-foreground">You&apos;re In</h3>
+					<p className="mt-1 text-sm text-muted-foreground">Welcome to VinylDig. Start digging.</p>
 				</div>
 			</div>
 
@@ -58,11 +52,7 @@ export function OnboardingComplete() {
 				aria-busy={isSubmitting}
 				onClick={handleComplete}
 			>
-				{isSubmitting ? (
-					<Loader2 className="size-4 animate-spin" />
-				) : (
-					"Go to Feed"
-				)}
+				{isSubmitting ? <Loader2 className="size-4 animate-spin" /> : "Go to Feed"}
 			</Button>
 		</div>
 	);

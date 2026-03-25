@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { DM_Sans, Fraunces } from "next/font/google";
 import { Toaster } from "@/components/ui/sonner";
 import "./globals.css";
@@ -20,6 +20,10 @@ const fraunces = Fraunces({
 export const metadata: Metadata = {
 	title: "VinylDig",
 	description: "A social network for vinyl diggers",
+};
+
+export const viewport: Viewport = {
+	viewportFit: "cover",
 };
 
 export default function RootLayout({

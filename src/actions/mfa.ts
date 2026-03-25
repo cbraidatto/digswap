@@ -1,17 +1,13 @@
 "use server";
 
-import { createClient } from "@/lib/supabase/server";
-import { totpRateLimit } from "@/lib/rate-limit";
-import { totpSchema, backupCodeSchema } from "@/lib/validations/auth";
-import {
-	generateBackupCodes,
-	storeBackupCodes,
-	consumeBackupCode,
-} from "@/lib/backup-codes";
+import { and, eq } from "drizzle-orm";
+import { consumeBackupCode, generateBackupCodes, storeBackupCodes } from "@/lib/backup-codes";
 import { db } from "@/lib/db";
-import { profiles } from "@/lib/db/schema/users";
 import { backupCodes } from "@/lib/db/schema/sessions";
-import { eq, and } from "drizzle-orm";
+import { profiles } from "@/lib/db/schema/users";
+import { totpRateLimit } from "@/lib/rate-limit";
+import { createClient } from "@/lib/supabase/server";
+import { backupCodeSchema, totpSchema } from "@/lib/validations/auth";
 
 type MfaResult<T = Record<string, unknown>> =
 	| { success: true; data: T }
@@ -71,10 +67,7 @@ export async function enrollTotp(): Promise<
  * Verify TOTP enrollment by challenging and verifying a code.
  * After successful verification, marks the user's profile as 2FA-enabled.
  */
-export async function verifyTotpEnrollment(
-	factorId: string,
-	code: string,
-): Promise<MfaResult> {
+export async function verifyTotpEnrollment(factorId: string, code: string): Promise<MfaResult> {
 	const supabase = await createClient();
 	const {
 		data: { user },
@@ -98,14 +91,14 @@ export async function verifyTotpEnrollment(
 	if (!parsed.success) {
 		return {
 			success: false,
-			error:
-				"Invalid code. Please check your authenticator app and try again.",
+			error: "Invalid code. Please check your authenticator app and try again.",
 		};
 	}
 
 	// Challenge the factor
-	const { data: challengeData, error: challengeError } =
-		await supabase.auth.mfa.challenge({ factorId });
+	const { data: challengeData, error: challengeError } = await supabase.auth.mfa.challenge({
+		factorId,
+	});
 
 	if (challengeError || !challengeData) {
 		return {
@@ -124,8 +117,7 @@ export async function verifyTotpEnrollment(
 	if (verifyError) {
 		return {
 			success: false,
-			error:
-				"Invalid code. Please check your authenticator app and try again.",
+			error: "Invalid code. Please check your authenticator app and try again.",
 		};
 	}
 
@@ -142,9 +134,7 @@ export async function verifyTotpEnrollment(
  * Challenge TOTP during login.
  * User has authenticated (AAL1) and needs to verify TOTP to reach AAL2.
  */
-export async function challengeTotp(
-	code: string,
-): Promise<MfaResult<{ redirectTo: string }>> {
+export async function challengeTotp(code: string): Promise<MfaResult<{ redirectTo: string }>> {
 	const supabase = await createClient();
 	const {
 		data: { user },
@@ -168,14 +158,12 @@ export async function challengeTotp(
 	if (!parsed.success) {
 		return {
 			success: false,
-			error:
-				"Invalid code. Please check your authenticator app and try again.",
+			error: "Invalid code. Please check your authenticator app and try again.",
 		};
 	}
 
 	// Get user's TOTP factors
-	const { data: factorsData, error: factorsError } =
-		await supabase.auth.mfa.listFactors();
+	const { data: factorsData, error: factorsError } = await supabase.auth.mfa.listFactors();
 
 	if (factorsError || !factorsData) {
 		return {
@@ -185,17 +173,16 @@ export async function challengeTotp(
 	}
 
 	// Find the first verified TOTP factor
-	const totpFactor = factorsData.totp.find(
-		(f) => f.status === "verified",
-	);
+	const totpFactor = factorsData.totp.find((f) => f.status === "verified");
 
 	if (!totpFactor) {
 		return { success: false, error: "No verified TOTP factor found." };
 	}
 
 	// Challenge
-	const { data: challengeData, error: challengeError } =
-		await supabase.auth.mfa.challenge({ factorId: totpFactor.id });
+	const { data: challengeData, error: challengeError } = await supabase.auth.mfa.challenge({
+		factorId: totpFactor.id,
+	});
 
 	if (challengeError || !challengeData) {
 		return {
@@ -214,8 +201,7 @@ export async function challengeTotp(
 	if (verifyError) {
 		return {
 			success: false,
-			error:
-				"Invalid code. Please check your authenticator app and try again.",
+			error: "Invalid code. Please check your authenticator app and try again.",
 		};
 	}
 
@@ -226,8 +212,7 @@ export async function challengeTotp(
 		.where(eq(profiles.id, user.id))
 		.limit(1);
 
-	const redirectTo =
-		profile && !profile.onboardingCompleted ? "/onboarding" : "/";
+	const redirectTo = profile && !profile.onboardingCompleted ? "/onboarding" : "/feed";
 
 	return { success: true, data: { redirectTo } };
 }
@@ -282,9 +267,7 @@ export async function useBackupCode(
 
 	// Get user's TOTP factors and complete the MFA challenge
 	const { data: factorsData } = await supabase.auth.mfa.listFactors();
-	const totpFactor = factorsData?.totp.find(
-		(f) => f.status === "verified",
-	);
+	const totpFactor = factorsData?.totp.find((f) => f.status === "verified");
 
 	// Even with backup code, we note the factor exists for the session
 	// The backup code flow bypasses TOTP verification by design
@@ -296,8 +279,7 @@ export async function useBackupCode(
 		.where(eq(profiles.id, user.id))
 		.limit(1);
 
-	const redirectTo =
-		profile && !profile.onboardingCompleted ? "/onboarding" : "/";
+	const redirectTo = profile && !profile.onboardingCompleted ? "/onboarding" : "/feed";
 
 	return {
 		success: true,
@@ -337,14 +319,12 @@ export async function disableTotp(): Promise<MfaResult> {
 	if (aalData.currentLevel !== "aal2") {
 		return {
 			success: false,
-			error:
-				"You must verify with your authenticator app before disabling 2FA.",
+			error: "You must verify with your authenticator app before disabling 2FA.",
 		};
 	}
 
 	// Get and unenroll all TOTP factors
-	const { data: factorsData, error: factorsError } =
-		await supabase.auth.mfa.listFactors();
+	const { data: factorsData, error: factorsError } = await supabase.auth.mfa.listFactors();
 
 	if (factorsError || !factorsData) {
 		return {

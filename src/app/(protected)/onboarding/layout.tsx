@@ -1,9 +1,9 @@
-import type { ReactNode } from "react";
+import { eq } from "drizzle-orm";
 import { redirect } from "next/navigation";
-import { createClient } from "@/lib/supabase/server";
+import type { ReactNode } from "react";
 import { db } from "@/lib/db";
 import { profiles } from "@/lib/db/schema/users";
-import { eq } from "drizzle-orm";
+import { createClient } from "@/lib/supabase/server";
 
 /**
  * Onboarding layout -- Server Component.
@@ -15,11 +15,7 @@ import { eq } from "drizzle-orm";
  * Layout: Full viewport height centered with VinylDig wordmark.
  * Same visual pattern as the auth layout.
  */
-export default async function OnboardingLayout({
-	children,
-}: {
-	children: ReactNode;
-}) {
+export default async function OnboardingLayout({ children }: { children: ReactNode }) {
 	const supabase = await createClient();
 	const {
 		data: { user },
@@ -37,7 +33,7 @@ export default async function OnboardingLayout({
 		.limit(1);
 
 	if (profile?.onboardingCompleted) {
-		redirect("/");
+		redirect("/feed");
 	}
 
 	return (
