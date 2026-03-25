@@ -2,7 +2,7 @@ import Link from "next/link";
 
 export default function Home() {
 	return (
-		<div className="min-h-screen grid place-items-center px-6 py-12 relative overflow-hidden">
+		<div className="min-h-screen flex items-center justify-center p-6 relative overflow-hidden">
 			{/* Background dot grid */}
 			<div
 				className="absolute inset-0 opacity-[0.03] pointer-events-none"
@@ -26,8 +26,8 @@ export default function Home() {
 				</h1>
 
 				<p className="text-on-surface-variant font-sans text-sm md:text-base mb-12">
-					A social network for vinyl diggers. Import your Discogs library, discover who has what
-					you&apos;re hunting for, and trade audio rips via secure P2P connections.
+					A social network for vinyl diggers. Import your Discogs library, discover who has
+					what you&apos;re hunting for, and trade audio rips via secure P2P connections.
 				</p>
 
 				{/* CTA card */}
