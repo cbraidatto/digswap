@@ -46,7 +46,7 @@ Load via `next/font/google` in the root layout:
 
 ```
 Fraunces: weights 400, 600; subsets latin; display swap; variable --font-fraunces
-DM Sans: weights 400, 500, 600; subsets latin; display swap; variable --font-dm-sans
+DM Sans: weights 400, 600; subsets latin; display swap; variable --font-dm-sans
 ```
 
 Apply `font-dm-sans` as the default body font. Apply `font-fraunces` on headings and display text only.
@@ -78,17 +78,17 @@ Exceptions:
 | Role | Font | Size | Weight | Line Height | Letter Spacing |
 |------|------|------|--------|-------------|----------------|
 | Body | DM Sans | 16px | 400 (regular) | 1.5 | 0 |
-| Label | DM Sans | 14px | 500 (medium) | 1.4 | 0.01em |
+| Label | DM Sans | 14px | 400 (regular) | 1.4 | 0.01em |
 | Heading | Fraunces | 24px | 600 (semibold) | 1.2 | -0.02em |
-| Display | Fraunces | 36px | 400 (regular) | 1.1 | -0.03em |
+| Display | Fraunces | 36px (desktop) / 28px (mobile) | 400 (regular) | 1.1 | -0.03em |
 
 **Rules:**
 - Maximum 2 font families in the entire phase (Fraunces + DM Sans)
-- Maximum 3 weights across both families (400, 500, 600)
+- Maximum 2 weights across both families (400, 600)
 - Body text MUST be 16px minimum — no 14px body copy, no 12px body copy
 - Labels at 14px are permitted only for form labels and metadata captions
 - Headings use Fraunces with negative letter-spacing for the tight, warm editorial feel
-- Display size (36px) reserved for page titles only: "Sign In", "Create Account", "Welcome to VinylDig"
+- Display size: 36px on desktop (>=480px), 28px on mobile (<480px). Reserved for page titles only: "Sign In", "Create Account", "Welcome to VinylDig"
 
 ---
 
@@ -122,7 +122,7 @@ All colors defined in OKLCH for Tailwind v4 compatibility.
 ### Accent Reserved For (explicit list)
 
 The accent color (#D4872C amber) is ONLY used on:
-1. Primary CTA buttons ("Create Account", "Sign In", "Continue")
+1. Primary CTA buttons ("Create Account", "Sign In", "Continue Setup")
 2. Text links on dark backgrounds
 3. Active focus ring on form inputs
 4. Loading spinner/progress indicator
@@ -233,7 +233,7 @@ All auth pages share a single layout:
 |---------|------|
 | **Step 1 — Title** | "Set Up Your Profile" |
 | **Step 1 — Body** | "Choose a display name and avatar. This is how other diggers will find you." |
-| **Step 1 — CTA** | "Continue" |
+| **Step 1 — CTA** | "Continue Setup" |
 | **Step 2 — Title** | "Secure Your Account" |
 | **Step 2 — Body** | "Two-factor authentication adds an extra layer of security. We recommend enabling it." |
 | **Step 2 — Primary CTA** | "Enable 2FA" |
@@ -255,7 +255,7 @@ All auth pages share a single layout:
 | **2FA Setup — CTA** | "Verify and Enable" |
 | **2FA Challenge — Title** | "Enter Verification Code" |
 | **2FA Challenge — Body** | "Open your authenticator app and enter the 6-digit code." |
-| **2FA Challenge — CTA** | "Verify" |
+| **2FA Challenge — CTA** | "Verify Code" |
 | **2FA Challenge — Backup link** | "Use a backup code instead" |
 
 ### Error States
