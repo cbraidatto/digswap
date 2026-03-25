@@ -1,6 +1,7 @@
 import { eq } from "drizzle-orm";
 import { redirect } from "next/navigation";
 import { AppShell } from "@/components/shell/app-shell";
+import { ImportBanner } from "@/components/discogs/import-banner";
 import { db } from "@/lib/db";
 import { profiles } from "@/lib/db/schema/users";
 import { createClient } from "@/lib/supabase/server";
@@ -30,6 +31,7 @@ export default async function ProtectedLayout({ children }: { children: React.Re
 				displayName: profile?.displayName ?? null,
 				avatarUrl: profile?.avatarUrl ?? null,
 			}}
+			banner={<ImportBanner userId={user.id} />}
 		>
 			{children}
 		</AppShell>

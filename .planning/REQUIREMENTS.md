@@ -24,7 +24,7 @@
 
 - [x] **DISC-01**: User can connect their Discogs account via OAuth 1.0a
 - [x] **DISC-02**: User can import their full Discogs collection (all owned records)
-- [x] **DISC-03**: User can import their Discogs wantlist
+- [ ] **DISC-03**: User can import their Discogs wantlist
 - [x] **DISC-04**: Import runs asynchronously with progress indicator (large collections take minutes)
 - [ ] **DISC-05**: User can trigger manual sync to pull latest Discogs changes
 - [ ] **DISC-06**: User can disconnect their Discogs account and remove imported data
@@ -174,7 +174,7 @@
 | NAV-03 | Phase 2: UI Shell + Navigation | Complete |
 | DISC-01 | Phase 3: Discogs Integration | Complete |
 | DISC-02 | Phase 3: Discogs Integration | Complete |
-| DISC-03 | Phase 3: Discogs Integration | Complete |
+| DISC-03 | Phase 3: Discogs Integration | Pending |
 | DISC-04 | Phase 3: Discogs Integration | Complete |
 | DISC-05 | Phase 3: Discogs Integration | Pending |
 | DISC-06 | Phase 3: Discogs Integration | Pending |
