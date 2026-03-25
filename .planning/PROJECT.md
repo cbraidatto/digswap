@@ -21,6 +21,11 @@ A digger opens the app and immediately finds who has the record they've been hun
 - [x] 2FA disable + backup code recovery (AUTH-06)
 - [x] OWASP Top 10 compliance on all auth surfaces — CSP/HSTS headers, rate limiting, input validation, CSRF protection (SEC-01)
 
+**Phase 2: UI Shell + Navigation** *(2026-03-25)*
+- [x] 4-tab bottom navigation shell (Feed, Perfil, Explorar, Comunidade) visible on all authenticated pages (NAV-01)
+- [x] Active tab visually distinct with amber accent — persists on within-tab navigation (NAV-02)
+- [x] Deep-link routing — navigating directly to any tab route highlights the correct tab (NAV-03)
+
 ### Active
 
 **Discovery & Matching**
@@ -127,4 +132,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-03-25 after initialization*
+*Last updated: 2026-03-25 after Phase 2 (UI Shell + Navigation) complete*
