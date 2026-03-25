@@ -5,6 +5,18 @@ import { db } from "@/lib/db";
 import { collectionItems } from "@/lib/db/schema/collections";
 import { profiles } from "@/lib/db/schema/users";
 import { createClient } from "@/lib/supabase/server";
+import { collectionFilterSchema } from "@/lib/collection/filters";
+import {
+	getCollectionPage,
+	getCollectionCount,
+	getUniqueGenres,
+	getUniqueFormats,
+	PAGE_SIZE,
+} from "@/lib/collection/queries";
+import { CollectionGrid } from "./_components/collection-grid";
+import { CollectionSkeleton } from "./_components/collection-skeleton";
+import { FilterBar } from "./_components/filter-bar";
+import { Pagination } from "./_components/pagination";
 
 function getRankTitle(collectionCount: number): string {
 	if (collectionCount >= 500) return "Record Archaeologist";
@@ -26,7 +38,11 @@ function getContributionLevel(index: number, total: number): number {
 	return noise > 0.4 ? Math.floor(noise * 4) : 0;
 }
 
-export default async function PerfilPage() {
+interface PerfilPageProps {
+	searchParams: Promise<Record<string, string | string[] | undefined>>;
+}
+
+export default async function PerfilPage({ searchParams }: PerfilPageProps) {
 	const supabase = await createClient();
 	const {
 		data: { user },
@@ -60,7 +76,7 @@ export default async function PerfilPage() {
 
 	const xp = collectionCount * 10;
 
-	// 52 weeks × 7 days = 364 cells
+	// 52 weeks x 7 days = 364 cells
 	const contributionCells = Array.from({ length: 364 }, (_, i) =>
 		getContributionLevel(i, 364),
 	);
@@ -72,6 +88,20 @@ export default async function PerfilPage() {
 		"bg-primary/80",
 		"bg-primary",
 	];
+
+	// Parse filters from search params
+	const rawSearchParams = await searchParams;
+	const filters = collectionFilterSchema.parse(rawSearchParams);
+
+	// Fetch collection data in parallel
+	const [items, totalCount, genres, formats] = await Promise.all([
+		getCollectionPage(user.id, filters),
+		getCollectionCount(user.id, filters),
+		getUniqueGenres(user.id),
+		getUniqueFormats(user.id),
+	]);
+
+	const totalPages = Math.ceil(totalCount / PAGE_SIZE);
 
 	return (
 		<div className="max-w-7xl mx-auto px-4 md:px-6 py-8">
@@ -198,55 +228,25 @@ export default async function PerfilPage() {
 					</Link>
 				</div>
 
-				{collectionCount === 0 ? (
-					<div className="bg-surface-container-low rounded-xl p-12 flex flex-col items-center gap-4 text-center border border-outline-variant/10">
-						<div className="w-16 h-16 bg-surface-container-high rounded-full flex items-center justify-center">
-							<span className="material-symbols-outlined text-primary text-3xl">album</span>
-						</div>
-						<div>
-							<div className="text-[10px] font-mono text-primary uppercase tracking-widest mb-2">
-								EMPTY_REPOSITORY
-							</div>
-							<h3 className="text-lg font-bold font-heading text-on-surface mb-2">
-								No records committed yet
-							</h3>
-							<p className="text-sm text-on-surface-variant font-sans max-w-sm">
-								Connect your Discogs account to import your collection, or add records manually.
-							</p>
-						</div>
-						<Link
-							href="/settings"
-							className="mt-2 px-6 py-2 bg-primary-container text-on-primary-container font-mono text-xs font-bold rounded hover:brightness-110 transition-all"
-						>
-							CONNECT_DISCOGS
-						</Link>
-					</div>
-				) : (
-					<div className="bg-surface-container-low rounded-xl overflow-hidden shadow-lg">
-						<div className="bg-surface-container-high px-6 py-4 flex items-center justify-between border-b border-outline-variant/10">
-							<div className="flex items-center gap-2 text-primary">
-								<span className="material-symbols-outlined text-[18px]">database</span>
-								<span className="text-xs font-bold font-mono">
-									{collectionCount.toLocaleString()} records
-								</span>
-							</div>
-							<div className="flex items-center gap-3 text-xs font-mono text-on-surface-variant">
-								{profile?.discogsConnected && (
-									<span className="text-primary bg-primary/10 px-2 py-0.5 rounded border border-primary/20">
-										[DISCOGS_LINKED]
-									</span>
-								)}
-							</div>
-						</div>
-						<div className="p-6">
-							<div className="text-center text-on-surface-variant font-mono text-sm py-8">
-								<span className="material-symbols-outlined text-primary text-3xl block mb-2">
-									construction
-								</span>
-								Collection browser coming in Phase 4...
-							</div>
-						</div>
-					</div>
+				{/* Filter Bar */}
+				<FilterBar
+					genres={genres}
+					formats={formats}
+					currentFilters={filters}
+					basePath="/perfil"
+				/>
+
+				{/* Collection Grid */}
+				<CollectionGrid items={items} isOwner={true} />
+
+				{/* Pagination */}
+				{totalPages > 1 && (
+					<Pagination
+						currentPage={filters.page}
+						totalPages={totalPages}
+						baseUrl="/perfil"
+						searchParams={rawSearchParams as Record<string, string>}
+					/>
 				)}
 			</section>
 		</div>
