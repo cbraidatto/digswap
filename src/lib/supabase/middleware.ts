@@ -1,5 +1,5 @@
 import { createServerClient } from "@supabase/ssr";
-import { NextResponse, type NextRequest } from "next/server";
+import { type NextRequest, NextResponse } from "next/server";
 
 /**
  * Updates the auth session by refreshing the JWT token via getClaims().
@@ -45,10 +45,16 @@ export async function updateSession(request: NextRequest) {
 	const { pathname } = request.nextUrl;
 
 	// Protected routes: redirect unauthenticated users to /signin
-	const protectedPaths = ["/onboarding", "/settings", "/profile"];
-	const isProtectedRoute = protectedPaths.some((path) =>
-		pathname.startsWith(path),
-	);
+	const protectedPaths = [
+		"/onboarding",
+		"/settings",
+		"/profile",
+		"/feed",
+		"/perfil",
+		"/explorar",
+		"/comunidade",
+	];
+	const isProtectedRoute = protectedPaths.some((path) => pathname.startsWith(path));
 
 	if (!user && isProtectedRoute) {
 		const url = request.nextUrl.clone();
@@ -63,7 +69,7 @@ export async function updateSession(request: NextRequest) {
 	if (user && isAuthRoute) {
 		const url = request.nextUrl.clone();
 		// Default redirect for authenticated users
-		url.pathname = "/";
+		url.pathname = "/feed";
 		return NextResponse.redirect(url);
 	}
 

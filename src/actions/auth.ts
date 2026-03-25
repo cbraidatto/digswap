@@ -1,14 +1,15 @@
 "use server";
 
 import { headers } from "next/headers";
-import { createClient } from "@/lib/supabase/server";
-import { createAdminClient } from "@/lib/supabase/admin";
+import { redirect } from "next/navigation";
 import { authRateLimit, resetRateLimit } from "@/lib/rate-limit";
+import { createAdminClient } from "@/lib/supabase/admin";
+import { createClient } from "@/lib/supabase/server";
 import {
-	signUpSchema,
-	signInSchema,
 	forgotPasswordSchema,
 	resetPasswordSchema,
+	signInSchema,
+	signUpSchema,
 } from "@/lib/validations/auth";
 
 /**
@@ -73,8 +74,7 @@ export async function signUp(
 
 	// Create user in Supabase
 	const supabase = await createClient();
-	const siteUrl =
-		process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
+	const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
 
 	const { error } = await supabase.auth.signUp({
 		email,
@@ -104,9 +104,7 @@ export async function signUp(
  * check MFA level -> record session in user_sessions table (D-13) ->
  * if session count > MAX_SESSIONS, invalidate oldest -> return success or error.
  */
-export async function signIn(
-	formData: FormData,
-): Promise<{
+export async function signIn(formData: FormData): Promise<{
 	success: boolean;
 	error?: string;
 	mfaRequired?: boolean;
@@ -148,10 +146,8 @@ export async function signIn(
 	}
 
 	// Check MFA level
-	const {
-		data: mfaData,
-		error: mfaError,
-	} = await supabase.auth.mfa.getAuthenticatorAssuranceLevel();
+	const { data: mfaData, error: mfaError } =
+		await supabase.auth.mfa.getAuthenticatorAssuranceLevel();
 
 	if (!mfaError && mfaData.nextLevel === "aal2" && mfaData.currentLevel !== "aal2") {
 		return { success: true, mfaRequired: true };
@@ -181,15 +177,9 @@ export async function signIn(
 				.order("created_at", { ascending: true });
 
 			if (sessions && sessions.length > MAX_SESSIONS) {
-				const sessionsToRemove = sessions.slice(
-					0,
-					sessions.length - MAX_SESSIONS,
-				);
+				const sessionsToRemove = sessions.slice(0, sessions.length - MAX_SESSIONS);
 				const idsToRemove = sessionsToRemove.map((s) => s.id);
-				await admin
-					.from("user_sessions")
-					.delete()
-					.in("id", idsToRemove);
+				await admin.from("user_sessions").delete().in("id", idsToRemove);
 			}
 		} catch (sessionError) {
 			// Session tracking failure should not block login.
@@ -264,9 +254,7 @@ export async function forgotPassword(
 	const { email } = parsed.data;
 
 	// Rate limit by email (3 per 15 min)
-	const { success: withinLimit } = await resetRateLimit.limit(
-		email.toLowerCase(),
-	);
+	const { success: withinLimit } = await resetRateLimit.limit(email.toLowerCase());
 	if (!withinLimit) {
 		return {
 			success: false,
@@ -275,8 +263,7 @@ export async function forgotPassword(
 	}
 
 	const supabase = await createClient();
-	const siteUrl =
-		process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
+	const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
 
 	// Send reset email -- errors are intentionally swallowed (OWASP)
 	await supabase.auth.resetPasswordForEmail(email, {
@@ -335,10 +322,7 @@ export async function resetPassword(
 
 	if (error) {
 		// Handle expired/invalid recovery link
-		if (
-			error.message?.toLowerCase().includes("expired") ||
-			error.status === 403
-		) {
+		if (error.message?.toLowerCase().includes("expired") || error.status === 403) {
 			return {
 				success: false,
 				message: "This reset link has expired. Request a new one.",
@@ -355,4 +339,15 @@ export async function resetPassword(
 		success: true,
 		message: "Password updated. You can now sign in with your new password.",
 	};
+}
+
+/**
+ * Sign out the current user and redirect to sign-in page.
+ * Uses scope: "local" (default) to sign out only the current session,
+ * preserving other concurrent sessions per D-13 (max 3 sessions).
+ */
+export async function signOut(): Promise<never> {
+	const supabase = await createClient();
+	await supabase.auth.signOut();
+	redirect("/signin");
 }

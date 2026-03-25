@@ -1,9 +1,9 @@
 "use server";
 
-import { createClient } from "@/lib/supabase/server";
+import { eq } from "drizzle-orm";
 import { db } from "@/lib/db";
 import { profiles } from "@/lib/db/schema/users";
-import { eq } from "drizzle-orm";
+import { createClient } from "@/lib/supabase/server";
 
 /**
  * Validate display name: 3-50 chars, alphanumeric plus hyphens/underscores.
@@ -95,7 +95,7 @@ export async function completeOnboarding(): Promise<{
 			})
 			.where(eq(profiles.id, user.id));
 
-		return { success: true, redirectTo: "/" };
+		return { success: true, redirectTo: "/feed" };
 	} catch {
 		return {
 			success: false,
@@ -108,8 +108,6 @@ export async function completeOnboarding(): Promise<{
  * Skip to next step -- a no-op server action that returns the next step number.
  * Used to track progress without requiring database writes for skipped steps.
  */
-export async function skipToStep(
-	step: number,
-): Promise<{ success: boolean; nextStep: number }> {
+export async function skipToStep(step: number): Promise<{ success: boolean; nextStep: number }> {
 	return { success: true, nextStep: step };
 }

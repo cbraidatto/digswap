@@ -58,7 +58,7 @@ Plans:
   3. User can deep-link to a page within any tab and the correct tab is highlighted
 **Plans**: 2 plans
 Plans:
-- [ ] 02-01-PLAN.md -- Shell infrastructure: components, protected layout, middleware, redirects
+- [x] 02-01-PLAN.md -- Shell infrastructure: components, protected layout, middleware, redirects
 - [ ] 02-02-PLAN.md -- Tab pages with empty states, profile placeholder, and navigation tests
 **UI hint**: yes
 
