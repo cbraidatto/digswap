@@ -3,7 +3,7 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-stopped_at: Completed 02-02-PLAN.md
+stopped_at: Completed 03-02-PLAN.md
 last_updated: "2026-03-25T11:14:08.014Z"
 last_activity: 2026-03-25
 progress:
@@ -21,13 +21,13 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-25)
 
 **Core value:** A digger opens the app and immediately finds who has the record they've been hunting -- and sees where they stand in the community.
-**Current focus:** Phase 02 — ui-shell-navigation
+**Current focus:** Phase 03 — discogs-integration
 
 ## Current Position
 
 Phase: 3
-Plan: Not started
-Status: Ready to execute
+Plan: 2 of 6
+Status: Executing
 Last activity: 2026-03-25
 
 Progress: [█░░░░░░░░░] 9%
@@ -62,6 +62,7 @@ Progress: [█░░░░░░░░░] 9%
 | Phase 01 P08 | 5min | 2 tasks | 9 files |
 | Phase 02 P01 | 5min | 2 tasks | 15 files |
 | Phase 02 P02 | 5min | 2 tasks | 11 files |
+| Phase 03 P02 | 6min | 2 tasks | 5 files |
 
 ## Accumulated Context
 
@@ -96,6 +97,9 @@ Recent decisions affecting current work:
 - [Phase 02]: All redirect chains updated from "/" to "/feed" as default authenticated landing page
 - [Phase 02]: Mock UserAvatarMenu in AppHeader tests to avoid Base UI jsdom complexity
 - [Phase 02]: E2E tests use test.fixme() pending auth storageState fixture (Phase 3+)
+- [Phase 03]: Vault-first token storage with discogs_tokens table fallback for local dev without Vault
+- [Phase 03]: httpOnly cookie (sameSite: lax, maxAge: 600) for OAuth request token across Discogs redirect
+- [Phase 03]: Admin client (not Drizzle) in callback for RLS bypass consistency with import worker pattern
 - [Phase 02]: @vitejs/plugin-react added for JSX transform in vitest (jsx: preserve in tsconfig)
 
 ### Pending Todos
@@ -110,6 +114,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-25T11:08:58.142Z
-Stopped at: Completed 02-02-PLAN.md
+Last session: 2026-03-25T17:32:14Z
+Stopped at: Completed 03-02-PLAN.md
 Resume file: None
