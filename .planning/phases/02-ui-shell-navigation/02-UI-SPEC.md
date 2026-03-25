@@ -1,7 +1,8 @@
 ---
 phase: 2
 slug: ui-shell-navigation
-status: draft
+status: approved
+reviewed_at: 2026-03-25
 shadcn_initialized: true
 preset: base-nova
 created: 2026-03-25
