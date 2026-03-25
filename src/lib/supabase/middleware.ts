@@ -53,6 +53,7 @@ export async function updateSession(request: NextRequest) {
 		"/perfil",
 		"/explorar",
 		"/comunidade",
+		"/import-progress",
 	];
 	const isProtectedRoute = protectedPaths.some((path) => pathname.startsWith(path));
 

@@ -1,25 +1,47 @@
 "use client";
 
-import { Disc3 } from "lucide-react";
+import { useTransition } from "react";
+import { Disc3, Loader2 } from "lucide-react";
+import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
+import { connectDiscogs } from "@/actions/discogs";
 
 interface DiscogsConnectProps {
 	onSkip: () => void;
 }
 
 /**
- * Onboarding Step 3: Discogs connection placeholder.
+ * Onboarding Step 3: Discogs connection.
  *
  * Per UI-SPEC:
  * - Title: "Connect Discogs"
  * - Body: "Link your Discogs account to import your collection and wantlist. You can always do this later."
- * - Primary CTA: "Connect Discogs" -- DISABLED/placeholder for Phase 1
+ * - Primary CTA: "Connect Discogs" -- initiates OAuth 1.0a flow
  * - Secondary CTA: "Skip for Now" -> advances to completion
  *
- * Discogs integration is Phase 3 work -- this step just establishes the onboarding slot.
+ * Phase 3 activates the previously-disabled button with a real OAuth flow.
+ * The connectDiscogs server action redirects to Discogs for authorization.
  */
 export function DiscogsConnect({ onSkip }: DiscogsConnectProps) {
+	const [isPending, startTransition] = useTransition();
+
+	const handleConnect = () => {
+		startTransition(async () => {
+			try {
+				await connectDiscogs();
+				// redirect happens inside the server action, this line won't be reached
+			} catch (error) {
+				// redirect() throws a special NEXT_REDIRECT error -- only show toast for real errors
+				const message =
+					error instanceof Error ? error.message : String(error);
+				if (!message.includes("NEXT_REDIRECT")) {
+					toast.error("Could not connect to Discogs. Please try again.");
+				}
+			}
+		});
+	};
+
 	return (
 		<div className="space-y-6">
 			<div className="flex flex-col items-center gap-4">
@@ -35,10 +57,17 @@ export function DiscogsConnect({ onSkip }: DiscogsConnectProps) {
 			<div className="space-y-3">
 				<Button
 					className="h-11 w-full"
-					disabled
-					title="Coming soon in Phase 3"
+					onClick={handleConnect}
+					disabled={isPending}
 				>
-					Connect Discogs
+					{isPending ? (
+						<>
+							<Loader2 className="mr-2 size-4 animate-spin" />
+							Connecting...
+						</>
+					) : (
+						"Connect Discogs"
+					)}
 				</Button>
 
 				<Button
