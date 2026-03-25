@@ -5,40 +5,72 @@
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {
+  /* Fonts */
+  --font-sans: var(--font-inter);
+  --font-heading: var(--font-space-grotesk);
+  --font-mono: var(--font-jetbrains-mono);
+
+  /* Core semantic colors (shadcn compat) */
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-dm-sans);
-  --font-heading: var(--font-fraunces);
-  --color-ring: var(--ring);
-  --color-input: var(--input);
-  --color-border: var(--border);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
   --color-destructive: var(--destructive);
   --color-destructive-foreground: var(--destructive-foreground);
-  --color-accent-foreground: var(--accent-foreground);
-  --color-accent: var(--accent);
-  --color-muted-foreground: var(--muted-foreground);
-  --color-muted: var(--muted);
-  --color-secondary-foreground: var(--secondary-foreground);
-  --color-secondary: var(--secondary);
-  --color-primary-foreground: var(--primary-foreground);
-  --color-primary: var(--primary);
-  --color-popover-foreground: var(--popover-foreground);
-  --color-popover: var(--popover);
-  --color-card-foreground: var(--card-foreground);
-  --color-card: var(--card);
-  --color-success: var(--success);
-  --color-success-foreground: var(--success-foreground);
-  --color-warning: var(--warning);
-  --color-warning-foreground: var(--warning-foreground);
-  --radius-sm: calc(var(--radius) * 0.6);
-  --radius-md: calc(var(--radius) * 0.8);
-  --radius-lg: var(--radius);
-  --radius-xl: calc(var(--radius) * 1.4);
-  --radius-2xl: calc(var(--radius) * 1.8);
-  --radius-3xl: calc(var(--radius) * 2.2);
-  --radius-4xl: calc(var(--radius) * 2.6);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
 
-  /* Spacing scale (multiples of 4) */
+  /* Ghost Protocol extended surface palette */
+  --color-surface: var(--surface);
+  --color-surface-dim: var(--surface-dim);
+  --color-surface-bright: var(--surface-bright);
+  --color-surface-container-lowest: var(--surface-container-lowest);
+  --color-surface-container-low: var(--surface-container-low);
+  --color-surface-container: var(--surface-container);
+  --color-surface-container-high: var(--surface-container-high);
+  --color-surface-container-highest: var(--surface-container-highest);
+  --color-surface-variant: var(--surface-variant);
+  --color-on-surface: var(--on-surface);
+  --color-on-surface-variant: var(--on-surface-variant);
+  --color-outline: var(--outline);
+  --color-outline-variant: var(--outline-variant);
+  --color-primary-container: var(--primary-container);
+  --color-on-primary: var(--on-primary);
+  --color-on-primary-container: var(--on-primary-container);
+  --color-primary-fixed: var(--primary-fixed);
+  --color-primary-fixed-dim: var(--primary-fixed-dim);
+  --color-secondary-container: var(--secondary-container);
+  --color-on-secondary: var(--on-secondary);
+  --color-on-secondary-container: var(--on-secondary-container);
+  --color-tertiary: var(--tertiary);
+  --color-tertiary-container: var(--tertiary-container);
+  --color-on-tertiary: var(--on-tertiary);
+  --color-on-tertiary-container: var(--on-tertiary-container);
+  --color-error: var(--error);
+  --color-error-container: var(--error-container);
+  --color-on-error: var(--on-error);
+  --color-inverse-surface: var(--inverse-surface);
+  --color-inverse-on-surface: var(--inverse-on-surface);
+
+  /* Border radius */
+  --radius-sm: calc(var(--radius) * 0.5);
+  --radius-md: var(--radius);
+  --radius-lg: calc(var(--radius) * 2);
+  --radius-xl: calc(var(--radius) * 3);
+  --radius-2xl: calc(var(--radius) * 4);
+
+  /* Spacing scale */
   --spacing-xs: 4px;
   --spacing-sm: 8px;
   --spacing-md: 16px;
@@ -49,34 +81,80 @@
 }
 
 /* ===========================
-   DigSwap Dark Theme
-   Dark-only: no .dark class, no media query
+   Ghost Protocol Theme
+   Cyber-Terminal / Matrix-lite
    =========================== */
 :root {
-  --background: oklch(0.09 0 0);
-  --foreground: oklch(0.95 0 0);
-  --card: oklch(0.13 0 0);
-  --card-foreground: oklch(0.95 0 0);
-  --popover: oklch(0.13 0 0);
-  --popover-foreground: oklch(0.95 0 0);
-  --primary: oklch(0.58 0.18 250);
-  --primary-foreground: oklch(0.98 0 0);
-  --secondary: oklch(0.18 0 0);
-  --secondary-foreground: oklch(0.95 0 0);
-  --muted: oklch(0.18 0 0);
-  --muted-foreground: oklch(0.55 0 0);
-  --accent: oklch(0.58 0.18 250);
-  --accent-foreground: oklch(0.98 0 0);
-  --destructive: oklch(0.55 0.16 25);
-  --destructive-foreground: oklch(0.95 0 0);
-  --border: oklch(0.22 0 0);
-  --input: oklch(0.18 0 0);
-  --ring: oklch(0.58 0.18 250);
-  --success: oklch(0.65 0.14 145);
-  --success-foreground: oklch(0.09 0 0);
-  --warning: oklch(0.75 0.14 85);
-  --warning-foreground: oklch(0.09 0 0);
-  --radius: 0.5rem;
+  /* Core semantic */
+  --background: #10141a;
+  --foreground: #dfe2eb;
+  --card: #181c22;
+  --card-foreground: #dfe2eb;
+  --popover: #1c2026;
+  --popover-foreground: #dfe2eb;
+  --primary: #6fdd78;
+  --primary-foreground: #00390e;
+  --secondary: #aac7ff;
+  --secondary-foreground: #002f65;
+  --muted: #181c22;
+  --muted-foreground: #becab9;
+  --accent: #262a31;
+  --accent-foreground: #dfe2eb;
+  --destructive: #ffb4ab;
+  --destructive-foreground: #690005;
+  --border: #3e4a3d;
+  --input: #181c22;
+  --ring: #6fdd78;
+  --radius: 0.25rem;
+
+  /* Ghost Protocol surface hierarchy */
+  --surface: #10141a;
+  --surface-dim: #10141a;
+  --surface-bright: #353940;
+  --surface-container-lowest: #0a0e14;
+  --surface-container-low: #181c22;
+  --surface-container: #1c2026;
+  --surface-container-high: #262a31;
+  --surface-container-highest: #31353c;
+  --surface-variant: #31353c;
+  --on-surface: #dfe2eb;
+  --on-surface-variant: #becab9;
+  --outline: #889484;
+  --outline-variant: #3e4a3d;
+
+  /* Primary scale */
+  --on-primary: #00390e;
+  --primary-container: #34a547;
+  --on-primary-container: #00320b;
+  --primary-fixed: #8bfb91;
+  --primary-fixed-dim: #6fdd78;
+
+  /* Secondary scale */
+  --on-secondary: #002f65;
+  --secondary-container: #0072e3;
+  --on-secondary-container: #fefcff;
+
+  /* Tertiary scale */
+  --tertiary: #7cc8e8;
+  --tertiary-container: #163a50;
+  --on-tertiary: #00222e;
+  --on-tertiary-container: #b8e0f5;
+
+  /* Error */
+  --error: #ffb4ab;
+  --error-container: #93000a;
+  --on-error: #690005;
+
+  /* Inverse */
+  --inverse-surface: #dfe2eb;
+  --inverse-on-surface: #2d3137;
+}
+
+/* ===========================
+   Material Symbols configuration
+   =========================== */
+.material-symbols-outlined {
+  font-variation-settings: "FILL" 0, "wght" 400, "GRAD" 0, "opsz" 24;
 }
 
 /* ===========================
@@ -86,14 +164,14 @@
   content: "";
   position: fixed;
   inset: 0;
-  opacity: 0.03;
+  opacity: 0.025;
   pointer-events: none;
   z-index: 50;
   background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
 }
 
 /* ===========================
-   Skeleton Shimmer (warm)
+   Skeleton Shimmer
    =========================== */
 @keyframes shimmer {
   0% {
@@ -107,12 +185,24 @@
 .skeleton-shimmer {
   background: linear-gradient(
     90deg,
-    oklch(0.18 0 0) 25%,
-    oklch(0.23 0 0) 50%,
-    oklch(0.18 0 0) 75%
+    #181c22 25%,
+    #262a31 50%,
+    #181c22 75%
   );
   background-size: 200% 100%;
   animation: shimmer 1.5s ease-in-out infinite;
+}
+
+/* ===========================
+   Blinking cursor (terminal)
+   =========================== */
+@keyframes blink {
+  50% {
+    opacity: 0;
+  }
+}
+.blink {
+  animation: blink 1s linear infinite;
 }
 
 /* ===========================
@@ -124,6 +214,10 @@
   }
 
   .skeleton-shimmer {
+    animation: none;
+  }
+
+  .blink {
     animation: none;
   }
 
