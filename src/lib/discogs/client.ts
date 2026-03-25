@@ -63,7 +63,7 @@ export async function createDiscogsClient(
 
 /**
  * Computes a rarity score from Discogs have/want counts.
- * Returns a value between 0.0 and 1.0 (higher = rarer).
+ * Returns the raw want/have ratio (higher = rarer). No upper bound.
  * Returns null if both have and want are 0 (insufficient data).
  */
 export function computeRarityScore(
@@ -73,6 +73,6 @@ export function computeRarityScore(
 	const h = have ?? 0;
 	const w = want ?? 0;
 	if (h === 0 && w === 0) return null;
-	if (h === 0) return 1.0; // Nobody has it, maximum rarity
-	return Math.min(1.0, w / h); // Higher ratio = rarer
+	if (h === 0) return 1.0; // Nobody has it, high rarity
+	return w / h;
 }

@@ -15,6 +15,7 @@ export const profiles = pgTable(
   {
     id: uuid("id").primaryKey(), // References auth.users.id
     displayName: varchar("display_name", { length: 50 }),
+    username: varchar("username", { length: 30 }).unique(),
     avatarUrl: text("avatar_url"),
     bio: text("bio"),
     discogsUsername: varchar("discogs_username", { length: 100 }),
