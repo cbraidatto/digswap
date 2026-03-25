@@ -56,7 +56,10 @@ Plans:
   1. App displays 4 primary tabs (Feed, Perfil, Explorar, Comunidade) visible on every authenticated page
   2. Active tab is visually distinct and does not reset when navigating within a tab
   3. User can deep-link to a page within any tab and the correct tab is highlighted
-**Plans**: TBD
+**Plans**: 2 plans
+Plans:
+- [ ] 02-01-PLAN.md -- Shell infrastructure: components, protected layout, middleware, redirects
+- [ ] 02-02-PLAN.md -- Tab pages with empty states, profile placeholder, and navigation tests
 **UI hint**: yes
 
 ### Phase 3: Discogs Integration
@@ -178,7 +181,7 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7 -> 8 -> 9 -> 10
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Foundation + Authentication | 0/8 | Planning complete | - |
-| 2. UI Shell + Navigation | 0/TBD | Not started | - |
+| 2. UI Shell + Navigation | 0/2 | Planning complete | - |
 | 3. Discogs Integration | 0/TBD | Not started | - |
 | 4. Collection Management | 0/TBD | Not started | - |
 | 5. Social Layer | 0/TBD | Not started | - |
