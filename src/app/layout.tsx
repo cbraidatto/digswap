@@ -1,20 +1,27 @@
 import type { Metadata, Viewport } from "next";
-import { DM_Sans, Fraunces } from "next/font/google";
+import { Inter, Space_Grotesk, JetBrains_Mono } from "next/font/google";
 import { Toaster } from "@/components/ui/sonner";
 import "./globals.css";
 
-const dmSans = DM_Sans({
+const inter = Inter({
 	subsets: ["latin"],
-	weight: ["400", "600"],
+	weight: ["300", "400", "500", "600"],
 	display: "swap",
-	variable: "--font-dm-sans",
+	variable: "--font-inter",
 });
 
-const fraunces = Fraunces({
+const spaceGrotesk = Space_Grotesk({
 	subsets: ["latin"],
-	weight: ["400", "600"],
+	weight: ["300", "400", "500", "600", "700"],
 	display: "swap",
-	variable: "--font-fraunces",
+	variable: "--font-space-grotesk",
+});
+
+const jetbrainsMono = JetBrains_Mono({
+	subsets: ["latin"],
+	weight: ["400", "500"],
+	display: "swap",
+	variable: "--font-jetbrains-mono",
 });
 
 export const metadata: Metadata = {
@@ -32,15 +39,27 @@ export default function RootLayout({
 	children: React.ReactNode;
 }>) {
 	return (
-		<html lang="en" className={`${dmSans.variable} ${fraunces.variable}`}>
+		<html
+			lang="en"
+			className={`${inter.variable} ${spaceGrotesk.variable} ${jetbrainsMono.variable}`}
+		>
+			<head>
+				<link rel="preconnect" href="https://fonts.googleapis.com" />
+				<link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="" />
+				<link
+					href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0"
+					rel="stylesheet"
+				/>
+			</head>
 			<body className="font-sans antialiased">
 				<div className="grain">{children}</div>
 				<Toaster
 					toastOptions={{
 						style: {
-							background: "oklch(0.18 0.02 55)",
-							border: "1px solid oklch(0.25 0.02 55)",
-							color: "oklch(0.90 0.01 70)",
+							background: "#181c22",
+							border: "1px solid #3e4a3d",
+							color: "#dfe2eb",
+							fontFamily: "JetBrains Mono, monospace",
 						},
 					}}
 				/>

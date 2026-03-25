@@ -191,7 +191,7 @@ export async function processImportPage(jobId: string): Promise<PageResult> {
 						discogs_instance_id: item.instance_id,
 						added_via: "discogs",
 						created_at:
-							item.date_added || new Date().toISOString(),
+							(item as unknown as { date_added?: string }).date_added || new Date().toISOString(),
 						updated_at: new Date().toISOString(),
 					});
 				} else {
