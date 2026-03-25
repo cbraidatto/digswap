@@ -50,14 +50,15 @@ export async function updateSession(request: NextRequest) {
 		"/settings",
 		"/profile",
 		"/feed",
-		"/perfil",
 		"/explorar",
 		"/comunidade",
 		"/import-progress",
 	];
 	const isProtectedRoute = protectedPaths.some((path) => pathname.startsWith(path));
+	// /perfil is protected ONLY as exact path (own profile), not /perfil/[username] (public profile)
+	const isOwnProfile = pathname === "/perfil" || pathname === "/perfil/";
 
-	if (!user && isProtectedRoute) {
+	if (!user && (isProtectedRoute || isOwnProfile)) {
 		const url = request.nextUrl.clone();
 		url.pathname = "/signin";
 		return NextResponse.redirect(url);
