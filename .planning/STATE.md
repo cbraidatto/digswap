@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-stopped_at: Completed 03-06-PLAN.md
-last_updated: "2026-03-25T20:29:57.311Z"
+stopped_at: Completed 04-01-PLAN.md
+last_updated: "2026-03-25T22:18:08.364Z"
 last_activity: 2026-03-25
 progress:
   total_phases: 11
   completed_phases: 3
-  total_plans: 16
-  completed_plans: 16
+  total_plans: 20
+  completed_plans: 17
   percent: 9
 ---
 
@@ -26,7 +26,7 @@ See: .planning/PROJECT.md (updated 2026-03-25)
 ## Current Position
 
 Phase: 3
-Plan: 5 of 6
+Plan: 6 of 6
 Status: Ready to execute
 Last activity: 2026-03-25
 
@@ -66,6 +66,7 @@ Progress: [█░░░░░░░░░] 9%
 | Phase 03 P04 | 6min | 2 tasks | 7 files |
 | Phase 03 P05 | 3min | 2 tasks | 5 files |
 | Phase 03 P06 | 12min | 2 tasks | 7 files |
+| Phase 04 P01 | 5min | 2 tasks | 17 files |
 
 ## Accumulated Context
 
@@ -111,6 +112,10 @@ Recent decisions affecting current work:
 - [Phase 03]: OAuth error on settings page displayed as static server-rendered banner from searchParams
 - [Phase 03]: All 42 tests use vi.mock() for full module isolation -- no real DB or API calls
 - [Phase 03]: Human verification confirmed full OAuth-to-disconnect flow functional
+- [Phase 04]: Uncapped rarity formula: removed Math.min(1.0) to allow scores >= 2.0 for Ultra Rare tier
+- [Phase 04]: Username column nullable initially, with one-time migration script for existing profiles
+- [Phase 04]: IDOR prevention in updateConditionGrade via .eq(user_id, user.id) ownership check
+- [Phase 04]: Collection queries use Drizzle db client with innerJoin, not Supabase client
 
 ### Pending Todos
 
@@ -124,6 +129,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-25T20:29:57.306Z
-Stopped at: Completed 03-06-PLAN.md
+Last session: 2026-03-25T22:18:08.360Z
+Stopped at: Completed 04-01-PLAN.md
 Resume file: None

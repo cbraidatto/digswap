@@ -31,12 +31,12 @@
 
 ### Collection Management
 
-- [ ] **COLL-01**: User has a public profile page showcasing their vinyl collection
-- [ ] **COLL-02**: Each record in the collection displays rarity score based on Discogs have/want ratio
-- [ ] **COLL-03**: User can add a record manually (not from Discogs) to their collection
-- [ ] **COLL-04**: User can filter their collection by genre, decade, country, and format
-- [ ] **COLL-05**: User can sort their collection by rarity score, date added, and alphabetically
-- [ ] **COLL-06**: User can mark the physical condition of a record (Mint, VG+, VG, G+, G, F, P)
+- [x] **COLL-01**: User has a public profile page showcasing their vinyl collection
+- [x] **COLL-02**: Each record in the collection displays rarity score based on Discogs have/want ratio
+- [x] **COLL-03**: User can add a record manually (not from Discogs) to their collection
+- [x] **COLL-04**: User can filter their collection by genre, decade, country, and format
+- [x] **COLL-05**: User can sort their collection by rarity score, date added, and alphabetically
+- [x] **COLL-06**: User can mark the physical condition of a record (Mint, VG+, VG, G+, G, F, P)
 
 ### Social
 
@@ -178,12 +178,12 @@
 | DISC-04 | Phase 3: Discogs Integration | Complete |
 | DISC-05 | Phase 3: Discogs Integration | Complete |
 | DISC-06 | Phase 3: Discogs Integration | Complete |
-| COLL-01 | Phase 4: Collection Management | Pending |
-| COLL-02 | Phase 4: Collection Management | Pending |
-| COLL-03 | Phase 4: Collection Management | Pending |
-| COLL-04 | Phase 4: Collection Management | Pending |
-| COLL-05 | Phase 4: Collection Management | Pending |
-| COLL-06 | Phase 4: Collection Management | Pending |
+| COLL-01 | Phase 4: Collection Management | Complete |
+| COLL-02 | Phase 4: Collection Management | Complete |
+| COLL-03 | Phase 4: Collection Management | Complete |
+| COLL-04 | Phase 4: Collection Management | Complete |
+| COLL-05 | Phase 4: Collection Management | Complete |
+| COLL-06 | Phase 4: Collection Management | Complete |
 | SOCL-01 | Phase 5: Social Layer | Pending |
 | SOCL-02 | Phase 5: Social Layer | Pending |
 | SOCL-03 | Phase 5: Social Layer | Pending |
