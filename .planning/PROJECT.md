@@ -12,7 +12,14 @@ A digger opens the app and immediately finds who has the record they've been hun
 
 ### Validated
 
-(None yet — ship to validate)
+**Phase 1: Foundation + Authentication** *(2026-03-25)*
+- [x] Email/password signup with mandatory email verification (AUTH-01)
+- [x] Login with session persistence — sessions persist until manual logout, max 3 simultaneous (AUTH-02)
+- [x] Password reset via email link (AUTH-03)
+- [x] Google + GitHub OAuth social login (AUTH-04)
+- [x] TOTP two-factor authentication enrollment and challenge (AUTH-05)
+- [x] 2FA disable + backup code recovery (AUTH-06)
+- [x] OWASP Top 10 compliance on all auth surfaces — CSP/HSTS headers, rate limiting, input validation, CSRF protection (SEC-01)
 
 ### Active
 
@@ -94,8 +101,11 @@ A digger opens the app and immediately finds who has the record they've been hun
 | Discogs have/want ratio as rarity base | Discogs is the authoritative data source for vinyl rarity in the community | — Pending |
 | Web-first (no native mobile v1) | Solo developer constraint — web reaches all platforms without maintaining two codebases | — Pending |
 | Freemium model (not subscription) | Lower barrier to adoption; proves willingness to pay before locking in subscription model | — Pending |
-| Security-first development | Pen testing and security tests generated during development — not bolted on at the end | — Pending |
-| Claude aesthetics prompting for frontend | Distinctive retro/analog visual identity using Anthropic cookbook methodology | — Pending |
+| Security-first development | Pen testing and security tests generated during development — not bolted on at the end | ✓ Phase 1: vitest unit + integration + Playwright E2E scaffolds; OWASP headers + rate limiting live |
+| Claude aesthetics prompting for frontend | Distinctive retro/analog visual identity using Anthropic cookbook methodology | ✓ Phase 1: Fraunces + DM Sans, OKLCH dark-warm palette, SVG grain texture |
+| Full DB schema in Phase 1 (not incremental) | Prevents painful migrations in later phases | ✓ Phase 1: 20 tables, 59 RLS policies, all v1 domains covered |
+| Max 3 simultaneous sessions, persist until logout | UX convenience (D-13/D-14); custom user_sessions table required (Supabase no native limit) | ✓ Phase 1: enforceSessionLimit() with oldest-first eviction |
+| getClaims() not getSession() in all server code | getSession() doesn't validate JWT signature — security risk | ✓ Phase 1: enforced in middleware, all server actions, session management |
 
 ---
 
