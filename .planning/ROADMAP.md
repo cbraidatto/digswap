@@ -76,9 +76,9 @@ Plans:
 Plans:
 - [x] 03-01-PLAN.md -- Schema additions, dependency install, type contracts, Zustand store, and Wave 0 test scaffolds
 - [x] 03-02-PLAN.md -- OAuth 1.0a flow: helpers, callback route, server action, onboarding button activation
-- [ ] 03-03-PLAN.md -- Background import pipeline: worker, API route, Realtime broadcast, self-invocation chain
+- [x] 03-03-PLAN.md -- Background import pipeline: worker, API route, Realtime broadcast, self-invocation chain
 - [x] 03-04-PLAN.md -- Import progress UI: progress page, sticky banner, shadcn components
-- [ ] 03-05-PLAN.md -- Settings Discogs section: sync, disconnect, re-import with confirmation dialogs
+- [x] 03-05-PLAN.md -- Settings Discogs section: sync, disconnect, re-import with confirmation dialogs
 - [ ] 03-06-PLAN.md -- Test implementations and visual verification checkpoint
 **UI hint**: yes
 
@@ -190,7 +190,7 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7 -> 8 -> 9 -> 10
 |-------|----------------|--------|-----------|
 | 1. Foundation + Authentication | 0/8 | Planning complete | - |
 | 2. UI Shell + Navigation | 0/2 | Planning complete | - |
-| 3. Discogs Integration | 0/6 | Planning complete | - |
+| 3. Discogs Integration | 5/6 | In Progress|  |
 | 4. Collection Management | 0/TBD | Not started | - |
 | 5. Social Layer | 0/TBD | Not started | - |
 | 6. Discovery + Notifications | 0/TBD | Not started | - |
