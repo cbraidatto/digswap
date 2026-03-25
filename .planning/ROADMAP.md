@@ -12,8 +12,8 @@ VinylDig delivers a social network for vinyl diggers in 11 phases, moving from f
 
 Decimal phases appear between their surrounding integers in numeric order.
 
-- [ ] **Phase 1: Foundation + Authentication** - Project scaffolding, Supabase auth, database schema, retro/analog design system
-- [ ] **Phase 2: UI Shell + Navigation** - 4-tab navigation (Feed, Perfil, Explorar, Comunidade) with per-tab routing
+- [x] **Phase 1: Foundation + Authentication** - Project scaffolding, Supabase auth, database schema, retro/analog design system (completed 2026-03-25)
+- [x] **Phase 2: UI Shell + Navigation** - 4-tab navigation (Feed, Perfil, Explorar, Comunidade) with per-tab routing (completed 2026-03-25)
 - [x] **Phase 3: Discogs Integration** - OAuth 1.0a connection, collection/wantlist import, async pipeline with progress (completed 2026-03-25)
 - [ ] **Phase 4: Collection Management** - Public collection profiles, rarity scoring, filtering, sorting, manual entry
 - [ ] **Phase 5: Social Layer** - Follow system, activity feed, collection comparison, public profiles
@@ -38,14 +38,14 @@ Decimal phases appear between their surrounding integers in numeric order.
   5. All auth surfaces pass OWASP Top 10 checks (rate limiting, input validation, secure headers)
 **Plans**: 8 plans
 Plans:
-- [ ] 01-PLAN-01.md -- Scaffold Next.js 15 project with dark-warm design system and security headers
-- [ ] 01-PLAN-02.md -- Define complete application database schema with Drizzle ORM and RLS policies
-- [ ] 01-PLAN-03.md -- Create Supabase auth infrastructure, validation schemas, and rate limiters
-- [ ] 01-PLAN-04.md -- Build sign-up, sign-in, and email verification pages with server actions
-- [ ] 01-PLAN-05.md -- Build OAuth callback, forgot password, and reset password flows
-- [ ] 01-PLAN-06.md -- Implement TOTP 2FA enrollment, challenge, and backup codes
-- [ ] 01-PLAN-07.md -- Build multi-step onboarding wizard
-- [ ] 01-PLAN-08.md -- Session management UI and security/auth test suite
+- [x] 01-PLAN-01.md -- Scaffold Next.js 15 project with dark-warm design system and security headers
+- [x] 01-PLAN-02.md -- Define complete application database schema with Drizzle ORM and RLS policies
+- [x] 01-PLAN-03.md -- Create Supabase auth infrastructure, validation schemas, and rate limiters
+- [x] 01-PLAN-04.md -- Build sign-up, sign-in, and email verification pages with server actions
+- [x] 01-PLAN-05.md -- Build OAuth callback, forgot password, and reset password flows
+- [x] 01-PLAN-06.md -- Implement TOTP 2FA enrollment, challenge, and backup codes
+- [x] 01-PLAN-07.md -- Build multi-step onboarding wizard
+- [x] 01-PLAN-08.md -- Session management UI and security/auth test suite
 **UI hint**: yes
 
 ### Phase 2: UI Shell + Navigation
@@ -188,8 +188,8 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7 -> 8 -> 9 -> 10
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Foundation + Authentication | 0/8 | Planning complete | - |
-| 2. UI Shell + Navigation | 0/2 | Planning complete | - |
+| 1. Foundation + Authentication | 8/8 | Complete | 2026-03-25 |
+| 2. UI Shell + Navigation | 2/2 | Complete | 2026-03-25 |
 | 3. Discogs Integration | 6/6 | Complete   | 2026-03-25 |
 | 4. Collection Management | 0/TBD | Not started | - |
 | 5. Social Layer | 0/TBD | Not started | - |
