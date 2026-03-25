@@ -59,7 +59,7 @@ Plans:
 **Plans**: 2 plans
 Plans:
 - [x] 02-01-PLAN.md -- Shell infrastructure: components, protected layout, middleware, redirects
-- [ ] 02-02-PLAN.md -- Tab pages with empty states, profile placeholder, and navigation tests
+- [x] 02-02-PLAN.md -- Tab pages with empty states, profile placeholder, and navigation tests
 **UI hint**: yes
 
 ### Phase 3: Discogs Integration
