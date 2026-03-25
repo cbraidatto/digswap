@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-stopped_at: Completed 01-01-PLAN.md
-last_updated: "2026-03-25T05:56:31.266Z"
+stopped_at: Completed 01-02-PLAN.md
+last_updated: "2026-03-25T06:03:19.574Z"
 last_activity: 2026-03-25
 progress:
   total_phases: 11
   completed_phases: 0
   total_plans: 8
-  completed_plans: 1
+  completed_plans: 2
   percent: 0
 ---
 
@@ -26,7 +26,7 @@ See: .planning/PROJECT.md (updated 2026-03-25)
 ## Current Position
 
 Phase: 01 (foundation-authentication) — EXECUTING
-Plan: 2 of 8
+Plan: 3 of 8
 Status: Ready to execute
 Last activity: 2026-03-25
 
@@ -53,6 +53,7 @@ Progress: [░░░░░░░░░░] 0%
 
 *Updated after each plan completion*
 | Phase 01 P01 | 8min | 2 tasks | 21 files |
+| Phase 01 P02 | 4min | 2 tasks | 15 files |
 
 ## Accumulated Context
 
@@ -68,6 +69,8 @@ Recent decisions affecting current work:
 - [Phase 01]: Biome v2 (2.4.8) config schema used instead of v1 -- installed version requires v2 format
 - [Phase 01]: React 19.1.0 bundled by create-next-app@15.5.14 -- using what the framework ships
 - [Phase 01]: Dark-only theme at :root with no .dark class -- single OKLCH variable set per D-01
+- [Phase 01]: supabaseAuthAdminRole for service-managed tables (releases, subscriptions, user_badges)
+- [Phase 01]: Backup codes use invalidation (used=true) not deletion -- audit trail and timing-attack prevention
 
 ### Pending Todos
 
@@ -81,6 +84,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-25T05:56:31.262Z
-Stopped at: Completed 01-01-PLAN.md
+Last session: 2026-03-25T06:03:19.570Z
+Stopped at: Completed 01-02-PLAN.md
 Resume file: None

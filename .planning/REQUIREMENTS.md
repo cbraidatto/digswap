@@ -8,11 +8,11 @@
 ### Authentication
 
 - [x] **AUTH-01**: User can sign up with email and password
-- [ ] **AUTH-02**: User can log in with email and password and stay logged in across sessions
+- [x] **AUTH-02**: User can log in with email and password and stay logged in across sessions
 - [ ] **AUTH-03**: User can reset password via email link
 - [ ] **AUTH-04**: User can log in with Google or GitHub (OAuth social login)
-- [ ] **AUTH-05**: User can enable two-factor authentication (TOTP)
-- [ ] **AUTH-06**: User can disable 2FA and recover access via backup codes
+- [x] **AUTH-05**: User can enable two-factor authentication (TOTP)
+- [x] **AUTH-06**: User can disable 2FA and recover access via backup codes
 
 ### Navigation
 
@@ -163,11 +163,11 @@
 | Requirement | Phase | Status |
 |-------------|-------|--------|
 | AUTH-01 | Phase 1: Foundation + Authentication | Complete |
-| AUTH-02 | Phase 1: Foundation + Authentication | Pending |
+| AUTH-02 | Phase 1: Foundation + Authentication | Complete |
 | AUTH-03 | Phase 1: Foundation + Authentication | Pending |
 | AUTH-04 | Phase 1: Foundation + Authentication | Pending |
-| AUTH-05 | Phase 1: Foundation + Authentication | Pending |
-| AUTH-06 | Phase 1: Foundation + Authentication | Pending |
+| AUTH-05 | Phase 1: Foundation + Authentication | Complete |
+| AUTH-06 | Phase 1: Foundation + Authentication | Complete |
 | SEC-01 | Phase 1: Foundation + Authentication | Complete |
 | NAV-01 | Phase 2: UI Shell + Navigation | Pending |
 | NAV-02 | Phase 2: UI Shell + Navigation | Pending |
