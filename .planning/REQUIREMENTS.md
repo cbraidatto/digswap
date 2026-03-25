@@ -9,8 +9,8 @@
 
 - [x] **AUTH-01**: User can sign up with email and password
 - [x] **AUTH-02**: User can log in with email and password and stay logged in across sessions
-- [ ] **AUTH-03**: User can reset password via email link
-- [ ] **AUTH-04**: User can log in with Google or GitHub (OAuth social login)
+- [x] **AUTH-03**: User can reset password via email link
+- [x] **AUTH-04**: User can log in with Google or GitHub (OAuth social login)
 - [x] **AUTH-05**: User can enable two-factor authentication (TOTP)
 - [x] **AUTH-06**: User can disable 2FA and recover access via backup codes
 
@@ -164,8 +164,8 @@
 |-------------|-------|--------|
 | AUTH-01 | Phase 1: Foundation + Authentication | Complete |
 | AUTH-02 | Phase 1: Foundation + Authentication | Complete |
-| AUTH-03 | Phase 1: Foundation + Authentication | Pending |
-| AUTH-04 | Phase 1: Foundation + Authentication | Pending |
+| AUTH-03 | Phase 1: Foundation + Authentication | Complete |
+| AUTH-04 | Phase 1: Foundation + Authentication | Complete |
 | AUTH-05 | Phase 1: Foundation + Authentication | Complete |
 | AUTH-06 | Phase 1: Foundation + Authentication | Complete |
 | SEC-01 | Phase 1: Foundation + Authentication | Complete |
