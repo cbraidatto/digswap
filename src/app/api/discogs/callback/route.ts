@@ -78,7 +78,7 @@ export async function GET(request: NextRequest) {
 				accessToken,
 				accessTokenSecret,
 			},
-			userAgent: "VinylDig/1.0",
+			userAgent: "DigSwap/1.0",
 		});
 
 		const identity = await discogsClient.getIdentity();

@@ -18,7 +18,7 @@ const fraunces = Fraunces({
 });
 
 export const metadata: Metadata = {
-	title: "VinylDig",
+	title: "DigSwap",
 	description: "A social network for vinyl diggers",
 };
 

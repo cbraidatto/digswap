@@ -3,9 +3,9 @@ import { ResendVerificationButton } from "./resend-button";
 import Link from "next/link";
 
 export const metadata = {
-	title: "Verify Your Email | VinylDig",
+	title: "Verify Your Email | DigSwap",
 	description:
-		"Check your inbox for the verification link to activate your VinylDig account.",
+		"Check your inbox for the verification link to activate your DigSwap account.",
 };
 
 export default async function VerifyEmailPage({

@@ -65,7 +65,7 @@ export function DisconnectDialog({ disabled }: DisconnectDialogProps) {
 					<AlertDialogTitle>Disconnect Discogs?</AlertDialogTitle>
 					<AlertDialogDescription>
 						Your imported collection and wantlist will be removed from
-						VinylDig. Records added manually will not be affected.
+						DigSwap. Records added manually will not be affected.
 					</AlertDialogDescription>
 				</AlertDialogHeader>
 				<AlertDialogFooter>

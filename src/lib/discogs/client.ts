@@ -55,7 +55,7 @@ export async function createDiscogsClient(
 			accessToken,
 			accessTokenSecret,
 		},
-		userAgent: "VinylDig/1.0",
+		userAgent: "DigSwap/1.0",
 	});
 
 	return client;

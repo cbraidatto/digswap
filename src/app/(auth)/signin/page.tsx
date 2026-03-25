@@ -3,8 +3,8 @@ import { SignInForm } from "@/components/auth/sign-in-form";
 import Link from "next/link";
 
 export const metadata = {
-	title: "Welcome Back | VinylDig",
-	description: "Sign in to your VinylDig account.",
+	title: "Welcome Back | DigSwap",
+	description: "Sign in to your DigSwap account.",
 };
 
 export default async function SignInPage({
@@ -25,7 +25,7 @@ export default async function SignInPage({
 			}
 			footer={
 				<p>
-					New to VinylDig?{" "}
+					New to DigSwap?{" "}
 					<Link
 						href="/signup"
 						className="text-primary hover:underline"

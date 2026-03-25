@@ -3,8 +3,8 @@ import { SignUpForm } from "@/components/auth/sign-up-form";
 import Link from "next/link";
 
 export const metadata = {
-	title: "Create Your Account | VinylDig",
-	description: "Sign up for VinylDig and start discovering vinyl records.",
+	title: "Create Your Account | DigSwap",
+	description: "Sign up for DigSwap and start discovering vinyl records.",
 };
 
 export default function SignUpPage() {

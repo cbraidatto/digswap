@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 
@@ -5,7 +6,7 @@ export default function Home() {
 	return (
 		<div className="flex min-h-screen flex-col items-center justify-center px-4">
 			<h1 className="font-heading text-[28px] font-normal leading-[1.1] tracking-[-0.03em] sm:text-[36px]">
-				VinylDig
+				Dig<span className="text-primary">Swap</span>
 			</h1>
 
 			<p className="mt-2 text-muted-foreground">A social network for vinyl diggers</p>
@@ -21,9 +22,9 @@ export default function Home() {
 					</CardDescription>
 				</CardHeader>
 				<CardContent className="flex flex-col gap-3">
-					<Button size="lg" className="w-full">
+					<Link href="/signup" className="inline-flex w-full items-center justify-center rounded-lg bg-primary px-2.5 h-9 text-sm font-medium text-primary-foreground transition-all">
 						Get Started
-					</Button>
+					</Link>
 					<Button variant="secondary" size="lg" className="w-full">
 						Learn More
 					</Button>

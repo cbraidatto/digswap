@@ -38,7 +38,7 @@ export async function enrollTotp(): Promise<
 	// Enroll TOTP factor
 	const { data, error } = await supabase.auth.mfa.enroll({
 		factorType: "totp",
-		friendlyName: "VinylDig",
+		friendlyName: "DigSwap",
 	});
 
 	if (error || !data) {

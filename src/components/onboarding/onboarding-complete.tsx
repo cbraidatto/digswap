@@ -13,7 +13,7 @@ import { Button } from "@/components/ui/button";
  *
  * Per UI-SPEC:
  * - Title: "You're In"
- * - Body: "Welcome to VinylDig. Start digging."
+ * - Body: "Welcome to DigSwap. Start digging."
  * - CTA: "Go to Feed" (primary amber) -> calls completeOnboarding() then redirects to /
  */
 export function OnboardingComplete() {
@@ -42,7 +42,7 @@ export function OnboardingComplete() {
 				</div>
 				<div className="text-center">
 					<h3 className="font-heading text-lg font-semibold text-foreground">You&apos;re In</h3>
-					<p className="mt-1 text-sm text-muted-foreground">Welcome to VinylDig. Start digging.</p>
+					<p className="mt-1 text-sm text-muted-foreground">Welcome to DigSwap. Start digging.</p>
 				</div>
 			</div>
 

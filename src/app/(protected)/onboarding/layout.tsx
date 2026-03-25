@@ -12,7 +12,7 @@ import { createClient } from "@/lib/supabase/server";
  * 1. Redirects to /signin if not authenticated (backup to middleware)
  * 2. Redirects to / if onboarding is already completed
  *
- * Layout: Full viewport height centered with VinylDig wordmark.
+ * Layout: Full viewport height centered with DigSwap wordmark.
  * Same visual pattern as the auth layout.
  */
 export default async function OnboardingLayout({ children }: { children: ReactNode }) {

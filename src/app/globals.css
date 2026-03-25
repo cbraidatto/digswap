@@ -49,33 +49,33 @@
 }
 
 /* ===========================
-   VinylDig Dark Warm Theme
+   DigSwap Dark Theme
    Dark-only: no .dark class, no media query
    =========================== */
 :root {
-  --background: oklch(0.13 0.02 60);
-  --foreground: oklch(0.90 0.01 70);
-  --card: oklch(0.18 0.02 55);
-  --card-foreground: oklch(0.90 0.01 70);
-  --popover: oklch(0.18 0.02 55);
-  --popover-foreground: oklch(0.90 0.01 70);
-  --primary: oklch(0.72 0.14 65);
-  --primary-foreground: oklch(0.13 0.02 60);
-  --secondary: oklch(0.20 0.02 55);
-  --secondary-foreground: oklch(0.90 0.01 70);
-  --muted: oklch(0.20 0.02 55);
-  --muted-foreground: oklch(0.60 0.03 60);
-  --accent: oklch(0.72 0.14 65);
-  --accent-foreground: oklch(0.13 0.02 60);
+  --background: oklch(0.09 0 0);
+  --foreground: oklch(0.95 0 0);
+  --card: oklch(0.13 0 0);
+  --card-foreground: oklch(0.95 0 0);
+  --popover: oklch(0.13 0 0);
+  --popover-foreground: oklch(0.95 0 0);
+  --primary: oklch(0.58 0.18 250);
+  --primary-foreground: oklch(0.98 0 0);
+  --secondary: oklch(0.18 0 0);
+  --secondary-foreground: oklch(0.95 0 0);
+  --muted: oklch(0.18 0 0);
+  --muted-foreground: oklch(0.55 0 0);
+  --accent: oklch(0.58 0.18 250);
+  --accent-foreground: oklch(0.98 0 0);
   --destructive: oklch(0.55 0.16 25);
-  --destructive-foreground: oklch(0.95 0.01 70);
-  --border: oklch(0.25 0.02 55);
-  --input: oklch(0.20 0.02 55);
-  --ring: oklch(0.72 0.14 65);
+  --destructive-foreground: oklch(0.95 0 0);
+  --border: oklch(0.22 0 0);
+  --input: oklch(0.18 0 0);
+  --ring: oklch(0.58 0.18 250);
   --success: oklch(0.65 0.14 145);
-  --success-foreground: oklch(0.13 0.02 60);
+  --success-foreground: oklch(0.09 0 0);
   --warning: oklch(0.75 0.14 85);
-  --warning-foreground: oklch(0.13 0.02 60);
+  --warning-foreground: oklch(0.09 0 0);
   --radius: 0.5rem;
 }
 
@@ -107,9 +107,9 @@
 .skeleton-shimmer {
   background: linear-gradient(
     90deg,
-    oklch(0.25 0.02 55) 25%,
-    oklch(0.30 0.02 55) 50%,
-    oklch(0.25 0.02 55) 75%
+    oklch(0.18 0 0) 25%,
+    oklch(0.23 0 0) 50%,
+    oklch(0.18 0 0) 75%
   );
   background-size: 200% 100%;
   animation: shimmer 1.5s ease-in-out infinite;

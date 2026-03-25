@@ -3,8 +3,8 @@ import { AuthCard } from "@/components/auth/auth-card";
 import { ForgotPasswordForm } from "@/components/auth/forgot-password-form";
 
 export const metadata: Metadata = {
-	title: "Reset Your Password | VinylDig",
-	description: "Request a password reset link for your VinylDig account.",
+	title: "Reset Your Password | DigSwap",
+	description: "Request a password reset link for your DigSwap account.",
 };
 
 /**

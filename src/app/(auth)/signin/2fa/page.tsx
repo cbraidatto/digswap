@@ -4,7 +4,7 @@ import { AuthCard } from "@/components/auth/auth-card";
 import { TotpChallenge } from "@/components/auth/totp-challenge";
 
 export const metadata = {
-	title: "Two-Factor Authentication | VinylDig",
+	title: "Two-Factor Authentication | DigSwap",
 	description: "Enter your verification code to complete sign in.",
 };
 
