@@ -14,7 +14,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 
 - [x] **Phase 1: Foundation + Authentication** - Project scaffolding, Supabase auth, database schema, retro/analog design system (completed 2026-03-25)
 - [x] **Phase 2: UI Shell + Navigation** - 4-tab navigation (Feed, Perfil, Explorar, Comunidade) with per-tab routing (completed 2026-03-25)
-- [x] **Phase 3: Discogs Integration** - OAuth 1.0a connection, collection/wantlist import, async pipeline with progress (completed 2026-03-25)
+- [x] **Phase 3: Discogs Integration** - OAuth 1.0a connection, collection/wantlist import, async pipeline with progress (completed 2026-03-25)
 - [ ] **Phase 4: Collection Management** - Public collection profiles, rarity scoring, filtering, sorting, manual entry
 - [ ] **Phase 5: Social Layer** - Follow system, activity feed, collection comparison, public profiles
 - [ ] **Phase 6: Discovery + Notifications** - Cross-collection search, wantlist matching, in-app/email/push notifications
@@ -92,7 +92,12 @@ Plans:
   3. User can add a record manually (not from Discogs) and it appears in their collection
   4. User can filter their collection by genre, decade, country, and format, and sort by rarity, date added, or alphabetically
   5. User can set the physical condition grade (Mint through Poor) on any record in their collection
-**Plans**: TBD
+**Plans**: 4 plans
+Plans:
+- [ ] 04-01-PLAN.md -- Schema migration (username column), rarity formula fix, utility library, server actions, Wave 0 test scaffolds
+- [ ] 04-02-PLAN.md -- Collection grid UI, public profile route, filter bar, pagination, own profile rewrite
+- [ ] 04-03-PLAN.md -- Add Record FAB, Discogs search dialog, condition grade editor
+- [ ] 04-04-PLAN.md -- Test implementations and human verification checkpoint
 **UI hint**: yes
 
 ### Phase 5: Social Layer
@@ -191,7 +196,7 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7 -> 8 -> 9 -> 10
 | 1. Foundation + Authentication | 8/8 | Complete | 2026-03-25 |
 | 2. UI Shell + Navigation | 2/2 | Complete | 2026-03-25 |
 | 3. Discogs Integration | 6/6 | Complete   | 2026-03-25 |
-| 4. Collection Management | 0/TBD | Not started | - |
+| 4. Collection Management | 0/4 | Not started | - |
 | 5. Social Layer | 0/TBD | Not started | - |
 | 6. Discovery + Notifications | 0/TBD | Not started | - |
 | 7. Community + Reviews | 0/TBD | Not started | - |
