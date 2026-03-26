@@ -18,7 +18,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 4: Collection Management** - Public collection profiles, rarity scoring, filtering, sorting, manual entry (completed 2026-03-25)
 - [x] **Phase 4.5: Template Alignment** - Remove GitHub metaphors, align navigation language, clean placeholder content, wire empty states to product vision (INSERTED, completed 2026-03-25)
 - [ ] **Phase 5: Social Layer** - Follow system, activity feed, collection comparison, public profiles
-- [ ] **Phase 6: Discovery + Notifications** - Cross-collection search, wantlist matching, in-app/email/push notifications
+- [x] **Phase 6: Discovery + Notifications** - Cross-collection search, wantlist matching, in-app/email/push notifications (completed 2026-03-26)
 - [ ] **Phase 7: Community + Reviews** - Genre/era groups, group activity feeds, pressing and release reviews
 - [ ] **Phase 8: Gamification + Rankings** - Global/genre leaderboards, badges, titles, composite ranking formula
 - [ ] **Phase 9: P2P Audio Trading** - DMCA compliance, WebRTC file transfer, trade reputation, TURN relay
@@ -169,7 +169,7 @@ Plans:
 - [x] 06-02-PLAN.md -- Explorar page rewrite: DIGGERS/RECORDS tab bar, record search, genre/decade browse, suggested section
 - [x] 06-03-PLAN.md -- NotificationBell component with Realtime subscription, NotificationRow, /notifications page, AppHeader wiring
 - [x] 06-04-PLAN.md -- Wantlist match triggers in addRecord and import pipeline, notification preferences UI in settings
-- [ ] 06-05-PLAN.md -- NotificationBell component tests, full test suite, human verification checkpoint
+- [x] 06-05-PLAN.md -- NotificationBell component tests, full test suite, human verification checkpoint
 **UI hint**: yes
 
 ### Phase 7: Community + Reviews
@@ -249,7 +249,7 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7 -> 8 -> 9 -> 10
 | 4. Collection Management | 4/4 | Complete | 2026-03-25 |
 | 4.5. Template Alignment | 2/2 | Complete | 2026-03-25 |
 | 5. Social Layer | 0/4 | Planned | - |
-| 6. Discovery + Notifications | 1/5 | In Progress|  |
+| 6. Discovery + Notifications | 5/5 | Complete   | 2026-03-26 |
 | 7. Community + Reviews | 0/TBD | Not started | - |
 | 8. Gamification + Rankings | 0/TBD | Not started | - |
 | 9. P2P Audio Trading | 0/TBD | Not started | - |
