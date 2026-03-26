@@ -16,6 +16,7 @@ export const groups = pgTable(
     id: uuid("id").defaultRandom().primaryKey(),
     creatorId: uuid("creator_id").notNull(),
     name: varchar("name", { length: 200 }).notNull(),
+    slug: varchar("slug", { length: 250 }).unique(),
     description: text("description"),
     category: varchar("category", { length: 100 }), // genre/era/region/style
     visibility: varchar("visibility", { length: 20 }).default("public").notNull(),
