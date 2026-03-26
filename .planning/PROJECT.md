@@ -185,7 +185,7 @@ Feed and Profile have equal weight — both are primary entry points. Feed-first
 
 This document evolves at phase transitions and milestone boundaries.
 
-*Last updated: 2026-03-26 — Phase 6 complete*
+*Last updated: 2026-03-26 — Phase 7 complete (community + reviews)*
 
 **After each phase transition** (via `/gsd:transition`):
 1. Requirements invalidated? → Move to Out of Scope with reason
