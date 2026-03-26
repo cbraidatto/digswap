@@ -27,6 +27,22 @@ export async function getNotificationsAction(page = 1) {
 }
 
 /**
+ * Get recent notifications for the current user (for dropdown display).
+ */
+export async function getRecentNotificationsAction(limit = 5) {
+	const supabase = await createClient();
+	const {
+		data: { user },
+	} = await supabase.auth.getUser();
+
+	if (!user) {
+		throw new Error("Not authenticated");
+	}
+
+	return getRecentNotifications(user.id, limit);
+}
+
+/**
  * Get the unread notification count for the current user.
  */
 export async function getUnreadCountAction(): Promise<number> {
