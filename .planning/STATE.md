@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-stopped_at: Completed 04.5-template-alignment-02-PLAN.md
-last_updated: "2026-03-26T01:38:15.296Z"
+stopped_at: Completed 05-01-PLAN.md
+last_updated: "2026-03-26T03:06:00.104Z"
 last_activity: 2026-03-26
 progress:
   total_phases: 12
   completed_phases: 3
-  total_plans: 22
-  completed_plans: 20
+  total_plans: 26
+  completed_plans: 21
   percent: 9
 ---
 
@@ -26,7 +26,7 @@ See: .planning/PROJECT.md (updated 2026-03-25)
 ## Current Position
 
 Phase: 4.5 planned → ready to execute Phase 4.5
-Plan: 1 of 2 (Phase 4.5)
+Plan: 2 of 2 (Phase 4.5)
 Status: Ready to execute
 Last activity: 2026-03-26
 
@@ -69,6 +69,7 @@ Progress: [█░░░░░░░░░] 9%
 | Phase 04 P01 | 5min | 2 tasks | 17 files |
 | Phase 04 P03 | 3min | 2 tasks | 4 files |
 | Phase 04.5-template-alignment P02 | 8 | 3 tasks | 3 files |
+| Phase 05 P01 | 5min | 2 tasks | 9 files |
 
 ## Accumulated Context
 
@@ -126,6 +127,9 @@ Recent decisions affecting current work:
 - [Phase 04.5]: Feed page right sidebar removed entirely -- Trending_Repos and System_Logs are GitHub metaphors (D-10)
 - [Phase 04.5-template-alignment]: Rewrote feed/comunidade as complete files — fake data was too pervasive for surgical edits; used phase badges to communicate roadmap honestly
 - [Phase 04.5-template-alignment]: Removed ADD_RECORD Link from perfil/page.tsx (broken /settings destination); FAB is now sole add-record entry point
+- [Phase 05]: logActivity wired non-blocking into addRecordToCollection -- failure does not fail add-record
+- [Phase 05]: searchUsers sanitizes ilike patterns to prevent wildcard injection
+- [Phase 05]: getCollectionComparison safeguard: returns empty if collection > 5000 items
 
 ### Pending Todos
 
@@ -139,6 +143,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-26T01:38:15.290Z
-Stopped at: Completed 04.5-template-alignment-02-PLAN.md
+Last session: 2026-03-26T03:06:00.099Z
+Stopped at: Completed 05-01-PLAN.md
 Resume file: None

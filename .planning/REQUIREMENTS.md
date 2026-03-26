@@ -40,11 +40,11 @@
 
 ### Social
 
-- [ ] **SOCL-01**: User can follow other diggers
-- [ ] **SOCL-02**: User can unfollow diggers
-- [ ] **SOCL-03**: User can view an activity feed showing what their followed diggers added, traded, and reviewed
-- [ ] **SOCL-04**: User can compare their collection with another user's — seeing overlap and unique records on each side
-- [ ] **SOCL-05**: User can view any public profile and their collection
+- [x] **SOCL-01**: User can follow other diggers
+- [x] **SOCL-02**: User can unfollow diggers
+- [x] **SOCL-03**: User can view an activity feed showing what their followed diggers added, traded, and reviewed
+- [x] **SOCL-04**: User can compare their collection with another user's — seeing overlap and unique records on each side
+- [x] **SOCL-05**: User can view any public profile and their collection
 
 ### Groups & Community
 
@@ -184,11 +184,11 @@
 | COLL-04 | Phase 4: Collection Management | Complete |
 | COLL-05 | Phase 4: Collection Management | Complete |
 | COLL-06 | Phase 4: Collection Management | Complete |
-| SOCL-01 | Phase 5: Social Layer | Pending |
-| SOCL-02 | Phase 5: Social Layer | Pending |
-| SOCL-03 | Phase 5: Social Layer | Pending |
-| SOCL-04 | Phase 5: Social Layer | Pending |
-| SOCL-05 | Phase 5: Social Layer | Pending |
+| SOCL-01 | Phase 5: Social Layer | Complete |
+| SOCL-02 | Phase 5: Social Layer | Complete |
+| SOCL-03 | Phase 5: Social Layer | Complete |
+| SOCL-04 | Phase 5: Social Layer | Complete |
+| SOCL-05 | Phase 5: Social Layer | Complete |
 | DISC2-01 | Phase 6: Discovery + Notifications | Pending |
 | DISC2-02 | Phase 6: Discovery + Notifications | Pending |
 | DISC2-03 | Phase 6: Discovery + Notifications | Pending |
