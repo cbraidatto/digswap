@@ -128,7 +128,10 @@ Plans:
   4. Bottom bar FAB makes sense for current phase
   5. Empty states on Feed and Comunidade are clean and honest (not fake placeholder content)
   6. All routes and buttons point to correct destinations
-**Plans**: TBD
+**Plans**: 2 plans
+Plans:
+- [ ] 04.5-01-PLAN.md -- Shell alignment: rename sidebar labels, remove Popular Crews, collapse bottom bar to 4-tab, fix header nav
+- [ ] 04.5-02-PLAN.md -- Page alignment: feed empty state, comunidade empty states, remove broken perfil ADD_RECORD link
 **UI hint**: yes
 
 ### Phase 5: Social Layer
@@ -233,7 +236,7 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7 -> 8 -> 9 -> 10
 | 2. UI Shell + Navigation | 2/2 | Complete | 2026-03-25 |
 | 3. Discogs Integration | 6/6 | Complete   | 2026-03-25 |
 | 4. Collection Management | 4/4 | Complete | 2026-03-25 |
-| 4.5. Template Alignment | 0/TBD | Not started | - |
+| 4.5. Template Alignment | 0/2 | Not started | - |
 | 5. Social Layer | 0/TBD | Not started | - |
 | 6. Discovery + Notifications | 0/TBD | Not started | - |
 | 7. Community + Reviews | 0/TBD | Not started | - |

@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: planning
-stopped_at: Phase 4 complete — ready to plan Phase 5
-last_updated: "2026-03-25T23:00:00.000Z"
+stopped_at: Phase 4.5 planned (2 plans) — ready to execute
+last_updated: "2026-03-25T23:30:00.000Z"
 last_activity: 2026-03-25
 progress:
   total_phases: 11
   completed_phases: 4
-  total_plans: 20
+  total_plans: 22
   completed_plans: 20
   percent: 36
 ---
@@ -21,13 +21,13 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-25)
 
 **Core value:** A digger opens the app and immediately finds who has the record they've been hunting -- and sees where they stand in the community.
-**Current focus:** Phase 05 — social-layer
+**Current focus:** Phase 04.5 — template-alignment
 
 ## Current Position
 
-Phase: 4 complete → Phase 5 next
-Plan: 4 of 4 (Phase 4)
-Status: Phase 4 verified by user — ready to plan Phase 5
+Phase: 4.5 planned → ready to execute Phase 4.5
+Plan: 0 of 2 (Phase 4.5)
+Status: Phase 4.5 PLAN.md files created — execute next
 Last activity: 2026-03-25
 
 Progress: [█░░░░░░░░░] 9%
@@ -120,6 +120,9 @@ Recent decisions affecting current work:
 - [Phase 04]: FAB positioned with calc(64px+16px+safe-area) for BottomBar clearance, lg:bottom-6 for desktop
 - [Phase 04]: 300ms debounce on Discogs search using useCallback + setTimeout/clearTimeout ref pattern
 - [Phase 04]: ConditionEditor integration into CollectionCard deferred to merge -- parallel worktree constraint
+- [Phase 04.5]: Bottom bar FAB removed entirely -- /trades/new is Phase 9, no replacement until then (D-04)
+- [Phase 04.5]: Comunidade page collapses to single column -- right column was all fake data, removed (D-13)
+- [Phase 04.5]: Feed page right sidebar removed entirely -- Trending_Repos and System_Logs are GitHub metaphors (D-10)
 
 ### Pending Todos
 
@@ -133,6 +136,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-25T22:25:14.707Z
-Stopped at: Completed 04-03-PLAN.md
+Last session: 2026-03-25T23:30:00.000Z
+Stopped at: Created Phase 4.5 PLAN.md files (04.5-01, 04.5-02)
 Resume file: None
