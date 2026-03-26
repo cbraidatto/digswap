@@ -1,7 +1,8 @@
 ---
 phase: 5
 slug: social-layer
-status: draft
+status: approved
+reviewed_at: 2026-03-26
 shadcn_initialized: true
 preset: base-nova
 created: 2026-03-26
