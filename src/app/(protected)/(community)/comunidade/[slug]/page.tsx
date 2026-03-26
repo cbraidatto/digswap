@@ -8,8 +8,7 @@ import {
 } from "@/lib/community/queries";
 import { GroupDetailHeader } from "./_components/group-detail-header";
 import { InviteControls } from "./_components/invite-controls";
-import { GroupComposer } from "./_components/group-composer";
-import { GroupPostFeed } from "./_components/group-post-feed";
+import { GroupContentSection } from "./_components/group-content-section";
 
 export default async function GroupDetailPage({
 	params,
@@ -78,19 +77,12 @@ export default async function GroupDetailPage({
 					</p>
 				</div>
 			) : (
-				<>
-					{membership.isMember && (
-						<GroupComposer
-							groupId={group.id}
-							groupName={group.name}
-						/>
-					)}
-
-					<GroupPostFeed
-						groupId={group.id}
-						initialPosts={initialPosts}
-					/>
-				</>
+				<GroupContentSection
+					groupId={group.id}
+					groupName={group.name}
+					isMember={membership.isMember}
+					initialPosts={initialPosts}
+				/>
 			)}
 		</div>
 	);
