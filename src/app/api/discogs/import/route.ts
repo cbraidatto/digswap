@@ -5,6 +5,7 @@ import {
 	processWantlistPage,
 } from "@/lib/discogs/import-worker";
 import { broadcastProgress } from "@/lib/discogs/broadcast";
+import { checkWantlistMatches } from "@/lib/notifications/match";
 import type { ImportJobType } from "@/lib/discogs/types";
 
 /** Vercel Pro timeout (10s on Hobby, 60s on Pro) */
@@ -129,6 +130,64 @@ export async function POST(request: NextRequest) {
 			totalItems: completedJob?.total_items ?? 0,
 			currentRecord: null,
 		});
+
+		// Batch wantlist match check (Phase 6, DISC2-03)
+		// Run AFTER import completes to avoid notification flood during import
+		if (job.type === "collection" || job.type === "sync") {
+			try {
+				// Get all release IDs from this user's collection items
+				// that were created/updated during this import job
+				const { data: recentItems } = await admin
+					.from("collection_items")
+					.select("release_id")
+					.eq("user_id", job.user_id)
+					.eq("added_via", "discogs")
+					.gte("updated_at", job.started_at || job.created_at);
+
+				if (recentItems && recentItems.length > 0) {
+					// Deduplicate release IDs
+					const releaseIds = [
+						...new Set(
+							recentItems
+								.map((item: { release_id: string }) => item.release_id)
+								.filter(Boolean),
+						),
+					];
+
+					// Batch query: find all wantlist items matching these releases
+					const { data: matches } = await admin
+						.from("wantlist_items")
+						.select("user_id, release_id")
+						.in("release_id", releaseIds)
+						.neq("user_id", job.user_id);
+
+					if (matches && matches.length > 0) {
+						// Group by release_id to avoid duplicate notifications per release
+						const matchesByRelease = new Map<string, string[]>();
+						for (const match of matches) {
+							if (!match.release_id) continue;
+							if (!matchesByRelease.has(match.release_id))
+								matchesByRelease.set(match.release_id, []);
+							matchesByRelease.get(match.release_id)!.push(match.user_id);
+						}
+
+						// For each matched release, create notifications
+						// Cap at 50 match notifications per import to prevent email flood
+						let notificationCount = 0;
+						const MAX_IMPORT_NOTIFICATIONS = 50;
+
+						for (const [releaseId] of matchesByRelease) {
+							if (notificationCount >= MAX_IMPORT_NOTIFICATIONS) break;
+							await checkWantlistMatches(releaseId, job.user_id);
+							notificationCount++;
+						}
+					}
+				}
+			} catch (err) {
+				// Non-blocking: match check failure should not fail the import completion
+				console.error("Batch wantlist match check failed:", err);
+			}
+		}
 
 		// If collection just completed, start wantlist import (D-07)
 		if (job.type === "collection") {

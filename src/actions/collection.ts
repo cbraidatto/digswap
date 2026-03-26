@@ -6,6 +6,7 @@ import { createAdminClient } from "@/lib/supabase/admin";
 import { createDiscogsClient, computeRarityScore } from "@/lib/discogs/client";
 import { CONDITION_GRADES } from "@/lib/collection/filters";
 import { logActivity } from "@/actions/social";
+import { checkWantlistMatches } from "@/lib/notifications/match";
 
 /**
  * Search the Discogs database for releases matching a query string.
@@ -158,6 +159,13 @@ export async function addRecordToCollection(
 		await logActivity(user.id, "added_record", "release", releaseId, null);
 	} catch {
 		// Non-blocking: activity logging failure should not fail the add-record action
+	}
+
+	// Wantlist match check (Phase 6, DISC2-03)
+	try {
+		await checkWantlistMatches(releaseId, user.id);
+	} catch {
+		// Non-blocking: match check failure should not fail the add-record action
 	}
 
 	return { success: true };
