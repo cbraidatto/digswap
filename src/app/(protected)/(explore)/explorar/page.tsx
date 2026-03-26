@@ -1,3 +1,5 @@
+import { SearchSection } from "./_components/search-section";
+
 const DIRECTORIES = [
 	{ path: "/root/bpm", active: true },
 	{ path: "/root/genre/jazz", active: false },
@@ -60,41 +62,7 @@ export default function ExplorarPage() {
 			{/* Search Hero */}
 			<section className="w-full bg-surface-container-low p-8 md:p-12">
 				<div className="max-w-4xl mx-auto">
-					<div className="mb-4 flex items-center gap-2 text-primary font-mono text-xs">
-						<span className="material-symbols-outlined text-sm">terminal</span>
-						<span>DIGGER_V4.2.0_STABLE</span>
-					</div>
-					<div className="relative group">
-						<div className="absolute inset-0 bg-primary/5 blur-xl group-focus-within:bg-primary/10 transition-all rounded" />
-						<div className="relative flex items-center bg-surface-container-lowest p-4 md:p-6 border-l-4 border-primary shadow-2xl">
-							<span className="text-primary font-mono text-xl md:text-2xl mr-4">&gt;</span>
-							<input
-								type="text"
-								className="w-full bg-transparent border-none focus:ring-0 text-on-surface font-mono text-lg md:text-xl placeholder:text-on-surface-variant/40 outline-none"
-								placeholder="Search or jump to vinyl, artist, label..."
-							/>
-							<span className="w-3 h-8 bg-primary blink ml-2" />
-						</div>
-					</div>
-					<div className="mt-4 flex flex-wrap gap-4 font-mono text-[10px] text-on-surface-variant">
-						<span className="flex items-center gap-1">
-							<kbd className="bg-surface-container-high px-1 rounded border border-outline-variant/30">
-								CTRL
-							</kbd>
-							+{" "}
-							<kbd className="bg-surface-container-high px-1 rounded border border-outline-variant/30">
-								K
-							</kbd>{" "}
-							to focus
-						</span>
-						<span className="flex items-center gap-1">
-							<kbd className="bg-surface-container-high px-1 rounded border border-outline-variant/30">
-								ESC
-							</kbd>{" "}
-							to clear
-						</span>
-						<span className="text-primary/60 ml-auto">ESTIMATED RESULTS: 1.4M OBJECTS</span>
-					</div>
+					<SearchSection />
 				</div>
 			</section>
 
