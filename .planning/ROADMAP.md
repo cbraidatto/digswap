@@ -16,7 +16,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 2: UI Shell + Navigation** - 4-tab navigation (Feed, Perfil, Explorar, Comunidade) with per-tab routing (completed 2026-03-25)
 - [x] **Phase 3: Discogs Integration** - OAuth 1.0a connection, collection/wantlist import, async pipeline with progress (completed 2026-03-25)
 - [x] **Phase 4: Collection Management** - Public collection profiles, rarity scoring, filtering, sorting, manual entry (completed 2026-03-25)
-- [ ] **Phase 4.5: Template Alignment** - Remove GitHub metaphors, align navigation language, clean placeholder content, wire empty states to product vision (INSERTED)
+- [x] **Phase 4.5: Template Alignment** - Remove GitHub metaphors, align navigation language, clean placeholder content, wire empty states to product vision (INSERTED, completed 2026-03-25)
 - [ ] **Phase 5: Social Layer** - Follow system, activity feed, collection comparison, public profiles
 - [ ] **Phase 6: Discovery + Notifications** - Cross-collection search, wantlist matching, in-app/email/push notifications
 - [ ] **Phase 7: Community + Reviews** - Genre/era groups, group activity feeds, pressing and release reviews
@@ -236,7 +236,7 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7 -> 8 -> 9 -> 10
 | 2. UI Shell + Navigation | 2/2 | Complete | 2026-03-25 |
 | 3. Discogs Integration | 6/6 | Complete   | 2026-03-25 |
 | 4. Collection Management | 4/4 | Complete | 2026-03-25 |
-| 4.5. Template Alignment | 1/2 | In Progress|  |
+| 4.5. Template Alignment | 2/2 | Complete | 2026-03-25 |
 | 5. Social Layer | 0/TBD | Not started | - |
 | 6. Discovery + Notifications | 0/TBD | Not started | - |
 | 7. Community + Reviews | 0/TBD | Not started | - |
