@@ -186,7 +186,7 @@ Plans:
 **Plans**: 5 plans
 Plans:
 - [ ] 07-01-PLAN.md -- Schema migration (slug, release_id, review_id, group_invites), slugify utility, query functions, server actions, Wave 0 test scaffolds
-- [ ] 07-02-PLAN.md -- /comunidade group discovery hub (genre groups, member groups, filter chips) + /comunidade/new group creation form
+- [x] 07-02-PLAN.md -- /comunidade group discovery hub (genre groups, member groups, filter chips) + /comunidade/new group creation form
 - [ ] 07-03-PLAN.md -- /comunidade/[slug] group detail page (header, join/leave, composer, post feed, invite controls) + /join/[token] invite landing
 - [ ] 07-04-PLAN.md -- Reviews panel on RecordSearchCard (/explorar) + GroupFeedCard in /feed for group_post events
 - [ ] 07-05-PLAN.md -- Test implementations and human verification checkpoint
@@ -256,7 +256,7 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7 -> 8 -> 9 -> 10
 | 4.5. Template Alignment | 2/2 | Complete | 2026-03-25 |
 | 5. Social Layer | 0/4 | Planned | - |
 | 6. Discovery + Notifications | 5/5 | Complete   | 2026-03-26 |
-| 7. Community + Reviews | 0/5 | Planned | - |
+| 7. Community + Reviews | 1/5 | In Progress|  |
 | 8. Gamification + Rankings | 0/TBD | Not started | - |
 | 9. P2P Audio Trading | 0/TBD | Not started | - |
 | 10. Monetization | 0/TBD | Not started | - |
