@@ -52,7 +52,7 @@ describe("BottomBar", () => {
 		expect(explorarLink?.className).toContain("text-primary");
 
 		const feedLink = screen.getByText("Feed").closest("a");
-		expect(feedLink?.className).toContain("text-muted-foreground");
+		expect(feedLink?.className).toContain("text-on-surface-variant");
 	});
 
 	it("has nav element with aria-label", () => {

@@ -8,7 +8,9 @@ vi.mock("@supabase/ssr", () => ({
 	})),
 	createServerClient: vi.fn(() => ({
 		auth: {
-			getUser: vi.fn(),
+			getUser: vi.fn(() =>
+				Promise.resolve({ data: { user: null }, error: null }),
+			),
 			getClaims: vi.fn(() =>
 				Promise.resolve({ data: { claims: null }, error: null }),
 			),

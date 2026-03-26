@@ -23,14 +23,14 @@ vi.mock("@/components/shell/user-avatar-menu", () => ({
 import { AppHeader } from "@/components/shell/app-header";
 
 describe("AppHeader", () => {
-	it("renders VinylDig wordmark", () => {
+	it("renders DIGSWAP wordmark", () => {
 		render(<AppHeader displayName="Test" avatarUrl={null} />);
-		expect(screen.getByText("VinylDig")).toBeInTheDocument();
+		expect(screen.getByText("DIGSWAP")).toBeInTheDocument();
 	});
 
 	it("renders wordmark with font-heading class", () => {
 		render(<AppHeader displayName="Test" avatarUrl={null} />);
-		const wordmark = screen.getByText("VinylDig");
+		const wordmark = screen.getByText("DIGSWAP");
 		expect(wordmark.className).toContain("font-heading");
 	});
 });
