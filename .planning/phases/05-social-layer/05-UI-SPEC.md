@@ -67,13 +67,12 @@ All typography uses the existing 3-font stack loaded in `src/app/layout.tsx`.
 
 | Role | Font | Size | Weight | Line Height | Tailwind Classes | Phase 5 Usage |
 |------|------|------|--------|-------------|------------------|---------------|
-| Body | Inter (sans) | 14px | 400 (regular) | 1.5 | `text-sm font-sans` | Feed card metadata text, search result details, comparison record rows |
-| Label | JetBrains Mono (mono) | 10px | 400 (regular) | 1.4 | `text-[10px] font-mono` | Terminal-style labels: `[NEW_FIND]`, `[PHASE_7]`, timestamps, section headers like `Communication_Node` |
-| Mono Body | JetBrains Mono (mono) | 12px | 400 (regular) | 1.5 | `text-xs font-mono` | Feed subtitle, progress bar step labels, follow-event inline text, empty state descriptions |
+| Label | JetBrains Mono (mono) | 10px | 400 (regular) | 1.4 | `text-[10px] font-mono` | Terminal-style labels: `[NEW_FIND]`, `[PHASE_7]`, timestamps, hash tags, section headers like `Communication_Node`, step labels, status badges, metadata keys, rarity badges, button labels, column headers |
+| Body | Inter (sans) / JetBrains Mono (mono) | 14px | 400 (regular) | 1.5 | `text-sm font-sans` or `text-sm font-mono` | Feed card metadata text, search result details, comparison record rows, follow-event inline text, empty state descriptions, feed subtitle |
 | Heading | Space Grotesk (heading) | 20px | 700 (bold) | 1.2 | `text-xl font-heading font-bold` | Profile display names, comparison column headers |
-| Display | Space Grotesk (heading) | 30px | 800 (extrabold) | 1.1 | `text-3xl font-heading font-extrabold` | Page titles: `ARCHIVE_FEED`, profile name on public profile header |
+| Display | Space Grotesk (heading) | 30px | 700 (bold) | 1.1 | `text-3xl font-heading font-bold` | Page titles: `ARCHIVE_FEED`, profile name on public profile header |
 
-Weights used: 400 (regular) + 700 (bold). `font-extrabold` (800) only for the `ARCHIVE_FEED` page title (existing pattern from current feed page).
+Weights used: 400 (regular) + 700 (bold).
 
 ---
 
@@ -154,16 +153,16 @@ Type: Client Component
 - **Accent strip:** `h-1 w-full` with rarity tier color (bg-primary / bg-secondary / bg-tertiary)
 - **Header row:** `px-4 pt-3 pb-2 flex items-center gap-2`
   - Avatar: shadcn `<Avatar size="default">` (32px) with `<AvatarFallback>` showing first letter
-  - Username: `font-mono text-xs text-on-surface hover:text-primary transition-colors` as `<Link>` to `/perfil/[username]`
+  - Username: `font-mono text-[10px] text-on-surface hover:text-primary transition-colors` as `<Link>` to `/perfil/[username]`
   - Hash tag: `font-mono text-[10px] text-outline` (e.g., `#a7f3`)
   - Timestamp: `font-mono text-[10px] text-on-surface-variant` (relative: "2m ago", "1h ago", "3d ago")
   - Status label: `font-mono text-[10px] text-primary bg-primary/10 px-1.5 py-0.5 rounded border border-primary/20` showing `[NEW_FIND]`
 - **Content grid:** `px-4 pb-4 flex gap-4`
   - Left: Cover art placeholder `w-[120px] h-[120px] bg-surface-container-high rounded flex items-center justify-center` with `material-symbols-outlined album` icon at `text-3xl text-on-surface-variant/30`
-  - Right: Metadata in terminal format using `font-mono text-xs`
+  - Right: Metadata in terminal format using `font-mono text-[10px]`
     - Each field: `text-on-surface-variant` label + `text-on-surface` value
     - Format: `ARTIST: {value}` / `TITLE: {value}` / `GENRE: {value}` / `LABEL: {value}`
-    - Rarity badge: `font-mono text-xs font-bold` with tier color, e.g., `RARITY: 4.2` in tertiary color for Ultra Rare
+    - Rarity badge: `font-mono text-[10px] font-bold` with tier color, e.g., `RARITY: 4.2` in tertiary color for Ultra Rare
 
 **States:**
 - Default: as described above
@@ -186,7 +185,7 @@ Type: Client Component
 
 - **Container:** `bg-surface-container-low/50 rounded-lg px-4 py-3 flex items-center gap-3 border border-outline-variant/5`
 - **Avatar:** shadcn `<Avatar size="sm">` (24px) with fallback
-- **Text:** `font-mono text-xs text-on-surface-variant`
+- **Text:** `font-mono text-sm text-on-surface-variant`
   - Follower username: `text-on-surface hover:text-primary` as `<Link>`
   - "started following": plain text
   - Followed username: `text-on-surface hover:text-primary` as `<Link>`
@@ -203,8 +202,8 @@ Type: Client Component ("use client")
 - Uses `useInView` from `react-intersection-observer` for scroll sentinel
 - Calls server action `loadMoreFeed(cursor, mode)` via `startTransition`
 - **Mode toggle:** Two buttons at top of container: `Global` / `Following`
-  - Active: `bg-primary text-on-primary text-xs font-bold rounded px-3 py-1.5`
-  - Inactive: `text-on-surface-variant hover:text-on-surface text-xs font-bold px-3 py-1.5`
+  - Active: `bg-primary text-on-primary text-[10px] font-bold rounded px-3 py-1.5`
+  - Inactive: `text-on-surface-variant hover:text-on-surface text-[10px] font-bold px-3 py-1.5`
   - Container: `bg-surface-container-low p-1 rounded-lg flex items-center gap-1 mb-6`
 - **Sentinel:** `<div ref={sentinelRef} className="h-10" />` at bottom of feed list
 - **Loading indicator:** 3 skeleton FeedCards during fetch (shimmer pattern from globals.css)
@@ -237,9 +236,9 @@ Type: Server Component (state computed server-side per D-24)
   - Indicator: `bg-primary`
 - **Steps row:** `flex flex-wrap gap-4 mt-4`
   - Each step: `flex items-center gap-2`
-    - Completed: `material-symbols-outlined text-primary text-base` showing `check_circle` + `font-mono text-xs text-primary` with strikethrough label
-    - Incomplete (active): `material-symbols-outlined text-on-surface-variant text-base` showing `radio_button_unchecked` + `font-mono text-xs text-on-surface` clickable label as `<Link>`
-    - Locked: `material-symbols-outlined text-outline text-base` showing `lock` + `font-mono text-xs text-outline line-through` + `[PHASE_7]` badge (`font-mono text-[10px] text-outline border border-outline-variant/20 px-1.5 py-0.5 rounded`)
+    - Completed: `material-symbols-outlined text-primary text-base` showing `check_circle` + `font-mono text-[10px] text-primary` with strikethrough label
+    - Incomplete (active): `material-symbols-outlined text-on-surface-variant text-base` showing `radio_button_unchecked` + `font-mono text-[10px] text-on-surface` clickable label as `<Link>`
+    - Locked: `material-symbols-outlined text-outline text-base` showing `lock` + `font-mono text-[10px] text-outline line-through` + `[PHASE_7]` badge (`font-mono text-[10px] text-outline border border-outline-variant/20 px-1.5 py-0.5 rounded`)
   - Step 1 links to `/settings` (D-23)
   - Step 2 links to `/explorar` (D-23)
   - Step 3 is locked/greyed (D-22, D-23)
@@ -278,12 +277,12 @@ Type: Server Component (data fetched server-side)
   - Username: `text-sm font-mono text-on-surface-variant` prefixed with `@`
   - Bio: `text-sm text-on-surface-variant mt-1 max-w-md` (if present)
   - Member since: `text-[10px] font-mono text-on-surface-variant mt-2`
-  - Counts: `flex items-center gap-4 mt-4 font-mono text-xs`
+  - Counts: `flex items-center gap-4 mt-4 font-mono text-[10px]`
     - Following: `text-secondary` count + `text-on-surface-variant` label, clickable to expand list
     - Followers: `text-secondary` count + `text-on-surface-variant` label, clickable to expand list
   - Buttons: `flex items-center gap-3 mt-4`
     - Follow: `<FollowButton>` (see below)
-    - Compare: `<Button variant="outline" size="sm">` with `font-mono text-xs uppercase tracking-wider` showing `COMPARE COLLECTION` with `material-symbols-outlined compare_arrows` icon
+    - Compare: `<Button variant="outline" size="sm">` with `font-mono text-[10px] uppercase tracking-wider` showing `COMPARE COLLECTION` with `material-symbols-outlined compare_arrows` icon
 
 #### 6. FollowButton (optimistic toggle)
 
@@ -294,11 +293,11 @@ Type: Client Component ("use client")
 
 - Uses `useOptimistic` from React 19 (per RESEARCH.md Pattern 2)
 - **Follow state (not following):**
-  - `border border-primary text-primary bg-transparent hover:bg-primary/10 font-mono text-xs uppercase tracking-wider px-4 py-2 rounded-lg`
+  - `border border-primary text-primary bg-transparent hover:bg-primary/10 font-mono text-[10px] uppercase tracking-wider px-4 py-2 rounded-lg`
   - Text: `FOLLOW`
   - Icon: `material-symbols-outlined person_add` at 16px
 - **Following state (already following):**
-  - Default: `border border-outline-variant text-on-surface-variant bg-transparent font-mono text-xs uppercase tracking-wider px-4 py-2 rounded-lg`
+  - Default: `border border-outline-variant text-on-surface-variant bg-transparent font-mono text-[10px] uppercase tracking-wider px-4 py-2 rounded-lg`
   - Text: `FOLLOWING`
   - Icon: `material-symbols-outlined person_check` at 16px
   - On hover: `border-destructive text-destructive bg-destructive/10`
@@ -319,9 +318,9 @@ Type: Client Component ("use client")
 - **Container:** `mt-3 bg-surface-container rounded-lg border border-outline-variant/10 max-h-64 overflow-y-auto`
 - **Each item:** `flex items-center gap-3 px-4 py-3 hover:bg-surface-container-high transition-colors`
   - Avatar: `<Avatar size="sm">` (24px)
-  - Username: `font-mono text-xs text-on-surface hover:text-primary` as `<Link>` to `/perfil/[username]`
-  - Display name: `text-xs text-on-surface-variant`
-- **Empty:** `font-mono text-xs text-on-surface-variant text-center py-6` showing `no followers yet` or `not following anyone yet`
+  - Username: `font-mono text-[10px] text-on-surface hover:text-primary` as `<Link>` to `/perfil/[username]`
+  - Display name: `text-[10px] text-on-surface-variant`
+- **Empty:** `font-mono text-sm text-on-surface-variant text-center py-6` showing `no followers yet` or `not following anyone yet`
 
 #### 8. ComparisonPage (3-column)
 
@@ -346,25 +345,25 @@ Type: Server Component
 ```
 
 - **Page header:** Back link to `/perfil/[username]` + `COLLECTION_COMPARISON` title + `vs @username` subtitle
-  - Back: `font-mono text-xs text-on-surface-variant hover:text-primary flex items-center gap-1` with `material-symbols-outlined arrow_back` at 16px
+  - Back: `font-mono text-[10px] text-on-surface-variant hover:text-primary flex items-center gap-1` with `material-symbols-outlined arrow_back` at 16px
   - Title: `text-2xl font-heading font-bold text-on-surface mt-2`
-  - Subtitle: `font-mono text-xs text-on-surface-variant mt-1`
+  - Subtitle: `font-mono text-[10px] text-on-surface-variant mt-1`
 - **Desktop layout:** `grid grid-cols-3 gap-8 mt-8` (3 equal columns)
 - **Mobile layout:** `flex flex-col gap-6 mt-6` (stacked vertically)
 - **Each column:**
   - Header: `flex items-center justify-between mb-4`
-    - Label: `font-mono text-xs uppercase tracking-[0.2em]` with column-specific color
+    - Label: `font-mono text-[10px] uppercase tracking-[0.2em]` with column-specific color
     - Count badge: `font-mono text-[10px] px-2 py-0.5 rounded` with column-specific bg at 10% opacity
   - Container: `bg-surface-container-low rounded-lg border border-outline-variant/10 max-h-[60vh] overflow-y-auto`
   - Each record row: `px-4 py-3 border-b border-outline-variant/5 last:border-0`
-    - Artist: `font-mono text-xs text-on-surface-variant`
+    - Artist: `font-mono text-[10px] text-on-surface-variant`
     - Title: `font-heading text-sm font-bold text-on-surface truncate`
     - Rarity: `font-mono text-[10px]` with tier color
 - **Column accent colors:**
   - Unique to you: `text-secondary` / `bg-secondary/10` (blue)
   - In common: `text-primary` / `bg-primary/10` (green)
   - Unique to them: `text-tertiary` / `bg-tertiary/10` (orange)
-- **Empty column:** `font-mono text-xs text-on-surface-variant text-center py-8` showing `no unique records` or `no records in common`
+- **Empty column:** `font-mono text-sm text-on-surface-variant text-center py-8` showing `no unique records` or `no records in common`
 
 #### 9. ExplorarSearch (username search)
 
@@ -403,9 +402,9 @@ Type: Client Component ("use client")
   - Avatar: 40px (`w-10 h-10 bg-surface-container-high rounded flex items-center justify-center`)
   - Info:
     - Username: `font-mono text-sm text-on-surface hover:text-primary` as `<Link>` to `/perfil/[username]`
-    - Display name + stats: `font-mono text-[11px] text-on-surface-variant` showing `DISPLAY_NAME  ·  N records  ·  N followers`
+    - Display name + stats: `font-mono text-[10px] text-on-surface-variant` showing `DISPLAY_NAME  ·  N records  ·  N followers`
   - Follow button: `<FollowButton>` component (compact variant)
-- **No results:** `font-mono text-xs text-on-surface-variant text-center py-8` showing `no diggers found matching "{query}"`
+- **No results:** `font-mono text-sm text-on-surface-variant text-center py-8` showing `no diggers found matching "{query}"`
 - **Minimum query:** 2 characters before triggering search (per RESEARCH.md `searchUsers` implementation)
 
 ### Existing Components Reused (no modification)
