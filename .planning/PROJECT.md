@@ -1,12 +1,64 @@
-# VinylDig
+# DigSwap
 
 ## What This Is
 
-A social network for vinyl diggers — collectors who actively hunt for records. Users import their Discogs library, discover who has what they're looking for, compare collections with others, and trade audio rips of their vinyl via secure peer-to-peer connections. Gamified rankings reward both collection rarity and community contribution.
+A social network for vinyl diggers — collectors who actively hunt for records. The app operates as a layer on top of Discogs: import your collection instantly, then access social discovery, community groups, gamified rankings, and peer-to-peer audio trading — all in one place. It serves two types of users equally: the obsessive researcher and the community-driven digger.
 
 ## Core Value
 
 A digger opens the app and immediately finds who has the record they've been hunting — and sees where they stand in the community.
+
+## Product Architecture
+
+The app is built around 5 interconnected pillars:
+
+1. **Ferramenta (Tool)** — Individual value. Useful even with one user.
+   - Full Discogs collection import (no limits)
+   - Wantlist management
+   - Rarity scoring per record (Discogs have/want ratio)
+   - Filters: genre, decade, country, format, condition
+   - Physical condition tracking (Goldmine Standard)
+
+2. **Rede Social (Social Network)** — Collective value. Grows with users.
+   - Activity feed (what followed diggers are doing)
+   - Public profiles with collection showcase (URL-addressable)
+   - Follow system
+   - Collection comparison between users
+   - Wantlist matching: see who on the platform has what you want
+
+3. **Comunidade (Community)** — Groups for shared interests.
+   - Auto-generated groups by genre (exist day 1, never empty)
+   - User-created groups (free-form themes, e.g. "Blue Note Originals SP")
+   - Groups can be public (open) or private (invite-only)
+   - Group feed: member posts (text + optional linked record) + reviews
+   - Moderation: deferred to later phase
+
+4. **Gamificação (Gamification)** — Motivates contribution and return.
+   - Global rank = rarity score + social contribution (trades, reviews, activity)
+   - Per-genre leaderboards
+   - Badges for milestones (first import, 100 records, first trade, first review)
+   - Profile titles by rank tier ("Crate Digger" → "Wax Prophet")
+
+5. **Trades P2P** — Audio exchange directly between browsers.
+   - Trade linked to an audio file the user owns (not necessarily physical record)
+   - WebRTC browser-to-browser transfer — zero server file storage
+   - Audio spectrum analysis: verify if file is genuine analog (not digital upscale)
+   - Post-trade quality rating → sharer reputation score
+   - Legal prerequisite: DMCA agent registration before any trade is enabled
+
+## First Day Experience
+
+New user lands on app → immediately sees live content (global feed, active groups, rare records in spotlight) without needing to import first.
+
+Alongside, a 3-step progress bar:
+```
+[ Connect Discogs ] → [ Follow 3 diggers ] → [ Join a group ]
+```
+Each step completed unlocks more of the app and awards a welcome badge. Users without Discogs see value immediately (social content); users with Discogs have a clear setup path.
+
+## Home Screen Decision
+
+Feed and Profile have equal weight — both are primary entry points. Feed-first for social diggers; Profile-first for collection-focused diggers. Neither is secondary.
 
 ## Requirements
 
@@ -54,8 +106,9 @@ A digger opens the app and immediately finds who has the record they've been hun
 - [ ] Reputation score for sharers — bad quality = reputation loss
 
 **Monetization (Freemium)**
-- [ ] Free tier with limited P2P trades per month
-- [ ] Premium tier unlocks: unlimited P2P, collection analytics, exclusive groups, priority wantlist matching
+- [ ] Free tier: full social features, 5 P2P trades/month, 1 spectrum analysis per trade
+- [ ] Premium tier (~$8/month): unlimited P2P trades, unlimited spectrum analysis, deep collection analytics, unlimited private groups, priority wantlist matching
+- [ ] Conversion trigger: hitting trade/analysis limit mid-session naturally converts free users
 
 **Security**
 - [ ] Security tests generated throughout development (not as afterthought)
@@ -102,10 +155,15 @@ A digger opens the app and immediately finds who has the record they've been hun
 
 | Decision | Rationale | Outcome |
 |----------|-----------|---------|
-| WebRTC for P2P (no server file storage) | Legal "mere conduit" posture — platform not liable for content users share | — Pending |
-| Discogs have/want ratio as rarity base | Discogs is the authoritative data source for vinyl rarity in the community | — Pending |
+| WebRTC for P2P (no server file storage) | Legal "mere conduit" posture — platform not liable for content users share | — Pending Phase 9 |
+| Discogs have/want ratio as rarity base | Discogs is the authoritative data source for vinyl rarity in the community | ✓ Phase 4: implemented |
 | Web-first (no native mobile v1) | Solo developer constraint — web reaches all platforms without maintaining two codebases | — Pending |
-| Freemium model (not subscription) | Lower barrier to adoption; proves willingness to pay before locking in subscription model | — Pending |
+| Freemium model (not subscription) | Lower barrier to adoption; proves willingness to pay before locking in subscription model | ✓ Defined: free=5 trades/mo + 1 analysis/trade; premium=unlimited+analytics+groups |
+| Trade linked to audio file, not physical record | Digger may have audio without owning the physical disc today | ✓ Defined 2026-03-25 |
+| Audio spectrum analysis as premium conversion trigger | Solves real digger pain (analog vs digital upscale verification); free with 1/trade limit drives upgrades | ✓ Defined 2026-03-25 |
+| Auto-generated groups by genre + user-created groups (hybrid) | Auto groups ensure day-1 content; user groups enable niche communities | ✓ Defined 2026-03-25 |
+| First day: global feed visible before import (B+C hybrid) | Reduces friction for new users without Discogs while guiding Discogs users through setup | ✓ Defined 2026-03-25 |
+| Feed and Profile as equal primary entry points | Serves both community-first and collection-first digger personas | ✓ Defined 2026-03-25 |
 | Security-first development | Pen testing and security tests generated during development — not bolted on at the end | ✓ Phase 1: vitest unit + integration + Playwright E2E scaffolds; OWASP headers + rate limiting live |
 | Claude aesthetics prompting for frontend | Distinctive retro/analog visual identity using Anthropic cookbook methodology | ✓ Phase 1: Fraunces + DM Sans, OKLCH dark-warm palette, SVG grain texture |
 | Full DB schema in Phase 1 (not incremental) | Prevents painful migrations in later phases | ✓ Phase 1: 20 tables, 59 RLS policies, all v1 domains covered |

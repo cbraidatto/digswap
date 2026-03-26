@@ -2,16 +2,16 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-status: verifying
-stopped_at: Completed 04-03-PLAN.md
-last_updated: "2026-03-25T22:25:14.712Z"
+status: planning
+stopped_at: Phase 4 complete — ready to plan Phase 5
+last_updated: "2026-03-25T23:00:00.000Z"
 last_activity: 2026-03-25
 progress:
   total_phases: 11
-  completed_phases: 3
+  completed_phases: 4
   total_plans: 20
-  completed_plans: 18
-  percent: 9
+  completed_plans: 20
+  percent: 36
 ---
 
 # Project State
@@ -21,13 +21,13 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-25)
 
 **Core value:** A digger opens the app and immediately finds who has the record they've been hunting -- and sees where they stand in the community.
-**Current focus:** Phase 03 — discogs-integration
+**Current focus:** Phase 05 — social-layer
 
 ## Current Position
 
-Phase: 3
-Plan: 6 of 6
-Status: Phase complete — ready for verification
+Phase: 4 complete → Phase 5 next
+Plan: 4 of 4 (Phase 4)
+Status: Phase 4 verified by user — ready to plan Phase 5
 Last activity: 2026-03-25
 
 Progress: [█░░░░░░░░░] 9%
@@ -85,7 +85,7 @@ Recent decisions affecting current work:
 - [Phase 01]: Dark-only theme at :root with no .dark class -- single OKLCH variable set per D-01
 - [Phase 01]: supabaseAuthAdminRole for service-managed tables (releases, subscriptions, user_badges)
 - [Phase 01]: Backup codes use invalidation (used=true) not deletion -- audit trail and timing-attack prevention
-- [Phase 01]: getClaims() exclusively for JWT validation in middleware (never getSession()) per Supabase security best practice
+- [Phase 01]: Middleware uses getUser() for JWT validation + auto-refresh (getClaims was too strict, caused session expiry bugs on router.refresh())
 - [Phase 01]: Password complexity: min 8 chars, 1 uppercase, 1 number, 1 special char (per D-18)
 - [Phase 01]: Rate limiter windows: auth=5/60s, reset=3/15m, totp=5/5m (per D-16)
 - [Phase 01]: Password reset redirectTo uses /api/auth/callback?next=/reset-password for PKCE flow consistency

@@ -1,8 +1,8 @@
-# Roadmap: VinylDig
+# Roadmap: DigSwap
 
 ## Overview
 
-VinylDig delivers a social network for vinyl diggers in 11 phases, moving from foundation (auth, database, design system) through Discogs integration (the cold-start hook), collection management, social features, discovery and matching, community and reviews, gamification, P2P audio trading (with DMCA compliance as a prerequisite), monetization, and a final security hardening pass. Each phase delivers a complete, verifiable capability that unblocks the next.
+DigSwap delivers a social network for vinyl diggers in 11 phases, moving from foundation (auth, database, design system) through Discogs integration (the cold-start hook), collection management, social features, discovery and matching, community and reviews, gamification, P2P audio trading (with DMCA compliance as a prerequisite), monetization, and a final security hardening pass. Each phase delivers a complete, verifiable capability that unblocks the next.
 
 ## Phases
 
@@ -15,7 +15,8 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 1: Foundation + Authentication** - Project scaffolding, Supabase auth, database schema, retro/analog design system (completed 2026-03-25)
 - [x] **Phase 2: UI Shell + Navigation** - 4-tab navigation (Feed, Perfil, Explorar, Comunidade) with per-tab routing (completed 2026-03-25)
 - [x] **Phase 3: Discogs Integration** - OAuth 1.0a connection, collection/wantlist import, async pipeline with progress (completed 2026-03-25)
-- [ ] **Phase 4: Collection Management** - Public collection profiles, rarity scoring, filtering, sorting, manual entry
+- [x] **Phase 4: Collection Management** - Public collection profiles, rarity scoring, filtering, sorting, manual entry (completed 2026-03-25)
+- [ ] **Phase 4.5: Template Alignment** - Remove GitHub metaphors, align navigation language, clean placeholder content, wire empty states to product vision (INSERTED)
 - [ ] **Phase 5: Social Layer** - Follow system, activity feed, collection comparison, public profiles
 - [ ] **Phase 6: Discovery + Notifications** - Cross-collection search, wantlist matching, in-app/email/push notifications
 - [ ] **Phase 7: Community + Reviews** - Genre/era groups, group activity feeds, pressing and release reviews
@@ -63,14 +64,14 @@ Plans:
 **UI hint**: yes
 
 ### Phase 3: Discogs Integration
-**Goal**: Users can connect their Discogs account and import their full collection and wantlist into VinylDig
+**Goal**: Users can connect their Discogs account and import their full collection and wantlist into DigSwap
 **Depends on**: Phase 1
 **Requirements**: DISC-01, DISC-02, DISC-03, DISC-04, DISC-05, DISC-06
 **Success Criteria** (what must be TRUE):
   1. User can connect their Discogs account via OAuth and see a confirmation of the linked account
   2. User can trigger an import and see a real-time progress indicator as their collection loads
   3. User can import their wantlist and see it reflected separately from their collection
-  4. User can trigger a manual re-sync and see newly added Discogs records appear in VinylDig
+  4. User can trigger a manual re-sync and see newly added Discogs records appear in DigSwap
   5. User can disconnect their Discogs account and all imported data is removed
 **Plans**: 6 plans
 Plans:
@@ -95,14 +96,44 @@ Plans:
 **Plans**: 4 plans
 Plans:
 - [x] 04-01-PLAN.md -- Schema migration (username column), rarity formula fix, utility library, server actions, Wave 0 test scaffolds
-- [ ] 04-02-PLAN.md -- Collection grid UI, public profile route, filter bar, pagination, own profile rewrite
+- [x] 04-02-PLAN.md -- Collection grid UI, public profile route, filter bar, pagination, own profile rewrite
 - [x] 04-03-PLAN.md -- Add Record FAB, Discogs search dialog, condition grade editor
-- [ ] 04-04-PLAN.md -- Test implementations and human verification checkpoint
+- [x] 04-04-PLAN.md -- Test implementations and human verification checkpoint
+**UI hint**: yes
+
+### Phase 4.5: Template Alignment (INSERTED)
+**Goal**: Align every existing UI surface with the DigSwap product vision — remove GitHub metaphors, fix navigation language, clean placeholder content, and wire empty states correctly
+**Depends on**: Phase 4
+**Why now**: Phases 1–4 built working infrastructure with placeholder/GitHub-style UI language. Before building social features on top, the shell must reflect the actual product so future phases build on clean foundations.
+
+**What to fix:**
+
+| Surface | Current (broken) | Target |
+|---------|-----------------|--------|
+| Sidebar label "Repositories" | GitHub metaphor | "Collection" → `/perfil` |
+| Sidebar label "Organizations" | GitHub metaphor | "Community" → `/comunidade` |
+| Sidebar label "Recent Activity" | Generic | "Feed" → `/feed` |
+| Sidebar "Popular Crews" section | 3 hardcoded fake crews | Remove — will be real data in Phase 7 |
+| Feed items: "star", "fork", "comment" | GitHub metaphors | Digger-appropriate actions (like, repost discovery, comment) |
+| Bottom bar FAB → `/trades/new` | Trades don't exist yet (Phase 9) | Change to `/explorar` or remove until Phase 9 |
+| Header nav label "Digger" | Confusing | "Explorar" or "Explore" |
+| Comunidade tab: hardcoded swap/discussion/crew data | Fake placeholder | Clean empty states with "coming soon" context |
+| Feed: hardcoded trending/system-log sidebars | GitHub UI | Remove or replace with digger-relevant empty states |
+| `/perfil`: "ADD_RECORD" button links to `/settings` | Wrong destination | Opens add record modal (already exists as FAB) |
+
+**Success Criteria**:
+  1. No GitHub metaphors remain anywhere in the UI (no stars, forks, repositories, organizations)
+  2. All navigation labels match product language (Feed, Explorar, Comunidade, Perfil)
+  3. Sidebar shows only real navigation — no hardcoded fake data
+  4. Bottom bar FAB makes sense for current phase
+  5. Empty states on Feed and Comunidade are clean and honest (not fake placeholder content)
+  6. All routes and buttons point to correct destinations
+**Plans**: TBD
 **UI hint**: yes
 
 ### Phase 5: Social Layer
 **Goal**: Users can build a social graph, see what fellow diggers are doing, and compare collections
-**Depends on**: Phase 4
+**Depends on**: Phase 4.5
 **Requirements**: SOCL-01, SOCL-02, SOCL-03, SOCL-04, SOCL-05
 **Success Criteria** (what must be TRUE):
   1. User can follow another digger and see them in their following list
@@ -110,6 +141,7 @@ Plans:
   3. User sees an activity feed showing recent actions (adds, trades, reviews) from diggers they follow
   4. User can compare their collection with another user and see overlap, unique-to-me, and unique-to-them
   5. User can visit any public profile and browse that user's full collection
+  6. New user first-day experience: global feed visible before import + 3-step onboarding progress bar (Connect Discogs → Follow 3 diggers → Join a group)
 **Plans**: TBD
 **UI hint**: yes
 
@@ -131,11 +163,12 @@ Plans:
 **Depends on**: Phase 5
 **Requirements**: COMM-01, COMM-02, COMM-03, COMM-04, COMM-05, REV-01, REV-02, REV-03
 **Success Criteria** (what must be TRUE):
-  1. User can create a group for a genre, era, or style and it appears in the Comunidade tab
-  2. User can join and leave groups, and group membership is reflected on their profile
-  3. User can post text updates inside a group and view the group's activity feed
-  4. User can write a review for a specific pressing or a general release, with a star rating
-  5. User can browse all reviews for any pressing or release
+  1. Auto-generated genre groups exist from day 1 (Electronic, Jazz, Hip Hop, Rock, Latin, etc.) — always have content, never empty
+  2. User can create a custom group (free-form theme, e.g. "Blue Note Originals SP") and set it as public or private (invite-only)
+  3. User can join and leave groups; membership is reflected on their profile
+  4. User can post in a group (text + optional linked record) and browse the group feed
+  5. User can write a review for a specific pressing or release with a star rating, linked to the group
+  6. User can browse all reviews for any pressing or release
 **Plans**: TBD
 **UI hint**: yes
 
@@ -159,9 +192,12 @@ Plans:
 **Success Criteria** (what must be TRUE):
   1. DMCA agent is registered and notice-and-takedown procedure is operational before any file transfer is possible
   2. Terms of Service explicitly place copyright responsibility on users and are accepted before first trade
-  3. User can initiate a file transfer request for a specific record and the recipient can accept or decline
-  4. File transfers occur directly browser-to-browser via WebRTC with a progress indicator -- no file data touches the server
-  5. After a transfer completes, the recipient can rate the audio quality and that rating updates the sharer's reputation score visible on their profile
+  3. Trade is linked to an audio file the user owns — not required to match a physical record in collection
+  4. User can initiate a file transfer request and the recipient can accept or decline
+  5. File transfers occur directly browser-to-browser via WebRTC — no file data touches the server
+  6. Audio spectrum analysis available during trade review: free users get 1 analysis per trade, premium users get unlimited
+  7. After transfer completes, recipient rates audio quality → updates sharer's reputation score on profile
+  8. Free users limited to 5 trades/month with visible counter; premium users have no limit
 **Plans**: TBD
 
 ### Phase 10: Monetization
@@ -196,7 +232,8 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7 -> 8 -> 9 -> 10
 | 1. Foundation + Authentication | 8/8 | Complete | 2026-03-25 |
 | 2. UI Shell + Navigation | 2/2 | Complete | 2026-03-25 |
 | 3. Discogs Integration | 6/6 | Complete   | 2026-03-25 |
-| 4. Collection Management | 0/4 | Not started | - |
+| 4. Collection Management | 4/4 | Complete | 2026-03-25 |
+| 4.5. Template Alignment | 0/TBD | Not started | - |
 | 5. Social Layer | 0/TBD | Not started | - |
 | 6. Discovery + Notifications | 0/TBD | Not started | - |
 | 7. Community + Reviews | 0/TBD | Not started | - |
