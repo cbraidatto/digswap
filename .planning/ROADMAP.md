@@ -104,18 +104,18 @@ Plans:
 ### Phase 4.5: Template Alignment (INSERTED)
 **Goal**: Align every existing UI surface with the DigSwap product vision — remove GitHub metaphors, fix navigation language, clean placeholder content, and wire empty states correctly
 **Depends on**: Phase 4
-**Why now**: Phases 1–4 built working infrastructure with placeholder/GitHub-style UI language. Before building social features on top, the shell must reflect the actual product so future phases build on clean foundations.
+**Why now**: Phases 1-4 built working infrastructure with placeholder/GitHub-style UI language. Before building social features on top, the shell must reflect the actual product so future phases build on clean foundations.
 
 **What to fix:**
 
 | Surface | Current (broken) | Target |
 |---------|-----------------|--------|
-| Sidebar label "Repositories" | GitHub metaphor | "Collection" → `/perfil` |
-| Sidebar label "Organizations" | GitHub metaphor | "Community" → `/comunidade` |
-| Sidebar label "Recent Activity" | Generic | "Feed" → `/feed` |
-| Sidebar "Popular Crews" section | 3 hardcoded fake crews | Remove — will be real data in Phase 7 |
+| Sidebar label "Repositories" | GitHub metaphor | "Collection" -> `/perfil` |
+| Sidebar label "Organizations" | GitHub metaphor | "Community" -> `/comunidade` |
+| Sidebar label "Recent Activity" | Generic | "Feed" -> `/feed` |
+| Sidebar "Popular Crews" section | 3 hardcoded fake crews | Remove -- will be real data in Phase 7 |
 | Feed items: "star", "fork", "comment" | GitHub metaphors | Digger-appropriate actions (like, repost discovery, comment) |
-| Bottom bar FAB → `/trades/new` | Trades don't exist yet (Phase 9) | Change to `/explorar` or remove until Phase 9 |
+| Bottom bar FAB -> `/trades/new` | Trades don't exist yet (Phase 9) | Change to `/explorar` or remove until Phase 9 |
 | Header nav label "Digger" | Confusing | "Explorar" or "Explore" |
 | Comunidade tab: hardcoded swap/discussion/crew data | Fake placeholder | Clean empty states with "coming soon" context |
 | Feed: hardcoded trending/system-log sidebars | GitHub UI | Remove or replace with digger-relevant empty states |
@@ -124,7 +124,7 @@ Plans:
 **Success Criteria**:
   1. No GitHub metaphors remain anywhere in the UI (no stars, forks, repositories, organizations)
   2. All navigation labels match product language (Feed, Explorar, Comunidade, Perfil)
-  3. Sidebar shows only real navigation — no hardcoded fake data
+  3. Sidebar shows only real navigation -- no hardcoded fake data
   4. Bottom bar FAB makes sense for current phase
   5. Empty states on Feed and Comunidade are clean and honest (not fake placeholder content)
   6. All routes and buttons point to correct destinations
@@ -144,8 +144,13 @@ Plans:
   3. User sees an activity feed showing recent actions (adds, trades, reviews) from diggers they follow
   4. User can compare their collection with another user and see overlap, unique-to-me, and unique-to-them
   5. User can visit any public profile and browse that user's full collection
-  6. New user first-day experience: global feed visible before import + 3-step onboarding progress bar (Connect Discogs → Follow 3 diggers → Join a group)
-**Plans**: TBD
+  6. New user first-day experience: global feed visible before import + 3-step onboarding progress bar (Connect Discogs -> Follow 3 diggers -> Join a group)
+**Plans**: 4 plans
+Plans:
+- [ ] 05-01-PLAN.md -- Data layer: test scaffolds, server actions (follow/unfollow/logActivity/loadMoreFeed/searchUsers), query functions, comparison logic, wire logActivity into addRecord
+- [ ] 05-02-PLAN.md -- Feed page: FeedCard, FollowEventCard, FeedContainer with infinite scroll, ProgressBanner, /feed rewrite
+- [ ] 05-03-PLAN.md -- Public profiles + Explorar: /perfil/[username] with ProfileHeader and FollowButton, FollowList on own profile, username search on /explorar
+- [ ] 05-04-PLAN.md -- Collection comparison: /perfil/[username]/compare with 3-column layout, human verification checkpoint
 **UI hint**: yes
 
 ### Phase 6: Discovery + Notifications
@@ -166,7 +171,7 @@ Plans:
 **Depends on**: Phase 5
 **Requirements**: COMM-01, COMM-02, COMM-03, COMM-04, COMM-05, REV-01, REV-02, REV-03
 **Success Criteria** (what must be TRUE):
-  1. Auto-generated genre groups exist from day 1 (Electronic, Jazz, Hip Hop, Rock, Latin, etc.) — always have content, never empty
+  1. Auto-generated genre groups exist from day 1 (Electronic, Jazz, Hip Hop, Rock, Latin, etc.) -- always have content, never empty
   2. User can create a custom group (free-form theme, e.g. "Blue Note Originals SP") and set it as public or private (invite-only)
   3. User can join and leave groups; membership is reflected on their profile
   4. User can post in a group (text + optional linked record) and browse the group feed
@@ -195,11 +200,11 @@ Plans:
 **Success Criteria** (what must be TRUE):
   1. DMCA agent is registered and notice-and-takedown procedure is operational before any file transfer is possible
   2. Terms of Service explicitly place copyright responsibility on users and are accepted before first trade
-  3. Trade is linked to an audio file the user owns — not required to match a physical record in collection
+  3. Trade is linked to an audio file the user owns -- not required to match a physical record in collection
   4. User can initiate a file transfer request and the recipient can accept or decline
-  5. File transfers occur directly browser-to-browser via WebRTC — no file data touches the server
+  5. File transfers occur directly browser-to-browser via WebRTC -- no file data touches the server
   6. Audio spectrum analysis available during trade review: free users get 1 analysis per trade, premium users get unlimited
-  7. After transfer completes, recipient rates audio quality → updates sharer's reputation score on profile
+  7. After transfer completes, recipient rates audio quality -> updates sharer's reputation score on profile
   8. Free users limited to 5 trades/month with visible counter; premium users have no limit
 **Plans**: TBD
 
@@ -237,7 +242,7 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7 -> 8 -> 9 -> 10
 | 3. Discogs Integration | 6/6 | Complete   | 2026-03-25 |
 | 4. Collection Management | 4/4 | Complete | 2026-03-25 |
 | 4.5. Template Alignment | 2/2 | Complete | 2026-03-25 |
-| 5. Social Layer | 0/TBD | Not started | - |
+| 5. Social Layer | 0/4 | Planned | - |
 | 6. Discovery + Notifications | 0/TBD | Not started | - |
 | 7. Community + Reviews | 0/TBD | Not started | - |
 | 8. Gamification + Rankings | 0/TBD | Not started | - |
