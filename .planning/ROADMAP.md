@@ -19,7 +19,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 4.5: Template Alignment** - Remove GitHub metaphors, align navigation language, clean placeholder content, wire empty states to product vision (INSERTED, completed 2026-03-25)
 - [ ] **Phase 5: Social Layer** - Follow system, activity feed, collection comparison, public profiles
 - [x] **Phase 6: Discovery + Notifications** - Cross-collection search, wantlist matching, in-app/email/push notifications (completed 2026-03-26)
-- [ ] **Phase 7: Community + Reviews** - Genre/era groups, group activity feeds, pressing and release reviews
+- [x] **Phase 7: Community + Reviews** - Genre/era groups, group activity feeds, pressing and release reviews (completed 2026-03-26)
 - [ ] **Phase 8: Gamification + Rankings** - Global/genre leaderboards, badges, titles, composite ranking formula
 - [ ] **Phase 9: P2P Audio Trading** - DMCA compliance, WebRTC file transfer, trade reputation, TURN relay
 - [ ] **Phase 10: Monetization** - Stripe subscription, freemium gating, premium tier features
@@ -189,7 +189,7 @@ Plans:
 - [x] 07-02-PLAN.md -- /comunidade group discovery hub (genre groups, member groups, filter chips) + /comunidade/new group creation form
 - [x] 07-03-PLAN.md -- /comunidade/[slug] group detail page (header, join/leave, composer, post feed, invite controls) + /join/[token] invite landing
 - [x] 07-04-PLAN.md -- Reviews panel on RecordSearchCard (/explorar) + GroupFeedCard in /feed for group_post events
-- [ ] 07-05-PLAN.md -- Test implementations and human verification checkpoint
+- [x] 07-05-PLAN.md -- Test implementations and human verification checkpoint
 **UI hint**: yes
 
 ### Phase 8: Gamification + Rankings
@@ -256,7 +256,7 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7 -> 8 -> 9 -> 10
 | 4.5. Template Alignment | 2/2 | Complete | 2026-03-25 |
 | 5. Social Layer | 0/4 | Planned | - |
 | 6. Discovery + Notifications | 5/5 | Complete   | 2026-03-26 |
-| 7. Community + Reviews | 1/5 | In Progress|  |
+| 7. Community + Reviews | 5/5 | Complete   | 2026-03-26 |
 | 8. Gamification + Rankings | 0/TBD | Not started | - |
 | 9. P2P Audio Trading | 0/TBD | Not started | - |
 | 10. Monetization | 0/TBD | Not started | - |
