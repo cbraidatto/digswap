@@ -28,6 +28,7 @@ export default async function ProtectedLayout({ children }: { children: React.Re
 	return (
 		<AppShell
 			user={{
+				id: user.id,
 				displayName: profile?.displayName ?? null,
 				avatarUrl: profile?.avatarUrl ?? null,
 			}}

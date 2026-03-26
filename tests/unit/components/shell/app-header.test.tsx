@@ -20,16 +20,23 @@ vi.mock("@/components/shell/user-avatar-menu", () => ({
 	),
 }));
 
+// Mock NotificationBell to avoid Base UI Popover + Realtime complexity in jsdom
+vi.mock("@/components/shell/notification-bell", () => ({
+	NotificationBell: ({ userId }: { userId: string }) => (
+		<div data-testid="notification-bell" data-user-id={userId} />
+	),
+}));
+
 import { AppHeader } from "@/components/shell/app-header";
 
 describe("AppHeader", () => {
 	it("renders DIGSWAP wordmark", () => {
-		render(<AppHeader displayName="Test" avatarUrl={null} />);
+		render(<AppHeader displayName="Test" avatarUrl={null} userId="test-user-id" />);
 		expect(screen.getByText("DIGSWAP")).toBeInTheDocument();
 	});
 
 	it("renders wordmark with font-heading class", () => {
-		render(<AppHeader displayName="Test" avatarUrl={null} />);
+		render(<AppHeader displayName="Test" avatarUrl={null} userId="test-user-id" />);
 		const wordmark = screen.getByText("DIGSWAP");
 		expect(wordmark.className).toContain("font-heading");
 	});

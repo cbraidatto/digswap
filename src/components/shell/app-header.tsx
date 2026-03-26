@@ -1,13 +1,15 @@
 import Link from "next/link";
 import { UserAvatarMenu } from "@/components/shell/user-avatar-menu";
+import { NotificationBell } from "@/components/shell/notification-bell";
 
 interface AppHeaderProps {
 	displayName: string | null;
 	avatarUrl: string | null;
 	xp?: number;
+	userId: string;
 }
 
-export function AppHeader({ displayName, avatarUrl, xp = 0 }: AppHeaderProps) {
+export function AppHeader({ displayName, avatarUrl, xp = 0, userId }: AppHeaderProps) {
 	return (
 		<header className="fixed top-0 left-0 right-0 z-50 flex justify-between items-center px-6 py-3 w-full border-b border-outline-variant/20 bg-surface-dim">
 			<div className="flex items-center gap-8">
@@ -51,13 +53,7 @@ export function AppHeader({ displayName, avatarUrl, xp = 0 }: AppHeaderProps) {
 						</span>
 					</div>
 				)}
-				<button
-					type="button"
-					className="p-2 text-on-surface-variant hover:bg-surface-bright transition-colors rounded"
-					aria-label="Notifications"
-				>
-					<span className="material-symbols-outlined text-[20px]">notifications</span>
-				</button>
+				<NotificationBell userId={userId} />
 				<UserAvatarMenu displayName={displayName} avatarUrl={avatarUrl} />
 			</div>
 		</header>

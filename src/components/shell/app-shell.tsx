@@ -9,6 +9,7 @@ const SHELL_EXCLUDED_PREFIXES = ["/onboarding", "/settings"];
 
 interface AppShellProps {
 	user: {
+		id: string;
 		displayName: string | null;
 		avatarUrl: string | null;
 		rank?: string;
@@ -28,7 +29,7 @@ export function AppShell({ user, banner, children }: AppShellProps) {
 
 	return (
 		<>
-			<AppHeader displayName={user.displayName} avatarUrl={user.avatarUrl} xp={user.xp} />
+			<AppHeader displayName={user.displayName} avatarUrl={user.avatarUrl} xp={user.xp} userId={user.id} />
 			<Sidebar displayName={user.displayName} rank={user.rank} />
 			{banner}
 			<main
