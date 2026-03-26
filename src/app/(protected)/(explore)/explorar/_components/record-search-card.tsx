@@ -1,8 +1,11 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import type { SearchResult } from "@/lib/discovery/queries";
 import { getRarityTier } from "@/lib/collection/rarity";
+import { getReviewCountAction } from "@/actions/community";
 import { OwnersList } from "./owners-list";
+import { ReviewsPanel } from "./reviews-panel";
 
 function getRarityColors(tier: string | null): string {
 	switch (tier) {
@@ -23,6 +26,12 @@ interface RecordSearchCardProps {
 
 export function RecordSearchCard({ release }: RecordSearchCardProps) {
 	const rarityTier = getRarityTier(release.rarityScore);
+	const [isReviewsExpanded, setIsReviewsExpanded] = useState(false);
+	const [reviewCount, setReviewCount] = useState<number | null>(null);
+
+	useEffect(() => {
+		getReviewCountAction(release.id).then((count) => setReviewCount(count));
+	}, [release.id]);
 
 	return (
 		<div>
@@ -90,6 +99,30 @@ export function RecordSearchCard({ release }: RecordSearchCardProps) {
 
 			{/* Owners List */}
 			<OwnersList owners={release.owners} />
+
+			{/* Review trigger */}
+			{reviewCount !== null && (
+				<div className="pl-16 py-1">
+					<button
+						type="button"
+						onClick={() => setIsReviewsExpanded((prev) => !prev)}
+						className="font-mono text-[10px] text-primary hover:underline cursor-pointer"
+						aria-expanded={isReviewsExpanded}
+						aria-controls={`reviews-panel-${release.id}`}
+					>
+						{reviewCount === 1 ? "review: 1" : `reviews: ${reviewCount}`}
+						{isReviewsExpanded ? " \u2191 collapse" : " \u2193"}
+					</button>
+				</div>
+			)}
+
+			{/* Reviews Panel */}
+			<div id={`reviews-panel-${release.id}`}>
+				<ReviewsPanel
+					releaseId={release.id}
+					isExpanded={isReviewsExpanded}
+				/>
+			</div>
 		</div>
 	);
 }
