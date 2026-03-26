@@ -21,9 +21,9 @@ created: 2026-03-26
 | Preset | base-nova (neutral base, CSS variables, RSC) |
 | Component library | base-ui (via shadcn base-nova style) |
 | Icon library | lucide-react + Material Symbols Outlined |
-| Font (sans) | Inter (400, 500, 600) |
-| Font (heading) | Space Grotesk (600, 700) |
-| Font (mono) | JetBrains Mono (400, 500) |
+| Font (sans) | Inter (400, 600) |
+| Font (heading) | Space Grotesk (600) |
+| Font (mono) | JetBrains Mono (400, 600) |
 
 **Theme:** Ghost Protocol -- dark-only, terminal aesthetic, grain overlay. No light mode.
 
@@ -37,7 +37,7 @@ Declared values (multiples of 4):
 |-------|-------|-------|
 | xs | 4px | Icon gaps, inline badge padding, chip internal gap |
 | sm | 8px | Compact element spacing, filter chip gap, notification row gap |
-| md | 16px | Default element spacing, card padding, dropdown padding |
+| md | 16px | Default element spacing, card padding, dropdown padding, notification row padding, tab horizontal padding |
 | lg | 24px | Section padding, settings section vertical gap |
 | xl | 32px | Page-level horizontal padding (mobile), tab content vertical gap |
 | 2xl | 48px | Hero section padding (desktop: `p-12`) |
@@ -45,7 +45,6 @@ Declared values (multiples of 4):
 
 Exceptions:
 - Notification bell touch target: 40px (10px padding around 20px icon) for accessibility
-- Tab bar: 12px horizontal padding per tab label, 8px vertical padding
 
 ---
 
@@ -62,19 +61,19 @@ Exceptions:
 
 | Element | Size | Weight | Font | Transform |
 |---------|------|--------|------|-----------|
-| Tab label (active) | 12px | 500 | JetBrains Mono | uppercase, tracking-widest |
-| Tab label (inactive) | 12px | 400 | JetBrains Mono | uppercase, tracking-widest |
+| Tab label (active) | 10px | 600 | JetBrains Mono | uppercase, tracking-widest |
+| Tab label (inactive) | 10px | 400 | JetBrains Mono | uppercase, tracking-widest |
 | Section header | 10px | 400 | JetBrains Mono | uppercase, tracking-[0.2em] |
-| Notification title | 14px | 500 | Inter | none |
-| Notification body | 12px | 400 | Inter | none |
+| Notification title | 14px | 600 | Inter | none |
+| Notification body | 14px | 400 | Inter | none |
 | Notification timestamp | 10px | 400 | JetBrains Mono | none |
 | Record card title | 14px | 600 | Space Grotesk | none |
-| Record card metadata | 11px | 400 | JetBrains Mono | none |
-| Filter chip text | 12px | 400 | JetBrains Mono | none |
+| Record card metadata | 10px | 400 | JetBrains Mono | none |
+| Filter chip text | 10px | 400 | JetBrains Mono | none |
 | Owner count | 10px | 400 | JetBrains Mono | none |
 | Settings toggle label | 14px | 400 | Inter | none |
-| Settings toggle description | 12px | 400 | Inter | none |
-| Phase badge (disabled toggle) | 10px | 500 | JetBrains Mono | uppercase |
+| Settings toggle description | 14px | 400 | Inter | none |
+| Phase badge (disabled toggle) | 10px | 600 | JetBrains Mono | uppercase |
 
 ---
 
@@ -100,7 +99,7 @@ Exceptions:
 
 **Secondary accent (`#aac7ff` / --secondary) reserved for:**
 - "Rare" rarity badge
-- "View all" link in notification dropdown
+- "View all notifications" link in notification dropdown
 
 **Tertiary (`#ffb689` / --tertiary) reserved for:**
 - "Ultra Rare" rarity badge
@@ -162,6 +161,8 @@ Exceptions:
 
 ### Explorar Page (rewrite)
 
+**Focal point:** RECORDS tab -- the search input is the primary interaction entry point. On tab activation, the search input auto-focuses. The terminal prompt `>` and green left border draw the eye immediately.
+
 ```
 +-----------------------------------------------------------+
 |  [DIGGERS]   [RECORDS]                  <- tab bar         |
@@ -194,11 +195,11 @@ Exceptions:
 
 **Tab bar spec:**
 - Full width, horizontal, left-aligned
-- Tab labels: JetBrains Mono, 12px, uppercase, tracking-widest
-- Active tab: `text-primary`, `border-b-2 border-primary`
-- Inactive tab: `text-on-surface-variant`, `hover:text-on-surface`
+- Tab labels: JetBrains Mono, 10px, uppercase, tracking-widest
+- Active tab: `text-primary`, `border-b-2 border-primary`, weight 600
+- Inactive tab: `text-on-surface-variant`, `hover:text-on-surface`, weight 400
 - Tab gap: 24px between tabs
-- Tab padding: `px-3 py-2`
+- Tab padding: `px-4 py-2`
 - Tab bar bottom border: `border-b border-outline-variant/10`
 - Tab bar background: transparent (inherits page background)
 
@@ -231,7 +232,7 @@ Exceptions:
 - Shadow: `shadow-md`
 - Z-index: `z-[60]` (above grain overlay `z-50` and header `z-50`)
 - Notification row height: auto (content-driven, minimum ~64px)
-- Notification row padding: `p-3`
+- Notification row padding: `p-4`
 - Notification row hover: `bg-surface-container-high`
 - Unread row: left border `border-l-2 border-primary`
 - Read row: no left border accent
@@ -241,7 +242,7 @@ Exceptions:
 
 ```
 [type_icon]  Title text (14px semibold)
-             Body snippet (12px regular, 1 line truncated)
+             Body text (14px regular, 1 line truncated)
              2 min ago (10px mono, muted)
 ```
 
@@ -271,8 +272,8 @@ Exceptions:
 - Padding: `p-4`
 - Hover: `bg-surface-container`
 - Album art placeholder: 48x48 `bg-surface-container-high rounded`, Material Symbol `album` centered
-- Title: Space Grotesk, 14px, semibold, `text-on-surface`, on hover `text-primary`
-- Metadata row: JetBrains Mono, 11px, `text-on-surface-variant`, items separated by ` . `
+- Title: Space Grotesk, 14px, semibold (600), `text-on-surface`, on hover `text-primary`
+- Metadata row: JetBrains Mono, 10px, `text-on-surface-variant`, items separated by ` . `
 - Rarity badge: reuse existing `getRarityTier()` + `getRarityBadgeVariant()` from `src/lib/collection/rarity.ts`
 - Owner count: JetBrains Mono, 10px, `text-on-surface-variant`
 
@@ -281,10 +282,10 @@ Exceptions:
 - Row height: 32px
 - Row gap: 4px
 - Avatar: `w-6 h-6 rounded bg-surface-container-high`
-- Username: JetBrains Mono, 12px, `text-on-surface`, link to `/perfil/[username]`, hover `text-primary`
+- Username: JetBrains Mono, 10px, `text-on-surface`, link to `/perfil/[username]`, hover `text-primary`
 - Condition badge: JetBrains Mono, 10px, `text-on-surface-variant border border-outline-variant/20 px-1 rounded`
 - Collapsed by default if >3 owners: show 3 + "+N more" link
-- If no owners: show `[NO_OWNERS_IN_NETWORK]` in mono 12px `text-on-surface-variant`
+- If no owners: show `[NO_OWNERS_IN_NETWORK]` in mono 10px `text-on-surface-variant`
 
 ### Genre/Decade Filter Chips
 
@@ -295,15 +296,15 @@ Decade: [60s] [70s] [80s] [90s] [00s] [10s]
 
 **Chip spec:**
 - Layout: horizontal flex wrap, gap 8px between chips
-- Chip dimensions: auto width, `px-3 py-1.5`, `rounded-full`
-- Font: JetBrains Mono, 12px
+- Chip dimensions: auto width, `px-4 py-1`, `rounded-full`
+- Font: JetBrains Mono, 10px
 - Inactive state: `bg-surface-container-low text-on-surface-variant border border-outline-variant/20`
 - Active state: `bg-primary/10 text-primary border border-primary`
 - Hover (inactive): `bg-surface-container text-on-surface`
 - Single selection per row: clicking a chip deselects the previously active chip in that row. Clicking the active chip deselects it (no filter).
 - Genre row label: "Genre:" -- JetBrains Mono, 10px, uppercase, tracking-[0.2em], `text-outline`, inline before chips
 - Decade row label: "Decade:" -- same style as genre label
-- Row gap: 12px between genre row and decade row
+- Row gap: 16px between genre row and decade row
 
 ### Settings - Notification Preferences Section
 
@@ -340,15 +341,15 @@ Decade: [60s] [70s] [80s] [90s] [00s] [10s]
 
 **Preferences section spec:**
 - Positioned below existing DiscogsSettings section on `/settings`
-- Section heading: "Notification Preferences" -- Space Grotesk, 20px, semibold
+- Section heading: "Notification Preferences" -- Space Grotesk, 20px, semibold (600)
 - Each preference group: vertical stack
-- Group title: Inter, 14px, weight 500, `text-on-surface`
-- Group description: Inter, 12px, weight 400, `text-on-surface-variant`
+- Group title: Inter, 14px, weight 600, `text-on-surface`
+- Group description: Inter, 14px, weight 400, `text-on-surface-variant`
 - Toggle row: horizontal flex, gap 16px between toggles
 - Toggle: native HTML checkbox styled with `accent-primary` (matching existing format filter pattern)
-- Toggle label: JetBrains Mono, 12px, `text-on-surface-variant`
+- Toggle label: JetBrains Mono, 10px, `text-on-surface-variant`
 - Disabled toggles: `opacity-50 cursor-not-allowed`
-- Phase badge: JetBrains Mono, 10px, `bg-surface-container-high text-on-surface-variant px-1.5 py-0.5 rounded border border-outline-variant/20`, content like `[PHASE_9]`
+- Phase badge: JetBrains Mono, 10px, `bg-surface-container-high text-on-surface-variant px-2 py-1 rounded border border-outline-variant/20`, content like `[PHASE_9]`
 - Separator: `border-t border-outline-variant/10`, margin `my-4`
 
 ### Notifications Full Page (`/notifications`)
@@ -372,7 +373,7 @@ Decade: [60s] [70s] [80s] [90s] [00s] [10s]
 **Page spec:**
 - Max width: `max-w-[640px]` (matches settings page)
 - Centered: `mx-auto`
-- Heading: "Notifications" -- Space Grotesk, 20px, semibold
+- Heading: "Notifications" -- Space Grotesk, 20px, semibold (600)
 - Rows: same NotificationRow component as dropdown but full-width
 - Row separator: `border-b border-outline-variant/10`
 - Pagination: simple prev/next buttons at bottom
@@ -441,7 +442,7 @@ Decade: [60s] [70s] [80s] [90s] [00s] [10s]
 | Click outside dropdown | Close Popover dropdown |
 | Click notification row | Navigate to `notification.link`, mark as read, close dropdown |
 | Click "Mark all read" | Mark all notifications as read via server action, reset badge to 0 |
-| Click "View all" | Navigate to `/notifications` page |
+| Click "View all notifications" | Navigate to `/notifications` page |
 | Badge display | Number 1-9 shown; 10+ shows "9+" |
 | Zero unread | No badge visible (not "0") |
 
@@ -488,7 +489,7 @@ Decade: [60s] [70s] [80s] [90s] [00s] [10s]
 | Suggested empty state heading | `[NO_SUGGESTIONS_YET]` |
 | Suggested empty state body | `Follow more diggers or import your collection to get personalized suggestions.` |
 | Notification dropdown header | `Notifications` |
-| Notification dropdown "view all" | `View all` |
+| Notification dropdown "view all" | `View all notifications` |
 | Notification dropdown "mark all read" | `Mark all read` |
 | Notification: wantlist match title | `Wantlist match found!` |
 | Notification: wantlist match body | `{username} has "{title}" by {artist}` |
@@ -532,7 +533,7 @@ Decade: [60s] [70s] [80s] [90s] [00s] [10s]
 
 | Surface | Error Pattern |
 |---------|---------------|
-| Record search failure | `Search failed. Please try again.` below input, mono 12px, destructive color |
+| Record search failure | `Search failed. Please try again.` below input, mono 10px, destructive color |
 | Browse query failure | `Failed to load records. Please try again.` in grid area |
 | Notification dropdown load failure | `Could not load notifications.` single row in dropdown |
 | Email send failure | Silent (console.error only -- never blocks user flow) |
