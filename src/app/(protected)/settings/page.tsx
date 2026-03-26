@@ -2,6 +2,7 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { DiscogsSettings } from "@/components/discogs/discogs-settings";
+import { NotificationPreferences } from "./_components/notification-preferences";
 
 /**
  * Settings page with Discogs integration section.
@@ -45,6 +46,10 @@ export default async function SettingsPage({
 				discogsUsername={profile?.discogs_username ?? null}
 				lastSyncedAt={profile?.last_synced_at ?? null}
 			/>
+
+			<div className="border-t border-outline-variant/10" />
+
+			<NotificationPreferences />
 		</div>
 	);
 }
