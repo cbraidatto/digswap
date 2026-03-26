@@ -56,10 +56,10 @@
 
 ### Discovery
 
-- [ ] **DISC2-01**: User can search by record name/artist and see which platform users have it in their collection
-- [ ] **DISC2-02**: User can browse collections filtered by genre and decade
-- [ ] **DISC2-03**: User receives a notification when a platform user has a record from their wantlist
-- [ ] **DISC2-04**: Platform suggests records to the user based on their collection taste and similar diggers' collections (collaborative filtering)
+- [x] **DISC2-01**: User can search by record name/artist and see which platform users have it in their collection
+- [x] **DISC2-02**: User can browse collections filtered by genre and decade
+- [x] **DISC2-03**: User receives a notification when a platform user has a record from their wantlist
+- [x] **DISC2-04**: Platform suggests records to the user based on their collection taste and similar diggers' collections (collaborative filtering)
 
 ### Reviews
 
@@ -88,10 +88,10 @@
 
 ### Notifications
 
-- [ ] **NOTF-01**: User receives in-app notifications for: wantlist match, trade request, trade completed, ranking movement, new badge earned
-- [ ] **NOTF-02**: User receives email notifications for: wantlist match, trade request
+- [x] **NOTF-01**: User receives in-app notifications for: wantlist match, trade request, trade completed, ranking movement, new badge earned
+- [x] **NOTF-02**: User receives email notifications for: wantlist match, trade request
 - [ ] **NOTF-03**: User can enable browser push notifications
-- [ ] **NOTF-04**: User can configure which notification types they want to receive
+- [x] **NOTF-04**: User can configure which notification types they want to receive
 
 ### Monetization (Freemium)
 
@@ -189,14 +189,14 @@
 | SOCL-03 | Phase 5: Social Layer | Complete |
 | SOCL-04 | Phase 5: Social Layer | Complete |
 | SOCL-05 | Phase 5: Social Layer | Complete |
-| DISC2-01 | Phase 6: Discovery + Notifications | Pending |
-| DISC2-02 | Phase 6: Discovery + Notifications | Pending |
-| DISC2-03 | Phase 6: Discovery + Notifications | Pending |
-| DISC2-04 | Phase 6: Discovery + Notifications | Pending |
-| NOTF-01 | Phase 6: Discovery + Notifications | Pending |
-| NOTF-02 | Phase 6: Discovery + Notifications | Pending |
+| DISC2-01 | Phase 6: Discovery + Notifications | Complete |
+| DISC2-02 | Phase 6: Discovery + Notifications | Complete |
+| DISC2-03 | Phase 6: Discovery + Notifications | Complete |
+| DISC2-04 | Phase 6: Discovery + Notifications | Complete |
+| NOTF-01 | Phase 6: Discovery + Notifications | Complete |
+| NOTF-02 | Phase 6: Discovery + Notifications | Complete |
 | NOTF-03 | Phase 6: Discovery + Notifications | Pending |
-| NOTF-04 | Phase 6: Discovery + Notifications | Pending |
+| NOTF-04 | Phase 6: Discovery + Notifications | Complete |
 | COMM-01 | Phase 7: Community + Reviews | Pending |
 | COMM-02 | Phase 7: Community + Reviews | Pending |
 | COMM-03 | Phase 7: Community + Reviews | Pending |

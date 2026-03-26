@@ -165,7 +165,7 @@ Plans:
   5. User can configure which notification types they receive (in-app, email, push) per event type
 **Plans**: 5 plans
 Plans:
-- [ ] 06-01-PLAN.md -- Data layer: discovery queries (search, browse, suggestions), notification infrastructure (match, email, queries), server actions, test scaffolds
+- [x] 06-01-PLAN.md -- Data layer: discovery queries (search, browse, suggestions), notification infrastructure (match, email, queries), server actions, test scaffolds
 - [ ] 06-02-PLAN.md -- Explorar page rewrite: DIGGERS/RECORDS tab bar, record search, genre/decade browse, suggested section
 - [ ] 06-03-PLAN.md -- NotificationBell component with Realtime subscription, NotificationRow, /notifications page, AppHeader wiring
 - [ ] 06-04-PLAN.md -- Wantlist match triggers in addRecord and import pipeline, notification preferences UI in settings
@@ -249,7 +249,7 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7 -> 8 -> 9 -> 10
 | 4. Collection Management | 4/4 | Complete | 2026-03-25 |
 | 4.5. Template Alignment | 2/2 | Complete | 2026-03-25 |
 | 5. Social Layer | 0/4 | Planned | - |
-| 6. Discovery + Notifications | 0/5 | Planned | - |
+| 6. Discovery + Notifications | 1/5 | In Progress|  |
 | 7. Community + Reviews | 0/TBD | Not started | - |
 | 8. Gamification + Rankings | 0/TBD | Not started | - |
 | 9. P2P Audio Trading | 0/TBD | Not started | - |

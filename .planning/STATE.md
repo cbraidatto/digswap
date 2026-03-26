@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-stopped_at: "Completed 05-04-PLAN.md (checkpoint: human-verify)"
-last_updated: "2026-03-26T03:24:19.164Z"
+stopped_at: "Completed 06-01-PLAN.md"
+last_updated: "2026-03-26T04:57:13Z"
 last_activity: 2026-03-26
 progress:
   total_phases: 12
   completed_phases: 4
   total_plans: 26
-  completed_plans: 24
-  percent: 9
+  completed_plans: 25
+  percent: 96
 ---
 
 # Project State
@@ -21,16 +21,16 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-25)
 
 **Core value:** A digger opens the app and immediately finds who has the record they've been hunting -- and sees where they stand in the community.
-**Current focus:** Phase 05 — social-layer
+**Current focus:** Phase 06 — discovery-notifications
 
 ## Current Position
 
 Phase: 6
-Plan: Not started
-Status: Ready to execute
+Plan: 1 of 4 complete
+Status: Executing
 Last activity: 2026-03-26
 
-Progress: [█░░░░░░░░░] 9%
+Progress: [██████████░] 96%
 
 ## Performance Metrics
 
@@ -71,6 +71,7 @@ Progress: [█░░░░░░░░░] 9%
 | Phase 04.5-template-alignment P02 | 8 | 3 tasks | 3 files |
 | Phase 05 P03 | 5min | 2 tasks | 8 files |
 | Phase 05 P04 | 2min | 1 tasks | 1 files |
+| Phase 06 P01 | 8min | 2 tasks | 12 files |
 
 ## Accumulated Context
 
@@ -131,6 +132,11 @@ Recent decisions affecting current work:
 - [Phase 05]: useOptimistic from React 19 for follow/unfollow instant UI toggle with automatic revert on error
 - [Phase 05]: Server action wrappers (fetchFollowersList/fetchFollowingList) for client component access to query functions
 - [Phase 05]: Empty collection check before calling getCollectionComparison to avoid unnecessary DB queries
+- [Phase 06]: Drizzle thenable chain mock pattern for unit testing query builders without real DB
+- [Phase 06]: Admin client for checkWantlistMatches cross-user notification inserts (bypasses RLS)
+- [Phase 06]: Non-fatal email pattern: sendWantlistMatchEmail catches all errors, never throws
+- [Phase 06]: Notification preferences lazy-created on first getPreferencesAction call (D-18)
+- [Phase 06]: Release discogs_id null check skips wantlist matching for non-canonical releases (D-16)
 
 ### Pending Todos
 
@@ -144,6 +150,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-26T03:18:04.083Z
-Stopped at: Completed 05-04-PLAN.md (checkpoint: human-verify)
+Last session: 2026-03-26T04:57:13Z
+Stopped at: Completed 06-01-PLAN.md
 Resume file: None
