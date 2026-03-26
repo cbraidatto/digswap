@@ -13,7 +13,7 @@ export function AppHeader({ displayName, avatarUrl, xp = 0 }: AppHeaderProps) {
 			<div className="flex items-center gap-8">
 				<Link href="/feed">
 					<span className="text-xl font-bold tracking-tighter text-primary font-heading">
-						CYBER-DIGGER
+						DIGSWAP
 					</span>
 				</Link>
 				<nav className="hidden md:flex gap-6 items-center">
@@ -33,7 +33,7 @@ export function AppHeader({ displayName, avatarUrl, xp = 0 }: AppHeaderProps) {
 						href="/explorar"
 						className="font-mono text-xs uppercase tracking-widest text-on-surface-variant hover:text-on-surface transition-colors"
 					>
-						Digger
+						Explorar
 					</Link>
 					<Link
 						href="/perfil"
