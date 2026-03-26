@@ -167,7 +167,7 @@ Plans:
 Plans:
 - [x] 06-01-PLAN.md -- Data layer: discovery queries (search, browse, suggestions), notification infrastructure (match, email, queries), server actions, test scaffolds
 - [ ] 06-02-PLAN.md -- Explorar page rewrite: DIGGERS/RECORDS tab bar, record search, genre/decade browse, suggested section
-- [ ] 06-03-PLAN.md -- NotificationBell component with Realtime subscription, NotificationRow, /notifications page, AppHeader wiring
+- [x] 06-03-PLAN.md -- NotificationBell component with Realtime subscription, NotificationRow, /notifications page, AppHeader wiring
 - [ ] 06-04-PLAN.md -- Wantlist match triggers in addRecord and import pipeline, notification preferences UI in settings
 - [ ] 06-05-PLAN.md -- NotificationBell component tests, full test suite, human verification checkpoint
 **UI hint**: yes
