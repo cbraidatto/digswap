@@ -6,6 +6,7 @@ import type { FeedItem } from "@/actions/social";
 import { loadMoreFeed } from "@/actions/social";
 import { FeedCard } from "./feed-card";
 import { FollowEventCard } from "./follow-event-card";
+import { GroupFeedCard } from "./group-feed-card";
 
 interface FeedContainerProps {
 	initialItems: FeedItem[];
@@ -124,6 +125,9 @@ export function FeedContainer({
 						<FeedCard key={item.id} item={item} />
 					) : item.actionType === "followed_user" ? (
 						<FollowEventCard key={item.id} item={item} />
+					) : item.actionType === "group_post" ||
+						item.actionType === "wrote_review" ? (
+						<GroupFeedCard key={item.id} item={item} />
 					) : null,
 				)}
 			</div>
