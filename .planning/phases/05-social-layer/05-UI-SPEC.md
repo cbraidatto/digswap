@@ -346,7 +346,7 @@ Type: Server Component
 
 - **Page header:** Back link to `/perfil/[username]` + `COLLECTION_COMPARISON` title + `vs @username` subtitle
   - Back: `font-mono text-[10px] text-on-surface-variant hover:text-primary flex items-center gap-1` with `material-symbols-outlined arrow_back` at 16px
-  - Title: `text-2xl font-heading font-bold text-on-surface mt-2`
+  - Title: `text-3xl font-heading font-bold text-on-surface mt-2`
   - Subtitle: `font-mono text-[10px] text-on-surface-variant mt-1`
 - **Desktop layout:** `grid grid-cols-3 gap-8 mt-8` (3 equal columns)
 - **Mobile layout:** `flex flex-col gap-6 mt-6` (stacked vertically)
@@ -510,7 +510,7 @@ Type: Client Component ("use client")
 |---------|-------|------|
 | Follow action failed | Server action returns error | `could not follow this digger. try again.` (toast via Sonner) |
 | Unfollow action failed | Server action returns error | `could not unfollow this digger. try again.` (toast via Sonner) |
-| Feed load failed | Server action throws | `> feed_error` / `could not load feed. refresh to try again.` / `[RETRY]` (button) |
+| Feed load failed | Server action throws | `> feed_error` / `could not load feed. refresh to try again.` / `[RELOAD FEED]` (button) |
 | Profile not found | Username doesn't exist | Next.js `notFound()` -> default 404 page |
 | Comparison load failed | Query error | `could not load comparison data. try again later.` |
 | Search failed | Query error | `search failed. try again.` (inline text below search input) |
