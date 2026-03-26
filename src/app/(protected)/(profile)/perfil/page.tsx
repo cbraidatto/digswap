@@ -1,5 +1,4 @@
 import { count, eq } from "drizzle-orm";
-import Link from "next/link";
 import { redirect } from "next/navigation";
 import { db } from "@/lib/db";
 import { collectionItems } from "@/lib/db/schema/collections";
@@ -220,13 +219,6 @@ export default async function PerfilPage({ searchParams }: PerfilPageProps) {
 							Your_Collection
 						</h2>
 					</div>
-					<Link
-						href="/settings"
-						className="flex items-center gap-2 px-4 py-2 bg-primary-container text-on-primary-container font-mono text-xs font-bold rounded hover:brightness-110 transition-all"
-					>
-						<span className="material-symbols-outlined text-sm">add</span>
-						ADD_RECORD
-					</Link>
 				</div>
 
 				{/* Filter Bar */}
