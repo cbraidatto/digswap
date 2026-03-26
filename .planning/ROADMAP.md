@@ -148,7 +148,7 @@ Plans:
 **Plans**: 4 plans
 Plans:
 - [x] 05-01-PLAN.md -- Data layer: test scaffolds, server actions (follow/unfollow/logActivity/loadMoreFeed/searchUsers), query functions, comparison logic, wire logActivity into addRecord
-- [ ] 05-02-PLAN.md -- Feed page: FeedCard, FollowEventCard, FeedContainer with infinite scroll, ProgressBanner, /feed rewrite
+- [x] 05-02-PLAN.md -- Feed page: FeedCard, FollowEventCard, FeedContainer with infinite scroll, ProgressBanner, /feed rewrite
 - [ ] 05-03-PLAN.md -- Public profiles + Explorar: /perfil/[username] with ProfileHeader and FollowButton, FollowList on own profile, username search on /explorar
 - [ ] 05-04-PLAN.md -- Collection comparison: /perfil/[username]/compare with 3-column layout, human verification checkpoint
 **UI hint**: yes
