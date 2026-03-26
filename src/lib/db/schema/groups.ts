@@ -9,6 +9,8 @@ import {
 import { pgPolicy } from "drizzle-orm/pg-core";
 import { sql } from "drizzle-orm";
 import { authenticatedRole, authUid } from "drizzle-orm/supabase";
+import { releases } from "./releases";
+import { reviews } from "./reviews";
 
 export const groups = pgTable(
   "groups",
@@ -16,6 +18,7 @@ export const groups = pgTable(
     id: uuid("id").defaultRandom().primaryKey(),
     creatorId: uuid("creator_id").notNull(),
     name: varchar("name", { length: 200 }).notNull(),
+    slug: varchar("slug", { length: 250 }).unique().notNull(),
     description: text("description"),
     category: varchar("category", { length: 100 }), // genre/era/region/style
     visibility: varchar("visibility", { length: 20 }).default("public").notNull(),
@@ -93,6 +96,8 @@ export const groupPosts = pgTable(
       .notNull(),
     userId: uuid("user_id").notNull(),
     content: text("content").notNull(),
+    releaseId: uuid("release_id").references(() => releases.id),
+    reviewId: uuid("review_id").references(() => reviews.id),
     createdAt: timestamp("created_at", { withTimezone: true })
       .defaultNow()
       .notNull(),

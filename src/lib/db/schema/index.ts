@@ -10,4 +10,5 @@ export * from "./subscriptions";
 export * from "./wantlist";
 export * from "./reviews";
 export * from "./groups";
+export * from "./group-invites";
 export * from "./import-jobs";

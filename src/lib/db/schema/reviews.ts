@@ -6,6 +6,7 @@ import {
   timestamp,
   integer,
   boolean,
+  unique,
 } from "drizzle-orm/pg-core";
 import { pgPolicy } from "drizzle-orm/pg-core";
 import { sql } from "drizzle-orm";
@@ -35,6 +36,7 @@ export const reviews = pgTable(
       .notNull(),
   },
   (table) => [
+    unique("reviews_user_release").on(table.userId, table.releaseId),
     pgPolicy("reviews_select_all", {
       for: "select",
       to: authenticatedRole,
