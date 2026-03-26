@@ -48,11 +48,11 @@
 
 ### Groups & Community
 
-- [ ] **COMM-01**: User can create a community group (genre, era, region, style)
-- [ ] **COMM-02**: User can join and leave groups
-- [ ] **COMM-03**: User can post text updates inside a group
-- [ ] **COMM-04**: User can view a group's activity feed
-- [ ] **COMM-05**: Group creator can set group visibility (public / premium-only)
+- [x] **COMM-01**: User can create a community group (genre, era, region, style)
+- [x] **COMM-02**: User can join and leave groups
+- [x] **COMM-03**: User can post text updates inside a group
+- [x] **COMM-04**: User can view a group's activity feed
+- [x] **COMM-05**: Group creator can set group visibility (public / premium-only)
 
 ### Discovery
 
@@ -63,9 +63,9 @@
 
 ### Reviews
 
-- [ ] **REV-01**: User can rate and write a review for a specific pressing of a record
-- [ ] **REV-02**: User can rate the general release (not pressing-specific)
-- [ ] **REV-03**: User can view all reviews for a pressing or release
+- [x] **REV-01**: User can rate and write a review for a specific pressing of a record
+- [x] **REV-02**: User can rate the general release (not pressing-specific)
+- [x] **REV-03**: User can view all reviews for a pressing or release
 
 ### Gamification & Rankings
 
@@ -197,14 +197,14 @@
 | NOTF-02 | Phase 6: Discovery + Notifications | Complete |
 | NOTF-03 | Phase 6: Discovery + Notifications | Pending |
 | NOTF-04 | Phase 6: Discovery + Notifications | Complete |
-| COMM-01 | Phase 7: Community + Reviews | Pending |
-| COMM-02 | Phase 7: Community + Reviews | Pending |
-| COMM-03 | Phase 7: Community + Reviews | Pending |
-| COMM-04 | Phase 7: Community + Reviews | Pending |
-| COMM-05 | Phase 7: Community + Reviews | Pending |
-| REV-01 | Phase 7: Community + Reviews | Pending |
-| REV-02 | Phase 7: Community + Reviews | Pending |
-| REV-03 | Phase 7: Community + Reviews | Pending |
+| COMM-01 | Phase 7: Community + Reviews | Complete |
+| COMM-02 | Phase 7: Community + Reviews | Complete |
+| COMM-03 | Phase 7: Community + Reviews | Complete |
+| COMM-04 | Phase 7: Community + Reviews | Complete |
+| COMM-05 | Phase 7: Community + Reviews | Complete |
+| REV-01 | Phase 7: Community + Reviews | Complete |
+| REV-02 | Phase 7: Community + Reviews | Complete |
+| REV-03 | Phase 7: Community + Reviews | Complete |
 | GAME-01 | Phase 8: Gamification + Rankings | Pending |
 | GAME-02 | Phase 8: Gamification + Rankings | Pending |
 | GAME-03 | Phase 8: Gamification + Rankings | Pending |

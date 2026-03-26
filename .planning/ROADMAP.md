@@ -185,7 +185,7 @@ Plans:
   6. User can browse all reviews for any pressing or release
 **Plans**: 5 plans
 Plans:
-- [ ] 07-01-PLAN.md -- Schema migration (slug, release_id, review_id, group_invites), slugify utility, query functions, server actions, Wave 0 test scaffolds
+- [x] 07-01-PLAN.md -- Schema migration (slug, release_id, review_id, group_invites), slugify utility, query functions, server actions, Wave 0 test scaffolds
 - [ ] 07-02-PLAN.md -- /comunidade group discovery hub (genre groups, member groups, filter chips) + /comunidade/new group creation form
 - [ ] 07-03-PLAN.md -- /comunidade/[slug] group detail page (header, join/leave, composer, post feed, invite controls) + /join/[token] invite landing
 - [ ] 07-04-PLAN.md -- Reviews panel on RecordSearchCard (/explorar) + GroupFeedCard in /feed for group_post events
