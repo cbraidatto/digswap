@@ -1,6 +1,7 @@
 import { eq, and, sql, desc, lt } from "drizzle-orm";
 import { db } from "@/lib/db";
 import { follows, activityFeed } from "@/lib/db/schema/social";
+import { groupMembers } from "@/lib/db/schema/groups";
 import { profiles } from "@/lib/db/schema/users";
 import { releases } from "@/lib/db/schema/releases";
 import type { FeedItem } from "@/actions/social";
@@ -68,6 +69,8 @@ export async function getPersonalFeed(
 ): Promise<FeedItem[]> {
 	const conditions = [
 		sql`${activityFeed.userId} IN (SELECT ${follows.followingId} FROM ${follows} WHERE ${follows.followerId} = ${currentUserId})`,
+		// D-06: group_post events only visible if viewer is also a group member
+		sql`CASE WHEN ${activityFeed.actionType} = 'group_post' THEN ${activityFeed.metadata}->>'groupId' IN (SELECT ${groupMembers.groupId}::text FROM ${groupMembers} WHERE ${groupMembers.userId} = ${currentUserId}) ELSE true END`,
 	];
 
 	if (cursor) {
