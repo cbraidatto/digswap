@@ -5,6 +5,7 @@ import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { createDiscogsClient, computeRarityScore } from "@/lib/discogs/client";
 import { CONDITION_GRADES } from "@/lib/collection/filters";
+import { logActivity } from "@/actions/social";
 
 /**
  * Search the Discogs database for releases matching a query string.
@@ -150,6 +151,13 @@ export async function addRecordToCollection(
 
 	if (collectionError) {
 		return { error: "Could not add record to collection." };
+	}
+
+	// Log activity for feed (Phase 5, D-26)
+	try {
+		await logActivity(user.id, "added_record", "release", releaseId, null);
+	} catch {
+		// Non-blocking: activity logging failure should not fail the add-record action
 	}
 
 	return { success: true };

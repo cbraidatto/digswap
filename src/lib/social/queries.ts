@@ -1,4 +1,4 @@
-import { eq, and, sql, desc, lt, count } from "drizzle-orm";
+import { eq, and, sql, desc, lt } from "drizzle-orm";
 import { db } from "@/lib/db";
 import { follows, activityFeed } from "@/lib/db/schema/social";
 import { profiles } from "@/lib/db/schema/users";
@@ -166,7 +166,7 @@ export async function getFollowing(
 			avatarUrl: profiles.avatarUrl,
 		})
 		.from(follows)
-		.innerJoin(profiles, eq(follows.followerId, userId))
+		.innerJoin(profiles, eq(follows.followingId, profiles.id))
 		.where(eq(follows.followerId, userId))
 		.orderBy(desc(follows.createdAt))
 		.limit(limit)

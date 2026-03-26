@@ -4,7 +4,9 @@ import { createClient } from "@/lib/supabase/server";
 import { db } from "@/lib/db";
 import { follows, activityFeed } from "@/lib/db/schema/social";
 import { profiles } from "@/lib/db/schema/users";
-import { eq, and } from "drizzle-orm";
+import { collectionItems } from "@/lib/db/schema/collections";
+import { eq, and, ilike, sql } from "drizzle-orm";
+import { getGlobalFeed, getPersonalFeed } from "@/lib/social/queries";
 
 export interface FeedItem {
 	id: string;
@@ -118,16 +120,89 @@ export async function unfollowUser(
 }
 
 export async function loadMoreFeed(
-	_cursor: string | null,
-	_mode: "personal" | "global",
+	cursor: string | null,
+	mode: "personal" | "global",
 ): Promise<FeedItem[]> {
-	// Stub -- will be implemented in Task 2
-	return [];
+	const supabase = await createClient();
+	const {
+		data: { user },
+	} = await supabase.auth.getUser();
+
+	if (!user) {
+		return [];
+	}
+
+	if (mode === "personal") {
+		return getPersonalFeed(user.id, cursor);
+	}
+
+	return getGlobalFeed(cursor);
 }
 
 export async function searchUsers(
-	_query: string,
+	query: string,
 ): Promise<SearchResult[]> {
-	// Stub -- will be implemented in Task 2
-	return [];
+	const supabase = await createClient();
+	const {
+		data: { user },
+	} = await supabase.auth.getUser();
+
+	if (!user) {
+		return [];
+	}
+
+	const trimmed = query.trim();
+	if (trimmed.length < 2) {
+		return [];
+	}
+
+	// Sanitize query to prevent SQL injection through ilike patterns
+	const sanitized = trimmed.replace(/[%_\\]/g, "\\$&");
+
+	const matchingProfiles = await db
+		.select({
+			id: profiles.id,
+			username: profiles.username,
+			displayName: profiles.displayName,
+			avatarUrl: profiles.avatarUrl,
+		})
+		.from(profiles)
+		.where(ilike(profiles.username, `%${sanitized}%`))
+		.limit(20);
+
+	// Enrich each profile with counts
+	const results: SearchResult[] = [];
+	for (const profile of matchingProfiles) {
+		const recordCountResult = await db
+			.select({ count: sql<number>`count(*)` })
+			.from(collectionItems)
+			.where(eq(collectionItems.userId, profile.id));
+
+		const followerCountResult = await db
+			.select({ count: sql<number>`count(*)` })
+			.from(follows)
+			.where(eq(follows.followingId, profile.id));
+
+		const isFollowingResult = await db
+			.select({ id: follows.id })
+			.from(follows)
+			.where(
+				and(
+					eq(follows.followerId, user.id),
+					eq(follows.followingId, profile.id),
+				),
+			);
+
+		results.push({
+			id: profile.id,
+			username: profile.username,
+			displayName: profile.displayName,
+			avatarUrl: profile.avatarUrl,
+			recordCount: Number(recordCountResult[0]?.count ?? 0),
+			followerCount: Number(followerCountResult[0]?.count ?? 0),
+			isFollowing: isFollowingResult.length > 0,
+		});
+	}
+
+	return results;
 }
