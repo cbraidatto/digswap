@@ -42,7 +42,7 @@ created: 2026-03-26
 | 6-01-02 | 01 | 0 | DISC2-02 | unit stub | `npx vitest run tests/unit/discovery/genre-browse.test.ts` | ❌ W0 | ⬜ pending |
 | 6-01-03 | 01 | 0 | DISC2-03 | unit stub | `npx vitest run tests/unit/notifications/wantlist-match.test.ts` | ❌ W0 | ⬜ pending |
 | 6-01-04 | 01 | 0 | DISC2-04 | unit stub | `npx vitest run tests/unit/discovery/taste-match.test.ts` | ❌ W0 | ⬜ pending |
-| 6-01-05 | 01 | 0 | NOTF-01 | unit stub | `npx vitest run tests/unit/notifications/delivery.test.ts` | ❌ W0 | ⬜ pending |
+| 6-01-05 | 01 | 0 | NOTF-01 | unit stub | `npx vitest run tests/unit/notifications/wantlist-match.test.ts` | ❌ W0 | ⬜ pending |
 | 6-01-06 | 01 | 0 | NOTF-04 | unit stub | `npx vitest run tests/unit/notifications/preferences.test.ts` | ❌ W0 | ⬜ pending |
 
 *Status: ⬜ pending · ✅ green · ❌ red · ⚠️ flaky*
@@ -55,7 +55,7 @@ created: 2026-03-26
 - [ ] `tests/unit/discovery/genre-browse.test.ts` — stubs for DISC2-02 (browse by genre/decade, all-user grid)
 - [ ] `tests/unit/notifications/wantlist-match.test.ts` — stubs for DISC2-03 (match detection, admin insert, email trigger)
 - [ ] `tests/unit/discovery/taste-match.test.ts` — stubs for DISC2-04 (top-genre records + followers' records)
-- [ ] `tests/unit/notifications/delivery.test.ts` — stubs for NOTF-01 (in-app notification insert, Realtime broadcast)
+- [ ] `tests/unit/notifications/wantlist-match.test.ts` — stubs for NOTF-01 (in-app notification insert via checkWantlistMatches — same file as DISC2-03, covers notification creation path)
 - [ ] `tests/unit/notifications/preferences.test.ts` — stubs for NOTF-04 (preference read/write, lazy-create defaults)
 
 ---
