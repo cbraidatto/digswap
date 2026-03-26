@@ -2,12 +2,13 @@ import { createServerClient } from "@supabase/ssr";
 import { type NextRequest, NextResponse } from "next/server";
 
 /**
- * Updates the auth session by refreshing the JWT token via getClaims().
+ * Updates the auth session, refreshing the JWT token if expired.
  * Handles cookie synchronization between request and response.
  *
- * CRITICAL SECURITY: Uses getClaims() (never getSession()) to validate JWT.
- * getClaims() revalidates the JWT signature server-side.
- * getSession() does NOT and is unsafe for server code.
+ * Uses getUser() which both validates the JWT server-side AND automatically
+ * refreshes expired tokens via the refresh token in cookies — essential for
+ * middleware to keep sessions alive across page navigations.
+ * Never use getSession() here; it trusts the cookie without revalidation.
  */
 export async function updateSession(request: NextRequest) {
 	let supabaseResponse = NextResponse.next({
@@ -38,9 +39,9 @@ export async function updateSession(request: NextRequest) {
 	);
 
 	// IMPORTANT: Do NOT use supabase.auth.getSession() -- it doesn't validate JWT.
-	// Always use getClaims() which revalidates the JWT signature server-side.
-	const { data, error } = await supabase.auth.getClaims();
-	const user = error ? null : data?.claims?.sub;
+	// getUser() validates the JWT server-side AND refreshes expired tokens via
+	// the refresh token cookie, keeping sessions alive across navigations.
+	const { data: { user } } = await supabase.auth.getUser();
 
 	const { pathname } = request.nextUrl;
 

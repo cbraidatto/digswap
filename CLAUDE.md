@@ -1,7 +1,7 @@
 <!-- GSD:project-start source:PROJECT.md -->
 ## Project
 
-**VinylDig**
+**DigSwap**
 
 A social network for vinyl diggers — collectors who actively hunt for records. Users import their Discogs library, discover who has what they're looking for, compare collections with others, and trade audio rips of their vinyl via secure peer-to-peer connections. Gamified rankings reward both collection rarity and community contribution.
 

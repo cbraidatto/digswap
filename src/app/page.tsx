@@ -5,7 +5,7 @@ export default function Home() {
 		<div className="min-h-screen flex items-center justify-center p-6 relative overflow-hidden">
 			{/* Background dot grid */}
 			<div
-				className="absolute inset-0 opacity-[0.03] pointer-events-none"
+				className="fixed inset-0 opacity-[0.03] pointer-events-none"
 				style={{
 					backgroundImage: "radial-gradient(#6fdd78 1px, transparent 1px)",
 					backgroundSize: "32px 32px",
@@ -16,13 +16,13 @@ export default function Home() {
 				{/* Terminal prompt line */}
 				<div className="mb-8 inline-flex items-center gap-2 text-primary font-mono text-xs">
 					<span className="material-symbols-outlined text-sm">terminal</span>
-					<span>CYBER-DIGGER_v1.0.0</span>
+					<span>DIGSWAP_v1.0.0</span>
 					<span className="w-2 h-4 bg-primary blink inline-block" />
 				</div>
 
 				{/* Logo */}
 				<h1 className="font-heading text-4xl md:text-6xl font-extrabold tracking-tighter text-on-surface mb-4">
-					CYBER-<span className="text-primary">DIGGER</span>
+					DIG<span className="text-primary">SWAP</span>
 				</h1>
 
 				<p className="text-on-surface-variant font-sans text-sm md:text-base mb-12">

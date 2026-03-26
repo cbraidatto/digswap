@@ -1,7 +1,7 @@
 import { defineConfig, devices } from "@playwright/test";
 
 /**
- * Playwright E2E test configuration for VinylDig.
+ * Playwright E2E test configuration for DigSwap.
  *
  * Uses Chromium only for speed (solo developer workflow).
  * Starts the dev server automatically before running tests.

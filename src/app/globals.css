@@ -70,14 +70,6 @@
   --radius-xl: calc(var(--radius) * 3);
   --radius-2xl: calc(var(--radius) * 4);
 
-  /* Spacing scale */
-  --spacing-xs: 4px;
-  --spacing-sm: 8px;
-  --spacing-md: 16px;
-  --spacing-lg: 24px;
-  --spacing-xl: 32px;
-  --spacing-2xl: 48px;
-  --spacing-3xl: 64px;
 }
 
 /* ===========================
@@ -134,11 +126,11 @@
   --secondary-container: #0072e3;
   --on-secondary-container: #fefcff;
 
-  /* Tertiary scale */
-  --tertiary: #7cc8e8;
-  --tertiary-container: #163a50;
-  --on-tertiary: #00222e;
-  --on-tertiary-container: #b8e0f5;
+  /* Tertiary scale — orange per Ghost Protocol DESIGN.md (#ffb689) */
+  --tertiary: #ffb689;
+  --tertiary-container: #5c3700;
+  --on-tertiary: #290d00;
+  --on-tertiary-container: #ffdbc8;
 
   /* Error */
   --error: #ffb4ab;
@@ -235,10 +227,20 @@
   * {
     @apply border-border outline-ring/50;
   }
-  body {
-    @apply bg-background text-foreground;
-  }
   html {
     @apply font-sans;
+    width: 100%;
+    min-height: 100%;
+  }
+  body {
+    @apply bg-background text-foreground;
+    display: block;
+    width: 100%;
+    min-height: 100%;
+  }
+  .grain {
+    display: block;
+    width: 100%;
+    min-height: 100%;
   }
 }
