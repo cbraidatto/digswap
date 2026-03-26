@@ -3,8 +3,8 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-stopped_at: Completed 05-02-PLAN.md
-last_updated: "2026-03-26T03:12:14.477Z"
+stopped_at: Completed 05-03-PLAN.md
+last_updated: "2026-03-26T03:13:50.039Z"
 last_activity: 2026-03-26
 progress:
   total_phases: 12
@@ -69,7 +69,7 @@ Progress: [█░░░░░░░░░] 9%
 | Phase 04 P01 | 5min | 2 tasks | 17 files |
 | Phase 04 P03 | 3min | 2 tasks | 4 files |
 | Phase 04.5-template-alignment P02 | 8 | 3 tasks | 3 files |
-| Phase 05 P02 | 3 | 2 tasks | 5 files |
+| Phase 05 P03 | 5min | 2 tasks | 8 files |
 
 ## Accumulated Context
 
@@ -127,8 +127,8 @@ Recent decisions affecting current work:
 - [Phase 04.5]: Feed page right sidebar removed entirely -- Trending_Repos and System_Logs are GitHub metaphors (D-10)
 - [Phase 04.5-template-alignment]: Rewrote feed/comunidade as complete files — fake data was too pervasive for surgical edits; used phase badges to communicate roadmap honestly
 - [Phase 04.5-template-alignment]: Removed ADD_RECORD Link from perfil/page.tsx (broken /settings destination); FAB is now sole add-record entry point
-- [Phase 05]: Progress component uses slot-based CSS overrides for track/indicator styling rather than custom wrapper
-- [Phase 05]: FeedContainer handles both empty states inline rather than separate components for solo dev simplicity
+- [Phase 05]: useOptimistic from React 19 for follow/unfollow instant UI toggle with automatic revert on error
+- [Phase 05]: Server action wrappers (fetchFollowersList/fetchFollowingList) for client component access to query functions
 
 ### Pending Todos
 
@@ -142,6 +142,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-26T03:12:14.464Z
-Stopped at: Completed 05-02-PLAN.md
+Last session: 2026-03-26T03:13:50.035Z
+Stopped at: Completed 05-03-PLAN.md
 Resume file: None

@@ -6,7 +6,13 @@ import { follows, activityFeed } from "@/lib/db/schema/social";
 import { profiles } from "@/lib/db/schema/users";
 import { collectionItems } from "@/lib/db/schema/collections";
 import { eq, and, ilike, sql } from "drizzle-orm";
-import { getGlobalFeed, getPersonalFeed } from "@/lib/social/queries";
+import {
+	getGlobalFeed,
+	getPersonalFeed,
+	getFollowers,
+	getFollowing,
+	type FollowUser,
+} from "@/lib/social/queries";
 
 export interface FeedItem {
 	id: string;
@@ -137,6 +143,18 @@ export async function loadMoreFeed(
 	}
 
 	return getGlobalFeed(cursor);
+}
+
+export async function fetchFollowersList(
+	userId: string,
+): Promise<FollowUser[]> {
+	return getFollowers(userId);
+}
+
+export async function fetchFollowingList(
+	userId: string,
+): Promise<FollowUser[]> {
+	return getFollowing(userId);
 }
 
 export async function searchUsers(

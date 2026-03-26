@@ -12,9 +12,11 @@ import {
 	getUniqueFormats,
 	PAGE_SIZE,
 } from "@/lib/collection/queries";
+import { getFollowCounts } from "@/lib/social/queries";
 import { CollectionGrid } from "./_components/collection-grid";
 import { CollectionSkeleton } from "./_components/collection-skeleton";
 import { FilterBar } from "./_components/filter-bar";
+import { FollowList } from "./_components/follow-list";
 import { Pagination } from "./_components/pagination";
 import { AddRecordFAB } from "./_components/add-record-fab";
 
@@ -93,12 +95,13 @@ export default async function PerfilPage({ searchParams }: PerfilPageProps) {
 	const rawSearchParams = await searchParams;
 	const filters = collectionFilterSchema.parse(rawSearchParams);
 
-	// Fetch collection data in parallel
-	const [items, totalCount, genres, formats] = await Promise.all([
+	// Fetch collection data and social counts in parallel
+	const [items, totalCount, genres, formats, followCounts] = await Promise.all([
 		getCollectionPage(user.id, filters),
 		getCollectionCount(user.id, filters),
 		getUniqueGenres(user.id),
 		getUniqueFormats(user.id),
+		getFollowCounts(user.id),
 	]);
 
 	const totalPages = Math.ceil(totalCount / PAGE_SIZE);
@@ -142,6 +145,12 @@ export default async function PerfilPage({ searchParams }: PerfilPageProps) {
 								</div>
 								<div className="text-sm font-bold font-heading">{rankTitle}</div>
 							</div>
+						</div>
+						{/* Social Counts */}
+						<div className="flex items-center gap-4 mt-4 font-mono text-[10px]">
+							<FollowList userId={user.id} type="following" count={followCounts.followingCount} />
+							<span className="text-outline">&middot;</span>
+							<FollowList userId={user.id} type="followers" count={followCounts.followerCount} />
 						</div>
 					</div>
 					{/* Decorative dot grid */}
