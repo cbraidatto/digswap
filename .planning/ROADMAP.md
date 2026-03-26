@@ -256,7 +256,7 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7 -> 8 -> 9 -> 10
 | 4.5. Template Alignment | 2/2 | Complete | 2026-03-25 |
 | 5. Social Layer | 0/4 | Planned | - |
 | 6. Discovery + Notifications | 5/5 | Complete   | 2026-03-26 |
-| 7. Community + Reviews | 0/5 | Planned | - |
+| 7. Community + Reviews | 1/5 | In Progress|  |
 | 8. Gamification + Rankings | 0/TBD | Not started | - |
 | 9. P2P Audio Trading | 0/TBD | Not started | - |
 | 10. Monetization | 0/TBD | Not started | - |
