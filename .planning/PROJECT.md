@@ -78,13 +78,22 @@ Feed and Profile have equal weight — both are primary entry points. Feed-first
 - [x] Active tab visually distinct with amber accent — persists on within-tab navigation (NAV-02)
 - [x] Deep-link routing — navigating directly to any tab route highlights the correct tab (NAV-03)
 
+**Phase 6: Discovery + Notifications** *(2026-03-26)*
+- [x] Search across all user collections to find who has a specific record (DISC2-01)
+- [x] Genre/decade browse across all user collections, sorted by rarity (DISC2-02)
+- [x] Automatic wantlist matching — notify user when someone adds a record from their wantlist (DISC2-03)
+- [x] Taste-match suggestions based on collection and followed users (DISC2-04)
+- [x] In-app notification bell with Supabase Realtime delivery and unread badge (NOTF-01)
+- [x] Email notifications for wantlist matches via Resend (NOTF-02, partial — trade request email in Phase 9)
+- [x] Per-type notification preferences in settings with phase badges for deferred types (NOTF-04)
+
 ### Active
 
 **Discovery & Matching**
+- [x] Search across all user collections to find who has a specific record — *Validated in Phase 6*
+- [x] Automatic wantlist matching — *Validated in Phase 6*
+- [x] Recommendation engine based on collection taste — *Validated in Phase 6 (SQL-based taste match)*
 - [ ] Discogs library import (collection + wantlist) with manual sync option
-- [ ] Search across all user collections to find who has a specific record
-- [ ] Automatic wantlist matching — notify user when someone in the platform has a record they want
-- [ ] Recommendation engine based on collection taste and what similar diggers have
 
 **Collection & Social**
 - [ ] Public profile with collection showcase
@@ -175,6 +184,8 @@ Feed and Profile have equal weight — both are primary entry points. Feed-first
 ## Evolution
 
 This document evolves at phase transitions and milestone boundaries.
+
+*Last updated: 2026-03-26 — Phase 6 complete*
 
 **After each phase transition** (via `/gsd:transition`):
 1. Requirements invalidated? → Move to Out of Scope with reason
