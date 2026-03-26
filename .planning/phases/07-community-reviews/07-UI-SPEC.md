@@ -96,16 +96,16 @@ Exceptions:
 
 ## Color
 
-| Role | Value | Usage |
+| Role | Token | Usage |
 |------|-------|-------|
-| Dominant (60%) | `#10141a` (--background/--surface) | Page background, main content area |
-| Secondary (30%) | `#181c22` (--card/--surface-container-low) | Group cards, post cards, group detail background, form fields |
-| Accent (10%) | `#6fdd78` (--primary) | See reserved list below |
-| Destructive | `#ffb4ab` (--destructive) | Leave group confirmation, error states only |
+| Dominant (60%) | `--background` / `--surface` | Page background, main content area |
+| Secondary (30%) | `--card` / `--surface-container-low` | Group cards, post cards, group detail background, form fields |
+| Accent (10%) | `--primary` | See reserved list below |
+| Destructive | `--destructive` | Leave group confirmation, error states only |
 
 *Source: globals.css, Phase 6 UI-SPEC (inherited unchanged)*
 
-**Accent (`#6fdd78` / --primary) reserved for:**
+**Accent (`--primary`) reserved for:**
 - Active filter chip (genre chips) background at 10% opacity (`bg-primary/10 text-primary border-primary`)
 - Terminal prompt character `>` in composer input
 - `[+ CREATE_GROUP]` button border and text
@@ -114,11 +114,11 @@ Exceptions:
 - Record title hover color in post linked record row
 - Active/joined group indicator `[JOINED]` text
 
-**Secondary accent (`#aac7ff` / --secondary) reserved for:**
+**Secondary accent (`--secondary`) reserved for:**
 - "Rare" rarity badge on linked record in posts (reuses existing badge system)
 - Group invite accepted notification type icon tint
 
-**Tertiary (`#ffb689` / --tertiary) reserved for:**
+**Tertiary (`--tertiary`) reserved for:**
 - "Ultra Rare" rarity badge on linked records (reuses existing badge system)
 - Star characters in review cards (`color: var(--tertiary)`)
 
@@ -354,7 +354,7 @@ Exceptions:
 - Results list: title + artist + year, clicking selects the record and closes dialog
 - Selected record appears as a compact token below the textarea:
   - `└ {Artist} - {Title} [{Label}, {Year}]` -- JetBrains Mono, 10px, `text-on-surface-variant`
-  - `[x]` remove button: 12px `text-on-surface-variant hover:text-destructive`
+  - `[x]` remove button: 10px `text-on-surface-variant hover:text-destructive`
 
 ---
 
@@ -385,7 +385,7 @@ Exceptions:
 - `└ LINKED:` label: JetBrains Mono, 10px, `text-on-surface-variant`
 - Linked record text: JetBrains Mono, 10px, `text-on-surface`, clickable link to `/explorar` with pre-filled search
 - `RARITY: {score}`: JetBrains Mono, 10px, `text-on-surface-variant`, shown on second line of linked record block
-- Separator line `─────`: rendered as a `<hr>` with `border-t border-outline-variant/10`, `my-4`
+- Separator line `─────`: rendered as a `<hr>` with `border-t border-outline-variant/10`, `my-4` (= md / 16px)
 
 ---
 
