@@ -46,7 +46,7 @@ export default function ExplorarPage() {
 				className="w-full border-b border-outline-variant/10"
 				role="tablist"
 			>
-				<div className="max-w-4xl mx-auto flex gap-6">
+				<div className="px-6 flex gap-6">
 					<button
 						type="button"
 						onClick={() => setActiveTab("diggers")}
