@@ -52,8 +52,8 @@ Source: Existing patterns in `explorar/page.tsx` (p-8, md:p-12), `perfil/page.ts
 | Role | Size | Weight | Line Height | Font Family | Usage in Phase 8 |
 |------|------|--------|-------------|-------------|-------------------|
 | Body | 14px (text-sm) | 400 (normal) | 1.5 | Inter (font-sans) | Leaderboard score values, badge descriptions |
-| Label | 10px (text-[10px]) | 600 (semibold) | 1.4 | JetBrains Mono (font-mono) | Tab labels, section headers, stat labels, badge slugs, rank labels |
-| Heading | 24px (text-2xl) | 700 (bold) | 1.2 | Space Grotesk (font-heading) | Section titles, profile display name, stat numbers |
+| Label | 10px (text-[10px]) | 700 (bold) | 1.4 | JetBrains Mono (font-mono) | Tab labels, section headers, stat labels, badge slugs, rank labels |
+| Heading | 24px (text-2xl) | 700 (bold) | 1.2 | Space Grotesk (font-heading) | Section titles, profile display name, stat numbers, RankCard sub-stat numbers |
 | Display | 30px (text-3xl) | 700 (bold) | 1.1 | Space Grotesk (font-heading) | Hero stat numbers (global rank position) |
 
 Additional terminal-style sizes (existing pattern, not new):
@@ -61,7 +61,7 @@ Additional terminal-style sizes (existing pattern, not new):
 - `text-[9px]` — secondary micro labels (XP progress, sub-stats)
 - `text-[11px]` — body-small (bio text, genre names, username in leaderboard)
 
-Weights used: 400 (normal) and 700 (bold). Exception: 600 (semibold) on active tab text per existing explorar tab pattern.
+Weights used: 400 (normal) and 700 (bold). Active tab text uses 700 (bold).
 
 Source: Existing typography patterns in `perfil/page.tsx`, `explorar/page.tsx`
 
@@ -125,6 +125,13 @@ Source: `globals.css` Ghost Protocol theme, existing usage in `perfil/page.tsx`,
 
 ## Layout Specifications
 
+### Focal Points
+
+| Surface | Focal Element | Rationale |
+|---------|---------------|-----------|
+| `/explorar?tab=rankings` | Own-user-highlighted LeaderboardRow | The user's primary question is "Where do I stand?" — their highlighted row answers it instantly |
+| `/perfil` | RankCard (rank title + three score sub-stats) | Replaces the old XP stub; the rank title and composite scores are the new identity anchor on the profile |
+
 ### RANKINGS Tab on /explorar
 
 ```
@@ -176,9 +183,9 @@ Layout: Horizontal row of chip buttons, `flex gap-2 overflow-x-auto scrollbar-no
 First chip: "GLOBAL" (always present, default active).
 Remaining chips: One per Discogs genre from `DISCOGS_GENRES` constant (Electronic, Jazz, Hip Hop, Rock, Soul, Latin, Classical, Funk / Soul, Reggae, Pop, Blues, Folk, Country, Stage & Screen, Brass & Military).
 
-Active state: `bg-secondary/15 text-secondary border-secondary/30 font-semibold`.
+Active state: `bg-secondary/15 text-secondary border-secondary/30 font-bold`.
 Inactive state: `bg-transparent text-on-surface-variant border-outline-variant/20 hover:text-on-surface hover:border-outline-variant/40`.
-Chip sizing: `px-3 py-1.5 font-mono text-[10px] uppercase tracking-wider rounded-md border`.
+Chip sizing: `px-3 py-2 font-mono text-[10px] uppercase tracking-wider rounded-md border`.
 
 ### RankCard (replaces XP progress bar on /perfil)
 
@@ -196,13 +203,13 @@ Chip sizing: `px-3 py-1.5 font-mono text-[10px] uppercase tracking-wider rounded
 
 Background: `bg-surface-container-high p-3 rounded border-l-2 border-secondary` (matches existing rank display).
 Three sub-stats in a row: `grid grid-cols-3 gap-2 mt-3`.
-Each stat: number in `text-lg font-bold font-heading`, label in `font-mono text-[9px] text-outline uppercase`.
+Each stat: number in `text-2xl font-bold font-heading`, label in `font-mono text-[9px] text-outline uppercase`.
 
 ### BadgeRow Specification
 
 Layout: `flex flex-wrap gap-2 mt-3` below the RankCard.
 Each badge: Terminal bracket style `[BADGE_NAME]`.
-Earned badge: `font-mono text-[10px] text-primary/80 bg-primary/8 border border-primary/15 px-2 py-0.5 rounded`.
+Earned badge: `font-mono text-[10px] text-primary/80 bg-primary/8 border border-primary/15 px-2 py-1 rounded`.
 Unearned badges: Not shown (per RESEARCH.md recommendation — simpler than locked badge UI).
 
 Format: `[FIRST_DIG]  [CENTURY_CLUB]  [RARE_FIND]  [CRITIC]  [CREW_MEMBER]`
