@@ -75,7 +75,7 @@ export default function ExplorarPage() {
 			{activeTab === "diggers" && (
 				<section role="tabpanel" className="flex flex-col">
 					{/* Search */}
-					<div className="w-full bg-surface-container-low px-8 md:px-12 pt-8 pb-6">
+					<div className="w-full bg-surface-container-low px-8 md:px-12 pt-8 pb-10">
 						<div className="max-w-4xl mx-auto">
 							<SearchSection />
 						</div>
