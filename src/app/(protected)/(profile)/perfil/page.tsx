@@ -32,17 +32,9 @@ import { getWantlistPage, getWantlistTotalCount, WANTLIST_PAGE_SIZE } from "@/li
 import { WantlistAddButton } from "./_components/wantlist-add-button";
 import { WantlistGrid } from "./_components/wantlist-grid";
 import { AddToWantlistDialog } from "./_components/add-to-wantlist-dialog";
-
-function getRankTitle(collectionCount: number): string {
-	if (collectionCount >= 500) return "Record Archaeologist";
-	if (collectionCount >= 200) return "Wax Prophet";
-	if (collectionCount >= 50) return "Crate Digger";
-	return "Vinyl Rookie";
-}
-
-function getRankLevel(collectionCount: number): number {
-	return Math.min(Math.floor(collectionCount / 10) + 1, 99);
-}
+import { getUserRanking, getUserBadges } from "@/lib/gamification/queries";
+import { RankCard } from "./_components/rank-card";
+import { BadgeRow } from "./_components/badge-row";
 
 interface PerfilPageProps {
 	searchParams: Promise<Record<string, string | string[] | undefined>>;
@@ -85,16 +77,9 @@ export default async function PerfilPage({ searchParams }: PerfilPageProps) {
 		.where(eq(collectionItems.userId, user.id));
 
 	const displayName = profile?.displayName ?? "DIGGER";
-	const rankTitle = getRankTitle(collectionCount);
-	const rankLevel = getRankLevel(collectionCount);
 	const memberYear = profile?.createdAt
 		? new Date(profile.createdAt).getFullYear()
 		: new Date().getFullYear();
-
-	const xp = collectionCount * 10;
-	const xpInLevel = collectionCount % 10;
-	const xpProgressPct = xpInLevel * 10; // 0–100
-	const nextLevel = Math.min(rankLevel + 1, 99);
 
 	// Parse filters from search params
 	const rawSearchParams = await searchParams;
@@ -110,7 +95,7 @@ export default async function PerfilPage({ searchParams }: PerfilPageProps) {
 	].filter((id): id is string => Boolean(id));
 
 	// Fetch collection data, social counts and activity stats in parallel
-	const [items, totalCount, genres, formats, followCounts, [{ weeklyAdds }], topGenres, showcaseReleases, [{ tradesThisWeek }], [{ wantlistCount }], wantlistData, wantlistTotal, [{ tradesTotal }]] = await Promise.all([
+	const [items, totalCount, genres, formats, followCounts, [{ weeklyAdds }], topGenres, showcaseReleases, [{ tradesThisWeek }], [{ wantlistCount }], wantlistData, wantlistTotal, [{ tradesTotal }], ranking, userBadgeData] = await Promise.all([
 		getCollectionPage(user.id, filters),
 		getCollectionCount(user.id, filters),
 		getUniqueGenres(user.id),
@@ -139,7 +124,15 @@ export default async function PerfilPage({ searchParams }: PerfilPageProps) {
 	db.select({ tradesTotal: count() })
 		.from(tradeRequests)
 		.where(or(eq(tradeRequests.requesterId, user.id), eq(tradeRequests.providerId, user.id))),
+	getUserRanking(user.id),
+	getUserBadges(user.id),
 	]);
+
+	const rankTitle = ranking?.title ?? "Vinyl Rookie";
+	const globalRank = ranking?.globalRank ?? null;
+	const rarityScore = ranking?.rarityScore ?? 0;
+	const contributionScore = ranking?.contributionScore ?? 0;
+	const globalScore = rarityScore * 0.7 + contributionScore * 0.3;
 
 	const releaseById = Object.fromEntries(showcaseReleases.map((r) => [r.id, r]));
 	const showcaseSearching = profile?.showcaseSearchingId ? (releaseById[profile.showcaseSearchingId] ?? null) : null;
@@ -205,30 +198,13 @@ export default async function PerfilPage({ searchParams }: PerfilPageProps) {
 						)}
 
 						{/* Rank */}
-						<div className="flex items-center gap-2 bg-surface-container-high p-3 rounded border-l-2 border-secondary">
-							<span className="material-symbols-outlined text-secondary">military_tech</span>
-							<div>
-								<div className="text-[10px] text-secondary font-mono uppercase tracking-widest">
-									Class Status
-								</div>
-								<div className="text-sm font-bold font-heading">{rankTitle}</div>
-							</div>
-						</div>
-
-						{/* XP Progress */}
-						<div className="mt-3">
-							<div className="flex items-center justify-between font-mono text-[9px] text-on-surface-variant mb-1.5">
-								<span className="text-primary">LVL_{rankLevel}</span>
-								<span className="text-outline">{xpInLevel} / 10 records</span>
-								<span>LVL_{nextLevel}</span>
-							</div>
-							<div className="w-full h-1.5 bg-surface-container-high rounded-full overflow-hidden">
-								<div
-									className="h-full bg-primary rounded-full transition-all duration-500"
-									style={{ width: `${xpProgressPct}%` }}
-								/>
-							</div>
-						</div>
+						<RankCard
+							title={rankTitle}
+							globalRank={globalRank}
+							rarityScore={rarityScore}
+							contributionScore={contributionScore}
+						/>
+						<BadgeRow badges={userBadgeData} />
 
 
 						{/* Divider */}
@@ -358,8 +334,8 @@ export default async function PerfilPage({ searchParams }: PerfilPageProps) {
 			<section className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-12">
 				{[
 					{ label: "RECORDS", value: collectionCount.toLocaleString(), color: "text-primary", icon: "album" },
-					{ label: "XP_SCORE", value: xp.toLocaleString(), color: "text-secondary", icon: "bolt" },
-					{ label: "LEVEL", value: `LVL_${rankLevel}`, color: "text-tertiary", icon: "military_tech" },
+					{ label: "RANK", value: globalRank ? `#${globalRank}` : "#--", color: "text-secondary", icon: "leaderboard" },
+					{ label: "SCORE", value: globalScore.toFixed(1), color: "text-tertiary", icon: "score" },
 					{ label: "TRADES", value: tradesTotal.toLocaleString(), color: "text-primary", icon: "swap_horiz" },
 				].map((stat) => (
 					<div
