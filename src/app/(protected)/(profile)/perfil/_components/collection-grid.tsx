@@ -1,12 +1,14 @@
+import type { ReactNode } from "react";
 import type { CollectionItem } from "@/lib/collection/queries";
 import { CollectionCard } from "./collection-card";
 
 interface CollectionGridProps {
 	items: CollectionItem[];
 	isOwner: boolean;
+	renderAction?: (item: CollectionItem) => ReactNode;
 }
 
-export function CollectionGrid({ items, isOwner }: CollectionGridProps) {
+export function CollectionGrid({ items, isOwner, renderAction }: CollectionGridProps) {
 	if (items.length === 0) {
 		return (
 			<div className="bg-surface-container-low rounded-xl p-12 flex flex-col items-center gap-4 text-center border border-outline-variant/10">
@@ -34,7 +36,12 @@ export function CollectionGrid({ items, isOwner }: CollectionGridProps) {
 	return (
 		<div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
 			{items.map((item) => (
-				<CollectionCard key={item.id} item={item} isOwner={isOwner} />
+				<CollectionCard
+					key={item.id}
+					item={item}
+					isOwner={isOwner}
+					actionSlot={renderAction?.(item)}
+				/>
 			))}
 		</div>
 	);

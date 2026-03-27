@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import { Badge } from "@/components/ui/badge";
+import type { ReactNode } from "react";
 import type { CollectionItem } from "@/lib/collection/queries";
 import { getRarityTier, getRarityBadgeVariant } from "@/lib/collection/rarity";
 import { ConditionEditor } from "./condition-editor";
@@ -9,9 +10,10 @@ import { ConditionEditor } from "./condition-editor";
 interface CollectionCardProps {
 	item: CollectionItem;
 	isOwner: boolean;
+	actionSlot?: ReactNode;
 }
 
-export function CollectionCard({ item, isOwner }: CollectionCardProps) {
+export function CollectionCard({ item, isOwner, actionSlot }: CollectionCardProps) {
 	const tier = getRarityTier(item.rarityScore);
 
 	return (
@@ -57,6 +59,7 @@ export function CollectionCard({ item, isOwner }: CollectionCardProps) {
 						currentGrade={item.conditionGrade ?? null}
 					/>
 				)}
+				{actionSlot}
 			</div>
 		</div>
 	);
