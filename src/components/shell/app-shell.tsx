@@ -3,7 +3,6 @@
 import { usePathname } from "next/navigation";
 import { AppHeader } from "@/components/shell/app-header";
 import { BottomBar } from "@/components/shell/bottom-bar";
-import { Sidebar } from "@/components/shell/sidebar";
 
 const SHELL_EXCLUDED_PREFIXES = ["/onboarding", "/settings"];
 
@@ -30,10 +29,9 @@ export function AppShell({ user, banner, children }: AppShellProps) {
 	return (
 		<>
 			<AppHeader displayName={user.displayName} avatarUrl={user.avatarUrl} xp={user.xp} userId={user.id} />
-			<Sidebar displayName={user.displayName} rank={user.rank} />
 			{banner}
 			<main
-				className="pt-14 lg:pl-64"
+				className="pt-14"
 				style={{
 					paddingBottom: "calc(64px + env(safe-area-inset-bottom, 0px))",
 				}}
