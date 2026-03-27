@@ -51,15 +51,10 @@ Source: Existing patterns in `explorar/page.tsx` (p-8, md:p-12), `perfil/page.ts
 
 | Role | Size | Weight | Line Height | Font Family | Usage in Phase 8 |
 |------|------|--------|-------------|-------------|-------------------|
-| Body | 14px (text-sm) | 400 (normal) | 1.5 | Inter (font-sans) | Leaderboard score values, badge descriptions |
-| Label | 10px (text-[10px]) | 700 (bold) | 1.4 | JetBrains Mono (font-mono) | Tab labels, section headers, stat labels, badge slugs, rank labels |
+| Micro | 10px (text-[10px]) | 700 (bold) | 1.4 | JetBrains Mono (font-mono) | Tab labels, section headers, stat labels, badge slugs, rank labels, micro labels, sub-stat labels, usernames in leaderboard |
+| Body | 14px (text-sm) | 400 (normal) | 1.5 | Inter (font-sans) | Leaderboard score values, badge descriptions, rank numbers |
 | Heading | 24px (text-2xl) | 700 (bold) | 1.2 | Space Grotesk (font-heading) | Section titles, profile display name, stat numbers, RankCard sub-stat numbers |
 | Display | 30px (text-3xl) | 700 (bold) | 1.1 | Space Grotesk (font-heading) | Hero stat numbers (global rank position) |
-
-Additional terminal-style sizes (existing pattern, not new):
-- `text-[8px]` — micro labels (verified badges)
-- `text-[9px]` — secondary micro labels (XP progress, sub-stats)
-- `text-[11px]` — body-small (bio text, genre names, username in leaderboard)
 
 Weights used: 400 (normal) and 700 (bold). Active tab text uses 700 (bold).
 
@@ -169,7 +164,7 @@ Content format (per D-06):
 |---------|------|------|-------|-----------|
 | `#[rank]` | font-mono | text-sm (14px) | text-on-surface | Left, w-12 fixed |
 | `.` separator | font-mono | text-[10px] | text-outline | Inline |
-| `[username]` | font-mono | text-[11px] | text-on-surface | Flex-1, truncate |
+| `[username]` | font-mono | text-[10px] | text-on-surface | Flex-1, truncate |
 | `[title]` | font-mono | text-[10px] | text-secondary | Flex-shrink-0 |
 | `[score]pts` | font-mono | text-sm (14px) | text-primary | Right-aligned, tabular-nums |
 
@@ -203,7 +198,7 @@ Chip sizing: `px-3 py-2 font-mono text-[10px] uppercase tracking-wider rounded-m
 
 Background: `bg-surface-container-high p-3 rounded border-l-2 border-secondary` (matches existing rank display).
 Three sub-stats in a row: `grid grid-cols-3 gap-2 mt-3`.
-Each stat: number in `text-2xl font-bold font-heading`, label in `font-mono text-[9px] text-outline uppercase`.
+Each stat: number in `text-2xl font-bold font-heading`, label in `font-mono text-[10px] text-outline uppercase`.
 
 ### BadgeRow Specification
 
