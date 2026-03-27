@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Inter, Space_Grotesk, JetBrains_Mono } from "next/font/google";
 import { Toaster } from "@/components/ui/sonner";
+import { ThemeProvider } from "@/components/theme-provider";
 import "./globals.css";
 
 const inter = Inter({
@@ -42,6 +43,7 @@ export default function RootLayout({
 		<html
 			lang="en"
 			className={`${inter.variable} ${spaceGrotesk.variable} ${jetbrainsMono.variable}`}
+			suppressHydrationWarning
 		>
 			<head>
 				<link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -50,9 +52,17 @@ export default function RootLayout({
 					href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0"
 					rel="stylesheet"
 				/>
+				{/* Prevent theme flash on load */}
+				<script
+					dangerouslySetInnerHTML={{
+						__html: `try{var t=localStorage.getItem('app-theme');if(t)document.documentElement.setAttribute('data-theme',t)}catch(e){}`,
+					}}
+				/>
 			</head>
 			<body className="font-sans antialiased">
-				<div className="grain">{children}</div>
+				<ThemeProvider>
+					<div className="grain">{children}</div>
+				</ThemeProvider>
 				<Toaster
 					toastOptions={{
 						style: {

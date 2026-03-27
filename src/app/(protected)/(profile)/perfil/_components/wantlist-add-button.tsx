@@ -1,0 +1,22 @@
+"use client";
+
+import { useState } from "react";
+import { AddToWantlistDialog } from "./add-to-wantlist-dialog";
+
+export function WantlistAddButton() {
+	const [open, setOpen] = useState(false);
+
+	return (
+		<>
+			<button
+				type="button"
+				onClick={() => setOpen(true)}
+				className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-secondary/10 border border-secondary/20 text-secondary hover:bg-secondary/20 transition-colors font-mono text-[10px] uppercase tracking-widest"
+			>
+				<span className="material-symbols-outlined text-sm">add</span>
+				Add Record
+			</button>
+			<AddToWantlistDialog open={open} onOpenChange={setOpen} />
+		</>
+	);
+}

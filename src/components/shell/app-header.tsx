@@ -1,5 +1,4 @@
 import Link from "next/link";
-import { UserAvatarMenu } from "@/components/shell/user-avatar-menu";
 import { NotificationBell } from "@/components/shell/notification-bell";
 
 interface AppHeaderProps {
@@ -9,12 +8,12 @@ interface AppHeaderProps {
 	userId: string;
 }
 
-export function AppHeader({ displayName, avatarUrl, xp = 0, userId }: AppHeaderProps) {
+export function AppHeader({ xp = 0, userId }: AppHeaderProps) {
 	return (
 		<header className="fixed top-0 left-0 right-0 z-50 flex items-center px-6 py-3 w-full border-b border-outline-variant/20 bg-surface-dim">
 			<Link href="/feed" className="shrink-0">
-				<span className="text-xl font-bold tracking-tighter text-primary font-heading">
-					DIGSWAP
+				<span className="text-xl font-bold tracking-tighter font-heading">
+					<span className="text-primary">DIG</span><span className="text-on-surface">SWAP</span>
 				</span>
 			</Link>
 
@@ -35,7 +34,7 @@ export function AppHeader({ displayName, avatarUrl, xp = 0, userId }: AppHeaderP
 					href="/explorar"
 					className="font-mono text-[10px] uppercase tracking-[0.2em] text-on-surface-variant hover:text-on-surface transition-colors"
 				>
-					Explorar
+					Dig
 				</Link>
 				<Link
 					href="/perfil"
@@ -54,7 +53,6 @@ export function AppHeader({ displayName, avatarUrl, xp = 0, userId }: AppHeaderP
 					</div>
 				)}
 				<NotificationBell userId={userId} />
-				<UserAvatarMenu displayName={displayName} avatarUrl={avatarUrl} />
 			</div>
 		</header>
 	);

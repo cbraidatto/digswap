@@ -16,6 +16,7 @@ export const releases = pgTable(
   {
     id: uuid("id").defaultRandom().primaryKey(),
     discogsId: integer("discogs_id").unique(),
+    youtubeVideoId: varchar("youtube_video_id", { length: 20 }).unique(),
     title: varchar("title", { length: 500 }).notNull(),
     artist: varchar("artist", { length: 500 }).notNull(),
     year: integer("year"),

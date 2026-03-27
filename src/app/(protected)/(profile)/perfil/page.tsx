@@ -1,7 +1,10 @@
-import { count, eq } from "drizzle-orm";
+import { and, count, eq, gte, inArray, isNotNull, or } from "drizzle-orm";
 import { redirect } from "next/navigation";
 import { db } from "@/lib/db";
 import { collectionItems } from "@/lib/db/schema/collections";
+import { releases } from "@/lib/db/schema/releases";
+import { tradeRequests } from "@/lib/db/schema/trades";
+import { wantlistItems } from "@/lib/db/schema/wantlist";
 import { profiles } from "@/lib/db/schema/users";
 import { createClient } from "@/lib/supabase/server";
 import { collectionFilterSchema } from "@/lib/collection/filters";
@@ -10,6 +13,7 @@ import {
 	getCollectionCount,
 	getUniqueGenres,
 	getUniqueFormats,
+	getTopGenres,
 	PAGE_SIZE,
 } from "@/lib/collection/queries";
 import { getFollowCounts } from "@/lib/social/queries";
@@ -18,7 +22,16 @@ import { CollectionSkeleton } from "./_components/collection-skeleton";
 import { FilterBar } from "./_components/filter-bar";
 import { FollowList } from "./_components/follow-list";
 import { Pagination } from "./_components/pagination";
-import { AddRecordFAB } from "./_components/add-record-fab";
+import { AddRecordButton } from "./_components/add-record-button";
+import { CoverBanner } from "./_components/cover-banner";
+import { EditProfileModal } from "./_components/edit-profile-modal";
+import { ShowcaseCards } from "./_components/showcase-cards";
+import { SocialLinks } from "./_components/social-links";
+import { ThemeSwitcher } from "@/components/theme-switcher";
+import { getWantlistPage, getWantlistTotalCount, WANTLIST_PAGE_SIZE } from "@/lib/wantlist/queries";
+import { WantlistAddButton } from "./_components/wantlist-add-button";
+import { WantlistGrid } from "./_components/wantlist-grid";
+import { AddToWantlistDialog } from "./_components/add-to-wantlist-dialog";
 
 function getRankTitle(collectionCount: number): string {
 	if (collectionCount >= 500) return "Record Archaeologist";
@@ -29,15 +42,6 @@ function getRankTitle(collectionCount: number): string {
 
 function getRankLevel(collectionCount: number): number {
 	return Math.min(Math.floor(collectionCount / 10) + 1, 99);
-}
-
-// Generate a fake contribution grid pattern for visual effect
-function getContributionLevel(index: number, total: number): number {
-	const pos = index / total;
-	const noise = Math.sin(index * 2.3) * 0.5 + 0.5;
-	if (pos < 0.3) return noise > 0.7 ? 1 : 0;
-	if (pos < 0.6) return noise > 0.5 ? Math.floor(noise * 3) + 1 : 0;
-	return noise > 0.4 ? Math.floor(noise * 4) : 0;
 }
 
 interface PerfilPageProps {
@@ -56,9 +60,20 @@ export default async function PerfilPage({ searchParams }: PerfilPageProps) {
 		.select({
 			displayName: profiles.displayName,
 			avatarUrl: profiles.avatarUrl,
-			discogsUsername: profiles.discogsUsername,
-			discogsConnected: profiles.discogsConnected,
+			coverUrl: profiles.coverUrl,
+			coverPositionY: profiles.coverPositionY,
+			username: profiles.username,
+			location: profiles.location,
+			bio: profiles.bio,
 			createdAt: profiles.createdAt,
+			youtubeUrl:    profiles.youtubeUrl,
+			instagramUrl:  profiles.instagramUrl,
+			soundcloudUrl: profiles.soundcloudUrl,
+			discogsUrl:    profiles.discogsUrl,
+			beatportUrl:   profiles.beatportUrl,
+			showcaseSearchingId: profiles.showcaseSearchingId,
+			showcaseRarestId:    profiles.showcaseRarestId,
+			showcaseFavoriteId:  profiles.showcaseFavoriteId,
 		})
 		.from(profiles)
 		.where(eq(profiles.id, user.id))
@@ -77,44 +92,80 @@ export default async function PerfilPage({ searchParams }: PerfilPageProps) {
 		: new Date().getFullYear();
 
 	const xp = collectionCount * 10;
-
-	// 52 weeks x 7 days = 364 cells
-	const contributionCells = Array.from({ length: 364 }, (_, i) =>
-		getContributionLevel(i, 364),
-	);
-
-	const CELL_COLORS = [
-		"bg-outline-variant",
-		"bg-primary/20",
-		"bg-primary/50",
-		"bg-primary/80",
-		"bg-primary",
-	];
+	const xpInLevel = collectionCount % 10;
+	const xpProgressPct = xpInLevel * 10; // 0–100
+	const nextLevel = Math.min(rankLevel + 1, 99);
 
 	// Parse filters from search params
 	const rawSearchParams = await searchParams;
 	const filters = collectionFilterSchema.parse(rawSearchParams);
 
-	// Fetch collection data and social counts in parallel
-	const [items, totalCount, genres, formats, followCounts] = await Promise.all([
+	const weekAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
+
+	// Collect showcase release IDs to fetch in one query
+	const showcaseIds = [
+		profile?.showcaseSearchingId,
+		profile?.showcaseRarestId,
+		profile?.showcaseFavoriteId,
+	].filter((id): id is string => Boolean(id));
+
+	// Fetch collection data, social counts and activity stats in parallel
+	const [items, totalCount, genres, formats, followCounts, [{ weeklyAdds }], topGenres, showcaseReleases, [{ tradesThisWeek }], [{ wantlistCount }], wantlistData, wantlistTotal, [{ tradesTotal }]] = await Promise.all([
 		getCollectionPage(user.id, filters),
 		getCollectionCount(user.id, filters),
 		getUniqueGenres(user.id),
 		getUniqueFormats(user.id),
 		getFollowCounts(user.id),
+		db.select({ weeklyAdds: count() })
+			.from(collectionItems)
+			.where(and(eq(collectionItems.userId, user.id), gte(collectionItems.createdAt, weekAgo))),
+		getTopGenres(user.id),
+		showcaseIds.length > 0
+			? db.select({ id: releases.id, title: releases.title, artist: releases.artist, year: releases.year, coverImageUrl: releases.coverImageUrl })
+				.from(releases)
+				.where(inArray(releases.id, showcaseIds))
+			: Promise.resolve([]),
+		db.select({ tradesThisWeek: count() })
+			.from(tradeRequests)
+			.where(and(
+				or(eq(tradeRequests.requesterId, user.id), eq(tradeRequests.providerId, user.id)),
+				gte(tradeRequests.createdAt, weekAgo),
+			)),
+		db.select({ wantlistCount: count() })
+			.from(wantlistItems)
+			.where(and(eq(wantlistItems.userId, user.id), isNotNull(wantlistItems.foundAt))),
+	getWantlistPage(user.id, 1),
+	getWantlistTotalCount(user.id),
+	db.select({ tradesTotal: count() })
+		.from(tradeRequests)
+		.where(or(eq(tradeRequests.requesterId, user.id), eq(tradeRequests.providerId, user.id))),
 	]);
+
+	const releaseById = Object.fromEntries(showcaseReleases.map((r) => [r.id, r]));
+	const showcaseSearching = profile?.showcaseSearchingId ? (releaseById[profile.showcaseSearchingId] ?? null) : null;
+	const showcaseRarest    = profile?.showcaseRarestId    ? (releaseById[profile.showcaseRarestId]    ?? null) : null;
+	const showcaseFavorite  = profile?.showcaseFavoriteId  ? (releaseById[profile.showcaseFavoriteId]  ?? null) : null;
 
 	const totalPages = Math.ceil(totalCount / PAGE_SIZE);
 
 	return (
+		<div>
+			{/* Cover Banner — full bleed */}
+			<CoverBanner
+				initialCoverUrl={profile?.coverUrl ?? null}
+				initialPositionY={Number(profile?.coverPositionY ?? 50)}
+				isOwner={true}
+			/>
+
 		<div className="max-w-7xl mx-auto px-4 md:px-6 py-8">
 			{/* User Header Bento */}
 			<section className="grid grid-cols-1 md:grid-cols-12 gap-6 mb-12">
 				{/* Identity Card */}
 				<div className="md:col-span-4 bg-surface-container-low p-6 rounded-lg relative overflow-hidden">
 					<div className="relative z-10">
-						<div className="flex items-start justify-between mb-4">
-							<div className="w-20 h-20 bg-surface-container-high rounded border-2 border-primary/20 flex items-center justify-center">
+						{/* Avatar + name side by side */}
+						<div className="flex items-start gap-4 mb-4">
+							<div className="w-16 h-16 flex-shrink-0 bg-surface-container-high rounded border-2 border-primary/20 flex items-center justify-center">
 								{profile?.avatarUrl ? (
 									<img
 										src={profile.avatarUrl}
@@ -122,21 +173,38 @@ export default async function PerfilPage({ searchParams }: PerfilPageProps) {
 										className="w-full h-full object-cover rounded"
 									/>
 								) : (
-									<span className="text-3xl font-mono font-bold text-primary">
+									<span className="text-2xl font-mono font-bold text-primary">
 										{displayName.charAt(0).toUpperCase()}
 									</span>
 								)}
 							</div>
-							<span className="font-mono text-[10px] text-primary bg-primary/10 px-2 py-1 border border-primary/20 rounded">
-								[AUTHENTICATED]
-							</span>
+							<div className="flex-1 min-w-0 pt-0.5">
+								<div className="flex items-center gap-2 mb-0.5">
+									<h1 className="text-2xl font-bold tracking-tight font-heading leading-none truncate">
+										{displayName.toUpperCase()}
+									</h1>
+									<span className="font-mono text-[8px] text-primary/60 bg-primary/8 px-1.5 py-0.5 border border-primary/15 rounded flex-shrink-0">
+										✓
+									</span>
+								</div>
+								{profile?.username && (
+									<p className="font-mono text-[11px] text-primary/60 mb-0.5">@{profile.username}</p>
+								)}
+								<p className="text-on-surface-variant font-mono text-[10px]">
+									Member since {memberYear}
+								</p>
+							</div>
 						</div>
-						<h1 className="text-3xl font-bold tracking-tight mb-1 font-heading">
-							{displayName.toUpperCase()}
-						</h1>
-						<p className="text-on-surface-variant font-mono text-xs mb-4">
-							Member since {memberYear} / Vinyl Network
-						</p>
+
+						{/* Location */}
+						{profile?.location && (
+							<div className="flex items-center gap-1.5 font-mono text-xs text-on-surface-variant mb-3">
+								<span className="material-symbols-outlined text-sm leading-none">location_on</span>
+								{profile.location}
+							</div>
+						)}
+
+						{/* Rank */}
 						<div className="flex items-center gap-2 bg-surface-container-high p-3 rounded border-l-2 border-secondary">
 							<span className="material-symbols-outlined text-secondary">military_tech</span>
 							<div>
@@ -146,12 +214,67 @@ export default async function PerfilPage({ searchParams }: PerfilPageProps) {
 								<div className="text-sm font-bold font-heading">{rankTitle}</div>
 							</div>
 						</div>
-						{/* Social Counts */}
-						<div className="flex items-center gap-4 mt-4 font-mono text-[10px]">
-							<FollowList userId={user.id} type="following" count={followCounts.followingCount} />
-							<span className="text-outline">&middot;</span>
-							<FollowList userId={user.id} type="followers" count={followCounts.followerCount} />
+
+						{/* XP Progress */}
+						<div className="mt-3">
+							<div className="flex items-center justify-between font-mono text-[9px] text-on-surface-variant mb-1.5">
+								<span className="text-primary">LVL_{rankLevel}</span>
+								<span className="text-outline">{xpInLevel} / 10 records</span>
+								<span>LVL_{nextLevel}</span>
+							</div>
+							<div className="w-full h-1.5 bg-surface-container-high rounded-full overflow-hidden">
+								<div
+									className="h-full bg-primary rounded-full transition-all duration-500"
+									style={{ width: `${xpProgressPct}%` }}
+								/>
+							</div>
 						</div>
+
+
+						{/* Divider */}
+						<div className="border-t border-outline/10 my-4" />
+
+						{/* Follow counts + Edit */}
+						<div className="flex items-center justify-between mb-3">
+							<div className="flex items-center gap-3 font-mono text-[10px]">
+								<FollowList userId={user.id} type="following" count={followCounts.followingCount} />
+								<span className="text-outline">&middot;</span>
+								<FollowList userId={user.id} type="followers" count={followCounts.followerCount} />
+							</div>
+							<ThemeSwitcher />
+							<EditProfileModal
+								initial={{
+									displayName:   profile?.displayName  ?? displayName,
+									username:      profile?.username     ?? "",
+									location:      profile?.location     ?? "",
+									bio:           profile?.bio          ?? "",
+									youtubeUrl:    profile?.youtubeUrl    ?? "",
+									instagramUrl:  profile?.instagramUrl  ?? "",
+									soundcloudUrl: profile?.soundcloudUrl ?? "",
+									discogsUrl:    profile?.discogsUrl    ?? "",
+									beatportUrl:   profile?.beatportUrl   ?? "",
+									avatarUrl:     profile?.avatarUrl     ?? null,
+								}}
+							/>
+						</div>
+
+						{/* Social links */}
+						<SocialLinks
+							youtube={profile?.youtubeUrl    ?? null}
+							instagram={profile?.instagramUrl  ?? null}
+							soundcloud={profile?.soundcloudUrl ?? null}
+							discogs={profile?.discogsUrl    ?? null}
+							beatport={profile?.beatportUrl   ?? null}
+						/>
+
+						{/* Bio */}
+						{profile?.bio && (
+							<div className="mt-3 rounded border border-outline/15 bg-black/40 px-3 py-2.5 max-h-[180px] overflow-y-auto overflow-x-hidden" style={{ scrollbarWidth: "thin", scrollbarColor: "rgba(255,255,255,0.15) transparent" }}>
+								<p className="font-mono text-[11px] text-on-surface-variant leading-relaxed break-words whitespace-pre-wrap">
+									{profile.bio}
+								</p>
+							</div>
+						)}
 					</div>
 					{/* Decorative dot grid */}
 					<div
@@ -163,32 +286,71 @@ export default async function PerfilPage({ searchParams }: PerfilPageProps) {
 					/>
 				</div>
 
-				{/* Contribution Graph */}
-				<div className="md:col-span-8 bg-surface-container-low p-6 rounded-lg">
-					<div className="flex justify-between items-center mb-6">
-						<h3 className="text-xs font-mono uppercase tracking-widest text-on-surface-variant">
-							Digging Activity / Annual_Log
-						</h3>
-						<div className="flex items-center gap-1 text-[10px] text-on-surface-variant font-mono">
-							<span>Less</span>
-							{CELL_COLORS.map((c) => (
-								<div key={c} className={`w-3 h-3 ${c}`} />
-							))}
-							<span>More</span>
+				{/* Digging Activity */}
+				<div className="md:col-span-8 bg-surface-container-low p-6 rounded-lg flex flex-col gap-5">
+					<h3 className="text-[10px] font-mono uppercase tracking-[0.2em] text-tertiary">
+						Digging Activity
+					</h3>
+
+					{/* Stats row */}
+					<div className="grid grid-cols-2 gap-3">
+						{/* 3 number stats grouped */}
+						<div className="bg-surface-container-high rounded-lg border border-outline/[0.07] flex flex-col">
+							<p className="font-mono text-[9px] uppercase tracking-[0.18em] text-on-surface-variant px-4 pt-3 flex items-center gap-1.5">
+								<span className="material-symbols-outlined text-[13px] text-tertiary">calendar_month</span>
+								Week Activity
+							</p>
+							<div className="flex divide-x divide-outline/[0.07] flex-1">
+								{/* Weekly adds */}
+								<div className="flex-1 p-4 flex flex-col items-center justify-center gap-1 text-center">
+									<span className="material-symbols-outlined text-base text-primary">playlist_add</span>
+									<p className="text-3xl font-bold font-heading text-primary leading-none">{weeklyAdds}</p>
+									<p className="font-mono text-[9px] uppercase tracking-widest text-outline">Added</p>
+								</div>
+								{/* Trades this week */}
+								<div className="flex-1 p-4 flex flex-col items-center justify-center gap-1 text-center">
+									<span className="material-symbols-outlined text-base text-tertiary">swap_horiz</span>
+									<p className="text-3xl font-bold font-heading text-tertiary leading-none">{tradesThisWeek}</p>
+									<p className="font-mono text-[9px] uppercase tracking-widest text-outline">Trades</p>
+								</div>
+								{/* Tracks on wantlist */}
+								<div className="flex-1 p-4 flex flex-col items-center justify-center gap-1 text-center">
+									<span className="material-symbols-outlined text-base text-secondary">task_alt</span>
+									<p className="text-3xl font-bold font-heading text-secondary leading-none">{wantlistCount}</p>
+									<p className="font-mono text-[9px] uppercase tracking-widest text-outline">Finded</p>
+								</div>
+							</div>
+						</div>
+
+						{/* Top genres */}
+						<div className="bg-surface-container-high rounded-lg p-4 border border-outline/[0.07]">
+							<p className="font-mono text-[9px] uppercase tracking-[0.18em] text-on-surface-variant mb-2 flex items-center gap-1.5">
+								<span className="material-symbols-outlined text-[13px] text-secondary">queue_music</span>
+								Top Genres
+							</p>
+							{topGenres.length > 0 ? (
+								<ol className="space-y-1.5">
+									{topGenres.map((g, i) => (
+										<li key={g.genre} className="flex items-center gap-2 min-w-0">
+											<span className="font-mono text-[9px] text-outline w-2.5 flex-shrink-0">{i + 1}</span>
+											<span className="font-mono text-[11px] text-on-surface truncate flex-1">{g.genre}</span>
+											<span className="font-mono text-[10px] text-secondary flex-shrink-0">{g.count}</span>
+										</li>
+									))}
+								</ol>
+							) : (
+								<p className="font-mono text-[10px] text-outline/60 italic">no data yet</p>
+							)}
 						</div>
 					</div>
-					<div
-						className="grid gap-[2px] overflow-x-auto"
-						style={{ gridTemplateColumns: "repeat(52, minmax(0, 1fr))" }}
-					>
-						{contributionCells.map((level, i) => (
-							<div
-								// biome-ignore lint/suspicious/noArrayIndexKey: static display grid
-								key={i}
-								className={`aspect-square ${CELL_COLORS[level]} rounded-[1px]`}
-							/>
-						))}
-					</div>
+
+					{/* Showcase */}
+					<ShowcaseCards
+						searching={showcaseSearching}
+						rarest={showcaseRarest}
+						favorite={showcaseFavorite}
+						isOwner={true}
+					/>
 				</div>
 			</section>
 
@@ -198,7 +360,7 @@ export default async function PerfilPage({ searchParams }: PerfilPageProps) {
 					{ label: "RECORDS", value: collectionCount.toLocaleString(), color: "text-primary", icon: "album" },
 					{ label: "XP_SCORE", value: xp.toLocaleString(), color: "text-secondary", icon: "bolt" },
 					{ label: "LEVEL", value: `LVL_${rankLevel}`, color: "text-tertiary", icon: "military_tech" },
-					{ label: "TRADES", value: "0", color: "text-primary", icon: "swap_horiz" },
+					{ label: "TRADES", value: tradesTotal.toLocaleString(), color: "text-primary", icon: "swap_horiz" },
 				].map((stat) => (
 					<div
 						key={stat.label}
@@ -217,8 +379,31 @@ export default async function PerfilPage({ searchParams }: PerfilPageProps) {
 				))}
 			</section>
 
+			{/* Wantlist */}
+			<section className="mt-12">
+				<div className="flex items-center justify-between mb-6">
+					<div>
+						<span className="text-[10px] font-mono text-secondary tracking-[0.2em] uppercase">
+							Wantlist
+						</span>
+						<h2 className="text-2xl font-bold font-heading text-on-surface mt-1">
+							Your_Wantlist
+						</h2>
+					</div>
+					<WantlistAddButton />
+				</div>
+
+				<WantlistGrid items={wantlistData} isOwner={true} />
+
+				{wantlistTotal > WANTLIST_PAGE_SIZE && (
+					<p className="mt-4 text-center font-mono text-[10px] text-outline">
+						Showing {Math.min(WANTLIST_PAGE_SIZE, wantlistTotal)} of {wantlistTotal} items
+					</p>
+				)}
+			</section>
+
 			{/* Collection Repository */}
-			<section>
+			<section className="mt-12">
 				<div className="flex items-center justify-between mb-6">
 					<div>
 						<span className="text-[10px] font-mono text-primary tracking-[0.2em] uppercase">
@@ -228,6 +413,7 @@ export default async function PerfilPage({ searchParams }: PerfilPageProps) {
 							Your_Collection
 						</h2>
 					</div>
+					<AddRecordButton />
 				</div>
 
 				{/* Filter Bar */}
@@ -252,8 +438,7 @@ export default async function PerfilPage({ searchParams }: PerfilPageProps) {
 				)}
 			</section>
 
-			{/* Floating Action Button for adding records */}
-			<AddRecordFAB />
+		</div>
 		</div>
 	);
 }

@@ -1,7 +1,5 @@
 import { Resend } from "resend";
 
-const resend = new Resend(process.env.RESEND_API_KEY);
-
 /**
  * Send a wantlist match notification email to a user.
  *
@@ -15,6 +13,8 @@ export async function sendWantlistMatchEmail(
 	ownerUsername: string,
 ): Promise<void> {
 	try {
+		if (!process.env.RESEND_API_KEY) return;
+		const resend = new Resend(process.env.RESEND_API_KEY);
 		const from =
 			process.env.RESEND_FROM_EMAIL || "DigSwap <onboarding@resend.dev>";
 		const appUrl =

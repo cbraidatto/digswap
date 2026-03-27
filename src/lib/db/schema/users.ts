@@ -17,13 +17,24 @@ export const profiles = pgTable(
     displayName: varchar("display_name", { length: 50 }),
     username: varchar("username", { length: 30 }).unique(),
     avatarUrl: text("avatar_url"),
+    coverUrl: text("cover_url"),
+    coverPositionY: text("cover_position_y").default("50").notNull(),
     bio: text("bio"),
+    location: varchar("location", { length: 100 }),
     discogsUsername: varchar("discogs_username", { length: 100 }),
     discogsConnected: boolean("discogs_connected").default(false).notNull(),
     lastSyncedAt: timestamp("last_synced_at", { withTimezone: true }),
     onboardingCompleted: boolean("onboarding_completed")
       .default(false)
       .notNull(),
+    showcaseSearchingId: uuid("showcase_searching_id"),
+    showcaseRarestId: uuid("showcase_rarest_id"),
+    showcaseFavoriteId: uuid("showcase_favorite_id"),
+    youtubeUrl:    text("youtube_url"),
+    instagramUrl:  text("instagram_url"),
+    soundcloudUrl: text("soundcloud_url"),
+    discogsUrl:    text("discogs_url"),
+    beatportUrl:   text("beatport_url"),
     twoFactorEnabled: boolean("two_factor_enabled").default(false).notNull(),
     subscriptionTier: varchar("subscription_tier", { length: 20 })
       .default("free")

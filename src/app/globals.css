@@ -76,7 +76,8 @@
    Ghost Protocol Theme
    Cyber-Terminal / Matrix-lite
    =========================== */
-:root {
+:root,
+[data-theme="ghost"] {
   /* Core semantic */
   --background: #10141a;
   --foreground: #dfe2eb;
@@ -143,6 +144,192 @@
 }
 
 /* ===========================
+   Chrome Theme
+   Silver / Monochrome Steel
+   =========================== */
+[data-theme="chrome"] {
+  --background: #0c0d0f;
+  --foreground: #e4e8ee;
+  --card: #141618;
+  --card-foreground: #e4e8ee;
+  --popover: #1a1c20;
+  --popover-foreground: #e4e8ee;
+  --primary: #c0c8d4;
+  --primary-foreground: #101418;
+  --secondary: #8090a0;
+  --secondary-foreground: #0a1018;
+  --muted: #141618;
+  --muted-foreground: #909aa8;
+  --accent: #202428;
+  --accent-foreground: #e4e8ee;
+  --destructive: #ff8080;
+  --destructive-foreground: #400000;
+  --border: #303840;
+  --input: #141618;
+  --ring: #c0c8d4;
+
+  --surface: #0c0d0f;
+  --surface-dim: #0c0d0f;
+  --surface-bright: #303438;
+  --surface-container-lowest: #080910;
+  --surface-container-low: #141618;
+  --surface-container: #1a1c20;
+  --surface-container-high: #202428;
+  --surface-container-highest: #2c3038;
+  --surface-variant: #2c3038;
+  --on-surface: #e4e8ee;
+  --on-surface-variant: #909aa8;
+  --outline: #606870;
+  --outline-variant: #303840;
+
+  --on-primary: #101418;
+  --primary-container: #485058;
+  --on-primary-container: #dce4ee;
+  --primary-fixed: #dce4ee;
+  --primary-fixed-dim: #c0c8d4;
+
+  --on-secondary: #0a1018;
+  --secondary-container: #405060;
+  --on-secondary-container: #c0d0e0;
+
+  --tertiary: #78a0c0;
+  --tertiary-container: #203040;
+  --on-tertiary: #081828;
+  --on-tertiary-container: #c0d8f0;
+
+  --error: #ffb4ab;
+  --error-container: #93000a;
+  --on-error: #690005;
+
+  --inverse-surface: #e4e8ee;
+  --inverse-on-surface: #1a1c20;
+}
+
+/* ===========================
+   Rust Furnace Theme
+   Ember Orange / Cold Steel
+   =========================== */
+[data-theme="rust"] {
+  --background: #09090c;
+  --foreground: #e8e2dc;
+  --card: #121318;
+  --card-foreground: #e8e2dc;
+  --popover: #181920;
+  --popover-foreground: #e8e2dc;
+  --primary: #ff5c1a;
+  --primary-foreground: #200800;
+  --secondary: #4a7898;
+  --secondary-foreground: #080e14;
+  --muted: #121318;
+  --muted-foreground: #9098a8;
+  --accent: #1e2028;
+  --accent-foreground: #e8e2dc;
+  --destructive: #ff5050;
+  --destructive-foreground: #400000;
+  --border: #2a2e38;
+  --input: #121318;
+  --ring: #ff5c1a;
+
+  --surface: #09090c;
+  --surface-dim: #09090c;
+  --surface-bright: #2e3040;
+  --surface-container-lowest: #050508;
+  --surface-container-low: #121318;
+  --surface-container: #181920;
+  --surface-container-high: #1e2028;
+  --surface-container-highest: #282c38;
+  --surface-variant: #282c38;
+  --on-surface: #e8e2dc;
+  --on-surface-variant: #9098a8;
+  --outline: #505868;
+  --outline-variant: #2a2e38;
+
+  --on-primary: #200800;
+  --primary-container: #c03800;
+  --on-primary-container: #ffd0b8;
+  --primary-fixed: #ffd0b8;
+  --primary-fixed-dim: #ff5c1a;
+
+  --on-secondary: #080e14;
+  --secondary-container: #284860;
+  --on-secondary-container: #b8d4e8;
+
+  --tertiary: #e0a030;
+  --tertiary-container: #482800;
+  --on-tertiary: #201000;
+  --on-tertiary-container: #f8d890;
+
+  --error: #ffb4ab;
+  --error-container: #93000a;
+  --on-error: #690005;
+
+  --inverse-surface: #e8e2dc;
+  --inverse-on-surface: #181920;
+}
+
+/* ===========================
+   Deep Indigo Theme
+   Jazz Club / Electric Blue
+   =========================== */
+[data-theme="indigo"] {
+  --background: #080c18;
+  --foreground: #d8e2f8;
+  --card: #0e1428;
+  --card-foreground: #d8e2f8;
+  --popover: #141c34;
+  --popover-foreground: #d8e2f8;
+  --primary: #60b4ff;
+  --primary-foreground: #002060;
+  --secondary: #b068f8;
+  --secondary-foreground: #280060;
+  --muted: #0e1428;
+  --muted-foreground: #a0b8d8;
+  --accent: #182040;
+  --accent-foreground: #d8e2f8;
+  --destructive: #ff7080;
+  --destructive-foreground: #500010;
+  --border: #202e58;
+  --input: #0e1428;
+  --ring: #60b4ff;
+
+  --surface: #080c18;
+  --surface-dim: #080c18;
+  --surface-bright: #304068;
+  --surface-container-lowest: #040810;
+  --surface-container-low: #0e1428;
+  --surface-container: #141c34;
+  --surface-container-high: #182040;
+  --surface-container-highest: #202e58;
+  --surface-variant: #202e58;
+  --on-surface: #d8e2f8;
+  --on-surface-variant: #a0b8d8;
+  --outline: #6080b0;
+  --outline-variant: #202e58;
+
+  --on-primary: #002060;
+  --primary-container: #2080d8;
+  --on-primary-container: #d0e8ff;
+  --primary-fixed: #d0e8ff;
+  --primary-fixed-dim: #60b4ff;
+
+  --on-secondary: #280060;
+  --secondary-container: #7030c0;
+  --on-secondary-container: #f0d8ff;
+
+  --tertiary: #ff8080;
+  --tertiary-container: #600010;
+  --on-tertiary: #400010;
+  --on-tertiary-container: #ffd8d8;
+
+  --error: #ffb4ab;
+  --error-container: #93000a;
+  --on-error: #690005;
+
+  --inverse-surface: #d8e2f8;
+  --inverse-on-surface: #141c34;
+}
+
+/* ===========================
    Material Symbols configuration
    =========================== */
 .material-symbols-outlined {
@@ -183,6 +370,32 @@
   );
   background-size: 200% 100%;
   animation: shimmer 1.5s ease-in-out infinite;
+}
+
+/* ===========================
+   Showcase marquee
+   =========================== */
+@keyframes marquee {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }
+}
+.animate-marquee {
+  animation: marquee 28s linear infinite;
+  will-change: transform;
+}
+.animate-marquee:hover {
+  animation-play-state: paused;
+}
+
+/* ===========================
+   Hide scrollbar utility
+   =========================== */
+.scrollbar-none {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.scrollbar-none::-webkit-scrollbar {
+  display: none;
 }
 
 /* ===========================

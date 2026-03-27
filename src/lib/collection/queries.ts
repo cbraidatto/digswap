@@ -140,6 +140,28 @@ export async function getUniqueGenres(userId: string): Promise<string[]> {
 }
 
 /**
+ * Returns the top N genres by record count in a user's collection.
+ */
+export async function getTopGenres(
+	userId: string,
+	limit = 3,
+): Promise<{ genre: string; count: number }[]> {
+	const rows = await db
+		.select({
+			genre: sql<string>`unnest(${releases.genre})`,
+			count: sql<number>`count(*)`,
+		})
+		.from(collectionItems)
+		.innerJoin(releases, eq(collectionItems.releaseId, releases.id))
+		.where(eq(collectionItems.userId, userId))
+		.groupBy(sql`unnest(${releases.genre})`)
+		.orderBy(sql`count(*) desc`)
+		.limit(limit);
+
+	return rows.map((r) => ({ genre: r.genre, count: Number(r.count) }));
+}
+
+/**
  * Returns all unique formats across a user's collection.
  */
 export async function getUniqueFormats(userId: string): Promise<string[]> {

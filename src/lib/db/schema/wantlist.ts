@@ -20,6 +20,7 @@ export const wantlistItems = pgTable(
     notes: text("notes"),
     priority: integer("priority").default(0).notNull(),
     addedVia: varchar("added_via", { length: 20 }), // "discogs" or "manual"
+    foundAt: timestamp("found_at", { withTimezone: true }),
     createdAt: timestamp("created_at", { withTimezone: true })
       .defaultNow()
       .notNull(),

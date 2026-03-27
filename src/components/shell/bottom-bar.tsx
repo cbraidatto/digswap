@@ -16,7 +16,7 @@ export function BottomBar() {
 	return (
 		<nav
 			aria-label="Main navigation"
-			className="fixed bottom-0 left-0 right-0 bg-surface-container-low h-16 flex items-center justify-around lg:hidden border-t border-outline-variant/10 px-4 z-40"
+			className="fixed bottom-0 left-0 right-0 bg-surface-container-low h-16 flex items-center justify-around md:hidden border-t border-outline-variant/10 px-4 z-40"
 			style={{ paddingBottom: "env(safe-area-inset-bottom, 0px)" }}
 		>
 			{TABS.map((tab) => {

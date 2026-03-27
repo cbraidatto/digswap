@@ -40,6 +40,11 @@ const securityHeaders = [
 ];
 
 const nextConfig: NextConfig = {
+	experimental: {
+		serverActions: {
+			bodySizeLimit: "6mb",
+		},
+	},
 	images: {
 		remotePatterns: [
 			{
@@ -49,6 +54,10 @@ const nextConfig: NextConfig = {
 			{
 				protocol: "https",
 				hostname: "st.discogs.com",
+			},
+			{
+				protocol: "https",
+				hostname: "i.ytimg.com",
 			},
 		],
 	},
