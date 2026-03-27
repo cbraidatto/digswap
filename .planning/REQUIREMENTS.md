@@ -84,7 +84,7 @@
 - [ ] **P2P-04**: Both users must be online simultaneously for transfer to occur
 - [x] **P2P-05**: After transfer, recipient can rate the audio file quality (1-5 stars + comment)
 - [x] **P2P-06**: Sharer's reputation score is updated based on received quality reviews
-- [ ] **P2P-07**: User's trade reputation is visible on their public profile
+- [x] **P2P-07**: User's trade reputation is visible on their public profile
 
 ### Notifications
 
@@ -217,7 +217,7 @@
 | P2P-04 | Phase 9: P2P Audio Trading | Pending |
 | P2P-05 | Phase 9: P2P Audio Trading | Complete |
 | P2P-06 | Phase 9: P2P Audio Trading | Complete |
-| P2P-07 | Phase 9: P2P Audio Trading | Pending |
+| P2P-07 | Phase 9: P2P Audio Trading | Complete |
 | SEC-05 | Phase 9: P2P Audio Trading | Complete |
 | SEC-06 | Phase 9: P2P Audio Trading | Complete |
 | SEC-07 | Phase 9: P2P Audio Trading | Complete |
