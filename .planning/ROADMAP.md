@@ -19,7 +19,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 4.5: Template Alignment** - Remove GitHub metaphors, align navigation language, clean placeholder content, wire empty states to product vision (INSERTED, completed 2026-03-25)
 - [ ] **Phase 5: Social Layer** - Follow system, activity feed, collection comparison, public profiles
 - [x] **Phase 6: Discovery + Notifications** - Cross-collection search, wantlist matching, in-app/email/push notifications (completed 2026-03-26)
-- [x] **Phase 7: Community + Reviews** - Genre/era groups, group activity feeds, pressing and release reviews (completed 2026-03-26)
+- [x] **Phase 7: Community + Reviews** - Genre/era groups, group activity feeds, pressing and release reviews (completed 2026-03-26)
 - [ ] **Phase 8: Gamification + Rankings** - Global/genre leaderboards, badges, titles, composite ranking formula
 - [ ] **Phase 9: P2P Audio Trading** - DMCA compliance, WebRTC file transfer, trade reputation, TURN relay
 - [ ] **Phase 10: Monetization** - Stripe subscription, freemium gating, premium tier features
@@ -202,7 +202,13 @@ Plans:
   3. User earns badges for milestones (first import, 100 records, first trade, first review) that appear on their profile
   4. User has a visible title on their profile based on rank tier (e.g., "Crate Digger", "Wax Prophet")
   5. Community contribution score visibly tracks trades, reviews, and group activity
-**Plans**: TBD
+**Plans**: 5 plans
+Plans:
+- [ ] 08-01-PLAN.md -- Data layer: gamification constants, badge utility, leaderboard queries, server actions, schema migration, badge seed
+- [ ] 08-02-PLAN.md -- Badge triggers in server actions + import worker, pg_cron ranking SQL function
+- [ ] 08-03-PLAN.md -- RANKINGS tab on /explorar: LeaderboardRow, GenreFilter, RankingsTab components
+- [ ] 08-04-PLAN.md -- Profile rewrite: RankCard + BadgeRow replacing XP/level, public profile rank + badges
+- [ ] 08-05-PLAN.md -- Unit test suite (4 test files) and human verification checkpoint
 **UI hint**: yes
 
 ### Phase 9: P2P Audio Trading
@@ -257,7 +263,7 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7 -> 8 -> 9 -> 10
 | 5. Social Layer | 0/4 | Planned | - |
 | 6. Discovery + Notifications | 5/5 | Complete   | 2026-03-26 |
 | 7. Community + Reviews | 5/5 | Complete   | 2026-03-26 |
-| 8. Gamification + Rankings | 0/TBD | Not started | - |
+| 8. Gamification + Rankings | 0/5 | Planned | - |
 | 9. P2P Audio Trading | 0/TBD | Not started | - |
 | 10. Monetization | 0/TBD | Not started | - |
 | 11. Security Hardening | 0/TBD | Not started | - |
