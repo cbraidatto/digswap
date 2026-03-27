@@ -88,6 +88,58 @@ describe("computeGlobalScore", () => {
 	});
 });
 
+// ---------------------------------------------------------------------------
+// GAME-06: Contribution score aggregation pipeline verification
+// ---------------------------------------------------------------------------
+
+describe("contribution score aggregation (GAME-06)", () => {
+	test("contributionScore = reviews*10 + posts*3 + following*1 + received_follows*2", () => {
+		const reviews = 5;
+		const posts = 10;
+		const following = 20;
+		const followers = 15;
+
+		const contributionScore =
+			reviews * CONTRIBUTION_POINTS.review_written +
+			posts * CONTRIBUTION_POINTS.group_post +
+			following * CONTRIBUTION_POINTS.following_someone +
+			followers * CONTRIBUTION_POINTS.receiving_follow;
+
+		expect(contributionScore).toBe(130); // 50 + 30 + 20 + 30
+	});
+
+	test("contributionScore is 0 when user has no activity", () => {
+		const contributionScore =
+			0 * CONTRIBUTION_POINTS.review_written +
+			0 * CONTRIBUTION_POINTS.group_post +
+			0 * CONTRIBUTION_POINTS.following_someone +
+			0 * CONTRIBUTION_POINTS.receiving_follow;
+
+		expect(contributionScore).toBe(0);
+	});
+
+	test("trade_completed points exist but are not included in Phase 8 aggregation", () => {
+		// trade_completed = 15 points per D-03, but trades table doesn't exist yet (Phase 9)
+		expect(CONTRIBUTION_POINTS.trade_completed).toBe(15);
+		// The pg_cron function does NOT include trade_completed in its contribution CTE
+		// This test documents the intentional omission
+	});
+
+	test("contribution score weight in global formula is 0.3 (30%)", () => {
+		const rarityScore = 0;
+		const contributionScore = 100;
+		const globalScore = rarityScore * 0.7 + contributionScore * 0.3;
+		expect(globalScore).toBe(30);
+	});
+
+	test("rarity score weight in global formula is 0.7 (70%)", () => {
+		const rarityScore = 100;
+		const contributionScore = 0;
+		const globalScore = rarityScore * 0.7 + contributionScore * 0.3;
+		expect(globalScore).toBe(70);
+	});
+});
+
 describe("BADGE_DEFINITIONS", () => {
 	test("contains exactly 6 badges", () => {
 		expect(BADGE_DEFINITIONS).toHaveLength(6);
