@@ -81,7 +81,7 @@
 - [x] **P2P-01**: User can initiate a file transfer request to another user for a specific record
 - [x] **P2P-02**: File transfers occur directly browser-to-browser via WebRTC DataChannel — no file touches the server
 - [x] **P2P-03**: File transfer uses chunked transfer with progress indicator and resume on disconnect
-- [ ] **P2P-04**: Both users must be online simultaneously for transfer to occur
+- [x] **P2P-04**: Both users must be online simultaneously for transfer to occur
 - [x] **P2P-05**: After transfer, recipient can rate the audio file quality (1-5 stars + comment)
 - [x] **P2P-06**: Sharer's reputation score is updated based on received quality reviews
 - [ ] **P2P-07**: User's trade reputation is visible on their public profile
@@ -214,7 +214,7 @@
 | P2P-01 | Phase 9: P2P Audio Trading | Complete |
 | P2P-02 | Phase 9: P2P Audio Trading | Complete |
 | P2P-03 | Phase 9: P2P Audio Trading | Complete |
-| P2P-04 | Phase 9: P2P Audio Trading | Pending |
+| P2P-04 | Phase 9: P2P Audio Trading | Complete |
 | P2P-05 | Phase 9: P2P Audio Trading | Complete |
 | P2P-06 | Phase 9: P2P Audio Trading | Complete |
 | P2P-07 | Phase 9: P2P Audio Trading | Pending |
