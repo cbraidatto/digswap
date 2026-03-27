@@ -6,6 +6,7 @@ import {
   timestamp,
   integer,
   real,
+  unique,
 } from "drizzle-orm/pg-core";
 import { pgPolicy } from "drizzle-orm/pg-core";
 import { sql } from "drizzle-orm";
@@ -39,6 +40,11 @@ export const userRankings = pgTable(
       to: authenticatedRole,
       using: sql`${table.userId} = ${authUid}`,
       withCheck: sql`${table.userId} = ${authUid}`,
+    }),
+    pgPolicy("user_rankings_insert_service", {
+      for: "insert",
+      to: supabaseAuthAdminRole,
+      withCheck: sql`true`, // Service role only (gamification system manages rankings)
     }),
   ],
 );
@@ -76,7 +82,8 @@ export const userBadges = pgTable(
       .defaultNow()
       .notNull(),
   },
-  () => [
+  (table) => [
+    unique("user_badges_user_badge_unique").on(table.userId, table.badgeId),
     pgPolicy("user_badges_select_all", {
       for: "select",
       to: authenticatedRole,
