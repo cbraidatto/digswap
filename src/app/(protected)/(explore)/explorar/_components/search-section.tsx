@@ -3,7 +3,7 @@
 import { useState, useRef, useCallback, useTransition } from "react";
 import Link from "next/link";
 import { searchUsers, type SearchResult } from "@/actions/social";
-import { FollowButton } from "../../(profile)/perfil/[username]/_components/follow-button";
+import { FollowButton } from "@/app/(protected)/(profile)/perfil/[username]/_components/follow-button";
 
 export function SearchSection() {
 	const [query, setQuery] = useState("");
