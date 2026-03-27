@@ -18,8 +18,13 @@ export const tradeRequests = pgTable(
     requesterId: uuid("requester_id").notNull(),
     providerId: uuid("provider_id").notNull(),
     releaseId: uuid("release_id").references(() => releases.id),
-    status: varchar("status", { length: 20 }).default("pending").notNull(), // pending/accepted/declined/completed/cancelled
+    status: varchar("status", { length: 20 }).default("pending").notNull(), // pending/accepted/transferring/declined/completed/cancelled/expired
     message: text("message"),
+    expiresAt: timestamp("expires_at", { withTimezone: true }),
+    fileName: varchar("file_name", { length: 255 }),
+    fileFormat: varchar("file_format", { length: 50 }),
+    declaredBitrate: varchar("declared_bitrate", { length: 50 }),
+    fileSizeBytes: integer("file_size_bytes"),
     createdAt: timestamp("created_at", { withTimezone: true })
       .defaultNow()
       .notNull(),

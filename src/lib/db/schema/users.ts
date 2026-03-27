@@ -35,6 +35,7 @@ export const profiles = pgTable(
     soundcloudUrl: text("soundcloud_url"),
     discogsUrl:    text("discogs_url"),
     beatportUrl:   text("beatport_url"),
+    tradesTosAcceptedAt: timestamp("trades_tos_accepted_at", { withTimezone: true }),
     twoFactorEnabled: boolean("two_factor_enabled").default(false).notNull(),
     subscriptionTier: varchar("subscription_tier", { length: 20 })
       .default("free")
