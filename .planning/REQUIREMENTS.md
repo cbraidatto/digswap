@@ -69,12 +69,12 @@
 
 ### Gamification & Rankings
 
-- [ ] **GAME-01**: Each user has a global rank based on combined rarity score and community contribution
-- [ ] **GAME-02**: User can view the global leaderboard
-- [ ] **GAME-03**: User can view leaderboards segmented by genre (Jazz, Soul, Hip-Hop, etc.)
-- [ ] **GAME-04**: User earns badges for milestones (first import, 100 records, first trade, first review, etc.)
+- [x] **GAME-01**: Each user has a global rank based on combined rarity score and community contribution
+- [x] **GAME-02**: User can view the global leaderboard
+- [x] **GAME-03**: User can view leaderboards segmented by genre (Jazz, Soul, Hip-Hop, etc.)
+- [x] **GAME-04**: User earns badges for milestones (first import, 100 records, first trade, first review, etc.)
 - [ ] **GAME-05**: User has a visible title on their profile based on rank tier (e.g., "Crate Digger", "Wax Prophet", "Record Archaeologist")
-- [ ] **GAME-06**: Community contribution score tracks trades completed, reviews written, and activity in groups
+- [x] **GAME-06**: Community contribution score tracks trades completed, reviews written, and activity in groups
 
 ### P2P Audio Trading
 
@@ -205,12 +205,12 @@
 | REV-01 | Phase 7: Community + Reviews | Complete |
 | REV-02 | Phase 7: Community + Reviews | Complete |
 | REV-03 | Phase 7: Community + Reviews | Complete |
-| GAME-01 | Phase 8: Gamification + Rankings | Pending |
-| GAME-02 | Phase 8: Gamification + Rankings | Pending |
-| GAME-03 | Phase 8: Gamification + Rankings | Pending |
-| GAME-04 | Phase 8: Gamification + Rankings | Pending |
+| GAME-01 | Phase 8: Gamification + Rankings | Complete |
+| GAME-02 | Phase 8: Gamification + Rankings | Complete |
+| GAME-03 | Phase 8: Gamification + Rankings | Complete |
+| GAME-04 | Phase 8: Gamification + Rankings | Complete |
 | GAME-05 | Phase 8: Gamification + Rankings | Pending |
-| GAME-06 | Phase 8: Gamification + Rankings | Pending |
+| GAME-06 | Phase 8: Gamification + Rankings | Complete |
 | P2P-01 | Phase 9: P2P Audio Trading | Pending |
 | P2P-02 | Phase 9: P2P Audio Trading | Pending |
 | P2P-03 | Phase 9: P2P Audio Trading | Pending |

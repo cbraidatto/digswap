@@ -2,15 +2,15 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-status: completed
-stopped_at: Completed 07-05-PLAN.md
-last_updated: "2026-03-26T23:25:06.676Z"
-last_activity: 2026-03-26
+status: in-progress
+stopped_at: Completed 08-01-PLAN.md
+last_updated: "2026-03-27T16:42:37Z"
+last_activity: 2026-03-27
 progress:
   total_phases: 12
   completed_phases: 6
   total_plans: 36
-  completed_plans: 34
+  completed_plans: 35
   percent: 97
 ---
 
@@ -21,14 +21,14 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-25)
 
 **Core value:** A digger opens the app and immediately finds who has the record they've been hunting -- and sees where they stand in the community.
-**Current focus:** Phase 07 — community-reviews
+**Current focus:** Phase 08 — gamification-rankings
 
 ## Current Position
 
 Phase: 8
-Plan: Not started
-Status: Phase 07 complete — all 5 plans done
-Last activity: 2026-03-26
+Plan: 1 of 5 complete
+Status: Phase 08 in progress — plan 01 done
+Last activity: 2026-03-27
 
 Progress: [█████████░] 97%
 
@@ -77,6 +77,7 @@ Progress: [█████████░] 97%
 | Phase 07 P01 | 6min | 2 tasks | 16 files |
 | Phase 07 P04 | 3min | 2 tasks | 4 files |
 | Phase 07 P05 | 66min | 2 tasks | 6 files |
+| Phase 08 P01 | 4min | 2 tasks | 9 files |
 
 ## Accumulated Context
 
@@ -147,6 +148,9 @@ Recent decisions affecting current work:
 - [Phase 07]: Personal feed CASE WHEN SQL filter for group_post membership gating (D-06)
 - [Phase 07]: ReviewsPanel renders at 0 reviews for discovery; GroupFeedCard shared for group_post + wrote_review
 - [Phase 07]: Tests for server actions mock full dependency chain: supabase/server auth + drizzle db thenable chain + logActivity -- all in same pattern as existing discovery/notification tests
+- [Phase 08]: computeGlobalScore extracted as standalone pure function (not inline in queries) for shared use across ranking system
+- [Phase 08]: Genre leaderboard uses raw SQL via db.execute for ROW_NUMBER() window function and array containment operator
+- [Phase 08]: Badge award uses Supabase admin client (consistency with existing community.ts notification pattern)
 
 ### Pending Todos
 
@@ -160,6 +164,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-26T23:05:43.580Z
-Stopped at: Completed 07-05-PLAN.md
+Last session: 2026-03-27T16:42:37Z
+Stopped at: Completed 08-01-PLAN.md
 Resume file: None
