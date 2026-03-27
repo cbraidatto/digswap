@@ -73,7 +73,7 @@
 - [x] **GAME-02**: User can view the global leaderboard
 - [x] **GAME-03**: User can view leaderboards segmented by genre (Jazz, Soul, Hip-Hop, etc.)
 - [x] **GAME-04**: User earns badges for milestones (first import, 100 records, first trade, first review, etc.)
-- [ ] **GAME-05**: User has a visible title on their profile based on rank tier (e.g., "Crate Digger", "Wax Prophet", "Record Archaeologist")
+- [x] **GAME-05**: User has a visible title on their profile based on rank tier (e.g., "Crate Digger", "Wax Prophet", "Record Archaeologist")
 - [x] **GAME-06**: Community contribution score tracks trades completed, reviews written, and activity in groups
 
 ### P2P Audio Trading
@@ -209,7 +209,7 @@
 | GAME-02 | Phase 8: Gamification + Rankings | Complete |
 | GAME-03 | Phase 8: Gamification + Rankings | Complete |
 | GAME-04 | Phase 8: Gamification + Rankings | Complete |
-| GAME-05 | Phase 8: Gamification + Rankings | Pending |
+| GAME-05 | Phase 8: Gamification + Rankings | Complete |
 | GAME-06 | Phase 8: Gamification + Rankings | Complete |
 | P2P-01 | Phase 9: P2P Audio Trading | Pending |
 | P2P-02 | Phase 9: P2P Audio Trading | Pending |

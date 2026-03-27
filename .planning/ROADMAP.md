@@ -207,7 +207,7 @@ Plans:
 - [x] 08-01-PLAN.md -- Data layer: gamification constants, badge utility, leaderboard queries, server actions, schema migration, badge seed
 - [ ] 08-02-PLAN.md -- Badge triggers in server actions + import worker, pg_cron ranking SQL function
 - [x] 08-03-PLAN.md -- RANKINGS tab on /explorar: LeaderboardRow, GenreFilter, RankingsTab components
-- [ ] 08-04-PLAN.md -- Profile rewrite: RankCard + BadgeRow replacing XP/level, public profile rank + badges
+- [x] 08-04-PLAN.md -- Profile rewrite: RankCard + BadgeRow replacing XP/level, public profile rank + badges
 - [ ] 08-05-PLAN.md -- Unit test suite (4 test files) and human verification checkpoint
 **UI hint**: yes
 
