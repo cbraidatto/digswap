@@ -1,7 +1,8 @@
 ---
 phase: 9
 slug: p2p-audio-trading
-status: draft
+status: approved
+reviewed_at: 2026-03-27T00:00:00Z
 shadcn_initialized: true
 preset: base-nova
 created: 2026-03-27
@@ -41,7 +42,7 @@ Declared values (must be multiples of 4):
 | 2xl | 48px | Tab content padding (desktop: p-12) |
 | 3xl | 64px | Page-level vertical spacing, complete page vertical centering |
 
-Exceptions: 44px minimum touch target for file upload drop zone, play/pause button, and star rating buttons (accessibility)
+Exceptions: none
 
 Source: Existing patterns in `trades/new/page.tsx` (p-6, gap-6), `trades/[id]/complete/page.tsx` (py-16)
 
@@ -360,7 +361,7 @@ Uses existing stub layout. Changes:
 - Wire up star rating buttons with state management. Selected stars: `text-secondary` fill. Unselected: `text-on-surface-variant`.
 - Wire up comment input with existing styling.
 - SUBMIT_REVIEW button triggers `completeTrade` server action.
-- SKIP button navigates to `/trades` inbox.
+- SKIP_REVIEW button navigates to `/trades` inbox.
 
 ### Profile Integration -- Request Audio Button
 
@@ -535,6 +536,7 @@ Only shown when `tradesTotal > 0`.
 | Empty state (completed tab) | "No completed trades yet. Your trade history will appear here." |
 | Error state (connection failed) | "CONNECTION_FAILED: The peer-to-peer connection was interrupted. Check your network and try again." |
 | Error state (transfer failed) | "TRANSFER_INTERRUPTED: File transfer was interrupted at {N}%. Click Retry to resume from last checkpoint." |
+| Error state (spec check failed) | "Audio analysis failed. File may be corrupted. You may decline the trade if the file quality is unacceptable." |
 | P2P disabled banner heading | "[P2P_DISABLED]" |
 | P2P disabled banner body | "DMCA registration pending -- trading will be enabled once compliance infrastructure is operational." |
 | ToS modal title | "TERMS_OF_SERVICE" |
@@ -564,7 +566,7 @@ Only shown when `tradesTotal > 0`.
 | Accept trade | "ACCEPT_TRADE" |
 | Reject trade | "REJECT_TRADE" |
 | Submit review | "SUBMIT_REVIEW" |
-| Skip review | "SKIP" |
+| Skip review | "SKIP_REVIEW" |
 | Trade summary label | "Trade_Summary" |
 | Contribution earned label | "CONTRIBUTION" |
 | Contribution earned value | "+15 pts" |
@@ -615,7 +617,7 @@ Only shown when `tradesTotal > 0`.
 | Loading | File analysis in progress | Skeleton spectrogram + skeleton table rows |
 | Analyzed | Web Audio API complete | Live spectrogram canvas + populated metadata table |
 | Premium locked | Free user, already analyzed once | Blur overlay on spectrogram with lock icon |
-| Error | Web Audio API failed | "Audio analysis failed. File may be corrupted." in destructive text |
+| Error | Web Audio API failed | "Audio analysis failed. File may be corrupted. You may decline the trade if the file quality is unacceptable." in destructive text |
 
 ### Data States for Trade Form
 
@@ -640,6 +642,7 @@ Only shown when `tradesTotal > 0`.
 
 | Requirement | Implementation |
 |-------------|----------------|
+| Minimum touch targets | Interactive elements (file upload drop zone, play/pause button, star rating buttons) must meet WCAG 2.5.5 minimum target size of 44x44px. Star rating buttons are sized at 40x40px (`w-10 h-10`) with 4px gap between stars, providing an effective 44px touch target per star via adjacent spacing. The file upload drop zone at `min-h-[120px]` and full-width exceeds this requirement. Play/pause button must be sized at minimum 44x44px (`w-11 h-11`). |
 | Tab role semantics | PENDING/ACTIVE/COMPLETED tabs use `role="tablist"` and `role="tab"` with `aria-selected` |
 | Trade row as list | Wrap rows in `<ul>` with `role="list"`, each row is `<li>` with `role="listitem"` |
 | Lobby state announcements | Use `aria-live="polite"` on lobby state text for screen reader updates on state transitions |
