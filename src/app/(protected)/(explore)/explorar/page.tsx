@@ -7,17 +7,12 @@ import { RecordsTab } from "./_components/records-tab";
 import { RankingsTab } from "./_components/rankings-tab";
 import { createClient } from "@/lib/supabase/client";
 
-type Tab = "diggers" | "records" | "rankings";
+type Tab = "diggers" | "records";
 
 export default function ExplorarPage() {
 	const searchParams = useSearchParams();
-	const tabParam = searchParams.get("tab");
 	const initialTab: Tab =
-		tabParam === "records"
-			? "records"
-			: tabParam === "rankings"
-				? "rankings"
-				: "diggers";
+		searchParams.get("tab") === "records" ? "records" : "diggers";
 	const [activeTab, setActiveTab] = useState<Tab>(initialTab);
 	const [currentUserId, setCurrentUserId] = useState<string>("");
 
@@ -52,7 +47,7 @@ export default function ExplorarPage() {
 						onClick={() => setActiveTab("diggers")}
 						className={`px-4 py-2 font-mono text-[10px] uppercase tracking-widest transition-colors ${
 							activeTab === "diggers"
-								? "text-primary border-b-2 border-primary font-semibold"
+								? "text-primary border-b-2 border-primary font-bold"
 								: "text-on-surface-variant hover:text-on-surface font-normal"
 						}`}
 						role="tab"
@@ -65,7 +60,7 @@ export default function ExplorarPage() {
 						onClick={() => setActiveTab("records")}
 						className={`px-4 py-2 font-mono text-[10px] uppercase tracking-widest transition-colors ${
 							activeTab === "records"
-								? "text-primary border-b-2 border-primary font-semibold"
+								? "text-primary border-b-2 border-primary font-bold"
 								: "text-on-surface-variant hover:text-on-surface font-normal"
 						}`}
 						role="tab"
@@ -73,43 +68,27 @@ export default function ExplorarPage() {
 					>
 						RECORDS
 					</button>
-					<button
-						type="button"
-						onClick={() => setActiveTab("rankings")}
-						className={`px-4 py-2 font-mono text-[10px] uppercase tracking-widest transition-colors ${
-							activeTab === "rankings"
-								? "text-primary border-b-2 border-primary font-semibold"
-								: "text-on-surface-variant hover:text-on-surface font-normal"
-						}`}
-						role="tab"
-						aria-selected={activeTab === "rankings"}
-					>
-						RANKINGS
-					</button>
 				</div>
 			</div>
 
 			{/* Tab Content */}
 			{activeTab === "diggers" && (
-				<section
-					role="tabpanel"
-					className="w-full bg-surface-container-low p-8 md:p-12"
-				>
-					<div className="max-w-4xl mx-auto">
-						<SearchSection />
+				<section role="tabpanel" className="flex flex-col">
+					{/* Search */}
+					<div className="w-full bg-surface-container-low px-8 md:px-12 pt-8 pb-6">
+						<div className="max-w-4xl mx-auto">
+							<SearchSection />
+						</div>
 					</div>
+
+					{/* Rankings */}
+					<RankingsTab currentUserId={currentUserId} />
 				</section>
 			)}
 
 			{activeTab === "records" && (
 				<section role="tabpanel">
 					<RecordsTab />
-				</section>
-			)}
-
-			{activeTab === "rankings" && (
-				<section role="tabpanel">
-					<RankingsTab currentUserId={currentUserId} />
 				</section>
 			)}
 		</div>
