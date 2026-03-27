@@ -10,7 +10,7 @@ interface AppHeaderProps {
 
 export function AppHeader({ xp = 0, userId }: AppHeaderProps) {
 	return (
-		<header className="fixed top-0 left-0 right-0 z-50 flex items-center px-6 py-3 w-full border-b border-outline-variant/20 bg-surface-dim">
+		<header className="fixed top-0 left-0 right-0 z-50 h-14 flex items-center px-6 w-full border-b border-outline-variant/20 bg-surface-dim">
 			<Link href="/feed" className="shrink-0">
 				<span className="text-xl font-bold tracking-tighter font-heading">
 					<span className="text-primary">DIG</span><span className="text-on-surface">SWAP</span>
