@@ -12,6 +12,7 @@ import {
 	PAGE_SIZE,
 } from "@/lib/collection/queries";
 import { getFollowCounts, checkIsFollowing } from "@/lib/social/queries";
+import { getUserRanking, getUserBadges } from "@/lib/gamification/queries";
 import { CollectionGrid } from "../_components/collection-grid";
 import { FilterBar } from "../_components/filter-bar";
 import { Pagination } from "../_components/pagination";
@@ -60,7 +61,7 @@ export default async function PublicProfilePage({
 	const filters = collectionFilterSchema.parse(rawParams);
 
 	// Parallel data fetch
-	const [items, totalCount, genres, formats, followCounts, isFollowing] =
+	const [items, totalCount, genres, formats, followCounts, isFollowing, ranking, userBadgeData] =
 		await Promise.all([
 			getCollectionPage(targetProfile.id, filters),
 			getCollectionCount(targetProfile.id, filters),
@@ -68,6 +69,8 @@ export default async function PublicProfilePage({
 			getUniqueFormats(targetProfile.id),
 			getFollowCounts(targetProfile.id),
 			checkIsFollowing(user.id, targetProfile.id),
+			getUserRanking(targetProfile.id),
+			getUserBadges(targetProfile.id),
 		]);
 
 	const totalPages = Math.ceil(totalCount / PAGE_SIZE);
@@ -80,6 +83,8 @@ export default async function PublicProfilePage({
 				followCounts={followCounts}
 				isFollowing={isFollowing}
 				collectionCount={totalCount}
+				ranking={ranking}
+				badges={userBadgeData}
 			/>
 
 			{/* Collection Section */}

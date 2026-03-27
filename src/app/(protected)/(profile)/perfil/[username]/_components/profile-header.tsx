@@ -1,4 +1,5 @@
 import Link from "next/link";
+import type { UserRanking, UserBadge } from "@/lib/gamification/queries";
 import { FollowButton } from "./follow-button";
 
 interface ProfileHeaderProps {
@@ -13,6 +14,8 @@ interface ProfileHeaderProps {
 	followCounts: { followingCount: number; followerCount: number };
 	isFollowing: boolean;
 	collectionCount: number;
+	ranking: UserRanking | null;
+	badges: UserBadge[];
 }
 
 export function ProfileHeader({
@@ -20,6 +23,8 @@ export function ProfileHeader({
 	followCounts,
 	isFollowing,
 	collectionCount,
+	ranking,
+	badges,
 }: ProfileHeaderProps) {
 	const displayName = (profile.displayName || "DIGGER").toUpperCase();
 	const memberYear = new Date(profile.createdAt).getFullYear();
@@ -52,6 +57,28 @@ export function ProfileHeader({
 							@{profile.username}
 						</p>
 					)}
+					{/* Rank + Badges */}
+					<p className="font-mono text-[10px] mt-1 flex flex-wrap items-center gap-1.5">
+						<span className="text-secondary">{ranking?.title ?? "Vinyl Rookie"}</span>
+						<span className="text-outline">&middot;</span>
+						<span className="text-on-surface-variant">
+							{ranking?.globalRank ? `#${ranking.globalRank} globally` : "unranked"}
+						</span>
+						{badges.length > 0 && (
+							<>
+								<span className="text-outline">&middot;</span>
+								{badges.map((b) => (
+									<span
+										key={b.slug}
+										className="text-primary/80 bg-primary/8 border border-primary/15 px-1.5 py-0.5 rounded"
+										title={b.description ?? undefined}
+									>
+										[{b.name}]
+									</span>
+								))}
+							</>
+						)}
+					</p>
 					{profile.bio && (
 						<p className="text-sm text-on-surface-variant mt-1 max-w-md">
 							{profile.bio}
