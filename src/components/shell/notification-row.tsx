@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { cn } from "@/lib/utils";
 
 export interface NotificationData {
@@ -10,11 +11,17 @@ export interface NotificationData {
 	link: string | null;
 	read: boolean;
 	createdAt: string;
+	metadata?: {
+		matchUserId?: string;
+		releaseId?: string;
+		[key: string]: unknown;
+	} | null;
 }
 
 interface NotificationRowProps {
 	notification: NotificationData;
 	onClick?: (id: string) => void;
+	p2pEnabled?: boolean;
 }
 
 function getRelativeTime(dateStr: string): string {
@@ -55,9 +62,20 @@ function getTypeIcon(type: string | null): { icon: string; className: string } {
 	}
 }
 
-export function NotificationRow({ notification, onClick }: NotificationRowProps) {
+export function NotificationRow({ notification, onClick, p2pEnabled = false }: NotificationRowProps) {
 	const { icon, className: iconClassName } = getTypeIcon(notification.type);
 	const relativeTime = getRelativeTime(notification.createdAt);
+
+	// Build trade request URL from wantlist_match metadata
+	const showTradeLink =
+		p2pEnabled &&
+		notification.type === "wantlist_match" &&
+		notification.metadata?.matchUserId &&
+		notification.metadata?.releaseId;
+
+	const tradeUrl = showTradeLink
+		? `/trades/new?to=${notification.metadata!.matchUserId}&release=${notification.metadata!.releaseId}`
+		: null;
 
 	return (
 		<div
@@ -78,7 +96,7 @@ export function NotificationRow({ notification, onClick }: NotificationRowProps)
 			<span className={cn("material-symbols-outlined shrink-0 mt-0.5", iconClassName)}>
 				{icon}
 			</span>
-			<div className="flex flex-col gap-0.5 min-w-0">
+			<div className="flex flex-col gap-0.5 min-w-0 flex-1">
 				<div className="text-sm font-semibold text-on-surface">{notification.title}</div>
 				{notification.body && (
 					<div className="text-sm text-on-surface-variant line-clamp-1">
@@ -87,6 +105,15 @@ export function NotificationRow({ notification, onClick }: NotificationRowProps)
 				)}
 				<div className="font-mono text-[10px] text-on-surface-variant">{relativeTime}</div>
 			</div>
+			{tradeUrl && (
+				<Link
+					href={tradeUrl}
+					className="font-mono text-[10px] text-primary border border-primary/20 px-2 py-1 rounded hover:bg-primary/10 transition-colors flex-shrink-0 self-start"
+					onClick={(e) => e.stopPropagation()}
+				>
+					REQUEST_TRADE
+				</Link>
+			)}
 		</div>
 	);
 }

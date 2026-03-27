@@ -13,7 +13,9 @@ import {
 } from "@/lib/collection/queries";
 import { getFollowCounts, checkIsFollowing } from "@/lib/social/queries";
 import { getUserRanking, getUserBadges } from "@/lib/gamification/queries";
+import { isP2PEnabled } from "@/lib/trades/constants";
 import { CollectionGrid } from "../_components/collection-grid";
+import { RequestAudioButton } from "../_components/request-audio-button";
 import { FilterBar } from "../_components/filter-bar";
 import { Pagination } from "../_components/pagination";
 import { ProfileHeader } from "./_components/profile-header";
@@ -74,6 +76,7 @@ export default async function PublicProfilePage({
 		]);
 
 	const totalPages = Math.ceil(totalCount / PAGE_SIZE);
+	const p2pEnabled = isP2PEnabled();
 
 	return (
 		<div className="max-w-7xl mx-auto px-4 md:px-6 py-8">
@@ -110,7 +113,18 @@ export default async function PublicProfilePage({
 				/>
 
 				{/* Collection Grid */}
-				<CollectionGrid items={items} isOwner={false} />
+				<CollectionGrid
+					items={items}
+					isOwner={false}
+					renderAction={(item) => (
+						<RequestAudioButton
+							userId={targetProfile.id}
+							releaseId={item.releaseId}
+							p2pEnabled={p2pEnabled}
+							isOwner={false}
+						/>
+					)}
+				/>
 
 				{/* Pagination */}
 				{totalPages > 1 && (
