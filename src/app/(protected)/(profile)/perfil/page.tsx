@@ -33,6 +33,7 @@ import { WantlistAddButton } from "./_components/wantlist-add-button";
 import { WantlistGrid } from "./_components/wantlist-grid";
 import { AddToWantlistDialog } from "./_components/add-to-wantlist-dialog";
 import { getUserRanking, getUserBadges } from "@/lib/gamification/queries";
+import { getTradeReputation } from "@/lib/trades/queries";
 import { RankCard } from "./_components/rank-card";
 import { BadgeRow } from "./_components/badge-row";
 
@@ -95,7 +96,7 @@ export default async function PerfilPage({ searchParams }: PerfilPageProps) {
 	].filter((id): id is string => Boolean(id));
 
 	// Fetch collection data, social counts and activity stats in parallel
-	const [items, totalCount, genres, formats, followCounts, [{ weeklyAdds }], topGenres, showcaseReleases, [{ tradesThisWeek }], [{ wantlistCount }], wantlistData, wantlistTotal, [{ tradesTotal }], ranking, userBadgeData] = await Promise.all([
+	const [items, totalCount, genres, formats, followCounts, [{ weeklyAdds }], topGenres, showcaseReleases, [{ tradesThisWeek }], [{ wantlistCount }], wantlistData, wantlistTotal, [{ tradesTotal }], ranking, userBadgeData, tradeReputation] = await Promise.all([
 		getCollectionPage(user.id, filters),
 		getCollectionCount(user.id, filters),
 		getUniqueGenres(user.id),
@@ -126,6 +127,7 @@ export default async function PerfilPage({ searchParams }: PerfilPageProps) {
 		.where(or(eq(tradeRequests.requesterId, user.id), eq(tradeRequests.providerId, user.id))),
 	getUserRanking(user.id),
 	getUserBadges(user.id),
+	getTradeReputation(user.id),
 	]);
 
 	const rankTitle = ranking?.title ?? "Vinyl Rookie";
@@ -206,6 +208,16 @@ export default async function PerfilPage({ searchParams }: PerfilPageProps) {
 						/>
 						<BadgeRow badges={userBadgeData} />
 
+						{/* Trade reputation stat */}
+						{tradeReputation.totalTrades > 0 && (
+							<div className="font-mono text-[10px] text-on-surface-variant mt-2">
+								TRADES: <span className="text-primary">{tradeReputation.totalTrades}</span>
+								{" . "}
+								AVG: <span className="text-secondary">{tradeReputation.averageRating?.toFixed(1) ?? "N/A"}</span>
+								{" "}
+								<span className="material-symbols-outlined text-secondary text-[14px] align-middle">star</span>
+							</div>
+						)}
 
 						{/* Divider */}
 						<div className="border-t border-outline/10 my-4" />

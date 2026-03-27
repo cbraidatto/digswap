@@ -14,6 +14,7 @@ import {
 import { getFollowCounts, checkIsFollowing } from "@/lib/social/queries";
 import { getUserRanking, getUserBadges } from "@/lib/gamification/queries";
 import { isP2PEnabled } from "@/lib/trades/constants";
+import { getTradeReputation } from "@/lib/trades/queries";
 import { CollectionGrid } from "../_components/collection-grid";
 import { RequestAudioButton } from "../_components/request-audio-button";
 import { FilterBar } from "../_components/filter-bar";
@@ -63,7 +64,7 @@ export default async function PublicProfilePage({
 	const filters = collectionFilterSchema.parse(rawParams);
 
 	// Parallel data fetch
-	const [items, totalCount, genres, formats, followCounts, isFollowing, ranking, userBadgeData] =
+	const [items, totalCount, genres, formats, followCounts, isFollowing, ranking, userBadgeData, tradeReputation] =
 		await Promise.all([
 			getCollectionPage(targetProfile.id, filters),
 			getCollectionCount(targetProfile.id, filters),
@@ -73,6 +74,7 @@ export default async function PublicProfilePage({
 			checkIsFollowing(user.id, targetProfile.id),
 			getUserRanking(targetProfile.id),
 			getUserBadges(targetProfile.id),
+			getTradeReputation(targetProfile.id),
 		]);
 
 	const totalPages = Math.ceil(totalCount / PAGE_SIZE);
@@ -88,6 +90,7 @@ export default async function PublicProfilePage({
 				collectionCount={totalCount}
 				ranking={ranking}
 				badges={userBadgeData}
+				tradeReputation={tradeReputation}
 			/>
 
 			{/* Collection Section */}

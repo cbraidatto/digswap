@@ -1,5 +1,6 @@
 import Link from "next/link";
 import type { UserRanking, UserBadge } from "@/lib/gamification/queries";
+import type { TradeReputation } from "@/lib/trades/queries";
 import { FollowButton } from "./follow-button";
 
 interface ProfileHeaderProps {
@@ -16,6 +17,7 @@ interface ProfileHeaderProps {
 	collectionCount: number;
 	ranking: UserRanking | null;
 	badges: UserBadge[];
+	tradeReputation?: TradeReputation;
 }
 
 export function ProfileHeader({
@@ -25,6 +27,7 @@ export function ProfileHeader({
 	collectionCount,
 	ranking,
 	badges,
+	tradeReputation,
 }: ProfileHeaderProps) {
 	const displayName = (profile.displayName || "DIGGER").toUpperCase();
 	const memberYear = new Date(profile.createdAt).getFullYear();
@@ -79,6 +82,17 @@ export function ProfileHeader({
 							</>
 						)}
 					</p>
+					{/* Trade reputation stat */}
+					{tradeReputation && tradeReputation.totalTrades > 0 && (
+						<p className="font-mono text-[10px] text-on-surface-variant mt-1">
+							TRADES: <span className="text-primary">{tradeReputation.totalTrades}</span>
+							{" . "}
+							AVG: <span className="text-secondary">{tradeReputation.averageRating?.toFixed(1) ?? "N/A"}</span>
+							{" "}
+							<span className="material-symbols-outlined text-secondary text-[14px] align-middle">star</span>
+						</p>
+					)}
+
 					{profile.bio && (
 						<p className="text-sm text-on-surface-variant mt-1 max-w-md">
 							{profile.bio}
