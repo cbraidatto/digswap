@@ -78,12 +78,12 @@
 
 ### P2P Audio Trading
 
-- [ ] **P2P-01**: User can initiate a file transfer request to another user for a specific record
-- [ ] **P2P-02**: File transfers occur directly browser-to-browser via WebRTC DataChannel — no file touches the server
-- [ ] **P2P-03**: File transfer uses chunked transfer with progress indicator and resume on disconnect
+- [x] **P2P-01**: User can initiate a file transfer request to another user for a specific record
+- [x] **P2P-02**: File transfers occur directly browser-to-browser via WebRTC DataChannel — no file touches the server
+- [x] **P2P-03**: File transfer uses chunked transfer with progress indicator and resume on disconnect
 - [ ] **P2P-04**: Both users must be online simultaneously for transfer to occur
-- [ ] **P2P-05**: After transfer, recipient can rate the audio file quality (1-5 stars + comment)
-- [ ] **P2P-06**: Sharer's reputation score is updated based on received quality reviews
+- [x] **P2P-05**: After transfer, recipient can rate the audio file quality (1-5 stars + comment)
+- [x] **P2P-06**: Sharer's reputation score is updated based on received quality reviews
 - [ ] **P2P-07**: User's trade reputation is visible on their public profile
 
 ### Notifications
@@ -109,9 +109,9 @@
 - [ ] **SEC-02**: All API endpoints are protected against injection, IDOR, broken access control, and rate limiting abuse
 - [ ] **SEC-03**: Security tests are written alongside feature development (not post-launch)
 - [ ] **SEC-04**: Formal penetration test conducted before public launch
-- [ ] **SEC-05**: Platform registers a DMCA agent and implements notice-and-takedown procedures before P2P feature goes live
-- [ ] **SEC-06**: Terms of Service explicitly place copyright responsibility on users for files they share via P2P
-- [ ] **SEC-07**: WebRTC TURN relay is configured by default to prevent user IP address exposure during P2P transfers
+- [x] **SEC-05**: Platform registers a DMCA agent and implements notice-and-takedown procedures before P2P feature goes live
+- [x] **SEC-06**: Terms of Service explicitly place copyright responsibility on users for files they share via P2P
+- [x] **SEC-07**: WebRTC TURN relay is configured by default to prevent user IP address exposure during P2P transfers
 
 ---
 
@@ -211,16 +211,16 @@
 | GAME-04 | Phase 8: Gamification + Rankings | Complete |
 | GAME-05 | Phase 8: Gamification + Rankings | Complete |
 | GAME-06 | Phase 8: Gamification + Rankings | Complete |
-| P2P-01 | Phase 9: P2P Audio Trading | Pending |
-| P2P-02 | Phase 9: P2P Audio Trading | Pending |
-| P2P-03 | Phase 9: P2P Audio Trading | Pending |
+| P2P-01 | Phase 9: P2P Audio Trading | Complete |
+| P2P-02 | Phase 9: P2P Audio Trading | Complete |
+| P2P-03 | Phase 9: P2P Audio Trading | Complete |
 | P2P-04 | Phase 9: P2P Audio Trading | Pending |
-| P2P-05 | Phase 9: P2P Audio Trading | Pending |
-| P2P-06 | Phase 9: P2P Audio Trading | Pending |
+| P2P-05 | Phase 9: P2P Audio Trading | Complete |
+| P2P-06 | Phase 9: P2P Audio Trading | Complete |
 | P2P-07 | Phase 9: P2P Audio Trading | Pending |
-| SEC-05 | Phase 9: P2P Audio Trading | Pending |
-| SEC-06 | Phase 9: P2P Audio Trading | Pending |
-| SEC-07 | Phase 9: P2P Audio Trading | Pending |
+| SEC-05 | Phase 9: P2P Audio Trading | Complete |
+| SEC-06 | Phase 9: P2P Audio Trading | Complete |
+| SEC-07 | Phase 9: P2P Audio Trading | Complete |
 | MON-01 | Phase 10: Monetization | Pending |
 | MON-02 | Phase 10: Monetization | Pending |
 | MON-03 | Phase 10: Monetization | Pending |
