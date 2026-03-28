@@ -5,6 +5,18 @@ import { getTradeById } from "@/lib/trades/queries";
 import { getTurnCredentials, acceptTrade, declineTrade } from "@/actions/trades";
 import { TradeLobby } from "./_components/trade-lobby";
 
+function formatTimeRemaining(expiresAt: string | null): string | null {
+	if (!expiresAt) return null;
+	const now = Date.now();
+	const expiry = new Date(expiresAt).getTime();
+	const diffMs = expiry - now;
+	if (diffMs <= 0) return "Expired";
+	const hours = Math.floor(diffMs / (1000 * 60 * 60));
+	const minutes = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
+	if (hours > 0) return `Expires in ${hours}h ${minutes}m`;
+	return `Expires in ${minutes}m`;
+}
+
 export default async function TradePage({
 	params,
 }: {
@@ -104,6 +116,12 @@ export default async function TradePage({
 						FILE: {trade.fileName}
 					</p>
 				)}
+				{trade.expiresAt && (
+					<p className="text-[10px] font-mono text-on-surface-variant mt-1">
+						<span className="material-symbols-outlined text-[10px] align-middle mr-1">schedule</span>
+						{formatTimeRemaining(trade.expiresAt)}
+					</p>
+				)}
 				{trade.message && (
 					<div className="mt-4 bg-surface-container-low rounded-lg p-4 border border-outline-variant/10 text-left">
 						<p className="text-[10px] font-mono text-on-surface-variant mb-1">
@@ -164,6 +182,12 @@ export default async function TradePage({
 					<p className="text-[10px] font-mono text-on-surface-variant mt-4">
 						TRADE: {trade.releaseTitle}
 						{trade.releaseArtist ? ` by ${trade.releaseArtist}` : ""}
+					</p>
+				)}
+				{trade.expiresAt && (
+					<p className="text-[10px] font-mono text-on-surface-variant mt-1">
+						<span className="material-symbols-outlined text-[10px] align-middle mr-1">schedule</span>
+						{formatTimeRemaining(trade.expiresAt)}
 					</p>
 				)}
 				<Link

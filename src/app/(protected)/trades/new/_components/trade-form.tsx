@@ -5,8 +5,6 @@ import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { createTrade } from "@/actions/trades";
 import {
-	TRADE_EXPIRY_OPTIONS,
-	DEFAULT_EXPIRY_HOURS,
 	ACCEPTED_AUDIO_TYPES,
 } from "@/lib/trades/constants";
 import { formatFileSize } from "@/lib/audio/file-metadata";
@@ -67,9 +65,6 @@ export function TradeForm({
 	// Metadata
 	const [fileFormat, setFileFormat] = useState("");
 	const [bitrate, setBitrate] = useState("");
-
-	// Expiry
-	const [expiryHours, setExpiryHours] = useState(DEFAULT_EXPIRY_HOURS);
 
 	// Message
 	const [message, setMessage] = useState("");
@@ -138,7 +133,6 @@ export function TradeForm({
 				fileFormat: fileFormat || detectFormat(selectedFile.type),
 				declaredBitrate: bitrate || "unknown",
 				fileSizeBytes: selectedFile.size,
-				expiryHours,
 				message: message.trim() || undefined,
 			});
 
@@ -156,7 +150,6 @@ export function TradeForm({
 		releaseId,
 		fileFormat,
 		bitrate,
-		expiryHours,
 		message,
 		router,
 	]);
@@ -326,26 +319,21 @@ export function TradeForm({
 				</div>
 			</div>
 
-			{/* Proposal_Expiry */}
+			{/* Review_Window */}
 			<div className="bg-surface-container-low rounded-xl p-6 border border-outline-variant/10 mb-8">
 				<h2 className="text-xs font-mono uppercase tracking-widest text-on-surface-variant mb-4">
-					Proposal_Expiry
+					Review_Window
 				</h2>
-				<div className="flex items-center gap-4">
-					{TRADE_EXPIRY_OPTIONS.map((option) => (
-						<button
-							type="button"
-							key={option.value}
-							onClick={() => setExpiryHours(option.value)}
-							className={`px-4 py-2 rounded font-mono text-xs font-bold transition-all ${
-								expiryHours === option.value
-									? "bg-primary-container text-on-primary-container"
-									: "bg-surface-container-high text-on-surface-variant hover:text-on-surface border border-outline-variant/20"
-							}`}
-						>
-							{option.label}
-						</button>
-					))}
+				<div className="flex items-center gap-3">
+					<span className="material-symbols-outlined text-on-surface-variant text-xl">
+						schedule
+					</span>
+					<div>
+						<div className="text-xs font-mono text-on-surface font-bold">24h FIXED WINDOW</div>
+						<div className="text-[10px] font-mono text-on-surface-variant">
+							Trade requests expire automatically after 24 hours
+						</div>
+					</div>
 				</div>
 			</div>
 
