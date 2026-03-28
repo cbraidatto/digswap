@@ -106,8 +106,8 @@
 ### Security
 
 - [x] **SEC-01**: All authentication surfaces comply with OWASP Top 10
-- [ ] **SEC-02**: All API endpoints are protected against injection, IDOR, broken access control, and rate limiting abuse
-- [ ] **SEC-03**: Security tests are written alongside feature development (not post-launch)
+- [x] **SEC-02**: All API endpoints are protected against injection, IDOR, broken access control, and rate limiting abuse
+- [x] **SEC-03**: Security tests are written alongside feature development (not post-launch)
 - [ ] **SEC-04**: Formal penetration test conducted before public launch
 - [x] **SEC-05**: Platform registers a DMCA agent and implements notice-and-takedown procedures before P2P feature goes live
 - [x] **SEC-06**: Terms of Service explicitly place copyright responsibility on users for files they share via P2P
@@ -228,8 +228,8 @@
 | MON-05 | Phase 10: Monetization | Pending |
 | MON-06 | Phase 10: Monetization | Pending |
 | MON-07 | Phase 10: Monetization | Pending |
-| SEC-02 | Phase 11: Security Hardening | Pending |
-| SEC-03 | Phase 11: Security Hardening | Pending |
+| SEC-02 | Phase 11: Security Hardening | Complete |
+| SEC-03 | Phase 11: Security Hardening | Complete |
 | SEC-04 | Phase 11: Security Hardening | Pending |
 
 **Coverage:**

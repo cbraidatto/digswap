@@ -260,7 +260,7 @@ Plans:
   3. A formal penetration test has been conducted and all critical/high findings are resolved before public launch
 **Plans**: 3 plans
 Plans:
-- [ ] 11-01-PLAN.md -- Wave 0 test stubs + Zod validation schemas + CSP nonce hardening + open redirect fix
+- [x] 11-01-PLAN.md -- Wave 0 test stubs + Zod validation schemas + CSP nonce hardening + open redirect fix
 - [ ] 11-02-PLAN.md -- Rate limiting on all server actions + input validation + 5 security test implementations
 - [ ] 11-03-PLAN.md -- Auth bypass tests + RLS coverage tests + ZAP pen test prep + human verification
 
@@ -282,4 +282,4 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7 -> 8 -> 9 -> 10
 | 8. Gamification + Rankings | 0/5 | Planned | - |
 | 9. P2P Audio Trading | 2/6 | In Progress | - |
 | 10. Positioning, Radar & Workspace Foundation | 5/5 | Complete   | 2026-03-28 |
-| 11. Security Hardening | 0/3 | Not started | - |
+| 11. Security Hardening | 1/3 | In Progress|  |
