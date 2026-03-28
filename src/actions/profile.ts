@@ -180,6 +180,21 @@ export async function uploadAvatar(formData: FormData) {
 	return { url: avatarUrl };
 }
 
+export async function updateHolyGrails(ids: string[]) {
+	const supabase = await createClient();
+	const { data: { user } } = await supabase.auth.getUser();
+	if (!user) return { error: "Not authenticated" };
+	if (ids.length > 3) return { error: "Maximum 3 Holy Grails allowed" };
+
+	await db
+		.update(profiles)
+		.set({ holyGrailIds: ids, updatedAt: new Date() })
+		.where(eq(profiles.id, user.id));
+
+	revalidatePath("/perfil");
+	return { success: true };
+}
+
 export async function saveCoverPosition(positionY: number) {
 	const supabase = await createClient();
 	const {

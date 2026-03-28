@@ -246,7 +246,7 @@ Plans:
 - [x] 10-01-PLAN.md -- Sprint 0: P0 unblocking — landing page rewrite, remove REQUEST_TRADE from owners-list, ungate public profile, lock Discogs onboarding step, copy sweep
 - [x] 10-02-PLAN.md -- Sprint 0.5: leads schema migration + all 6 primitive components (LeadAction, QuickNotePopover, ContextTooltip, TrustStrip, ShareSurface, useDiggerMemory hook) + server actions
 - [x] 10-03-PLAN.md -- Sprint 1: RadarSection + RadarEmptyState + feed page modification (SIGNAL_BOARD) + /radar route with rarity filters
-- [ ] 10-04-PLAN.md -- Sprint 2: TrustStrip injection into profile headers + holy_grail_ids schema + Bounty Link public page + Rarity Score Card OG image + own profile sharing controls
+- [x] 10-04-PLAN.md -- Sprint 2: TrustStrip injection into profile headers + holy_grail_ids schema + Bounty Link public page + Rarity Score Card OG image + own profile sharing controls
 - [ ] 10-05-PLAN.md -- Sprint 3: WantlistMatchSection + CollectionGrid filterToIds prop + other user profile integration + P2P surface cleanup audit
 **UI hint**: yes
 

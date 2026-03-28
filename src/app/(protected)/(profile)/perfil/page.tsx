@@ -34,6 +34,10 @@ import { WantlistGrid } from "./_components/wantlist-grid";
 import { AddToWantlistDialog } from "./_components/add-to-wantlist-dialog";
 import { getUserRanking, getUserBadges } from "@/lib/gamification/queries";
 import { getTradeReputation } from "@/lib/trades/queries";
+import { TrustStrip } from "@/components/trust/trust-strip";
+import { ShareSurface } from "@/components/share/share-surface";
+import { HolyGrailSelector } from "./_components/holy-grail-selector";
+import { RarityCardModal } from "./_components/rarity-card-modal";
 import { RankCard } from "./_components/rank-card";
 import { BadgeRow } from "./_components/badge-row";
 
@@ -67,6 +71,7 @@ export default async function PerfilPage({ searchParams }: PerfilPageProps) {
 			showcaseSearchingId: profiles.showcaseSearchingId,
 			showcaseRarestId:    profiles.showcaseRarestId,
 			showcaseFavoriteId:  profiles.showcaseFavoriteId,
+			holyGrailIds:        profiles.holyGrailIds,
 		})
 		.from(profiles)
 		.where(eq(profiles.id, user.id))
@@ -208,16 +213,10 @@ export default async function PerfilPage({ searchParams }: PerfilPageProps) {
 						/>
 						<BadgeRow badges={userBadgeData} />
 
-						{/* Trade reputation stat */}
-						{tradeReputation.totalTrades > 0 && (
-							<div className="font-mono text-[10px] text-on-surface-variant mt-2">
-								TRADES: <span className="text-primary">{tradeReputation.totalTrades}</span>
-								{" . "}
-								AVG: <span className="text-secondary">{tradeReputation.averageRating?.toFixed(1) ?? "N/A"}</span>
-								{" "}
-								<span className="material-symbols-outlined text-secondary text-[14px] align-middle">star</span>
-							</div>
-						)}
+						{/* TrustStrip — replaces single-line trade stat */}
+						<div className="mt-2">
+							<TrustStrip userId={user.id} variant="full" />
+						</div>
 
 						{/* Divider */}
 						<div className="border-t border-outline/10 my-4" />
@@ -365,6 +364,54 @@ export default async function PerfilPage({ searchParams }: PerfilPageProps) {
 						<div className={`text-2xl font-bold font-heading ${stat.color}`}>{stat.value}</div>
 					</div>
 				))}
+			</section>
+
+			{/* Public Identity Controls */}
+			<section className="mt-12 grid grid-cols-1 md:grid-cols-3 gap-6">
+				{/* Holy Grail Selector */}
+				<div className="bg-surface-container-low p-4 rounded-lg border border-outline-variant/10">
+					<HolyGrailSelector
+						wantlistItems={wantlistData.map((item) => ({
+							id: item.id,
+							releaseTitle: item.title ?? null,
+							releaseArtist: item.artist ?? null,
+						}))}
+						currentHolyGrailIds={(profile?.holyGrailIds as string[] | null) ?? []}
+					/>
+				</div>
+
+				{/* Share + Rarity Controls */}
+				<div className="bg-surface-container-low p-4 rounded-lg border border-outline-variant/10 flex flex-col gap-4">
+					<div>
+						<div className="font-mono text-[10px] text-on-surface-variant tracking-[0.15em] mb-2">
+							[SHARE_BOUNTY_LINK]
+						</div>
+						<ShareSurface
+							url={`${process.env.NEXT_PUBLIC_APP_URL ?? ""}/u/${profile?.username}/bounty`}
+							label="SHARE_BOUNTY_LINK"
+						/>
+					</div>
+					<div className="border-t border-outline-variant/10 pt-4">
+						<div className="font-mono text-[10px] text-on-surface-variant tracking-[0.15em] mb-2">
+							[RARITY_CARD]
+						</div>
+						<RarityCardModal
+							username={profile?.username ?? ""}
+							appUrl={process.env.NEXT_PUBLIC_APP_URL ?? ""}
+						/>
+					</div>
+				</div>
+
+				{/* Quick Stats Recap */}
+				<div className="bg-surface-container-low p-4 rounded-lg border border-outline-variant/10 flex flex-col justify-center gap-2">
+					<div className="font-mono text-[10px] text-on-surface-variant tracking-[0.15em]">
+						[PUBLIC_IDENTITY]
+					</div>
+					<p className="font-mono text-[10px] text-on-surface-variant leading-relaxed">
+						Share your Bounty Link to let other diggers know what records you are hunting.
+						Generate your Rarity Card to show off your collection stats on social media.
+					</p>
+				</div>
 			</section>
 
 			{/* Wantlist */}
