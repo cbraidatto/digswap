@@ -6,10 +6,17 @@ interface CollectionGridProps {
 	items: CollectionItem[];
 	isOwner: boolean;
 	renderAction?: (item: CollectionItem) => ReactNode;
+	/** When set, only renders items whose releaseId is in this array (client-side filter). */
+	filterToIds?: string[];
 }
 
-export function CollectionGrid({ items, isOwner, renderAction }: CollectionGridProps) {
-	if (items.length === 0) {
+export function CollectionGrid({ items, isOwner, renderAction, filterToIds }: CollectionGridProps) {
+	const displayItems =
+		filterToIds && filterToIds.length > 0
+			? items.filter((item) => filterToIds.includes(item.releaseId))
+			: items;
+
+	if (displayItems.length === 0) {
 		return (
 			<div className="bg-surface-container-low rounded-xl p-12 flex flex-col items-center gap-4 text-center border border-outline-variant/10">
 				<div className="w-16 h-16 bg-surface-container-high rounded-full flex items-center justify-center">
@@ -35,7 +42,7 @@ export function CollectionGrid({ items, isOwner, renderAction }: CollectionGridP
 
 	return (
 		<div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-			{items.map((item) => (
+			{displayItems.map((item) => (
 				<CollectionCard
 					key={item.id}
 					item={item}
