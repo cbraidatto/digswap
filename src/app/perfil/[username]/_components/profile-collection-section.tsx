@@ -5,10 +5,10 @@ import { WantlistMatchSection } from "@/app/(protected)/(profile)/perfil/_compon
 import { CollectionGrid } from "@/app/(protected)/(profile)/perfil/_components/collection-grid";
 import { FilterBar } from "@/app/(protected)/(profile)/perfil/_components/filter-bar";
 import { Pagination } from "@/app/(protected)/(profile)/perfil/_components/pagination";
+import { RequestAudioButton } from "@/app/(protected)/(profile)/perfil/_components/request-audio-button";
 import type { WantlistIntersection } from "@/lib/wantlist/intersection-queries";
 import type { CollectionItem } from "@/lib/collection/queries";
 import type { CollectionFilters } from "@/lib/collection/filters";
-import type { ReactNode } from "react";
 
 interface ProfileCollectionSectionProps {
 	items: CollectionItem[];
@@ -19,7 +19,8 @@ interface ProfileCollectionSectionProps {
 	totalPages: number;
 	username: string;
 	searchParams: Record<string, string>;
-	renderAction?: (item: CollectionItem) => ReactNode;
+	targetUserId: string | null;
+	p2pEnabled: boolean;
 }
 
 export function ProfileCollectionSection({
@@ -31,7 +32,8 @@ export function ProfileCollectionSection({
 	totalPages,
 	username,
 	searchParams,
-	renderAction,
+	targetUserId,
+	p2pEnabled,
 }: ProfileCollectionSectionProps) {
 	const [filterIds, setFilterIds] = useState<string[] | null>(null);
 
@@ -69,7 +71,14 @@ export function ProfileCollectionSection({
 				items={items}
 				isOwner={false}
 				filterToIds={filterIds ?? undefined}
-				renderAction={renderAction}
+				renderAction={targetUserId ? (item) => (
+					<RequestAudioButton
+						userId={targetUserId}
+						releaseId={item.releaseId ?? ""}
+						p2pEnabled={p2pEnabled}
+						isOwner={false}
+					/>
+				) : undefined}
 			/>
 
 			{/* Pagination — hidden when match filter is active */}

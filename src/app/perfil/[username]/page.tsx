@@ -15,7 +15,6 @@ import {
 import { getFollowCounts, checkIsFollowing } from "@/lib/social/queries";
 import { getUserRanking, getUserBadges } from "@/lib/gamification/queries";
 import { isP2PEnabled } from "@/lib/trades/constants";
-import { RequestAudioButton } from "../../(protected)/(profile)/perfil/_components/request-audio-button";
 import { getWantlistIntersections } from "@/lib/wantlist/intersection-queries";
 import { ProfileHeader } from "./_components/profile-header";
 import { ProfileCollectionSection } from "./_components/profile-collection-section";
@@ -114,14 +113,8 @@ export default async function PublicProfilePage({
 				totalPages={totalPages}
 				username={username}
 				searchParams={rawParams as Record<string, string>}
-				renderAction={user ? (item) => (
-					<RequestAudioButton
-						userId={targetProfile.id}
-						releaseId={item.releaseId}
-						p2pEnabled={p2pEnabled}
-						isOwner={false}
-					/>
-				) : undefined}
+				targetUserId={user ? targetProfile.id : null}
+				p2pEnabled={p2pEnabled}
 			/>
 		</div>
 	);
