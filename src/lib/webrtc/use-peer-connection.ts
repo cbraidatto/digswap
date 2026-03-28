@@ -1,14 +1,15 @@
 "use client";
 
-import { useEffect, useRef, useCallback, useState } from "react";
-import Peer from "peerjs";
 import type { DataConnection } from "peerjs";
+import Peer from "peerjs";
+import { useCallback, useEffect, useRef, useState } from "react";
 import {
-	sliceFileIntoChunks,
-	reassembleChunks,
-	calculateTransferStats,
-	type TransferMessage,
 	CHUNK_SIZE,
+	calculateTransferStats,
+	isValidChunkIndex,
+	reassembleChunks,
+	sliceFileIntoChunks,
+	type TransferMessage,
 } from "./chunked-transfer";
 
 // ---------------------------------------------------------------------------
@@ -16,13 +17,7 @@ import {
 // ---------------------------------------------------------------------------
 
 export interface PeerState {
-	status:
-		| "idle"
-		| "waiting"
-		| "connecting"
-		| "transferring"
-		| "complete"
-		| "failed";
+	status: "idle" | "waiting" | "connecting" | "transferring" | "complete" | "failed";
 	progress: number; // 0-100
 	bytesTransferred: number;
 	totalBytes: number;
@@ -82,6 +77,7 @@ export function usePeerConnection(
 	const chunksRef = useRef<ArrayBuffer[]>([]);
 	const startTimeRef = useRef<number>(0);
 	const lastProgressUpdateRef = useRef<number>(0);
+	const retryTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
 	// -----------------------------------------------------------------------
 	// Setup data connection listeners (defined first — used by initPeer)
@@ -104,13 +100,19 @@ export function usePeerConnection(
 				const data = rawData as TransferMessage;
 
 				if (data.type === "chunk") {
+					// Validate chunk index bounds before storing
+					if (!isValidChunkIndex(data.index, data.total)) {
+						console.warn(
+							`[P2P] Invalid chunk index ${data.index} / total ${data.total} — ignoring`,
+						);
+						return;
+					}
 					// Receiver: collect chunks
 					chunksRef.current[data.index] = data.data;
-					const bytesTransferred =
-						chunksRef.current.reduce(
-							(sum, chunk) => sum + (chunk?.byteLength ?? 0),
-							0,
-						);
+					const bytesTransferred = chunksRef.current.reduce(
+						(sum, chunk) => sum + (chunk?.byteLength ?? 0),
+						0,
+					);
 					const totalBytes = data.total * CHUNK_SIZE;
 
 					// Throttle progress updates
@@ -174,7 +176,11 @@ export function usePeerConnection(
 	// -----------------------------------------------------------------------
 
 	const initPeer = useCallback(() => {
-		// Cleanup any existing peer
+		// Cleanup any existing peer and pending retry timeouts
+		if (retryTimeoutRef.current) {
+			clearTimeout(retryTimeoutRef.current);
+			retryTimeoutRef.current = null;
+		}
 		if (peerRef.current) {
 			peerRef.current.destroy();
 		}
@@ -200,7 +206,7 @@ export function usePeerConnection(
 				const RETRY_DELAY_MS = 2000;
 
 				const attemptConnect = () => {
-					if (!peerRef.current || retryCount >= MAX_RETRIES) return;
+					if (!peerRef.current || peerRef.current.destroyed || retryCount >= MAX_RETRIES) return;
 					const conn = peer.connect(receiverPeerId, { reliable: true });
 					connRef.current = conn;
 					setupDataConnection(conn);
@@ -210,7 +216,7 @@ export function usePeerConnection(
 				const onPeerError = (err: { type?: string; message?: string }) => {
 					if (err.type === "peer-unavailable" && retryCount < MAX_RETRIES) {
 						retryCount++;
-						setTimeout(attemptConnect, RETRY_DELAY_MS);
+						retryTimeoutRef.current = setTimeout(attemptConnect, RETRY_DELAY_MS);
 					} else if (err.type !== "peer-unavailable") {
 						peer.off("error", onPeerError as Parameters<typeof peer.on>[1]);
 						setState((prev) => ({
@@ -299,11 +305,7 @@ export function usePeerConnection(
 				if (now - lastProgressUpdateRef.current >= PROGRESS_THROTTLE_MS) {
 					lastProgressUpdateRef.current = now;
 					const bytesTransferred = (i + 1) * CHUNK_SIZE;
-					const stats = calculateTransferStats(
-						bytesTransferred,
-						file.size,
-						startTimeRef.current,
-					);
+					const stats = calculateTransferStats(bytesTransferred, file.size, startTimeRef.current);
 					setState((prev) => ({
 						...prev,
 						bytesTransferred,
@@ -334,8 +336,7 @@ export function usePeerConnection(
 			setState((prev) => ({
 				...prev,
 				status: "failed",
-				error:
-					err instanceof Error ? err.message : "File transfer failed",
+				error: err instanceof Error ? err.message : "File transfer failed",
 			}));
 		}
 	}, [role, file]);
@@ -345,6 +346,10 @@ export function usePeerConnection(
 	// -----------------------------------------------------------------------
 
 	const retry = useCallback(() => {
+		if (retryTimeoutRef.current) {
+			clearTimeout(retryTimeoutRef.current);
+			retryTimeoutRef.current = null;
+		}
 		if (peerRef.current) {
 			peerRef.current.destroy();
 			peerRef.current = null;
@@ -359,6 +364,10 @@ export function usePeerConnection(
 	// -----------------------------------------------------------------------
 
 	const cleanupFn = useCallback(() => {
+		if (retryTimeoutRef.current) {
+			clearTimeout(retryTimeoutRef.current);
+			retryTimeoutRef.current = null;
+		}
 		if (connRef.current) {
 			connRef.current.close();
 			connRef.current = null;

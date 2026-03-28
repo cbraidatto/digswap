@@ -1,17 +1,13 @@
 "use server";
 
-import { createClient } from "@/lib/supabase/server";
-import { createAdminClient } from "@/lib/supabase/admin";
-import { db } from "@/lib/db";
 import { sql } from "drizzle-orm";
 import { logActivity } from "@/actions/social";
+import { db } from "@/lib/db";
 import { awardBadge } from "@/lib/gamification/badge-awards";
 import { CONTRIBUTION_POINTS } from "@/lib/gamification/constants";
-import {
-	TRADE_STATUS,
-	MAX_FREE_TRADES_PER_MONTH,
-	isP2PEnabled,
-} from "@/lib/trades/constants";
+import { createAdminClient } from "@/lib/supabase/admin";
+import { createClient } from "@/lib/supabase/server";
+import { isP2PEnabled, MAX_FREE_TRADES_PER_MONTH, TRADE_STATUS } from "@/lib/trades/constants";
 import { getTradeCountThisMonth } from "@/lib/trades/queries";
 
 // ---------------------------------------------------------------------------
@@ -71,9 +67,7 @@ export async function createTrade(formData: {
 	}
 
 	// Compute expiry timestamp
-	const expiresAt = new Date(
-		Date.now() + formData.expiryHours * 60 * 60 * 1000,
-	).toISOString();
+	const expiresAt = new Date(Date.now() + formData.expiryHours * 60 * 60 * 1000).toISOString();
 
 	// Insert trade request
 	const { data: trade, error: insertError } = await admin
@@ -121,9 +115,7 @@ export async function createTrade(formData: {
 // Accept Trade
 // ---------------------------------------------------------------------------
 
-export async function acceptTrade(
-	tradeId: string,
-): Promise<{ success?: boolean; error?: string }> {
+export async function acceptTrade(tradeId: string): Promise<{ success?: boolean; error?: string }> {
 	const user = await requireUser();
 	const admin = createAdminClient();
 
@@ -227,9 +219,7 @@ export async function declineTrade(
 // Cancel Trade
 // ---------------------------------------------------------------------------
 
-export async function cancelTrade(
-	tradeId: string,
-): Promise<{ success?: boolean; error?: string }> {
+export async function cancelTrade(tradeId: string): Promise<{ success?: boolean; error?: string }> {
 	const user = await requireUser();
 	const admin = createAdminClient();
 
@@ -369,10 +359,7 @@ export async function completeTrade(
 	}
 
 	// Determine counterparty
-	const counterpartyId =
-		trade.requester_id === user.id
-			? trade.provider_id
-			: trade.requester_id;
+	const counterpartyId = trade.requester_id === user.id ? trade.provider_id : trade.requester_id;
 
 	// Check for duplicate review before inserting
 	const { data: existingReview } = await admin
@@ -413,7 +400,9 @@ export async function completeTrade(
 
 	// Atomic increment tradesThisMonth for both parties (no read-increment-write race)
 	for (const userId of [trade.requester_id, trade.provider_id]) {
-		await db.execute(sql`UPDATE subscriptions SET trades_this_month = COALESCE(trades_this_month, 0) + 1, updated_at = NOW() WHERE user_id = ${userId}`);
+		await db.execute(
+			sql`UPDATE subscriptions SET trades_this_month = COALESCE(trades_this_month, 0) + 1, updated_at = NOW() WHERE user_id = ${userId}`,
+		);
 	}
 
 	// Award CONNECTOR badge to both parties
@@ -422,7 +411,9 @@ export async function completeTrade(
 
 	// Atomic increment contribution scores (+15 per trade_completed) in user_rankings
 	for (const userId of [trade.requester_id, trade.provider_id]) {
-		await db.execute(sql`UPDATE user_rankings SET contribution_score = COALESCE(contribution_score, 0) + ${CONTRIBUTION_POINTS.trade_completed}, updated_at = NOW() WHERE user_id = ${userId}`);
+		await db.execute(
+			sql`UPDATE user_rankings SET contribution_score = COALESCE(contribution_score, 0) + ${CONTRIBUTION_POINTS.trade_completed}, updated_at = NOW() WHERE user_id = ${userId}`,
+		);
 	}
 
 	// Log activity
@@ -448,9 +439,7 @@ export async function completeTrade(
 // Skip Review (complete without review)
 // ---------------------------------------------------------------------------
 
-export async function skipReview(
-	tradeId: string,
-): Promise<{ success?: boolean; error?: string }> {
+export async function skipReview(tradeId: string): Promise<{ success?: boolean; error?: string }> {
 	const user = await requireUser();
 	const admin = createAdminClient();
 
@@ -469,17 +458,11 @@ export async function skipReview(
 		return { error: "Not a participant in this trade" };
 	}
 
-	if (
-		trade.status !== TRADE_STATUS.TRANSFERRING &&
-		trade.status !== TRADE_STATUS.ACCEPTED
-	) {
+	if (trade.status !== TRADE_STATUS.TRANSFERRING && trade.status !== TRADE_STATUS.ACCEPTED) {
 		return { error: "Trade is not in an active state" };
 	}
 
-	const counterpartyId =
-		trade.requester_id === user.id
-			? trade.provider_id
-			: trade.requester_id;
+	const counterpartyId = trade.requester_id === user.id ? trade.provider_id : trade.requester_id;
 
 	// Update status to completed (optimistic concurrency: only if status unchanged)
 	const { data: updated, error: updateError } = await admin
@@ -503,12 +486,16 @@ export async function skipReview(
 
 	// Atomic increment tradesThisMonth for both parties (no read-increment-write race)
 	for (const userId of [trade.requester_id, trade.provider_id]) {
-		await db.execute(sql`UPDATE subscriptions SET trades_this_month = COALESCE(trades_this_month, 0) + 1, updated_at = NOW() WHERE user_id = ${userId}`);
+		await db.execute(
+			sql`UPDATE subscriptions SET trades_this_month = COALESCE(trades_this_month, 0) + 1, updated_at = NOW() WHERE user_id = ${userId}`,
+		);
 	}
 
 	// Atomic increment contribution scores in user_rankings
 	for (const userId of [trade.requester_id, trade.provider_id]) {
-		await db.execute(sql`UPDATE user_rankings SET contribution_score = COALESCE(contribution_score, 0) + ${CONTRIBUTION_POINTS.trade_completed}, updated_at = NOW() WHERE user_id = ${userId}`);
+		await db.execute(
+			sql`UPDATE user_rankings SET contribution_score = COALESCE(contribution_score, 0) + ${CONTRIBUTION_POINTS.trade_completed}, updated_at = NOW() WHERE user_id = ${userId}`,
+		);
 	}
 
 	await logActivity(user.id, "completed_trade", "trade", tradeId, {
@@ -538,10 +525,7 @@ export async function getTurnCredentials(): Promise<RTCIceServer[]> {
 
 	// Dev fallback: use Google STUN if env vars not configured
 	if (!appName || !apiKey) {
-		return [
-			{ urls: "stun:stun.l.google.com:19302" },
-			{ urls: "stun:stun1.l.google.com:19302" },
-		];
+		return [{ urls: "stun:stun.l.google.com:19302" }, { urls: "stun:stun1.l.google.com:19302" }];
 	}
 
 	const response = await fetch(
@@ -621,10 +605,8 @@ async function sendTradeRequestEmail(
 
 		const { Resend } = await import("resend");
 		const resend = new Resend(process.env.RESEND_API_KEY);
-		const from =
-			process.env.RESEND_FROM_EMAIL || "DigSwap <onboarding@resend.dev>";
-		const appUrl =
-			process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
+		const from = process.env.RESEND_FROM_EMAIL || "DigSwap <onboarding@resend.dev>";
+		const appUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
 
 		await resend.emails.send({
 			from,

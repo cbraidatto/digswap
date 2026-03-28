@@ -16,6 +16,15 @@ export interface DoneMessage {
 export type TransferMessage = ChunkMessage | DoneMessage;
 
 /**
+ * Validates that a chunk index is within valid bounds.
+ */
+export function isValidChunkIndex(index: number, total: number): boolean {
+	return (
+		Number.isInteger(index) && Number.isInteger(total) && total > 0 && index >= 0 && index < total
+	);
+}
+
+/**
  * Slices a File into CHUNK_SIZE chunks. Returns a lazy accessor
  * so chunks are read on demand (avoids loading entire file into memory).
  */
@@ -27,6 +36,9 @@ export function sliceFileIntoChunks(file: File): {
 	return {
 		totalChunks,
 		getChunk: async (index: number) => {
+			if (index < 0 || index >= totalChunks) {
+				throw new RangeError(`Chunk index ${index} out of bounds [0, ${totalChunks})`);
+			}
 			const start = index * CHUNK_SIZE;
 			const end = Math.min(start + CHUNK_SIZE, file.size);
 			return file.slice(start, end).arrayBuffer();
@@ -37,10 +49,7 @@ export function sliceFileIntoChunks(file: File): {
 /**
  * Reassembles an array of ArrayBuffer chunks into a single Blob.
  */
-export function reassembleChunks(
-	chunks: ArrayBuffer[],
-	_fileName: string,
-): Blob {
+export function reassembleChunks(chunks: ArrayBuffer[], _fileName: string): Blob {
 	return new Blob(chunks, { type: "application/octet-stream" });
 }
 
@@ -61,10 +70,7 @@ export function calculateTransferStats(
 	const remaining = totalBytes - bytesTransferred;
 	const eta = speed > 0 ? remaining / speed : 0;
 	return {
-		progress:
-			totalBytes > 0
-				? Math.round((bytesTransferred / totalBytes) * 100)
-				: 0,
+		progress: totalBytes > 0 ? Math.round((bytesTransferred / totalBytes) * 100) : 0,
 		speed,
 		eta,
 	};
