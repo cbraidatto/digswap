@@ -35,3 +35,8 @@ export const ACCEPTED_AUDIO_TYPES = [
 export function isP2PEnabled(): boolean {
 	return process.env.P2P_ENABLED === "true";
 }
+
+/** Client-safe P2P check. Requires NEXT_PUBLIC_P2P_ENABLED env var. */
+export function isP2PEnabledClient(): boolean {
+	return process.env.NEXT_PUBLIC_P2P_ENABLED === "true";
+}

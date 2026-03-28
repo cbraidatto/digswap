@@ -6,6 +6,7 @@ import { SearchSection } from "./_components/search-section";
 import { RecordsTab } from "./_components/records-tab";
 import { RankingsTab } from "./_components/rankings-tab";
 import { createClient } from "@/lib/supabase/client";
+import { isP2PEnabledClient } from "@/lib/trades/constants";
 
 type Tab = "diggers" | "records";
 
@@ -15,6 +16,7 @@ export default function ExplorarPage() {
 		searchParams.get("tab") === "records" ? "records" : "diggers";
 	const [activeTab, setActiveTab] = useState<Tab>(initialTab);
 	const [currentUserId, setCurrentUserId] = useState<string>("");
+	const p2pEnabled = isP2PEnabledClient();
 
 	// Get current user ID for leaderboard own-user highlight
 	useEffect(() => {
@@ -88,7 +90,7 @@ export default function ExplorarPage() {
 
 			{activeTab === "records" && (
 				<section role="tabpanel">
-					<RecordsTab />
+					<RecordsTab p2pEnabled={p2pEnabled} currentUserId={currentUserId} />
 				</section>
 			)}
 		</div>
