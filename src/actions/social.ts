@@ -6,6 +6,7 @@ import { follows, activityFeed } from "@/lib/db/schema/social";
 import { profiles } from "@/lib/db/schema/users";
 import { collectionItems } from "@/lib/db/schema/collections";
 import { eq, and, ilike, sql } from "drizzle-orm";
+import { apiRateLimit } from "@/lib/rate-limit";
 import {
 	getGlobalFeed,
 	getPersonalFeed,
@@ -71,6 +72,11 @@ export async function followUser(
 		return { error: "Not authenticated" };
 	}
 
+	const { success: rlSuccess } = await apiRateLimit.limit(user.id);
+	if (!rlSuccess) {
+		return { error: "Too many requests. Please wait a moment." };
+	}
+
 	if (targetUserId === user.id) {
 		return { error: "Cannot follow yourself" };
 	}
@@ -107,6 +113,11 @@ export async function unfollowUser(
 
 	if (!user) {
 		return { error: "Not authenticated" };
+	}
+
+	const { success: rlSuccess } = await apiRateLimit.limit(user.id);
+	if (!rlSuccess) {
+		return { error: "Too many requests. Please wait a moment." };
 	}
 
 	try {
@@ -166,6 +177,11 @@ export async function searchUsers(
 	} = await supabase.auth.getUser();
 
 	if (!user) {
+		return [];
+	}
+
+	const { success: rlSuccess } = await apiRateLimit.limit(user.id);
+	if (!rlSuccess) {
 		return [];
 	}
 

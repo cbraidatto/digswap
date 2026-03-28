@@ -1,6 +1,7 @@
 "use server";
 
 import { createClient } from "@/lib/supabase/server";
+import { apiRateLimit } from "@/lib/rate-limit";
 import {
 	searchRecords,
 	browseRecords,
@@ -23,6 +24,11 @@ export async function searchRecordsAction(term: string) {
 
 	if (!user) {
 		throw new Error("Not authenticated");
+	}
+
+	const { success: rlSuccess } = await apiRateLimit.limit(user.id);
+	if (!rlSuccess) {
+		return [];
 	}
 
 	const trimmed = (term ?? "").trim();
@@ -53,6 +59,11 @@ export async function browseRecordsAction(
 		throw new Error("Not authenticated");
 	}
 
+	const { success: rlSuccess } = await apiRateLimit.limit(user.id);
+	if (!rlSuccess) {
+		return [];
+	}
+
 	const offset = (Math.max(1, page) - 1) * PAGE_SIZE;
 	return browseRecords(genre, decade, PAGE_SIZE, offset);
 }
@@ -71,6 +82,11 @@ export async function getSuggestionsAction() {
 
 	if (!user) {
 		throw new Error("Not authenticated");
+	}
+
+	const { success: rlSuccess } = await apiRateLimit.limit(user.id);
+	if (!rlSuccess) {
+		return [];
 	}
 
 	return getSuggestedRecords(user.id);

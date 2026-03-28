@@ -6,7 +6,10 @@ import { db } from "@/lib/db";
 import { collectionItems } from "@/lib/db/schema/collections";
 import { releases } from "@/lib/db/schema/releases";
 import { profiles } from "@/lib/db/schema/users";
+import { apiRateLimit } from "@/lib/rate-limit";
 import { createClient } from "@/lib/supabase/server";
+import { sanitizeWildcards } from "@/lib/validations/common";
+import { updateProfileSchema } from "@/lib/validations/profile";
 
 export type ShowcaseSlot = "searching" | "rarest" | "favorite";
 
@@ -20,6 +23,11 @@ export async function updateShowcase(slot: ShowcaseSlot, releaseId: string | nul
 	const supabase = await createClient();
 	const { data: { user } } = await supabase.auth.getUser();
 	if (!user) return { error: "Unauthenticated" };
+
+	const { success: rlSuccess } = await apiRateLimit.limit(user.id);
+	if (!rlSuccess) {
+		return { error: "Too many requests. Please wait a moment." };
+	}
 
 	await db
 		.update(profiles)
@@ -35,8 +43,15 @@ export async function searchCollectionForShowcase(query: string) {
 	const { data: { user } } = await supabase.auth.getUser();
 	if (!user) return [];
 
+	const { success: rlSuccess } = await apiRateLimit.limit(user.id);
+	if (!rlSuccess) {
+		return [];
+	}
+
 	const term = query.trim();
 	if (!term) return [];
+
+	const sanitized = sanitizeWildcards(term);
 
 	const rows = await db
 		.selectDistinctOn([releases.id], {
@@ -52,8 +67,8 @@ export async function searchCollectionForShowcase(query: string) {
 			and(
 				eq(collectionItems.userId, user.id),
 				or(
-					ilike(releases.title,  `%${term}%`),
-					ilike(releases.artist, `%${term}%`),
+					ilike(releases.title,  `%${sanitized}%`),
+					ilike(releases.artist, `%${sanitized}%`),
 				),
 			),
 		)
@@ -76,6 +91,22 @@ export async function updateProfile(data: {
 	const supabase = await createClient();
 	const { data: { user } } = await supabase.auth.getUser();
 	if (!user) return { error: "Unauthenticated" };
+
+	const { success: rlSuccess } = await apiRateLimit.limit(user.id);
+	if (!rlSuccess) {
+		return { error: "Too many requests. Please wait a moment." };
+	}
+
+	// Validate URL fields with Zod schema
+	const urlValidation = updateProfileSchema.safeParse({
+		displayName: data.displayName,
+		bio: data.bio,
+		youtubeUrl: data.youtubeUrl,
+		websiteUrl: data.discogsUrl, // validate as URL
+	});
+	if (!urlValidation.success) {
+		return { error: urlValidation.error.issues[0]?.message ?? "Invalid profile data" };
+	}
 
 	const displayName = data.displayName.trim().slice(0, 50);
 	const username = data.username.trim().toLowerCase().replace(/[^a-z0-9_]/g, "").slice(0, 30);
@@ -116,6 +147,11 @@ export async function uploadCoverImage(formData: FormData) {
 	} = await supabase.auth.getUser();
 	if (!user) return { error: "Unauthenticated" };
 
+	const { success: rlSuccess } = await apiRateLimit.limit(user.id);
+	if (!rlSuccess) {
+		return { error: "Too many requests. Please wait a moment." };
+	}
+
 	const file = formData.get("cover") as File | null;
 	if (!file || file.size === 0) return { error: "No file provided" };
 	if (file.size > 5 * 1024 * 1024) return { error: "File too large (max 5MB)" };
@@ -152,6 +188,11 @@ export async function uploadAvatar(formData: FormData) {
 	} = await supabase.auth.getUser();
 	if (!user) return { error: "Unauthenticated" };
 
+	const { success: rlSuccess } = await apiRateLimit.limit(user.id);
+	if (!rlSuccess) {
+		return { error: "Too many requests. Please wait a moment." };
+	}
+
 	const file = formData.get("avatar") as File | null;
 	if (!file || file.size === 0) return { error: "No file provided" };
 	if (file.size > 2 * 1024 * 1024) return { error: "File too large (max 2MB)" };
@@ -184,6 +225,12 @@ export async function updateHolyGrails(ids: string[]) {
 	const supabase = await createClient();
 	const { data: { user } } = await supabase.auth.getUser();
 	if (!user) return { error: "Not authenticated" };
+
+	const { success: rlSuccess } = await apiRateLimit.limit(user.id);
+	if (!rlSuccess) {
+		return { error: "Too many requests. Please wait a moment." };
+	}
+
 	if (ids.length > 3) return { error: "Maximum 3 Holy Grails allowed" };
 
 	await db
@@ -201,6 +248,11 @@ export async function saveCoverPosition(positionY: number) {
 		data: { user },
 	} = await supabase.auth.getUser();
 	if (!user) return { error: "Unauthenticated" };
+
+	const { success: rlSuccess } = await apiRateLimit.limit(user.id);
+	if (!rlSuccess) {
+		return { error: "Too many requests. Please wait a moment." };
+	}
 
 	const clamped = Math.min(100, Math.max(0, positionY));
 

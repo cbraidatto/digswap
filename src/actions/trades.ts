@@ -5,6 +5,7 @@ import { logActivity } from "@/actions/social";
 import { db } from "@/lib/db";
 import { awardBadge } from "@/lib/gamification/badge-awards";
 import { CONTRIBUTION_POINTS } from "@/lib/gamification/constants";
+import { tradeRateLimit } from "@/lib/rate-limit";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
 import { isP2PEnabled, MAX_FREE_TRADES_PER_MONTH, TRADE_EXPIRY_HOURS, TRADE_STATUS } from "@/lib/trades/constants";
@@ -46,6 +47,12 @@ export async function createTrade(formData: {
 	}
 
 	const user = await requireUser();
+
+	const { success: rlSuccess } = await tradeRateLimit.limit(user.id);
+	if (!rlSuccess) {
+		return { error: "Too many requests. Please wait a moment." };
+	}
+
 	const admin = createAdminClient();
 
 	// Check ToS acceptance
@@ -116,6 +123,12 @@ export async function createTrade(formData: {
 
 export async function acceptTrade(tradeId: string): Promise<{ success?: boolean; error?: string }> {
 	const user = await requireUser();
+
+	const { success: rlSuccess } = await tradeRateLimit.limit(user.id);
+	if (!rlSuccess) {
+		return { error: "Too many requests. Please wait a moment." };
+	}
+
 	const admin = createAdminClient();
 
 	// Fetch trade and verify user is provider
@@ -173,6 +186,12 @@ export async function declineTrade(
 	tradeId: string,
 ): Promise<{ success?: boolean; error?: string }> {
 	const user = await requireUser();
+
+	const { success: rlSuccess } = await tradeRateLimit.limit(user.id);
+	if (!rlSuccess) {
+		return { error: "Too many requests. Please wait a moment." };
+	}
+
 	const admin = createAdminClient();
 
 	const { data: trade, error } = await admin
@@ -227,6 +246,12 @@ export async function declineTrade(
 
 export async function cancelTrade(tradeId: string): Promise<{ success?: boolean; error?: string }> {
 	const user = await requireUser();
+
+	const { success: rlSuccess } = await tradeRateLimit.limit(user.id);
+	if (!rlSuccess) {
+		return { error: "Too many requests. Please wait a moment." };
+	}
+
 	const admin = createAdminClient();
 
 	const { data: trade, error } = await admin
@@ -284,6 +309,12 @@ export async function updateTradeStatus(
 	newStatus: string,
 ): Promise<{ success?: boolean; error?: string }> {
 	const user = await requireUser();
+
+	const { success: rlSuccess } = await tradeRateLimit.limit(user.id);
+	if (!rlSuccess) {
+		return { error: "Too many requests. Please wait a moment." };
+	}
+
 	const admin = createAdminClient();
 
 	const { data: trade, error } = await admin
@@ -341,6 +372,12 @@ export async function completeTrade(
 	comment: string | null,
 ): Promise<{ success?: boolean; error?: string }> {
 	const user = await requireUser();
+
+	const { success: rlSuccess } = await tradeRateLimit.limit(user.id);
+	if (!rlSuccess) {
+		return { error: "Too many requests. Please wait a moment." };
+	}
+
 	const admin = createAdminClient();
 
 	// Validate rating
@@ -455,6 +492,12 @@ export async function completeTrade(
 
 export async function skipReview(tradeId: string): Promise<{ success?: boolean; error?: string }> {
 	const user = await requireUser();
+
+	const { success: rlSuccess } = await tradeRateLimit.limit(user.id);
+	if (!rlSuccess) {
+		return { error: "Too many requests. Please wait a moment." };
+	}
+
 	const admin = createAdminClient();
 
 	const { data: trade, error } = await admin
@@ -532,7 +575,12 @@ interface RTCIceServer {
 }
 
 export async function getTurnCredentials(): Promise<RTCIceServer[]> {
-	await requireUser();
+	const user = await requireUser();
+
+	const { success: rlSuccess } = await tradeRateLimit.limit(user.id);
+	if (!rlSuccess) {
+		throw new Error("Too many requests. Please wait a moment.");
+	}
 
 	const appName = process.env.METERED_APP_NAME;
 	const apiKey = process.env.METERED_API_KEY;
@@ -560,6 +608,12 @@ export async function getTurnCredentials(): Promise<RTCIceServer[]> {
 
 export async function acceptToS(): Promise<{ success?: boolean; error?: string }> {
 	const user = await requireUser();
+
+	const { success: rlSuccess } = await tradeRateLimit.limit(user.id);
+	if (!rlSuccess) {
+		return { error: "Too many requests. Please wait a moment." };
+	}
+
 	const admin = createAdminClient();
 
 	const { error } = await admin
@@ -586,6 +640,12 @@ export async function getTradesRemaining(): Promise<{
 	plan: string;
 }> {
 	const user = await requireUser();
+
+	const { success: rlSuccess } = await tradeRateLimit.limit(user.id);
+	if (!rlSuccess) {
+		throw new Error("Too many requests. Please wait a moment.");
+	}
+
 	const tradeCount = await getTradeCountThisMonth(user.id);
 
 	if (tradeCount.plan !== "free") {
@@ -602,6 +662,15 @@ export async function getTradesRemaining(): Promise<{
 // ---------------------------------------------------------------------------
 // Trade Request Email (internal helper)
 // ---------------------------------------------------------------------------
+
+function escapeHtml(unsafe: string): string {
+	return unsafe
+		.replace(/&/g, "&amp;")
+		.replace(/</g, "&lt;")
+		.replace(/>/g, "&gt;")
+		.replace(/"/g, "&quot;")
+		.replace(/'/g, "&#039;");
+}
 
 async function sendTradeRequestEmail(
 	providerId: string,
@@ -622,14 +691,17 @@ async function sendTradeRequestEmail(
 		const from = process.env.RESEND_FROM_EMAIL || "DigSwap <onboarding@resend.dev>";
 		const appUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
 
+		const safeFileName = escapeHtml(fileName);
+		const safeTradeId = escapeHtml(tradeId);
+
 		await resend.emails.send({
 			from,
 			to: authUser.user.email,
 			subject: "New trade request on DigSwap",
 			html: `<div style="font-family: monospace; background: #10141a; color: #dfe2eb; padding: 24px;">
   <h2 style="color: #6fdd78;">New Trade Request</h2>
-  <p>Someone wants to trade <strong>"${fileName}"</strong> with you.</p>
-  <p><a href="${appUrl}/trades/${tradeId}" style="color: #aac7ff;">View trade request</a></p>
+  <p>Someone wants to trade <strong>"${safeFileName}"</strong> with you.</p>
+  <p><a href="${appUrl}/trades/${safeTradeId}" style="color: #aac7ff;">View trade request</a></p>
 </div>`,
 		});
 	} catch (error) {

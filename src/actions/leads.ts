@@ -3,6 +3,7 @@
 import { eq, and } from "drizzle-orm";
 import { db } from "@/lib/db";
 import { leads, type LeadStatus, type LeadTargetType } from "@/lib/db/schema/leads";
+import { apiRateLimit } from "@/lib/rate-limit";
 import { createClient } from "@/lib/supabase/server";
 
 export async function saveLead(
@@ -16,6 +17,11 @@ export async function saveLead(
     data: { user },
   } = await supabase.auth.getUser();
   if (!user) return { error: "Not authenticated" };
+
+  const { success: rlSuccess } = await apiRateLimit.limit(user.id);
+  if (!rlSuccess) {
+    return { error: "Too many requests. Please wait a moment." };
+  }
 
   await db
     .insert(leads)
@@ -42,6 +48,9 @@ export async function getLead(targetType: LeadTargetType, targetId: string) {
   } = await supabase.auth.getUser();
   if (!user) return null;
 
+  const { success: rlSuccess } = await apiRateLimit.limit(user.id);
+  if (!rlSuccess) return null;
+
   const [lead] = await db
     .select()
     .from(leads)
@@ -66,6 +75,9 @@ export async function getLeads(filters?: {
     data: { user },
   } = await supabase.auth.getUser();
   if (!user) return [];
+
+  const { success: rlSuccess } = await apiRateLimit.limit(user.id);
+  if (!rlSuccess) return [];
 
   const conditions = [eq(leads.userId, user.id)];
   if (filters?.status) conditions.push(eq(leads.status, filters.status));

@@ -6,6 +6,7 @@ import { createAdminClient } from "@/lib/supabase/admin";
 import { createDiscogsClient, computeRarityScore } from "@/lib/discogs/client";
 import { CONDITION_GRADES } from "@/lib/collection/filters";
 import { logActivity } from "@/actions/social";
+import { apiRateLimit } from "@/lib/rate-limit";
 import { checkWantlistMatches } from "@/lib/notifications/match";
 
 /**
@@ -25,6 +26,11 @@ export async function searchDiscogs(query: string) {
 
 	if (!user) {
 		throw new Error("Not authenticated");
+	}
+
+	const { success: rlSuccess } = await apiRateLimit.limit(user.id);
+	if (!rlSuccess) {
+		return [];
 	}
 
 	const client = await createDiscogsClient(user.id);
@@ -76,6 +82,11 @@ export async function addRecordToCollection(
 
 	if (!user) {
 		throw new Error("Not authenticated");
+	}
+
+	const { success: rlSuccess } = await apiRateLimit.limit(user.id);
+	if (!rlSuccess) {
+		return { error: "Too many requests. Please wait a moment." };
 	}
 
 	const admin = createAdminClient();
@@ -188,6 +199,11 @@ export async function updateConditionGrade(
 
 	if (!user) {
 		throw new Error("Not authenticated");
+	}
+
+	const { success: rlSuccess } = await apiRateLimit.limit(user.id);
+	if (!rlSuccess) {
+		return { error: "Too many requests. Please wait a moment." };
 	}
 
 	// Validate grade against allowed values

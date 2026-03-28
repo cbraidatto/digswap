@@ -3,6 +3,7 @@
 import { eq } from "drizzle-orm";
 import { db } from "@/lib/db";
 import { profiles } from "@/lib/db/schema/users";
+import { apiRateLimit } from "@/lib/rate-limit";
 import { createClient } from "@/lib/supabase/server";
 
 /**
@@ -37,6 +38,11 @@ export async function updateProfile(
 
 	if (!user) {
 		return { success: false, error: "Not authenticated." };
+	}
+
+	const { success: rlSuccess } = await apiRateLimit.limit(user.id);
+	if (!rlSuccess) {
+		return { success: false, error: "Too many requests. Please wait a moment." };
 	}
 
 	const displayName = formData.get("display_name") as string;
@@ -84,6 +90,11 @@ export async function completeOnboarding(): Promise<{
 
 	if (!user) {
 		return { success: false, error: "Not authenticated." };
+	}
+
+	const { success: rlSuccess } = await apiRateLimit.limit(user.id);
+	if (!rlSuccess) {
+		return { success: false, error: "Too many requests. Please wait a moment." };
 	}
 
 	try {

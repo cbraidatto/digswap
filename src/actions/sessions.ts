@@ -6,6 +6,7 @@ import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { db } from "@/lib/db";
 import { userSessions } from "@/lib/db/schema/sessions";
+import { apiRateLimit } from "@/lib/rate-limit";
 
 /**
  * Maximum concurrent sessions allowed per user (D-13).
@@ -71,6 +72,11 @@ export async function getSessions(): Promise<{
 
 	const userId = data.user.id;
 
+	const { success: rlSuccess } = await apiRateLimit.limit(userId);
+	if (!rlSuccess) {
+		return { success: false, sessions: [], error: "Too many requests. Please wait a moment." };
+	}
+
 	// Get current session identifier to mark "current" session.
 	// Uses getClaims() (not getSession()) per project convention — reads session_id
 	// from the validated JWT claims without an extra server round-trip.
@@ -121,6 +127,11 @@ export async function terminateSession(
 	}
 
 	const userId = data.user.id;
+
+	const { success: rlSuccess } = await apiRateLimit.limit(userId);
+	if (!rlSuccess) {
+		return { success: false, error: "Too many requests. Please wait a moment." };
+	}
 
 	try {
 		// Verify the session belongs to the current user (IDOR prevention)

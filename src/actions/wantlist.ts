@@ -3,6 +3,7 @@
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { createDiscogsClient, computeRarityScore } from "@/lib/discogs/client";
+import { apiRateLimit } from "@/lib/rate-limit";
 import { searchYouTube } from "@/lib/youtube/client";
 export { searchYouTube };
 
@@ -14,6 +15,11 @@ export async function addToWantlist(
 		data: { user },
 	} = await supabase.auth.getUser();
 	if (!user) throw new Error("Not authenticated");
+
+	const { success: rlSuccess } = await apiRateLimit.limit(user.id);
+	if (!rlSuccess) {
+		return { error: "Too many requests. Please wait a moment." };
+	}
 
 	const admin = createAdminClient();
 
@@ -90,6 +96,11 @@ export async function removeFromWantlist(
 	} = await supabase.auth.getUser();
 	if (!user) throw new Error("Not authenticated");
 
+	const { success: rlSuccess } = await apiRateLimit.limit(user.id);
+	if (!rlSuccess) {
+		return { error: "Too many requests. Please wait a moment." };
+	}
+
 	const admin = createAdminClient();
 
 	const { error } = await admin
@@ -110,6 +121,11 @@ export async function markAsFound(
 		data: { user },
 	} = await supabase.auth.getUser();
 	if (!user) throw new Error("Not authenticated");
+
+	const { success: rlSuccess } = await apiRateLimit.limit(user.id);
+	if (!rlSuccess) {
+		return { error: "Too many requests. Please wait a moment." };
+	}
 
 	const admin = createAdminClient();
 
@@ -173,6 +189,11 @@ export async function addToWantlistFromYouTube(
 		data: { user },
 	} = await supabase.auth.getUser();
 	if (!user) throw new Error("Not authenticated");
+
+	const { success: rlSuccess } = await apiRateLimit.limit(user.id);
+	if (!rlSuccess) {
+		return { error: "Too many requests. Please wait a moment." };
+	}
 
 	const admin = createAdminClient();
 

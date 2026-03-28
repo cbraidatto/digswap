@@ -9,7 +9,9 @@ import { reviews } from "@/lib/db/schema/reviews";
 import { profiles } from "@/lib/db/schema/users";
 import { eq, and, sql } from "drizzle-orm";
 import { logActivity } from "@/actions/social";
+import { apiRateLimit } from "@/lib/rate-limit";
 import { slugify } from "@/lib/community/slugify";
+import { createPostSchema, createReviewSchema } from "@/lib/validations/community";
 import {
 	getGroupPosts,
 	getGenreGroups,
@@ -50,6 +52,11 @@ export async function createGroupAction(data: {
 	visibility: "public" | "private";
 }): Promise<{ slug: string }> {
 	const user = await requireUser();
+
+	const { success: rlSuccess } = await apiRateLimit.limit(user.id);
+	if (!rlSuccess) {
+		throw new Error("Too many requests. Please wait a moment.");
+	}
 
 	const name = data.name.trim();
 	if (!name || name.length === 0) {
@@ -106,6 +113,11 @@ export async function joinGroupAction(
 	groupId: string,
 ): Promise<{ success?: boolean; error?: string }> {
 	const user = await requireUser();
+
+	const { success: rlSuccess } = await apiRateLimit.limit(user.id);
+	if (!rlSuccess) {
+		return { error: "Too many requests. Please wait a moment." };
+	}
 
 	// Check group exists
 	const [group] = await db
@@ -179,6 +191,11 @@ export async function leaveGroupAction(
 ): Promise<{ success?: boolean; error?: string }> {
 	const user = await requireUser();
 
+	const { success: rlSuccess } = await apiRateLimit.limit(user.id);
+	if (!rlSuccess) {
+		return { error: "Too many requests. Please wait a moment." };
+	}
+
 	// Check membership
 	const [membership] = await db
 		.select({ id: groupMembers.id, role: groupMembers.role })
@@ -240,7 +257,17 @@ export async function createPostAction(data: {
 }): Promise<{ id: string }> {
 	const user = await requireUser();
 
-	const content = data.content.trim();
+	const { success: rlSuccess } = await apiRateLimit.limit(user.id);
+	if (!rlSuccess) {
+		throw new Error("Too many requests. Please wait a moment.");
+	}
+
+	const parsed = createPostSchema.safeParse(data);
+	if (!parsed.success) {
+		throw new Error(parsed.error.issues[0]?.message ?? "Invalid post data");
+	}
+
+	const content = parsed.data.content;
 	if (!content) {
 		throw new Error("Post content cannot be empty.");
 	}
@@ -306,8 +333,24 @@ export async function createReviewAction(data: {
 }): Promise<{ id: string }> {
 	const user = await requireUser();
 
+	const { success: rlSuccess } = await apiRateLimit.limit(user.id);
+	if (!rlSuccess) {
+		throw new Error("Too many requests. Please wait a moment.");
+	}
+
+	const parsed = createReviewSchema.safeParse({
+		releaseId: data.releaseId,
+		rating: data.rating,
+		body: data.body,
+		title: data.title,
+		groupId: data.groupId,
+	});
+	if (!parsed.success) {
+		throw new Error(parsed.error.issues[0]?.message ?? "Invalid review data");
+	}
+
 	// Validate rating
-	const rating = Math.round(data.rating);
+	const rating = parsed.data.rating;
 	if (rating < 1 || rating > 5) {
 		throw new Error("Rating must be between 1 and 5.");
 	}
@@ -394,6 +437,11 @@ export async function generateInviteAction(
 ): Promise<{ token: string }> {
 	const user = await requireUser();
 
+	const { success: rlSuccess } = await apiRateLimit.limit(user.id);
+	if (!rlSuccess) {
+		throw new Error("Too many requests. Please wait a moment.");
+	}
+
 	// Verify user is admin of group
 	const [membership] = await db
 		.select({ role: groupMembers.role })
@@ -426,6 +474,11 @@ export async function inviteUserAction(
 	username: string,
 ): Promise<{ success?: boolean; error?: string }> {
 	const user = await requireUser();
+
+	const { success: rlSuccess } = await apiRateLimit.limit(user.id);
+	if (!rlSuccess) {
+		return { error: "Too many requests. Please wait a moment." };
+	}
 
 	// Verify admin
 	const [membership] = await db
@@ -491,6 +544,11 @@ export async function acceptInviteAction(
 	token: string,
 ): Promise<{ slug: string } | { error: string }> {
 	const user = await requireUser();
+
+	const { success: rlSuccess } = await apiRateLimit.limit(user.id);
+	if (!rlSuccess) {
+		return { error: "Too many requests. Please wait a moment." };
+	}
 
 	// Look up invite
 	const [invite] = await db
