@@ -22,7 +22,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 7: Community + Reviews** - Genre/era groups, group activity feeds, pressing and release reviews (completed 2026-03-26)
 - [ ] **Phase 8: Gamification + Rankings** - Global/genre leaderboards, badges, titles, composite ranking formula
 - [ ] **Phase 9: P2P Audio Trading** - DMCA compliance, WebRTC file transfer, trade reputation, TURN relay
-- [ ] **Phase 10: Positioning, Radar & Workspace Foundation** - Repositioned landing, The Radar as hero feature, public acquisition surfaces, Digger Memory primitives
+- [x] **Phase 10: Positioning, Radar & Workspace Foundation** - Repositioned landing, The Radar as hero feature, public acquisition surfaces, Digger Memory primitives (completed 2026-03-28)
 - [ ] **Phase 11: Security Hardening** - OWASP API coverage, security test suite, penetration testing
 
 ## Phase Details
@@ -247,7 +247,7 @@ Plans:
 - [x] 10-02-PLAN.md -- Sprint 0.5: leads schema migration + all 6 primitive components (LeadAction, QuickNotePopover, ContextTooltip, TrustStrip, ShareSurface, useDiggerMemory hook) + server actions
 - [x] 10-03-PLAN.md -- Sprint 1: RadarSection + RadarEmptyState + feed page modification (SIGNAL_BOARD) + /radar route with rarity filters
 - [x] 10-04-PLAN.md -- Sprint 2: TrustStrip injection into profile headers + holy_grail_ids schema + Bounty Link public page + Rarity Score Card OG image + own profile sharing controls
-- [ ] 10-05-PLAN.md -- Sprint 3: WantlistMatchSection + CollectionGrid filterToIds prop + other user profile integration + P2P surface cleanup audit
+- [x] 10-05-PLAN.md -- Sprint 3: WantlistMatchSection + CollectionGrid filterToIds prop + other user profile integration + P2P surface cleanup audit
 **UI hint**: yes
 
 ### Phase 11: Security Hardening
@@ -277,5 +277,5 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7 -> 8 -> 9 -> 10
 | 7. Community + Reviews | 5/5 | Complete   | 2026-03-26 |
 | 8. Gamification + Rankings | 0/5 | Planned | - |
 | 9. P2P Audio Trading | 2/6 | In Progress | - |
-| 10. Positioning, Radar & Workspace Foundation | 3/5 | In Progress|  |
+| 10. Positioning, Radar & Workspace Foundation | 5/5 | Complete   | 2026-03-28 |
 | 11. Security Hardening | 0/TBD | Not started | - |
