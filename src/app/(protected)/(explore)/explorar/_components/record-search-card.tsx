@@ -22,11 +22,9 @@ function getRarityColors(tier: string | null): string {
 
 interface RecordSearchCardProps {
 	release: SearchResult;
-	p2pEnabled?: boolean;
-	currentUserId?: string;
 }
 
-export function RecordSearchCard({ release, p2pEnabled, currentUserId }: RecordSearchCardProps) {
+export function RecordSearchCard({ release }: RecordSearchCardProps) {
 	const rarityTier = getRarityTier(release.rarityScore);
 	const [isReviewsExpanded, setIsReviewsExpanded] = useState(false);
 	const [reviewCount, setReviewCount] = useState<number | null>(null);
@@ -100,7 +98,7 @@ export function RecordSearchCard({ release, p2pEnabled, currentUserId }: RecordS
 			</div>
 
 			{/* Owners List */}
-			<OwnersList owners={release.owners} p2pEnabled={p2pEnabled} currentUserId={currentUserId} />
+			<OwnersList owners={release.owners} />
 
 			{/* Review trigger */}
 			{reviewCount !== null && (

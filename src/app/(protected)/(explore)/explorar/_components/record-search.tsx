@@ -5,12 +5,7 @@ import { searchRecordsAction } from "@/actions/discovery";
 import type { SearchResult } from "@/lib/discovery/queries";
 import { RecordSearchCard } from "./record-search-card";
 
-interface RecordSearchProps {
-	p2pEnabled: boolean;
-	currentUserId: string;
-}
-
-export function RecordSearch({ p2pEnabled, currentUserId }: RecordSearchProps) {
+export function RecordSearch() {
 	const [query, setQuery] = useState("");
 	const [results, setResults] = useState<SearchResult[]>([]);
 	const [searched, setSearched] = useState(false);
@@ -81,7 +76,7 @@ export function RecordSearch({ p2pEnabled, currentUserId }: RecordSearchProps) {
 					</div>
 					<div className="space-y-3">
 						{results.map((release) => (
-							<RecordSearchCard key={release.id} release={release} p2pEnabled={p2pEnabled} currentUserId={currentUserId} />
+							<RecordSearchCard key={release.id} release={release} />
 						))}
 					</div>
 				</>
