@@ -3,6 +3,7 @@ import {
 	sliceFileIntoChunks,
 	reassembleChunks,
 	calculateTransferStats,
+	isValidChunkIndex,
 	CHUNK_SIZE,
 } from "@/lib/webrtc/chunked-transfer";
 
@@ -51,5 +52,69 @@ describe("chunked-transfer", () => {
 		expect(stats.eta).toBeGreaterThan(1);
 		expect(stats.eta).toBeLessThan(3);
 		expect(stats.speed).toBeGreaterThan(200_000);
+	});
+});
+
+describe("sliceFileIntoChunks bounds validation", () => {
+	it("getChunk(-1) throws RangeError", async () => {
+		const fileSize = CHUNK_SIZE * 3;
+		const blob = new Blob([new ArrayBuffer(fileSize)]);
+		const file = new File([blob], "test.flac", { type: "audio/flac" });
+		const { getChunk } = sliceFileIntoChunks(file);
+
+		await expect(getChunk(-1)).rejects.toThrow(RangeError);
+	});
+
+	it("getChunk(totalChunks) throws RangeError (off by one)", async () => {
+		const fileSize = CHUNK_SIZE * 3;
+		const blob = new Blob([new ArrayBuffer(fileSize)]);
+		const file = new File([blob], "test.flac", { type: "audio/flac" });
+		const { totalChunks, getChunk } = sliceFileIntoChunks(file);
+
+		await expect(getChunk(totalChunks)).rejects.toThrow(RangeError);
+	});
+
+	it("getChunk(totalChunks - 1) succeeds (last valid index)", async () => {
+		const fileSize = CHUNK_SIZE * 3;
+		const blob = new Blob([new ArrayBuffer(fileSize)]);
+		const file = new File([blob], "test.flac", { type: "audio/flac" });
+		const { totalChunks, getChunk } = sliceFileIntoChunks(file);
+
+		const chunk = await getChunk(totalChunks - 1);
+		expect(chunk).toBeInstanceOf(ArrayBuffer);
+	});
+});
+
+describe("isValidChunkIndex", () => {
+	it("returns false for negative index", () => {
+		expect(isValidChunkIndex(-1, 10)).toBe(false);
+	});
+
+	it("returns false for NaN index", () => {
+		expect(isValidChunkIndex(Number.NaN, 10)).toBe(false);
+	});
+
+	it("returns false for float index", () => {
+		expect(isValidChunkIndex(1.5, 10)).toBe(false);
+	});
+
+	it("returns false for index >= total", () => {
+		expect(isValidChunkIndex(10, 10)).toBe(false);
+		expect(isValidChunkIndex(11, 10)).toBe(false);
+	});
+
+	it("returns false for total <= 0", () => {
+		expect(isValidChunkIndex(0, 0)).toBe(false);
+		expect(isValidChunkIndex(0, -1)).toBe(false);
+	});
+
+	it("returns false for non-integer total", () => {
+		expect(isValidChunkIndex(0, 1.5)).toBe(false);
+	});
+
+	it("returns true for valid index within range", () => {
+		expect(isValidChunkIndex(0, 10)).toBe(true);
+		expect(isValidChunkIndex(5, 10)).toBe(true);
+		expect(isValidChunkIndex(9, 10)).toBe(true);
 	});
 });
