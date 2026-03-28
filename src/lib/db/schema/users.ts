@@ -5,6 +5,7 @@ import {
   text,
   timestamp,
   boolean,
+  jsonb,
 } from "drizzle-orm/pg-core";
 import { pgPolicy } from "drizzle-orm/pg-core";
 import { sql } from "drizzle-orm";
@@ -36,6 +37,7 @@ export const profiles = pgTable(
     discogsUrl:    text("discogs_url"),
     beatportUrl:   text("beatport_url"),
     tradesTosAcceptedAt: timestamp("trades_tos_accepted_at", { withTimezone: true }),
+    holyGrailIds: jsonb("holy_grail_ids").$type<string[]>().default([]),
     twoFactorEnabled: boolean("two_factor_enabled").default(false).notNull(),
     subscriptionTier: varchar("subscription_tier", { length: 20 })
       .default("free")

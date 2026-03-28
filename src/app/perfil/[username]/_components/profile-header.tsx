@@ -1,6 +1,6 @@
 import Link from "next/link";
 import type { UserRanking, UserBadge } from "@/lib/gamification/queries";
-import type { TradeReputation } from "@/lib/trades/queries";
+import { TrustStrip } from "@/components/trust/trust-strip";
 import { FollowButton } from "./follow-button";
 
 interface ProfileHeaderProps {
@@ -17,7 +17,6 @@ interface ProfileHeaderProps {
 	collectionCount: number;
 	ranking: UserRanking | null;
 	badges: UserBadge[];
-	tradeReputation?: TradeReputation;
 	isAuthenticated?: boolean;
 }
 
@@ -28,7 +27,6 @@ export function ProfileHeader({
 	collectionCount,
 	ranking,
 	badges,
-	tradeReputation,
 	isAuthenticated = true,
 }: ProfileHeaderProps) {
 	const displayName = (profile.displayName || "DIGGER").toUpperCase();
@@ -84,16 +82,10 @@ export function ProfileHeader({
 							</>
 						)}
 					</p>
-					{/* Trade reputation stat */}
-					{tradeReputation && tradeReputation.totalTrades > 0 && (
-						<p className="font-mono text-[10px] text-on-surface-variant mt-1">
-							TRADES: <span className="text-primary">{tradeReputation.totalTrades}</span>
-							{" . "}
-							AVG: <span className="text-secondary">{tradeReputation.averageRating?.toFixed(1) ?? "N/A"}</span>
-							{" "}
-							<span className="material-symbols-outlined text-secondary text-[14px] align-middle">star</span>
-						</p>
-					)}
+					{/* TrustStrip — replaces single-line trade stat */}
+					<div className="mt-1">
+						<TrustStrip userId={profile.id} variant="compact" />
+					</div>
 
 					{profile.bio && (
 						<p className="text-sm text-on-surface-variant mt-1 max-w-md">
