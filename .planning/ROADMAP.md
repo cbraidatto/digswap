@@ -226,16 +226,22 @@ Plans:
   8. Free users limited to 5 trades/month with visible counter; premium users have no limit
 **Plans**: TBD
 
-### Phase 10: Monetization
-**Goal**: Users can subscribe to a premium tier that unlocks enhanced features while free-tier users retain full social functionality
+### Phase 10: Positioning, Radar & Workspace
+**Goal**: Transform DigSwap from generic social feed into active hunting tool with ADR-001 positioning, public profiles, Radar home, trust display, and acquisition links
 **Depends on**: Phase 9
-**Requirements**: MON-01, MON-02, MON-03, MON-04, MON-05, MON-06, MON-07
+**Requirements**: ADR-001, IDENTITY-01, WORKSPACE-01
 **Success Criteria** (what must be TRUE):
-  1. Free-tier user is limited to 5 P2P trades per month and sees their remaining count
-  2. User can subscribe to premium via Stripe (monthly or annual) and immediately access premium features
-  3. Premium user can access collection analytics, create/join premium-only groups, and get priority wantlist matching
-  4. User can cancel their premium subscription and retains access until the end of the billing period
-**Plans**: TBD
+  1. Landing page reflects ADR-001 positioning with no "social network" or "P2P audio" copy
+  2. Public profiles accessible without login for acquisition links to work
+  3. Radar section on home feed shows wantlist matches
+  4. Trust display and acquisition links (Bounty Link, Rarity Card) functional
+**Plans**: 5 plans
+Plans:
+- [x] 10-01-PLAN.md -- P0 unblocking: landing page rewrite, public profile ungate, Discogs lock, REQUEST_TRADE removal
+- [ ] 10-02-PLAN.md -- TBD
+- [ ] 10-03-PLAN.md -- TBD
+- [ ] 10-04-PLAN.md -- TBD
+- [ ] 10-05-PLAN.md -- TBD
 **UI hint**: yes
 
 ### Phase 11: Security Hardening
@@ -265,5 +271,5 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7 -> 8 -> 9 -> 10
 | 7. Community + Reviews | 5/5 | Complete   | 2026-03-26 |
 | 8. Gamification + Rankings | 0/5 | Planned | - |
 | 9. P2P Audio Trading | 2/6 | In Progress | - |
-| 10. Monetization | 0/TBD | Not started | - |
+| 10. Positioning, Radar & Workspace | 1/5 | In Progress | - |
 | 11. Security Hardening | 0/TBD | Not started | - |
