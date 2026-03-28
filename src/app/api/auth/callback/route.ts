@@ -2,6 +2,22 @@ import { createClient } from "@/lib/supabase/server";
 import { NextResponse } from "next/server";
 
 /**
+ * Validates a redirect path to prevent open redirect attacks.
+ * - Must start with "/"
+ * - Must NOT start with "//" (protocol-relative)
+ * - Must NOT contain "://" (absolute URL with protocol)
+ * Falls back to /onboarding if validation fails.
+ */
+function validateRedirectPath(next: string | null): string {
+	const fallback = "/onboarding";
+	if (!next) return fallback;
+	if (!next.startsWith("/") || next.startsWith("//") || next.includes("://")) {
+		return fallback;
+	}
+	return next;
+}
+
+/**
  * OAuth and email verification callback handler.
  *
  * Handles BOTH:
@@ -14,7 +30,7 @@ import { NextResponse } from "next/server";
 export async function GET(request: Request) {
 	const { searchParams, origin } = new URL(request.url);
 	const code = searchParams.get("code");
-	const next = searchParams.get("next") ?? "/onboarding";
+	const next = validateRedirectPath(searchParams.get("next"));
 
 	if (code) {
 		const supabase = await createClient();

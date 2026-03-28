@@ -1,4 +1,5 @@
 import type { Metadata, Viewport } from "next";
+import { headers } from "next/headers";
 import { Inter, Space_Grotesk, JetBrains_Mono } from "next/font/google";
 import { Toaster } from "@/components/ui/sonner";
 import { ThemeProvider } from "@/components/theme-provider";
@@ -34,11 +35,13 @@ export const viewport: Viewport = {
 	viewportFit: "cover",
 };
 
-export default function RootLayout({
+export default async function RootLayout({
 	children,
 }: Readonly<{
 	children: React.ReactNode;
 }>) {
+	const nonce = (await headers()).get("x-nonce") ?? "";
+
 	return (
 		<html
 			lang="en"
@@ -54,6 +57,7 @@ export default function RootLayout({
 				/>
 				{/* Prevent theme flash on load */}
 				<script
+					nonce={nonce}
 					dangerouslySetInnerHTML={{
 						__html: `try{var t=localStorage.getItem('app-theme');if(t)document.documentElement.setAttribute('data-theme',t)}catch(e){}`,
 					}}

@@ -143,6 +143,11 @@ export function TotpSetup({ onComplete }: { onComplete?: () => void }) {
 					<div
 						className="rounded-lg bg-white p-3"
 						// biome-ignore lint/security/noDangerouslySetInnerHtml: QR code SVG from Supabase MFA enrollment API
+						// TODO: Wire nonce for CSP compliance. This is a Client Component so headers() is unavailable.
+						// The SVG content is trusted (from Supabase MFA API). Options: pass nonce as prop from
+						// server parent, or use useRef + useEffect to set nonce attribute post-mount. Low priority
+						// since dangerouslySetInnerHTML renders a div (not script/style), so CSP script-src nonce
+						// does not apply here.
 						dangerouslySetInnerHTML={{ __html: enrollment.qrCode }}
 					/>
 					<p className="text-center text-sm text-muted-foreground">

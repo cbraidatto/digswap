@@ -25,18 +25,7 @@ const securityHeaders = [
 		key: "Permissions-Policy",
 		value: "camera=(), microphone=(), geolocation=()",
 	},
-	{
-		key: "Content-Security-Policy",
-		value: [
-			"default-src 'self'",
-			"script-src 'self' 'unsafe-inline' 'unsafe-eval'",
-			"style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
-			"img-src 'self' data: https:",
-			"font-src 'self' https://fonts.gstatic.com https://fonts.googleapis.com",
-			"connect-src 'self' https://*.supabase.co wss://*.supabase.co https://0.peerjs.com wss://0.peerjs.com",
-			"frame-ancestors 'none'",
-		].join("; "),
-	},
+	// CSP is now handled dynamically by middleware (nonce-based, per-request)
 ];
 
 const nextConfig: NextConfig = {
