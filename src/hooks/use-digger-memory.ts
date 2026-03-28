@@ -1,24 +1,30 @@
 "use client";
 
-import useSWR from "swr";
+import { useState, useEffect, useCallback } from "react";
 import { getLead, saveLead } from "@/actions/leads";
-import type { LeadStatus, LeadTargetType } from "@/lib/db/schema/leads";
+import type { Lead, LeadStatus, LeadTargetType } from "@/lib/db/schema/leads";
 
 export function useDiggerMemory(type: LeadTargetType, id: string) {
-  const key = ["lead", type, id];
+  const [lead, setLead] = useState<Lead | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
 
-  const {
-    data: lead,
-    mutate,
-    isLoading,
-  } = useSWR(key, () => getLead(type, id), {
-    revalidateOnFocus: false,
-  });
+  useEffect(() => {
+    let cancelled = false;
+    setIsLoading(true);
+    getLead(type, id).then((result) => {
+      if (!cancelled) {
+        setLead(result ?? null);
+        setIsLoading(false);
+      }
+    });
+    return () => { cancelled = true; };
+  }, [type, id]);
 
-  const save = async (note: string | null, status: LeadStatus) => {
+  const save = useCallback(async (note: string | null, status: LeadStatus) => {
     await saveLead(type, id, note, status);
-    mutate();
-  };
+    const updated = await getLead(type, id);
+    setLead(updated ?? null);
+  }, [type, id]);
 
-  return { lead: lead ?? null, save, isLoading };
+  return { lead, save, isLoading };
 }
