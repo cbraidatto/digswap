@@ -137,17 +137,20 @@ export async function acceptTrade(tradeId: string): Promise<{ success?: boolean;
 		return { error: "Trade is not in pending status" };
 	}
 
-	// Update status
-	const { error: updateError } = await admin
+	// Update status (optimistic concurrency: only if status unchanged)
+	const { data: updated, error: updateError } = await admin
 		.from("trade_requests")
 		.update({
 			status: TRADE_STATUS.ACCEPTED,
 			updated_at: new Date().toISOString(),
 		})
-		.eq("id", tradeId);
+		.eq("id", tradeId)
+		.eq("status", TRADE_STATUS.PENDING)
+		.select("id")
+		.single();
 
-	if (updateError) {
-		return { error: "Failed to accept trade" };
+	if (updateError || !updated) {
+		return { error: "Trade was modified by another request" };
 	}
 
 	// Notify requester
@@ -190,16 +193,20 @@ export async function declineTrade(
 		return { error: "Trade is not in pending status" };
 	}
 
-	const { error: updateError } = await admin
+	// Update status (optimistic concurrency: only if status unchanged)
+	const { data: updated, error: updateError } = await admin
 		.from("trade_requests")
 		.update({
 			status: TRADE_STATUS.DECLINED,
 			updated_at: new Date().toISOString(),
 		})
-		.eq("id", tradeId);
+		.eq("id", tradeId)
+		.eq("status", TRADE_STATUS.PENDING)
+		.select("id")
+		.single();
 
-	if (updateError) {
-		return { error: "Failed to decline trade" };
+	if (updateError || !updated) {
+		return { error: "Trade was modified by another request" };
 	}
 
 	// Notify requester
@@ -240,16 +247,20 @@ export async function cancelTrade(tradeId: string): Promise<{ success?: boolean;
 		return { error: "Trade is not in pending status" };
 	}
 
-	const { error: updateError } = await admin
+	// Update status (optimistic concurrency: only if status unchanged)
+	const { data: updated, error: updateError } = await admin
 		.from("trade_requests")
 		.update({
 			status: TRADE_STATUS.CANCELLED,
 			updated_at: new Date().toISOString(),
 		})
-		.eq("id", tradeId);
+		.eq("id", tradeId)
+		.eq("status", TRADE_STATUS.PENDING)
+		.select("id")
+		.single();
 
-	if (updateError) {
-		return { error: "Failed to cancel trade" };
+	if (updateError || !updated) {
+		return { error: "Trade was modified by another request" };
 	}
 
 	// Notify provider
@@ -301,16 +312,20 @@ export async function updateTradeStatus(
 		return { error: `Cannot transition from ${trade.status} to ${newStatus}` };
 	}
 
-	const { error: updateError } = await admin
+	// Update status (optimistic concurrency: only if status unchanged)
+	const { data: updated, error: updateError } = await admin
 		.from("trade_requests")
 		.update({
 			status: newStatus,
 			updated_at: new Date().toISOString(),
 		})
-		.eq("id", tradeId);
+		.eq("id", tradeId)
+		.eq("status", trade.status)
+		.select("id")
+		.single();
 
-	if (updateError) {
-		return { error: "Failed to update trade status" };
+	if (updateError || !updated) {
+		return { error: "Trade was modified by another request" };
 	}
 
 	return { success: true };

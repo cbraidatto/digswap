@@ -98,11 +98,17 @@ export async function consumeBackupCode(
 	for (const row of unusedCodes) {
 		const isMatch = await verifyBackupCode(code, row.codeHash);
 		if (isMatch) {
-			// Mark as used
-			await db
+			// Atomic claim: WHERE id = ? AND used = false (compare-and-swap)
+			const result = await db
 				.update(backupCodes)
 				.set({ used: true, usedAt: new Date() })
-				.where(eq(backupCodes.id, row.id));
+				.where(and(eq(backupCodes.id, row.id), eq(backupCodes.used, false)))
+				.returning({ id: backupCodes.id });
+
+			if (result.length === 0) {
+				// Another request already consumed this code -- try next
+				continue;
+			}
 
 			return {
 				success: true,
