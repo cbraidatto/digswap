@@ -357,10 +357,11 @@ export async function completeTrade(
 		return { error: "Not a participant in this trade" };
 	}
 
-	// Must be in transferring or accepted state
+	// Must be in transferring, accepted, or completed state
 	if (
 		trade.status !== TRADE_STATUS.TRANSFERRING &&
-		trade.status !== TRADE_STATUS.ACCEPTED
+		trade.status !== TRADE_STATUS.ACCEPTED &&
+		trade.status !== TRADE_STATUS.COMPLETED
 	) {
 		return { error: "Trade is not in an active state" };
 	}

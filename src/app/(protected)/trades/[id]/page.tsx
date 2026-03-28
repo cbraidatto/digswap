@@ -179,11 +179,15 @@ export default async function TradePage({
 	// Active trade: accepted or transferring — show the lobby
 	const iceServers = await getTurnCredentials();
 
+	const counterpartyId =
+		role === "sender" ? trade.providerId : trade.requesterId;
+
 	return (
 		<div className="max-w-2xl mx-auto px-4 md:px-8 py-16 text-center">
 			<TradeLobby
 				tradeId={trade.id}
 				userId={user.id}
+				counterpartyId={counterpartyId}
 				role={role}
 				iceServers={iceServers}
 				counterpartyUsername={trade.counterpartyUsername ?? "user"}

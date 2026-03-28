@@ -66,6 +66,7 @@ function buildPeerId(tradeId: string, odUserId: string): string {
 export function usePeerConnection(
 	tradeId: string,
 	userId: string,
+	counterpartyId: string,
 	role: "sender" | "receiver",
 	iceServers: RTCIceServer[],
 	file?: File,
@@ -83,47 +84,7 @@ export function usePeerConnection(
 	const lastProgressUpdateRef = useRef<number>(0);
 
 	// -----------------------------------------------------------------------
-	// Initialize peer
-	// -----------------------------------------------------------------------
-
-	const initPeer = useCallback(() => {
-		// Cleanup any existing peer
-		if (peerRef.current) {
-			peerRef.current.destroy();
-		}
-
-		setState({ ...INITIAL_STATE, status: "idle" });
-
-		const peerId = buildPeerId(tradeId, userId);
-		const peer = new Peer(peerId, {
-			config: { iceServers },
-			debug: 0,
-		});
-
-		peerRef.current = peer;
-
-		peer.on("open", () => {
-			setState((prev) => ({ ...prev, status: "waiting" }));
-		});
-
-		peer.on("error", (err) => {
-			setState((prev) => ({
-				...prev,
-				status: "failed",
-				error: err.message || "Peer connection error",
-			}));
-		});
-
-		// Handle incoming connections (receiver receives connection from sender)
-		peer.on("connection", (conn) => {
-			connRef.current = conn;
-			setState((prev) => ({ ...prev, status: "connecting" }));
-			setupDataConnection(conn);
-		});
-	}, [tradeId, userId, iceServers]); // eslint-disable-line react-hooks/exhaustive-deps
-
-	// -----------------------------------------------------------------------
-	// Setup data connection listeners
+	// Setup data connection listeners (defined first — used by initPeer)
 	// -----------------------------------------------------------------------
 
 	const setupDataConnection = useCallback(
@@ -209,21 +170,80 @@ export function usePeerConnection(
 	);
 
 	// -----------------------------------------------------------------------
-	// Connect to counterpart (sender initiates connection to receiver)
+	// Initialize peer
 	// -----------------------------------------------------------------------
 
-	const connectToCounterpart = useCallback(
-		(counterpartPeerId: string) => {
-			const peer = peerRef.current;
-			if (!peer) return;
+	const initPeer = useCallback(() => {
+		// Cleanup any existing peer
+		if (peerRef.current) {
+			peerRef.current.destroy();
+		}
 
-			const conn = peer.connect(counterpartPeerId, { reliable: true });
+		setState({ ...INITIAL_STATE, status: "idle" });
+
+		const peerId = buildPeerId(tradeId, userId);
+		const peer = new Peer(peerId, {
+			config: { iceServers },
+			debug: 0,
+		});
+
+		peerRef.current = peer;
+
+		peer.on("open", (_id) => {
+			setState((prev) => ({ ...prev, status: "waiting" }));
+
+			// Sender initiates connection to receiver, with retry on peer-unavailable
+			if (role === "sender") {
+				const receiverPeerId = buildPeerId(tradeId, counterpartyId);
+				let retryCount = 0;
+				const MAX_RETRIES = 10;
+				const RETRY_DELAY_MS = 2000;
+
+				const attemptConnect = () => {
+					if (!peerRef.current || retryCount >= MAX_RETRIES) return;
+					const conn = peer.connect(receiverPeerId, { reliable: true });
+					connRef.current = conn;
+					setupDataConnection(conn);
+				};
+
+				// Listen for peer-unavailable to retry
+				const onPeerError = (err: { type?: string; message?: string }) => {
+					if (err.type === "peer-unavailable" && retryCount < MAX_RETRIES) {
+						retryCount++;
+						setTimeout(attemptConnect, RETRY_DELAY_MS);
+					} else if (err.type !== "peer-unavailable") {
+						peer.off("error", onPeerError as Parameters<typeof peer.on>[1]);
+						setState((prev) => ({
+							...prev,
+							status: "failed",
+							error: err.message || "Peer connection error",
+						}));
+					}
+				};
+
+				peer.on("error", onPeerError as Parameters<typeof peer.on>[1]);
+				attemptConnect();
+			}
+		});
+
+		peer.on("error", (err) => {
+			const e = err as { type?: string; message?: string };
+			if (e.type !== "peer-unavailable") {
+				setState((prev) => ({
+					...prev,
+					status: "failed",
+					error: e.message || "Peer connection error",
+				}));
+			}
+		});
+
+		// Handle incoming connections (receiver receives connection from sender)
+		peer.on("connection", (conn) => {
 			connRef.current = conn;
 			setState((prev) => ({ ...prev, status: "connecting" }));
 			setupDataConnection(conn);
-		},
-		[setupDataConnection],
-	);
+		});
+	}, [tradeId, userId, counterpartyId, role, iceServers, setupDataConnection]); // eslint-disable-line react-hooks/exhaustive-deps
 
 	// -----------------------------------------------------------------------
 	// Send file (sender only)

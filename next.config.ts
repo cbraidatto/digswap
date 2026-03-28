@@ -33,7 +33,7 @@ const securityHeaders = [
 			"style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
 			"img-src 'self' data: https:",
 			"font-src 'self' https://fonts.gstatic.com https://fonts.googleapis.com",
-			"connect-src 'self' https://*.supabase.co wss://*.supabase.co",
+			"connect-src 'self' https://*.supabase.co wss://*.supabase.co https://0.peerjs.com wss://0.peerjs.com",
 			"frame-ancestors 'none'",
 		].join("; "),
 	},
