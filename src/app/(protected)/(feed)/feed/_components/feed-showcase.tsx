@@ -6,42 +6,42 @@ const SHOWCASE_ITEMS = [
 	{
 		id: "most-wanted",
 		category: "WANTLIST",
-		title: "Discos Mais Procurados",
-		subtitle: "Os registros que todo digger caça",
-		image: "https://picsum.photos/seed/vinyl-wanted/520/680",
+		title: "Most Wanted Records",
+		subtitle: "The records every digger hunts",
 		accent: "#e8a427",
+		icon: "favorite",
 	},
 	{
 		id: "valuable-trades",
-		category: "MERCADO",
-		title: "Trocas Mais Valiosas",
-		subtitle: "Movimentações raras da semana",
-		image: "https://picsum.photos/seed/vinyl-trade/520/680",
+		category: "TRADES",
+		title: "Notable Trades",
+		subtitle: "Rare movements this week",
 		accent: "#c0392b",
+		icon: "swap_horiz",
 	},
 	{
 		id: "rarest-now",
-		category: "RARIDADE",
-		title: "Mais Raros do Momento",
-		subtitle: "Score máximo, cópias mínimas",
-		image: "https://picsum.photos/seed/vinyl-rare/520/680",
+		category: "RARITY",
+		title: "Rarest Right Now",
+		subtitle: "Max score, minimum copies",
 		accent: "#2980b9",
+		icon: "diamond",
 	},
 	{
 		id: "featured-diggers",
-		category: "COMUNIDADE",
-		title: "Diggers em Destaque",
-		subtitle: "Coleções que valem o follow",
-		image: "https://picsum.photos/seed/vinyl-digger/520/680",
+		category: "COMMUNITY",
+		title: "Featured Diggers",
+		subtitle: "Collections worth a follow",
 		accent: "#27ae60",
+		icon: "person_search",
 	},
 	{
 		id: "new-arrivals",
-		category: "DESCOBERTA",
-		title: "Novas Chegadas",
-		subtitle: "Adicionados nos últimos 7 dias",
-		image: "https://picsum.photos/seed/vinyl-new/520/680",
+		category: "DISCOVERY",
+		title: "New Arrivals",
+		subtitle: "Added in the last 7 days",
 		accent: "#8e44ad",
+		icon: "new_releases",
 	},
 ];
 
@@ -95,10 +95,10 @@ export function FeedShowcase() {
 			{/* Header */}
 			<div className="px-4 md:px-8 mb-4 flex items-center justify-between">
 				<span className="font-mono text-[10px] uppercase tracking-[0.2em] text-on-surface-variant">
-					em_destaque
+					featured
 				</span>
 				<span className="font-mono text-[10px] text-outline">
-					// vitrine do feed
+					// feed showcase
 				</span>
 			</div>
 
@@ -129,15 +129,14 @@ export function FeedShowcase() {
 							<div
 								// biome-ignore lint/suspicious/noArrayIndexKey: intentional duplicate for marquee loop
 								key={`${item.id}-${i}`}
-								className="relative flex-shrink-0 w-[220px] h-[300px] rounded overflow-hidden group"
+								className="relative flex-shrink-0 w-[220px] h-[300px] rounded overflow-hidden group bg-surface-container-high"
 							>
-								{/* Image */}
-								<img
-									src={item.image}
-									alt={item.title}
-									draggable={false}
-									className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-								/>
+								{/* Ghost Protocol placeholder — icon on dark surface */}
+								<div className="absolute inset-0 flex items-center justify-center opacity-10">
+									<span className="material-symbols-outlined text-on-surface" style={{ fontSize: "96px" }}>
+										{item.icon}
+									</span>
+								</div>
 
 								{/* Gradient overlay */}
 								<div className="absolute inset-0 bg-gradient-to-t from-black via-black/55 to-black/10" />
