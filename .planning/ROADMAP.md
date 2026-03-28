@@ -22,7 +22,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 7: Community + Reviews** - Genre/era groups, group activity feeds, pressing and release reviews (completed 2026-03-26)
 - [ ] **Phase 8: Gamification + Rankings** - Global/genre leaderboards, badges, titles, composite ranking formula
 - [ ] **Phase 9: P2P Audio Trading** - DMCA compliance, WebRTC file transfer, trade reputation, TURN relay
-- [ ] **Phase 10: Monetization** - Stripe subscription, freemium gating, premium tier features
+- [ ] **Phase 10: Positioning, Radar & Workspace Foundation** - Repositioned landing, The Radar as hero feature, public acquisition surfaces, Digger Memory primitives
 - [ ] **Phase 11: Security Hardening** - OWASP API coverage, security test suite, penetration testing
 
 ## Phase Details
@@ -226,16 +226,28 @@ Plans:
   8. Free users limited to 5 trades/month with visible counter; premium users have no limit
 **Plans**: TBD
 
-### Phase 10: Monetization
-**Goal**: Users can subscribe to a premium tier that unlocks enhanced features while free-tier users retain full social functionality
+### Phase 10: Positioning, Radar & Workspace Foundation
+**Goal**: Transform DigSwap from a generic social feed into a serious digger's active hunting tool — repositioned landing, The Radar as named hero feature, public identity surfaces for viral acquisition, and the minimum workspace layer (Digger Memory primitives + wantlist-filtered crate browsing)
 **Depends on**: Phase 9
-**Requirements**: MON-01, MON-02, MON-03, MON-04, MON-05, MON-06, MON-07
+**Requirements**: ADR-001, RADAR-01, RADAR-02, IDENTITY-01, IDENTITY-02, IDENTITY-03, IDENTITY-04, WORKSPACE-01, WORKSPACE-02, WORKSPACE-03
 **Success Criteria** (what must be TRUE):
-  1. Free-tier user is limited to 5 P2P trades per month and sees their remaining count
-  2. User can subscribe to premium via Stripe (monthly or annual) and immediately access premium features
-  3. Premium user can access collection analytics, create/join premium-only groups, and get priority wantlist matching
-  4. User can cancel their premium subscription and retains access until the end of the billing period
-**Plans**: TBD
+  1. Landing page contains no instance of "social network" or "audio rip" — uses new ADR-001 positioning
+  2. Logged-in home shows RadarSection above the feed with real wantlist matches from the network
+  3. /perfil/[username] loads without authentication (public, server-rendered, SEO-indexable)
+  4. Onboarding has no Discogs skip button — sync is mandatory with non-blocking progress flow
+  5. /u/[username]/bounty is publicly accessible, shows up to 3 Holy Grails, and has account-creation CTA for non-users
+  6. Rarity Score Card OG image generates at /api/og/rarity/[username] and is shareable from profile
+  7. Visiting another user's collection shows a wantlist intersection section above the CollectionGrid when matches exist
+  8. Trust display block (response rate, completion rate, avg quality, trade count) appears on all profiles
+  9. No surface shows REQUEST_TRADE or REQUEST_AUDIO before profile context is established (P2P = mechanism not message)
+  10. Radar match cards have QuickNotePopover + status dropdown (watching/contacted) — Digger Memory minimum
+**Plans**: 5 plans
+Plans:
+- [ ] 10-01-PLAN.md -- Sprint 0: P0 unblocking — landing page rewrite, remove REQUEST_TRADE from owners-list, ungate public profile, lock Discogs onboarding step, copy sweep
+- [ ] 10-02-PLAN.md -- Sprint 0.5: leads schema migration + all 6 primitive components (LeadAction, QuickNotePopover, ContextTooltip, TrustStrip, ShareSurface, useDiggerMemory hook) + server actions
+- [ ] 10-03-PLAN.md -- Sprint 1: RadarSection + RadarEmptyState + feed page modification (SIGNAL_BOARD) + /radar route with rarity filters
+- [ ] 10-04-PLAN.md -- Sprint 2: TrustStrip injection into profile headers + holy_grail_ids schema + Bounty Link public page + Rarity Score Card OG image + own profile sharing controls
+- [ ] 10-05-PLAN.md -- Sprint 3: WantlistMatchSection + CollectionGrid filterToIds prop + other user profile integration + P2P surface cleanup audit
 **UI hint**: yes
 
 ### Phase 11: Security Hardening
@@ -265,5 +277,5 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7 -> 8 -> 9 -> 10
 | 7. Community + Reviews | 5/5 | Complete   | 2026-03-26 |
 | 8. Gamification + Rankings | 0/5 | Planned | - |
 | 9. P2P Audio Trading | 2/6 | In Progress | - |
-| 10. Monetization | 0/TBD | Not started | - |
+| 10. Positioning, Radar & Workspace Foundation | 0/5 | Planned | - |
 | 11. Security Hardening | 0/TBD | Not started | - |
