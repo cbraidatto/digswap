@@ -19,7 +19,7 @@ import { OnboardingComplete } from "@/components/onboarding/onboarding-complete"
  * Step flow:
  * 1. Profile setup (display name + avatar)
  * 2. Security setup (2FA suggestion, skippable)
- * 3. Discogs connection (placeholder, skippable)
+ * 3. Discogs connection (non-skippable — must connect to proceed)
  * 4. Completion screen
  *
  * Supports ?step=N query param for returning from /onboarding/2fa.
@@ -67,7 +67,7 @@ export default function OnboardingPage() {
 			case 2:
 				return <SecuritySetup onSkip={() => setCurrentStep(3)} />;
 			case 3:
-				return <DiscogsConnect onSkip={() => setCurrentStep(4)} />;
+				return <DiscogsConnect />;
 			case 4:
 				return <OnboardingComplete />;
 			default:

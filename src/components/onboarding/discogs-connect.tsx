@@ -7,23 +7,14 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { connectDiscogs } from "@/actions/discogs";
 
-interface DiscogsConnectProps {
-	onSkip: () => void;
-}
-
 /**
  * Onboarding Step 3: Discogs connection.
  *
- * Per UI-SPEC:
- * - Title: "Connect Discogs"
- * - Body: "Link your Discogs account to import your collection and wantlist. You can always do this later."
- * - Primary CTA: "Connect Discogs" -- initiates OAuth 1.0a flow
- * - Secondary CTA: "Skip for Now" -> advances to completion
- *
- * Phase 3 activates the previously-disabled button with a real OAuth flow.
+ * Non-skippable step. User must connect Discogs to proceed.
  * The connectDiscogs server action redirects to Discogs for authorization.
+ * After OAuth, the import starts async and user proceeds to completion.
  */
-export function DiscogsConnect({ onSkip }: DiscogsConnectProps) {
+export function DiscogsConnect() {
 	const [isPending, startTransition] = useTransition();
 
 	const handleConnect = () => {
@@ -50,7 +41,7 @@ export function DiscogsConnect({ onSkip }: DiscogsConnectProps) {
 				</div>
 				<p className="text-center text-sm text-muted-foreground">
 					Link your Discogs account to import your collection and wantlist.
-					You can always do this later.
+					Your library powers the Radar.
 				</p>
 			</div>
 
@@ -70,13 +61,9 @@ export function DiscogsConnect({ onSkip }: DiscogsConnectProps) {
 					)}
 				</Button>
 
-				<Button
-					variant="ghost"
-					className="h-11 w-full"
-					onClick={onSkip}
-				>
-					Skip for Now
-				</Button>
+				<p className="font-mono text-[10px] text-on-surface-variant text-center mt-4">
+					<span className="text-tertiary">[REQUIRED]</span> // Connect Discogs to activate the Radar. Without Discogs, the Radar is blind.
+				</p>
 			</div>
 		</div>
 	);

@@ -6,11 +6,9 @@ import type { RecordOwner } from "@/lib/discovery/queries";
 
 interface OwnersListProps {
 	owners: RecordOwner[];
-	p2pEnabled?: boolean;
-	currentUserId?: string;
 }
 
-export function OwnersList({ owners, p2pEnabled = false, currentUserId }: OwnersListProps) {
+export function OwnersList({ owners }: OwnersListProps) {
 	const [expanded, setExpanded] = useState(false);
 
 	if (!owners || owners.length === 0) {
@@ -67,13 +65,13 @@ export function OwnersList({ owners, p2pEnabled = false, currentUserId }: Owners
 						</span>
 					)}
 
-					{/* Request Trade link */}
-					{p2pEnabled && currentUserId && owner.userId !== currentUserId && (
+					{/* View Profile link */}
+					{owner.username && (
 						<Link
-							href={`/trades/new?to=${owner.userId}&release=${owner.releaseId}`}
-							className="font-mono text-[10px] text-primary hover:underline ml-auto"
+							href={`/perfil/${owner.username}`}
+							className="font-mono text-[10px] text-on-surface-variant hover:text-primary transition-colors ml-auto"
 						>
-							REQUEST_TRADE
+							VIEW_PROFILE &rarr;
 						</Link>
 					)}
 				</div>

@@ -26,8 +26,8 @@ const jetbrainsMono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-	title: "DigSwap",
-	description: "A social network for vinyl diggers",
+	title: "DigSwap — Find who has the record you're hunting",
+	description: "The discovery layer serious diggers have been missing. Connect your Discogs library, find who owns your Holy Grails, and organize the hunt.",
 };
 
 export const viewport: Viewport = {

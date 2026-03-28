@@ -1,5 +1,6 @@
 import { eq } from "drizzle-orm";
 import { notFound, redirect } from "next/navigation";
+import Link from "next/link";
 import { db } from "@/lib/db";
 import { profiles } from "@/lib/db/schema/users";
 import { createClient } from "@/lib/supabase/server";
@@ -15,10 +16,10 @@ import { getFollowCounts, checkIsFollowing } from "@/lib/social/queries";
 import { getUserRanking, getUserBadges } from "@/lib/gamification/queries";
 import { isP2PEnabled } from "@/lib/trades/constants";
 import { getTradeReputation } from "@/lib/trades/queries";
-import { CollectionGrid } from "../_components/collection-grid";
-import { RequestAudioButton } from "../_components/request-audio-button";
-import { FilterBar } from "../_components/filter-bar";
-import { Pagination } from "../_components/pagination";
+import { CollectionGrid } from "../../(protected)/(profile)/perfil/_components/collection-grid";
+import { RequestAudioButton } from "../../(protected)/(profile)/perfil/_components/request-audio-button";
+import { FilterBar } from "../../(protected)/(profile)/perfil/_components/filter-bar";
+import { Pagination } from "../../(protected)/(profile)/perfil/_components/pagination";
 import { ProfileHeader } from "./_components/profile-header";
 
 interface PublicProfileProps {
@@ -32,13 +33,11 @@ export default async function PublicProfilePage({
 }: PublicProfileProps) {
 	const { username } = await params;
 
-	// Auth check
+	// Optional auth — no redirect on null
 	const supabase = await createClient();
 	const {
 		data: { user },
 	} = await supabase.auth.getUser();
-
-	if (!user) redirect("/signin");
 
 	// Lookup target profile
 	const [targetProfile] = await db
@@ -56,14 +55,14 @@ export default async function PublicProfilePage({
 
 	if (!targetProfile) notFound();
 
-	// Self-redirect: if viewing own profile, go to /perfil
-	if (user.id === targetProfile.id) redirect("/perfil");
+	// Self-redirect: if viewing own profile while logged in, go to /perfil
+	if (user && user.id === targetProfile.id) redirect("/perfil");
 
 	// Parse filters from search params
 	const rawParams = await searchParams;
 	const filters = collectionFilterSchema.parse(rawParams);
 
-	// Parallel data fetch
+	// Parallel data fetch — isFollowing only when authenticated
 	const [items, totalCount, genres, formats, followCounts, isFollowing, ranking, userBadgeData, tradeReputation] =
 		await Promise.all([
 			getCollectionPage(targetProfile.id, filters),
@@ -71,7 +70,7 @@ export default async function PublicProfilePage({
 			getUniqueGenres(targetProfile.id),
 			getUniqueFormats(targetProfile.id),
 			getFollowCounts(targetProfile.id),
-			checkIsFollowing(user.id, targetProfile.id),
+			user ? checkIsFollowing(user.id, targetProfile.id) : Promise.resolve(false),
 			getUserRanking(targetProfile.id),
 			getUserBadges(targetProfile.id),
 			getTradeReputation(targetProfile.id),
@@ -82,6 +81,16 @@ export default async function PublicProfilePage({
 
 	return (
 		<div className="max-w-7xl mx-auto px-4 md:px-6 py-8">
+			{/* Visitor CTA */}
+			{!user && (
+				<div className="mb-6 p-4 bg-surface-container-low border border-outline-variant/20 rounded font-mono text-[11px]">
+					<span className="text-tertiary">[VISITOR]</span>
+					<span className="text-on-surface-variant">{" "}// </span>
+					<span className="text-on-surface">Create an account to follow this digger and initiate trades.</span>
+					<Link href="/signup" className="ml-3 text-primary hover:underline">START_DIGGING &rarr;</Link>
+				</div>
+			)}
+
 			{/* Profile Header */}
 			<ProfileHeader
 				profile={targetProfile}
@@ -91,6 +100,7 @@ export default async function PublicProfilePage({
 				ranking={ranking}
 				badges={userBadgeData}
 				tradeReputation={tradeReputation}
+				isAuthenticated={!!user}
 			/>
 
 			{/* Collection Section */}
@@ -98,7 +108,7 @@ export default async function PublicProfilePage({
 				<div className="flex items-center justify-between mb-6">
 					<div>
 						<span className="text-[10px] font-mono text-primary tracking-[0.2em] uppercase">
-							Repository
+							Collection
 						</span>
 						<h2 className="text-2xl font-bold font-heading text-on-surface mt-1">
 							{(targetProfile.displayName || "Digger").replace(/\s+/g, "_")}
@@ -119,14 +129,14 @@ export default async function PublicProfilePage({
 				<CollectionGrid
 					items={items}
 					isOwner={false}
-					renderAction={(item) => (
+					renderAction={user ? (item) => (
 						<RequestAudioButton
 							userId={targetProfile.id}
 							releaseId={item.releaseId}
 							p2pEnabled={p2pEnabled}
 							isOwner={false}
 						/>
-					)}
+					) : undefined}
 				/>
 
 				{/* Pagination */}

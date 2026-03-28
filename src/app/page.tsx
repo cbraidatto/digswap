@@ -20,54 +20,55 @@ export default function Home() {
 					<span className="w-2 h-4 bg-primary blink inline-block" />
 				</div>
 
-				{/* Logo */}
-				<h1 className="font-heading text-4xl md:text-6xl font-extrabold tracking-tighter text-on-surface mb-4">
-					DIG<span className="text-primary">SWAP</span>
+				{/* Headline */}
+				<h1 className="font-heading text-4xl md:text-5xl font-extrabold tracking-tighter text-on-surface mb-8">
+					Stop waiting for your Holy Grails to go on sale.
+					<br />
+					Find the diggers who actually have them.
 				</h1>
 
-				<p className="text-on-surface-variant font-sans text-sm md:text-base mb-12">
-					A social network for vinyl diggers. Import your Discogs library, discover who has
-					what you&apos;re hunting for, and trade audio rips via secure P2P connections.
-				</p>
+				{/* Three monospace status lines */}
+				<div className="mb-12 space-y-2 text-left max-w-sm mx-auto">
+					<div className="font-mono text-[11px]">
+						<span className="text-primary">[RADAR_ACTIVE]</span>
+						<span className="text-on-surface-variant">{"    "}// wantlist matches across the network</span>
+					</div>
+					<div className="font-mono text-[11px]">
+						<span className="text-secondary">[COLLECTION_ID]</span>
+						<span className="text-on-surface-variant">{"   "}// your Discogs library, now discoverable</span>
+					</div>
+					<div className="font-mono text-[11px]">
+						<span className="text-tertiary">[TRUST_LAYER]</span>
+						<span className="text-on-surface-variant">{"    "}// verified diggers, real trades, real reputation</span>
+					</div>
+				</div>
 
 				{/* CTA card */}
 				<div className="w-full bg-surface-container-low rounded-xl overflow-hidden shadow-2xl border border-outline-variant/10 text-left">
 					<div className="h-1 bg-primary" />
 					<div className="p-6">
-						<div className="font-mono text-[10px] text-on-surface-variant mb-6 space-y-1">
-							<div>
-								<span className="text-tertiary">MISSION</span>
-								<span className="text-on-surface"> =&gt; </span>
-								<span className="text-secondary">&quot;find the record you&apos;ve been hunting&quot;</span>
-							</div>
-							<div>
-								<span className="text-tertiary">STATUS</span>
-								<span className="text-on-surface"> =&gt; </span>
-								<span className="text-primary">[BETA_ACTIVE]</span>
-							</div>
-						</div>
-
 						<div className="flex flex-col gap-3">
 							<Link
 								href="/signup"
 								className="w-full bg-primary-container text-on-primary-container font-mono font-bold py-3 rounded text-sm hover:brightness-110 transition-all flex items-center justify-center gap-2"
 							>
 								<span className="material-symbols-outlined text-sm">add_circle</span>
-								INITIALIZE_ACCOUNT
+								START_DIGGING
 							</Link>
 							<Link
 								href="/signin"
 								className="w-full bg-transparent text-on-surface-variant font-mono text-sm py-3 rounded hover:bg-surface-container-high transition-all flex items-center justify-center gap-2 border border-outline-variant/20"
 							>
 								<span className="material-symbols-outlined text-sm">login</span>
-								AUTHENTICATE
+								SIGN_IN
 							</Link>
 						</div>
 					</div>
 				</div>
 
-				<p className="mt-8 text-[10px] font-mono text-on-surface-variant/50">
-					Gamified rankings · P2P audio · Discogs integration
+				<p className="mt-8 font-mono text-[10px] text-on-surface-variant/50">
+					<span className="text-primary">[RADAR_ACTIVE]</span>{" "}
+					// wantlist matching for serious diggers
 				</p>
 			</div>
 		</div>
