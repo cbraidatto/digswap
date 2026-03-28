@@ -35,12 +35,6 @@ export const userRankings = pgTable(
       to: authenticatedRole,
       using: sql`true`, // All authenticated users can view rankings
     }),
-    pgPolicy("user_rankings_update_own", {
-      for: "update",
-      to: authenticatedRole,
-      using: sql`${table.userId} = ${authUid}`,
-      withCheck: sql`${table.userId} = ${authUid}`,
-    }),
     pgPolicy("user_rankings_insert_service", {
       for: "insert",
       to: supabaseAuthAdminRole,

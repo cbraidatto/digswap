@@ -43,12 +43,6 @@ export const tradeRequests = pgTable(
       to: authenticatedRole,
       withCheck: sql`${table.requesterId} = ${authUid}`,
     }),
-    pgPolicy("trade_requests_update_participant", {
-      for: "update",
-      to: authenticatedRole,
-      using: sql`${table.requesterId} = ${authUid} OR ${table.providerId} = ${authUid}`,
-      withCheck: sql`${table.requesterId} = ${authUid} OR ${table.providerId} = ${authUid}`,
-    }),
   ],
 );
 
@@ -76,7 +70,17 @@ export const tradeReviews = pgTable(
     pgPolicy("trade_reviews_insert_own", {
       for: "insert",
       to: authenticatedRole,
-      withCheck: sql`${table.reviewerId} = ${authUid}`,
+      withCheck: sql`${table.reviewerId} = ${authUid}
+        AND EXISTS (
+          SELECT 1 FROM trade_requests tr
+          WHERE tr.id = ${table.tradeId}
+            AND tr.status = 'completed'
+            AND (tr.requester_id = ${authUid} OR tr.provider_id = ${authUid})
+            AND ${table.reviewedId} = CASE
+              WHEN tr.requester_id = ${authUid} THEN tr.provider_id
+              ELSE tr.requester_id
+            END
+        )`,
     }),
   ],
 );
