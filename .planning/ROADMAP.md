@@ -23,7 +23,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [ ] **Phase 8: Gamification + Rankings** - Global/genre leaderboards, badges, titles, composite ranking formula
 - [ ] **Phase 9: P2P Audio Trading** - DMCA compliance, WebRTC file transfer, trade reputation, TURN relay
 - [x] **Phase 10: Positioning, Radar & Workspace Foundation** - Repositioned landing, The Radar as hero feature, public acquisition surfaces, Digger Memory primitives (completed 2026-03-28)
-- [ ] **Phase 11: Security Hardening** - OWASP API coverage, security test suite, penetration testing
+- [x] **Phase 11: Security Hardening** - OWASP API coverage, security test suite, penetration testing (completed 2026-03-28)
 
 ## Phase Details
 
@@ -262,7 +262,7 @@ Plans:
 Plans:
 - [x] 11-01-PLAN.md -- Wave 0 test stubs + Zod validation schemas + CSP nonce hardening + open redirect fix
 - [x] 11-02-PLAN.md -- Rate limiting on all server actions + input validation + 5 security test implementations
-- [ ] 11-03-PLAN.md -- Auth bypass tests + RLS coverage tests + ZAP pen test prep + human verification
+- [x] 11-03-PLAN.md -- Auth bypass tests + RLS coverage tests + ZAP pen test prep + human verification
 
 ## Progress
 
@@ -282,4 +282,4 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7 -> 8 -> 9 -> 10
 | 8. Gamification + Rankings | 0/5 | Planned | - |
 | 9. P2P Audio Trading | 2/6 | In Progress | - |
 | 10. Positioning, Radar & Workspace Foundation | 5/5 | Complete   | 2026-03-28 |
-| 11. Security Hardening | 2/3 | In Progress|  |
+| 11. Security Hardening | 3/3 | Complete | 2026-03-28 |
