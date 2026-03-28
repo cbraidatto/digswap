@@ -15,11 +15,10 @@ import {
 import { getFollowCounts, checkIsFollowing } from "@/lib/social/queries";
 import { getUserRanking, getUserBadges } from "@/lib/gamification/queries";
 import { isP2PEnabled } from "@/lib/trades/constants";
-import { CollectionGrid } from "../../(protected)/(profile)/perfil/_components/collection-grid";
 import { RequestAudioButton } from "../../(protected)/(profile)/perfil/_components/request-audio-button";
-import { FilterBar } from "../../(protected)/(profile)/perfil/_components/filter-bar";
-import { Pagination } from "../../(protected)/(profile)/perfil/_components/pagination";
+import { getWantlistIntersections } from "@/lib/wantlist/intersection-queries";
 import { ProfileHeader } from "./_components/profile-header";
+import { ProfileCollectionSection } from "./_components/profile-collection-section";
 
 interface PublicProfileProps {
 	params: Promise<{ username: string }>;
@@ -77,6 +76,11 @@ export default async function PublicProfilePage({
 	const totalPages = Math.ceil(totalCount / PAGE_SIZE);
 	const p2pEnabled = isP2PEnabled();
 
+	// Wantlist intersections — only for logged-in visitors viewing someone else's profile
+	const intersections = user
+		? await getWantlistIntersections(user.id, targetProfile.id)
+		: [];
+
 	return (
 		<div className="max-w-7xl mx-auto px-4 md:px-6 py-8">
 			{/* Visitor CTA */}
@@ -100,52 +104,25 @@ export default async function PublicProfilePage({
 				isAuthenticated={!!user}
 			/>
 
-			{/* Collection Section */}
-			<section>
-				<div className="flex items-center justify-between mb-6">
-					<div>
-						<span className="text-[10px] font-mono text-primary tracking-[0.2em] uppercase">
-							Collection
-						</span>
-						<h2 className="text-2xl font-bold font-heading text-on-surface mt-1">
-							{(targetProfile.displayName || "Digger").replace(/\s+/g, "_")}
-							&apos;s_Collection
-						</h2>
-					</div>
-				</div>
-
-				{/* Filter Bar */}
-				<FilterBar
-					genres={genres}
-					formats={formats}
-					currentFilters={filters}
-					basePath={`/perfil/${username}`}
-				/>
-
-				{/* Collection Grid */}
-				<CollectionGrid
-					items={items}
-					isOwner={false}
-					renderAction={user ? (item) => (
-						<RequestAudioButton
-							userId={targetProfile.id}
-							releaseId={item.releaseId}
-							p2pEnabled={p2pEnabled}
-							isOwner={false}
-						/>
-					) : undefined}
-				/>
-
-				{/* Pagination */}
-				{totalPages > 1 && (
-					<Pagination
-						currentPage={filters.page}
-						totalPages={totalPages}
-						baseUrl={`/perfil/${username}`}
-						searchParams={rawParams as Record<string, string>}
+			{/* Collection Section — client wrapper manages filter toggle state */}
+			<ProfileCollectionSection
+				items={items}
+				intersections={intersections}
+				genres={genres}
+				formats={formats}
+				currentFilters={filters}
+				totalPages={totalPages}
+				username={username}
+				searchParams={rawParams as Record<string, string>}
+				renderAction={user ? (item) => (
+					<RequestAudioButton
+						userId={targetProfile.id}
+						releaseId={item.releaseId}
+						p2pEnabled={p2pEnabled}
+						isOwner={false}
 					/>
-				)}
-			</section>
+				) : undefined}
+			/>
 		</div>
 	);
 }
