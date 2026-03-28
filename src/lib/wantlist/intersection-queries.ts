@@ -1,4 +1,4 @@
-import { and, eq } from "drizzle-orm";
+import { and, eq, desc } from "drizzle-orm";
 import { db } from "@/lib/db";
 import { wantlistItems } from "@/lib/db/schema/wantlist";
 import { collectionItems } from "@/lib/db/schema/collections";
@@ -38,7 +38,7 @@ export async function getWantlistIntersections(
 		)
 		.innerJoin(releases, eq(wantlistItems.releaseId, releases.id))
 		.where(eq(wantlistItems.userId, currentUserId))
-		.orderBy(releases.rarityScore)
+		.orderBy(desc(releases.rarityScore))
 		.limit(20);
 
 	return results.map((r) => ({
