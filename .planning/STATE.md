@@ -3,9 +3,9 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: verifying
-stopped_at: Completed quick-260328-8g4
+stopped_at: Completed quick-260328-9gp
 last_updated: "2026-03-28T09:15:27.815Z"
-last_activity: 2026-03-28 - Completed quick task 260328-8g4: Fix race conditions, IDOR, chunk bounds, retry timeout leak
+last_activity: 2026-03-28 - Completed quick task 260328-9gp: Lock trade lobby expiry to 24h fixed window
 progress:
   total_phases: 12
   completed_phases: 7
@@ -188,9 +188,10 @@ None yet.
 | # | Description | Date | Commit | Directory |
 |---|-------------|------|--------|-----------|
 | 260328-8g4 | Fix race conditions, IDOR, chunk bounds, and retry timeout leak | 2026-03-28 | 5b60b0b | [260328-8g4-fix-all-4-critical-issues-from-the-code-](./quick/260328-8g4-fix-all-4-critical-issues-from-the-code-/) |
+| 260328-9gp | Lock trade lobby expiry to 24h fixed window | 2026-03-28 | dca9332 | [260328-9gp-lock-trade-lobby-expiry-to-24h-fixed-win](./quick/260328-9gp-lock-trade-lobby-expiry-to-24h-fixed-win/) |
 
 ## Session Continuity
 
-Last session: 2026-03-28T09:15:27.806Z
-Stopped at: Completed quick-260328-8g4
+Last session: 2026-03-28T09:54:12.000Z
+Stopped at: Completed quick-260328-9gp
 Resume file: None
