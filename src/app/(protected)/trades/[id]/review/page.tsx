@@ -31,7 +31,7 @@ export default async function TradeReviewPage({ params }: TradeReviewPageProps) 
 		.eq("user_id", user.id)
 		.maybeSingle();
 
-	const isPremium = sub?.plan === "premium" || sub?.plan === "pro";
+	const isPremium = sub?.plan === "premium_monthly" || sub?.plan === "premium_annual";
 
 	return (
 		<div className="max-w-4xl mx-auto px-4 md:px-8 py-8">
