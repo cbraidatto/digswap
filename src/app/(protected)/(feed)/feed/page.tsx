@@ -8,7 +8,8 @@ import {
 } from "@/lib/social/queries";
 import { ProgressBanner } from "./_components/progress-banner";
 import { FeedContainer } from "./_components/feed-container";
-import { FeedShowcase } from "./_components/feed-showcase";
+import { RadarSection } from "./_components/radar-section";
+import { RadarEmptyState } from "./_components/radar-empty-state";
 import { BackButton } from "@/components/shell/back-button";
 
 export default async function FeedPage() {
@@ -42,11 +43,14 @@ export default async function FeedPage() {
 						<BackButton />
 					</div>
 					<h1 className="font-heading text-3xl font-extrabold text-on-surface mb-2 uppercase tracking-tight">
-						ARCHIVE_FEED
+						SIGNAL_BOARD
 					</h1>
 				</header>
 
-				<FeedShowcase />
+				{progressState.discogsConnected
+					? <RadarSection userId={user.id} />
+					: <RadarEmptyState />
+				}
 
 				<ProgressBanner
 					discogsConnected={progressState.discogsConnected}
