@@ -2,6 +2,8 @@
 
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { db } from "@/lib/db";
+import { sql } from "drizzle-orm";
 import { logActivity } from "@/actions/social";
 import { awardBadge } from "@/lib/gamification/badge-awards";
 import { CONTRIBUTION_POINTS } from "@/lib/gamification/constants";
@@ -372,17 +374,32 @@ export async function completeTrade(
 			? trade.provider_id
 			: trade.requester_id;
 
-	// Update trade status to completed
-	const { error: updateError } = await admin
+	// Check for duplicate review before inserting
+	const { data: existingReview } = await admin
+		.from("trade_reviews")
+		.select("id")
+		.eq("trade_id", tradeId)
+		.eq("reviewer_id", user.id)
+		.maybeSingle();
+
+	if (existingReview) {
+		return { error: "You have already reviewed this trade" };
+	}
+
+	// Update trade status to completed (optimistic concurrency: only if status unchanged)
+	const { data: updated, error: updateError } = await admin
 		.from("trade_requests")
 		.update({
 			status: TRADE_STATUS.COMPLETED,
 			updated_at: new Date().toISOString(),
 		})
-		.eq("id", tradeId);
+		.eq("id", tradeId)
+		.eq("status", trade.status)
+		.select("id")
+		.single();
 
-	if (updateError) {
-		return { error: "Failed to complete trade" };
+	if (updateError || !updated) {
+		return { error: "Trade was already completed or modified by another request" };
 	}
 
 	// Insert trade review
@@ -394,44 +411,18 @@ export async function completeTrade(
 		comment: comment,
 	});
 
-	// Increment tradesThisMonth for both parties (read-increment-write)
+	// Atomic increment tradesThisMonth for both parties (no read-increment-write race)
 	for (const userId of [trade.requester_id, trade.provider_id]) {
-		const { data: sub } = await admin
-			.from("subscriptions")
-			.select("trades_this_month")
-			.eq("user_id", userId)
-			.maybeSingle();
-
-		await admin
-			.from("subscriptions")
-			.update({
-				trades_this_month: (sub?.trades_this_month ?? 0) + 1,
-				updated_at: new Date().toISOString(),
-			})
-			.eq("user_id", userId);
+		await db.execute(sql`UPDATE subscriptions SET trades_this_month = COALESCE(trades_this_month, 0) + 1, updated_at = NOW() WHERE user_id = ${userId}`);
 	}
 
 	// Award CONNECTOR badge to both parties
 	await awardBadge(trade.requester_id, "connector");
 	await awardBadge(trade.provider_id, "connector");
 
-	// Increment contribution scores (+15 per trade_completed) in user_rankings
+	// Atomic increment contribution scores (+15 per trade_completed) in user_rankings
 	for (const userId of [trade.requester_id, trade.provider_id]) {
-		const { data: ranking } = await admin
-			.from("user_rankings")
-			.select("contribution_score")
-			.eq("user_id", userId)
-			.maybeSingle();
-
-		if (ranking) {
-			await admin
-				.from("user_rankings")
-				.update({
-					contribution_score: (ranking.contribution_score ?? 0) + CONTRIBUTION_POINTS.trade_completed,
-					updated_at: new Date().toISOString(),
-				})
-				.eq("user_id", userId);
-		}
+		await db.execute(sql`UPDATE user_rankings SET contribution_score = COALESCE(contribution_score, 0) + ${CONTRIBUTION_POINTS.trade_completed}, updated_at = NOW() WHERE user_id = ${userId}`);
 	}
 
 	// Log activity
@@ -490,53 +481,34 @@ export async function skipReview(
 			? trade.provider_id
 			: trade.requester_id;
 
-	// Update status to completed (no review)
-	await admin
+	// Update status to completed (optimistic concurrency: only if status unchanged)
+	const { data: updated, error: updateError } = await admin
 		.from("trade_requests")
 		.update({
 			status: TRADE_STATUS.COMPLETED,
 			updated_at: new Date().toISOString(),
 		})
-		.eq("id", tradeId);
+		.eq("id", tradeId)
+		.eq("status", trade.status)
+		.select("id")
+		.single();
+
+	if (updateError || !updated) {
+		return { error: "Trade was already completed or modified by another request" };
+	}
 
 	// Award badges and increment counters (same as completeTrade)
 	await awardBadge(trade.requester_id, "connector");
 	await awardBadge(trade.provider_id, "connector");
 
-	// Increment tradesThisMonth for both parties (read-increment-write)
+	// Atomic increment tradesThisMonth for both parties (no read-increment-write race)
 	for (const userId of [trade.requester_id, trade.provider_id]) {
-		const { data: sub } = await admin
-			.from("subscriptions")
-			.select("trades_this_month")
-			.eq("user_id", userId)
-			.maybeSingle();
-
-		await admin
-			.from("subscriptions")
-			.update({
-				trades_this_month: (sub?.trades_this_month ?? 0) + 1,
-				updated_at: new Date().toISOString(),
-			})
-			.eq("user_id", userId);
+		await db.execute(sql`UPDATE subscriptions SET trades_this_month = COALESCE(trades_this_month, 0) + 1, updated_at = NOW() WHERE user_id = ${userId}`);
 	}
 
-	// Increment contribution scores in user_rankings
+	// Atomic increment contribution scores in user_rankings
 	for (const userId of [trade.requester_id, trade.provider_id]) {
-		const { data: ranking } = await admin
-			.from("user_rankings")
-			.select("contribution_score")
-			.eq("user_id", userId)
-			.maybeSingle();
-
-		if (ranking) {
-			await admin
-				.from("user_rankings")
-				.update({
-					contribution_score: (ranking.contribution_score ?? 0) + CONTRIBUTION_POINTS.trade_completed,
-					updated_at: new Date().toISOString(),
-				})
-				.eq("user_id", userId);
-		}
+		await db.execute(sql`UPDATE user_rankings SET contribution_score = COALESCE(contribution_score, 0) + ${CONTRIBUTION_POINTS.trade_completed}, updated_at = NOW() WHERE user_id = ${userId}`);
 	}
 
 	await logActivity(user.id, "completed_trade", "trade", tradeId, {
