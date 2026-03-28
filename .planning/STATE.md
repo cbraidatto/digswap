@@ -3,9 +3,9 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: verifying
-stopped_at: Completed quick-260328-9gp
-last_updated: "2026-03-28T09:15:27.815Z"
-last_activity: 2026-03-28 - Completed quick task 260328-9gp: Lock trade lobby expiry to 24h fixed window
+stopped_at: Completed quick-260328-a21
+last_updated: "2026-03-28T10:22:16.483Z"
+last_activity: 2026-03-28
 progress:
   total_phases: 12
   completed_phases: 7
@@ -172,6 +172,7 @@ Recent decisions affecting current work:
 - [Phase 09]: Freemium gate renders after first spectrogram analysis, premium users get re-analyze button
 - [Phase 09]: CONTRIBUTION_POINTS.trade_completed constant used directly for +15 pts display
 - [Phase 09]: isP2PEnabledClient reads NEXT_PUBLIC_P2P_ENABLED for client components
+- [Phase quick-260328-a21]: Removed trade_requests UPDATE and user_rankings UPDATE RLS policies entirely -- all mutations via admin client Server Actions
 
 ### Pending Todos
 
@@ -189,9 +190,10 @@ None yet.
 |---|-------------|------|--------|-----------|
 | 260328-8g4 | Fix race conditions, IDOR, chunk bounds, and retry timeout leak | 2026-03-28 | 5b60b0b | [260328-8g4-fix-all-4-critical-issues-from-the-code-](./quick/260328-8g4-fix-all-4-critical-issues-from-the-code-/) |
 | 260328-9gp | Lock trade lobby expiry to 24h fixed window | 2026-03-28 | dca9332 | [260328-9gp-lock-trade-lobby-expiry-to-24h-fixed-win](./quick/260328-9gp-lock-trade-lobby-expiry-to-24h-fixed-win/) |
+| 260328-a21 | Fix P0 RLS bypasses and P1 race conditions | 2026-03-28 | 6e7f9e1 | [260328-a21-fix-p0-rls-bypasses-and-p1-race-conditio](./quick/260328-a21-fix-p0-rls-bypasses-and-p1-race-conditio/) |
 
 ## Session Continuity
 
-Last session: 2026-03-28T09:54:12.000Z
-Stopped at: Completed quick-260328-9gp
+Last session: 2026-03-28T10:22:11.175Z
+Stopped at: Completed quick-260328-a21
 Resume file: None
