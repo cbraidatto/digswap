@@ -398,6 +398,9 @@ export default async function PerfilPage({ searchParams }: PerfilPageProps) {
 						<RarityCardModal
 							username={profile?.username ?? ""}
 							appUrl={process.env.NEXT_PUBLIC_APP_URL ?? ""}
+							displayName={profile?.displayName ?? undefined}
+							totalRecords={totalCount}
+							avgRarity={rarityScore}
 						/>
 					</div>
 				</div>

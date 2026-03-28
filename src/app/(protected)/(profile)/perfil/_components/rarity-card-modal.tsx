@@ -13,11 +13,19 @@ import { ShareSurface } from "@/components/share/share-surface";
 interface RarityCardModalProps {
   username: string;
   appUrl: string;
+  displayName?: string;
+  totalRecords?: number;
+  avgRarity?: number;
 }
 
-export function RarityCardModal({ username, appUrl }: RarityCardModalProps) {
+export function RarityCardModal({ username, appUrl, displayName, totalRecords = 0, avgRarity = 0 }: RarityCardModalProps) {
   const [open, setOpen] = useState(false);
-  const cardUrl = `${appUrl}/api/og/rarity/${username}`;
+  const params = new URLSearchParams({
+    name: displayName ?? username,
+    total: String(totalRecords),
+    avg: String(avgRarity),
+  });
+  const cardUrl = `${appUrl}/api/og/rarity/${username}?${params.toString()}`;
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>

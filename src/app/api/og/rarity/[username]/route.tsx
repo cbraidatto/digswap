@@ -1,58 +1,21 @@
 import { ImageResponse } from "next/og";
-import { eq, avg, count, gte, and } from "drizzle-orm";
-import { db } from "@/lib/db";
-import { profiles } from "@/lib/db/schema/users";
-import { collectionItems } from "@/lib/db/schema/collections";
-import { releases } from "@/lib/db/schema/releases";
 
-// Node.js runtime — postgres driver is not edge-compatible
-export const runtime = "nodejs";
-
+// OG image route — no DB imports (WASM bundle conflict).
+// Stats are passed as query params, computed server-side by the caller.
+// URL: /api/og/rarity/[username]?total=N&ultra=N&avg=N.N&name=Display+Name
 export async function GET(
-  _request: Request,
+  request: Request,
   { params }: { params: Promise<{ username: string }> },
 ) {
-  try {
   const { username } = await params;
+  const { searchParams } = new URL(request.url);
 
-  // Fetch profile
-  const [profile] = await db
-    .select({
-      id: profiles.id,
-      displayName: profiles.displayName,
-      username: profiles.username,
-    })
-    .from(profiles)
-    .where(eq(profiles.username, username))
-    .limit(1);
-
-  if (!profile) {
-    return new Response("Not found", { status: 404 });
-  }
-
-  // Fetch collection stats — two simple queries, no sql template literals
-  const [totalRow] = await db
-    .select({ totalRecords: count(collectionItems.id), avgRarity: avg(releases.rarityScore).mapWith(Number) })
-    .from(collectionItems)
-    .innerJoin(releases, eq(collectionItems.releaseId, releases.id))
-    .where(eq(collectionItems.userId, profile.id));
-
-  const [ultraRareRow] = await db
-    .select({ ultraRareCount: count(collectionItems.id) })
-    .from(collectionItems)
-    .innerJoin(releases, eq(collectionItems.releaseId, releases.id))
-    .where(and(eq(collectionItems.userId, profile.id), gte(releases.rarityScore, 80)));
-
-  const avgRarityScore = totalRow?.avgRarity ?? 0;
-  const obscurityPercentile = Math.min(99, Math.round(avgRarityScore));
-  const totalRecords = totalRow?.totalRecords ?? 0;
-  const ultraRareCount = ultraRareRow?.ultraRareCount ?? 0;
-  const avgDisplay = avgRarityScore > 0 ? avgRarityScore.toFixed(1) : "—";
-
-  const imageOptions: ConstructorParameters<typeof ImageResponse>[1] = {
-    width: 1200,
-    height: 630,
-  };
+  const displayName = searchParams.get("name") ?? username;
+  const totalRecords = Number(searchParams.get("total") ?? 0);
+  const ultraRareCount = Number(searchParams.get("ultra") ?? 0);
+  const avgRarity = Number(searchParams.get("avg") ?? 0);
+  const obscurityPercentile = Math.min(99, Math.round(avgRarity));
+  const avgDisplay = avgRarity > 0 ? avgRarity.toFixed(1) : "—";
 
   return new ImageResponse(
     (
@@ -68,172 +31,49 @@ export async function GET(
           fontFamily: "monospace",
         }}
       >
-        {/* Dot grid background */}
-        <div
-          style={{
-            position: "absolute",
-            inset: "0",
-            backgroundImage: "radial-gradient(#6fdd78 1px, transparent 1px)",
-            backgroundSize: "32px 32px",
-            opacity: 0.03,
-          }}
-        />
-
-        {/* Top: label + username */}
+        {/* Top */}
         <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
-          <div
-            style={{
-              color: "#6fdd78",
-              fontSize: "14px",
-              letterSpacing: "0.2em",
-            }}
-          >
+          <div style={{ color: "#6fdd78", fontSize: "14px", letterSpacing: "0.2em" }}>
             [RARITY_SCORE_CARD]
           </div>
-          <div
-            style={{ color: "#dfe2eb", fontSize: "48px", fontWeight: 700 }}
-          >
-            {profile.displayName ?? profile.username}
+          <div style={{ color: "#dfe2eb", fontSize: "48px", fontWeight: 700 }}>
+            {displayName}
           </div>
-          <div style={{ color: "#becab9", fontSize: "16px" }}>
-            @{profile.username}
-          </div>
+          <div style={{ color: "#8a9099", fontSize: "16px" }}>@{username}</div>
         </div>
 
-        {/* Middle: stats grid */}
-        <div
-          style={{ display: "flex", gap: "48px", alignItems: "center" }}
-        >
-          <div
-            style={{
-              display: "flex",
-              flexDirection: "column",
-              gap: "4px",
-            }}
-          >
-            <div
-              style={{
-                color: "#6fdd78",
-                fontSize: "64px",
-                fontWeight: 700,
-              }}
-            >
+        {/* Stats */}
+        <div style={{ display: "flex", gap: "48px", alignItems: "flex-end" }}>
+          <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
+            <div style={{ color: "#6fdd78", fontSize: "64px", fontWeight: 700 }}>
               {obscurityPercentile}%
             </div>
-            <div
-              style={{
-                color: "#becab9",
-                fontSize: "12px",
-                letterSpacing: "0.15em",
-              }}
-            >
+            <div style={{ color: "#8a9099", fontSize: "12px", letterSpacing: "0.15em" }}>
               MORE OBSCURE THAN NETWORK
             </div>
           </div>
-          <div
-            style={{
-              display: "flex",
-              flexDirection: "column",
-              gap: "20px",
-            }}
-          >
-            <div
-              style={{
-                display: "flex",
-                flexDirection: "column",
-                gap: "2px",
-              }}
-            >
-              <div
-                style={{
-                  color: "#dfe2eb",
-                  fontSize: "28px",
-                  fontWeight: 600,
-                }}
-              >
-                {totalRecords.toLocaleString()}
-              </div>
-              <div
-                style={{
-                  color: "#becab9",
-                  fontSize: "11px",
-                  letterSpacing: "0.12em",
-                }}
-              >
-                RECORDS IN COLLECTION
-              </div>
+          <div style={{ display: "flex", flexDirection: "column", gap: "16px", paddingBottom: "8px" }}>
+            <div style={{ display: "flex", flexDirection: "column", gap: "2px" }}>
+              <div style={{ color: "#dfe2eb", fontSize: "28px", fontWeight: 600 }}>{totalRecords.toLocaleString()}</div>
+              <div style={{ color: "#8a9099", fontSize: "11px", letterSpacing: "0.12em" }}>RECORDS IN COLLECTION</div>
             </div>
-            <div
-              style={{
-                display: "flex",
-                flexDirection: "column",
-                gap: "2px",
-              }}
-            >
-              <div
-                style={{
-                  color: "#ffb689",
-                  fontSize: "28px",
-                  fontWeight: 600,
-                }}
-              >
-                {ultraRareCount}
-              </div>
-              <div
-                style={{
-                  color: "#becab9",
-                  fontSize: "11px",
-                  letterSpacing: "0.12em",
-                }}
-              >
-                ULTRA-RARE RECORDS
-              </div>
+            <div style={{ display: "flex", flexDirection: "column", gap: "2px" }}>
+              <div style={{ color: "#ffb689", fontSize: "28px", fontWeight: 600 }}>{ultraRareCount}</div>
+              <div style={{ color: "#8a9099", fontSize: "11px", letterSpacing: "0.12em" }}>ULTRA-RARE RECORDS</div>
             </div>
-            <div
-              style={{
-                display: "flex",
-                flexDirection: "column",
-                gap: "2px",
-              }}
-            >
-              <div
-                style={{
-                  color: "#aac7ff",
-                  fontSize: "28px",
-                  fontWeight: 600,
-                }}
-              >
-                {avgDisplay}
-              </div>
-              <div
-                style={{
-                  color: "#becab9",
-                  fontSize: "11px",
-                  letterSpacing: "0.12em",
-                }}
-              >
-                AVG RARITY SCORE
-              </div>
+            <div style={{ display: "flex", flexDirection: "column", gap: "2px" }}>
+              <div style={{ color: "#aac7ff", fontSize: "28px", fontWeight: 600 }}>{avgDisplay}</div>
+              <div style={{ color: "#8a9099", fontSize: "11px", letterSpacing: "0.12em" }}>AVG RARITY SCORE</div>
             </div>
           </div>
         </div>
 
-        {/* Bottom: site URL */}
-        <div
-          style={{
-            color: "#becab9",
-            fontSize: "14px",
-            letterSpacing: "0.1em",
-          }}
-        >
+        {/* Bottom */}
+        <div style={{ color: "#8a9099", fontSize: "14px", letterSpacing: "0.1em" }}>
           digswap.com // find who has your Holy Grails
         </div>
       </div>
     ),
-    imageOptions,
+    { width: 1200, height: 630 },
   );
-  } catch (err) {
-    console.error("[OG rarity] route error:", err);
-    return new Response(String(err), { status: 500 });
-  }
 }
