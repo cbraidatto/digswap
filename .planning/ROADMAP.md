@@ -246,7 +246,7 @@ Plans:
 - [x] 10-01-PLAN.md -- Sprint 0: P0 unblocking — landing page rewrite, remove REQUEST_TRADE from owners-list, ungate public profile, lock Discogs onboarding step, copy sweep
 - [x] 10-02-PLAN.md -- Sprint 0.5: leads schema migration + all 6 primitive components (LeadAction, QuickNotePopover, ContextTooltip, TrustStrip, ShareSurface, useDiggerMemory hook) + server actions
 - [ ] 10-03-PLAN.md -- Sprint 1: RadarSection + RadarEmptyState + feed page modification (SIGNAL_BOARD) + /radar route with rarity filters
-- [ ] 10-04-PLAN.md -- Sprint 2: TrustStrip injection into profile headers + holy_grail_ids schema + Bounty Link public page + Rarity Score Card OG image + own profile sharing controls
+- [x] 10-04-PLAN.md -- Sprint 2: TrustStrip injection into profile headers + holy_grail_ids schema + Bounty Link public page + Rarity Score Card OG image + own profile sharing controls
 - [ ] 10-05-PLAN.md -- Sprint 3: WantlistMatchSection + CollectionGrid filterToIds prop + other user profile integration + P2P surface cleanup audit
 **UI hint**: yes
 
@@ -277,5 +277,5 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7 -> 8 -> 9 -> 10
 | 7. Community + Reviews | 5/5 | Complete   | 2026-03-26 |
 | 8. Gamification + Rankings | 0/5 | Planned | - |
 | 9. P2P Audio Trading | 2/6 | In Progress | - |
-| 10. Positioning, Radar & Workspace Foundation | 2/5 | In Progress|  |
+| 10. Positioning, Radar & Workspace Foundation | 3/5 | In Progress|  |
 | 11. Security Hardening | 0/TBD | Not started | - |
