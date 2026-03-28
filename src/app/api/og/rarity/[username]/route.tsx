@@ -1,5 +1,5 @@
 import { ImageResponse } from "next/og";
-import { eq, avg, count, sql } from "drizzle-orm";
+import { eq, avg, count, gte, and } from "drizzle-orm";
 import { db } from "@/lib/db";
 import { profiles } from "@/lib/db/schema/users";
 import { collectionItems } from "@/lib/db/schema/collections";
@@ -12,6 +12,7 @@ export async function GET(
   _request: Request,
   { params }: { params: Promise<{ username: string }> },
 ) {
+  try {
   const { username } = await params;
 
   // Fetch profile
@@ -29,43 +30,28 @@ export async function GET(
     return new Response("Not found", { status: 404 });
   }
 
-  // Fetch collection stats
-  const [stats] = await db
-    .select({
-      totalRecords: count(collectionItems.id),
-      avgRarity: avg(releases.rarityScore).mapWith(Number),
-      ultraRareCount:
-        sql<number>`count(*) filter (where ${releases.rarityScore} >= 80)`,
-    })
+  // Fetch collection stats — two simple queries, no sql template literals
+  const [totalRow] = await db
+    .select({ totalRecords: count(collectionItems.id), avgRarity: avg(releases.rarityScore).mapWith(Number) })
     .from(collectionItems)
     .innerJoin(releases, eq(collectionItems.releaseId, releases.id))
     .where(eq(collectionItems.userId, profile.id));
 
-  // Compute obscurity percentile (simplified: avg rarity as percentile proxy)
-  const avgRarityScore = stats?.avgRarity ?? 0;
-  const obscurityPercentile = Math.min(99, Math.round(avgRarityScore));
-  const totalRecords = stats?.totalRecords ?? 0;
-  const ultraRareCount = stats?.ultraRareCount ?? 0;
-  const avgDisplay = avgRarityScore > 0 ? avgRarityScore.toFixed(1) : "\u2014";
+  const [ultraRareRow] = await db
+    .select({ ultraRareCount: count(collectionItems.id) })
+    .from(collectionItems)
+    .innerJoin(releases, eq(collectionItems.releaseId, releases.id))
+    .where(and(eq(collectionItems.userId, profile.id), gte(releases.rarityScore, 80)));
 
-  // Fetch JetBrains Mono font from Google Fonts CDN
-  const fontUrl =
-    "https://fonts.gstatic.com/s/jetbrainsmono/v18/tDbY2o-flEEny0FZhsfKu5WU4zr3E_BX0PnT8RD8yKxjOVSNB0Z5dlQ.woff";
-  let fontData: ArrayBuffer | undefined;
-  try {
-    const fontRes = await fetch(fontUrl);
-    fontData = await fontRes.arrayBuffer();
-  } catch {
-    // Fall back to system monospace if font fetch fails
-    fontData = undefined;
-  }
+  const avgRarityScore = totalRow?.avgRarity ?? 0;
+  const obscurityPercentile = Math.min(99, Math.round(avgRarityScore));
+  const totalRecords = totalRow?.totalRecords ?? 0;
+  const ultraRareCount = ultraRareRow?.ultraRareCount ?? 0;
+  const avgDisplay = avgRarityScore > 0 ? avgRarityScore.toFixed(1) : "—";
 
   const imageOptions: ConstructorParameters<typeof ImageResponse>[1] = {
     width: 1200,
     height: 630,
-    fonts: fontData
-      ? [{ name: "JetBrainsMono", data: fontData, style: "normal" as const }]
-      : undefined,
   };
 
   return new ImageResponse(
@@ -79,7 +65,7 @@ export async function GET(
           flexDirection: "column",
           justifyContent: "space-between",
           padding: "60px",
-          fontFamily: fontData ? "JetBrainsMono" : "monospace",
+          fontFamily: "monospace",
         }}
       >
         {/* Dot grid background */}
@@ -246,4 +232,8 @@ export async function GET(
     ),
     imageOptions,
   );
+  } catch (err) {
+    console.error("[OG rarity] route error:", err);
+    return new Response(String(err), { status: 500 });
+  }
 }
