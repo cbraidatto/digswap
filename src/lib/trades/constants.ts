@@ -12,14 +12,7 @@ export const TRADE_STATUS = {
 
 export type TradeStatus = (typeof TRADE_STATUS)[keyof typeof TRADE_STATUS];
 
-export const TRADE_EXPIRY_OPTIONS = [
-	{ label: "6h", value: 6 },
-	{ label: "12h", value: 12 },
-	{ label: "24h", value: 24 },
-	{ label: "48h", value: 48 },
-] as const;
-
-export const DEFAULT_EXPIRY_HOURS = 48;
+export const TRADE_EXPIRY_HOURS = 24;
 
 export const MAX_FREE_TRADES_PER_MONTH = 5;
 

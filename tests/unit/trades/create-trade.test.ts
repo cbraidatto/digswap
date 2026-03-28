@@ -77,6 +77,7 @@ vi.mock("@/lib/trades/constants", () => ({
 		CANCELLED: "cancelled",
 		EXPIRED: "expired",
 	},
+	TRADE_EXPIRY_HOURS: 24,
 	MAX_FREE_TRADES_PER_MONTH: 5,
 	isP2PEnabled: vi.fn().mockReturnValue(true),
 }));
@@ -101,7 +102,6 @@ describe("createTrade", () => {
 		fileFormat: "FLAC",
 		declaredBitrate: "1411kbps",
 		fileSizeBytes: 30_000_000,
-		expiryHours: 48,
 		message: "Great record!",
 	};
 

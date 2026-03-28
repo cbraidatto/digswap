@@ -7,7 +7,7 @@ import { awardBadge } from "@/lib/gamification/badge-awards";
 import { CONTRIBUTION_POINTS } from "@/lib/gamification/constants";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
-import { isP2PEnabled, MAX_FREE_TRADES_PER_MONTH, TRADE_STATUS } from "@/lib/trades/constants";
+import { isP2PEnabled, MAX_FREE_TRADES_PER_MONTH, TRADE_EXPIRY_HOURS, TRADE_STATUS } from "@/lib/trades/constants";
 import { getTradeCountThisMonth } from "@/lib/trades/queries";
 
 // ---------------------------------------------------------------------------
@@ -38,7 +38,6 @@ export async function createTrade(formData: {
 	fileFormat: string;
 	declaredBitrate: string;
 	fileSizeBytes: number;
-	expiryHours: number;
 	message?: string;
 }): Promise<{ success?: boolean; tradeId?: string; error?: string; tradesRemaining?: number }> {
 	// D-03 server-side P2P gate check
@@ -67,7 +66,7 @@ export async function createTrade(formData: {
 	}
 
 	// Compute expiry timestamp
-	const expiresAt = new Date(Date.now() + formData.expiryHours * 60 * 60 * 1000).toISOString();
+	const expiresAt = new Date(Date.now() + TRADE_EXPIRY_HOURS * 60 * 60 * 1000).toISOString();
 
 	// Insert trade request
 	const { data: trade, error: insertError } = await admin
