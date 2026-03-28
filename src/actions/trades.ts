@@ -394,40 +394,44 @@ export async function completeTrade(
 		comment: comment,
 	});
 
-	// Increment tradesThisMonth for both parties
+	// Increment tradesThisMonth for both parties (read-increment-write)
 	for (const userId of [trade.requester_id, trade.provider_id]) {
-		await admin.rpc("increment_field", {
-			table_name: "subscriptions",
-			field_name: "trades_this_month",
-			row_filter: `user_id=eq.${userId}`,
-			increment_by: 1,
-		}).then(async ({ error: rpcError }) => {
-			// Fallback: direct update if RPC not available
-			if (rpcError) {
-				await admin
-					.from("subscriptions")
-					.update({
-						trades_this_month: admin
-							? undefined
-							: 0, // Will be computed below
-					})
-					.eq("user_id", userId);
-			}
-		});
+		const { data: sub } = await admin
+			.from("subscriptions")
+			.select("trades_this_month")
+			.eq("user_id", userId)
+			.maybeSingle();
+
+		await admin
+			.from("subscriptions")
+			.update({
+				trades_this_month: (sub?.trades_this_month ?? 0) + 1,
+				updated_at: new Date().toISOString(),
+			})
+			.eq("user_id", userId);
 	}
 
 	// Award CONNECTOR badge to both parties
 	await awardBadge(trade.requester_id, "connector");
 	await awardBadge(trade.provider_id, "connector");
 
-	// Increment contribution scores (+15 per trade_completed)
+	// Increment contribution scores (+15 per trade_completed) in user_rankings
 	for (const userId of [trade.requester_id, trade.provider_id]) {
-		await admin
-			.from("subscriptions")
-			.update({
-				updated_at: new Date().toISOString(),
-			})
-			.eq("user_id", userId);
+		const { data: ranking } = await admin
+			.from("user_rankings")
+			.select("contribution_score")
+			.eq("user_id", userId)
+			.maybeSingle();
+
+		if (ranking) {
+			await admin
+				.from("user_rankings")
+				.update({
+					contribution_score: (ranking.contribution_score ?? 0) + CONTRIBUTION_POINTS.trade_completed,
+					updated_at: new Date().toISOString(),
+				})
+				.eq("user_id", userId);
+		}
 	}
 
 	// Log activity
@@ -498,6 +502,42 @@ export async function skipReview(
 	// Award badges and increment counters (same as completeTrade)
 	await awardBadge(trade.requester_id, "connector");
 	await awardBadge(trade.provider_id, "connector");
+
+	// Increment tradesThisMonth for both parties (read-increment-write)
+	for (const userId of [trade.requester_id, trade.provider_id]) {
+		const { data: sub } = await admin
+			.from("subscriptions")
+			.select("trades_this_month")
+			.eq("user_id", userId)
+			.maybeSingle();
+
+		await admin
+			.from("subscriptions")
+			.update({
+				trades_this_month: (sub?.trades_this_month ?? 0) + 1,
+				updated_at: new Date().toISOString(),
+			})
+			.eq("user_id", userId);
+	}
+
+	// Increment contribution scores in user_rankings
+	for (const userId of [trade.requester_id, trade.provider_id]) {
+		const { data: ranking } = await admin
+			.from("user_rankings")
+			.select("contribution_score")
+			.eq("user_id", userId)
+			.maybeSingle();
+
+		if (ranking) {
+			await admin
+				.from("user_rankings")
+				.update({
+					contribution_score: (ranking.contribution_score ?? 0) + CONTRIBUTION_POINTS.trade_completed,
+					updated_at: new Date().toISOString(),
+				})
+				.eq("user_id", userId);
+		}
+	}
 
 	await logActivity(user.id, "completed_trade", "trade", tradeId, {
 		counterpartyId,
