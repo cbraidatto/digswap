@@ -1,11 +1,51 @@
+"use client";
+
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { NotificationBell } from "@/components/shell/notification-bell";
+import { getActionableTradeCount } from "@/actions/trades";
 
 interface AppHeaderProps {
 	displayName: string | null;
 	avatarUrl: string | null;
 	xp?: number;
 	userId: string;
+}
+
+function TradeBadge() {
+	const [count, setCount] = useState(0);
+
+	useEffect(() => {
+		let mounted = true;
+		getActionableTradeCount()
+			.then((c) => {
+				if (mounted) setCount(c);
+			})
+			.catch(() => {
+				/* silent */
+			});
+		return () => {
+			mounted = false;
+		};
+	}, []);
+
+	return (
+		<Link
+			href="/trades"
+			aria-label="Trades"
+			className="relative p-2 text-on-surface-variant hover:bg-surface-bright transition-colors rounded"
+		>
+			<span className="material-symbols-outlined text-[20px]">swap_horiz</span>
+			{count > 0 && (
+				<span
+					className="absolute -top-0.5 -right-0.5 bg-destructive text-destructive-foreground text-[10px] font-mono font-semibold rounded-full min-w-[18px] h-[18px] flex items-center justify-center px-1"
+					aria-label={`${count} actionable trades`}
+				>
+					{count > 9 ? "9+" : count}
+				</span>
+			)}
+		</Link>
+	);
 }
 
 export function AppHeader({ xp = 0, userId }: AppHeaderProps) {
@@ -52,6 +92,7 @@ export function AppHeader({ xp = 0, userId }: AppHeaderProps) {
 						</span>
 					</div>
 				)}
+				<TradeBadge />
 				<NotificationBell userId={userId} />
 			</div>
 		</header>

@@ -1,5 +1,5 @@
-import { describe, expect, it, vi } from "vitest";
-import { render, screen } from "@testing-library/react";
+import { describe, expect, it, vi, beforeEach } from "vitest";
+import { render, screen, waitFor, cleanup } from "@testing-library/react";
 
 vi.mock("next/navigation", () => ({
 	useRouter: () => ({ push: vi.fn() }),
@@ -27,17 +27,55 @@ vi.mock("@/components/shell/notification-bell", () => ({
 	),
 }));
 
+// Mock trades server action
+vi.mock("@/actions/trades", () => ({
+	getActionableTradeCount: vi.fn().mockResolvedValue(2),
+}));
+
 import { AppHeader } from "@/components/shell/app-header";
 
 describe("AppHeader", () => {
+	beforeEach(() => {
+		vi.clearAllMocks();
+		cleanup();
+	});
+
 	it("renders DIGSWAP wordmark", () => {
 		render(<AppHeader displayName="Test" avatarUrl={null} userId="test-user-id" />);
-		expect(screen.getByText("DIGSWAP")).toBeInTheDocument();
+		// Text is split across child spans: <span>DIG</span><span>SWAP</span>
+		expect(screen.getByText("DIG")).toBeInTheDocument();
+		expect(screen.getByText("SWAP")).toBeInTheDocument();
 	});
 
 	it("renders wordmark with font-heading class", () => {
 		render(<AppHeader displayName="Test" avatarUrl={null} userId="test-user-id" />);
-		const wordmark = screen.getByText("DIGSWAP");
-		expect(wordmark.className).toContain("font-heading");
+		// The parent span containing DIG+SWAP has font-heading
+		const dig = screen.getByText("DIG");
+		expect(dig.parentElement?.className).toContain("font-heading");
+	});
+
+	it("renders trade icon with swap_horiz", async () => {
+		render(<AppHeader displayName="Test" avatarUrl={null} userId="test-user-id" />);
+
+		await waitFor(() => {
+			const icon = screen.getByText("swap_horiz");
+			expect(icon).toBeInTheDocument();
+			expect(icon.className).toContain("material-symbols-outlined");
+		});
+	});
+
+	it("trade icon links to /trades", async () => {
+		render(<AppHeader displayName="Test" avatarUrl={null} userId="test-user-id" />);
+
+		await waitFor(() => {
+			const link = screen.getByLabelText("Trades");
+			expect(link).toBeInTheDocument();
+			expect(link).toHaveAttribute("href", "/trades");
+		});
+	});
+
+	it('trade icon has aria-label "Trades"', () => {
+		render(<AppHeader displayName="Test" avatarUrl={null} userId="test-user-id" />);
+		expect(screen.getByLabelText("Trades")).toBeInTheDocument();
 	});
 });

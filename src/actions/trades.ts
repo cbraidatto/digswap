@@ -660,6 +660,37 @@ export async function getTradesRemaining(): Promise<{
 }
 
 // ---------------------------------------------------------------------------
+// Get Actionable Trade Count (for AppHeader badge)
+// ---------------------------------------------------------------------------
+
+export async function getActionableTradeCount(): Promise<number> {
+	const supabase = await createClient();
+	const {
+		data: { user },
+	} = await supabase.auth.getUser();
+
+	if (!user) return 0;
+
+	const admin = createAdminClient();
+
+	// Count pending trades where user is provider (needs accept/decline)
+	const { count: pendingCount } = await admin
+		.from("trade_requests")
+		.select("id", { count: "exact", head: true })
+		.eq("provider_id", user.id)
+		.eq("status", TRADE_STATUS.PENDING);
+
+	// Count active trades (accepted/transferring) where user is participant
+	const { count: activeCount } = await admin
+		.from("trade_requests")
+		.select("id", { count: "exact", head: true })
+		.or(`requester_id.eq.${user.id},provider_id.eq.${user.id}`)
+		.in("status", [TRADE_STATUS.ACCEPTED, TRADE_STATUS.TRANSFERRING]);
+
+	return (pendingCount ?? 0) + (activeCount ?? 0);
+}
+
+// ---------------------------------------------------------------------------
 // Trade Request Email (internal helper)
 // ---------------------------------------------------------------------------
 
