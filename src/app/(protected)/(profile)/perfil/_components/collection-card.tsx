@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
 import type { ReactNode } from "react";
 import type { CollectionItem } from "@/lib/collection/queries";
@@ -51,7 +52,16 @@ export function CollectionCard({ item, isOwner, actionSlot }: CollectionCardProp
 				<h3 className="font-heading text-sm font-bold text-on-surface truncate">
 					{item.title}
 				</h3>
-				<p className="text-xs text-on-surface-variant truncate mb-2">{item.artist}</p>
+				<p className="text-xs text-on-surface-variant truncate mb-1">{item.artist}</p>
+				{item.discogsId && (
+					<Link
+						href={`/release/${item.discogsId}`}
+						className="font-mono text-[10px] text-on-surface-variant hover:text-primary transition-colors inline-flex items-center gap-0.5 mb-1"
+					>
+						VIEW_RELEASE
+						<span className="material-symbols-outlined text-[12px]">arrow_forward</span>
+					</Link>
+				)}
 				{/* Condition editor — only visible to owner */}
 				{isOwner && (
 					<ConditionEditor
