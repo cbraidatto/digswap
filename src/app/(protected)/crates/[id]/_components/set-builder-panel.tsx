@@ -57,11 +57,11 @@ function SortableTrackRow({ id, position, title, artist }: SortableTrackRowProps
       <span className="font-mono text-[10px] text-on-surface-variant w-5 flex-shrink-0">
         {position}
       </span>
-      <span className="font-heading text-xs text-on-surface truncate flex-1">
+      <span className="font-heading text-xs text-on-surface truncate flex-1 min-w-0">
         {title ?? "Unknown"}
       </span>
       {artist && (
-        <span className="font-mono text-[10px] text-on-surface-variant flex-shrink-0 truncate max-w-[120px]">
+        <span className="font-mono text-[10px] text-on-surface-variant flex-shrink-0 truncate max-w-[120px] min-w-0">
           {artist}
         </span>
       )}
@@ -93,17 +93,22 @@ export function SetBuilderPanel({ crateId, items, onClose }: SetBuilderPanelProp
   const itemById = Object.fromEntries(items.map((item) => [item.id, item]));
 
   const handleToggleItem = (itemId: string) => {
-    setSelectedItemIds((prev) => {
-      const next = new Set(prev);
-      if (next.has(itemId)) {
+    const isSelected = selectedItemIds.has(itemId);
+    if (isSelected) {
+      setSelectedItemIds((prev) => {
+        const next = new Set(prev);
         next.delete(itemId);
-        setTrackOrder((order) => order.filter((id) => id !== itemId));
-      } else {
+        return next;
+      });
+      setTrackOrder((order) => order.filter((id) => id !== itemId));
+    } else {
+      setSelectedItemIds((prev) => {
+        const next = new Set(prev);
         next.add(itemId);
-        setTrackOrder((order) => [...order, itemId]);
-      }
-      return next;
-    });
+        return next;
+      });
+      setTrackOrder((order) => [...order, itemId]);
+    }
   };
 
   const handleDragEnd = (event: DragEndEvent) => {
@@ -213,11 +218,11 @@ export function SetBuilderPanel({ crateId, items, onClose }: SetBuilderPanelProp
                     className="w-6 h-6 rounded object-cover flex-shrink-0"
                   />
                 )}
-                <span className="font-heading text-xs text-on-surface truncate flex-1">
+                <span className="font-heading text-xs text-on-surface truncate flex-1 min-w-0">
                   {item.title ?? "Unknown"}
                 </span>
                 {item.artist && (
-                  <span className="font-mono text-[10px] text-on-surface-variant flex-shrink-0 max-w-[100px] truncate">
+                  <span className="font-mono text-[10px] text-on-surface-variant flex-shrink-0 max-w-[100px] truncate min-w-0">
                     {item.artist}
                   </span>
                 )}
