@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import Link from "next/link";
 import type { SearchResult } from "@/lib/discovery/queries";
 import { getRarityTier } from "@/lib/collection/rarity";
 import { getReviewCountAction } from "@/actions/community";
@@ -86,6 +87,15 @@ export function RecordSearchCard({ release }: RecordSearchCardProps) {
 							</>
 						)}
 					</div>
+					{release.discogsId && (
+						<Link
+							href={`/release/${release.discogsId}`}
+							className="font-mono text-[10px] text-on-surface-variant hover:text-primary transition-colors inline-flex items-center gap-0.5 mt-1"
+						>
+							VIEW_RELEASE
+							<span className="material-symbols-outlined text-[12px]">arrow_forward</span>
+						</Link>
+					)}
 				</div>
 
 				{/* Owner Count */}

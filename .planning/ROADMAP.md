@@ -281,8 +281,8 @@ Plans:
 **Plans**: 3 plans
 Plans:
 - [x] 12-01-PLAN.md — Data layer: release queries, YouTube server action, CSP frame-src, SearchResult/RadarMatch discogsId fix
-- [x] 12-02-PLAN.md — Public /release/[discogsId] route: layout, page with generateMetadata, hero, YouTube embed, owners section, reviews section
-- [ ] 12-03-PLAN.md — VIEW_RELEASE entry points (CollectionCard, RecordSearchCard, RadarSection) + unit test suite
+- [ ] 12-02-PLAN.md — Public /release/[discogsId] route: layout, page with generateMetadata, hero, YouTube embed, owners section, reviews section
+- [x] 12-03-PLAN.md — VIEW_RELEASE entry points (CollectionCard, RecordSearchCard, RadarSection) + unit test suite
 **UI hint**: yes
 
 ### Phase 13: Crates & Sets

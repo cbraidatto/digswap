@@ -115,6 +115,15 @@ export async function RadarSection({ userId }: RadarSectionProps) {
               {/* Actions */}
               <div className="flex items-center gap-1 flex-shrink-0">
                 <LeadAction type="user" id={match.matchUserId} />
+                {match.discogsId && (
+                  <Link
+                    href={`/release/${match.discogsId}`}
+                    className="font-mono text-[10px] text-on-surface-variant hover:text-primary transition-colors"
+                    title="View release page"
+                  >
+                    <span className="material-symbols-outlined text-[16px]">album</span>
+                  </Link>
+                )}
                 <Link
                   href={`/perfil/${match.matchUsername}`}
                   className="font-mono text-[10px] text-on-surface-variant hover:text-primary transition-colors px-2 py-1 rounded hover:bg-surface-container-high"
