@@ -108,11 +108,11 @@
 
 ### Crates & Sets
 
-- [ ] **CRATE-01**: User can create a named crate before a digging session (e.g., "Festa Sábado 05/04")
-- [ ] **CRATE-02**: From any search result, radar card, or release page, user can add a release to an existing crate
-- [ ] **CRATE-03**: Within a crate, user can move any item to their wantlist or collection
-- [ ] **CRATE-04**: User can create a set within a crate — an ordered list of tracks representing a played set
-- [ ] **CRATE-05**: Set stores track order (position) and optional event metadata (date, venue name)
+- [x] **CRATE-01**: User can create a named crate before a digging session (e.g., "Festa Sábado 05/04")
+- [x] **CRATE-02**: From any search result, radar card, or release page, user can add a release to an existing crate
+- [x] **CRATE-03**: Within a crate, user can move any item to their wantlist or collection
+- [x] **CRATE-04**: User can create a set within a crate — an ordered list of tracks representing a played set
+- [x] **CRATE-05**: Set stores track order (position) and optional event metadata (date, venue name)
 
 ### Trade V2
 
