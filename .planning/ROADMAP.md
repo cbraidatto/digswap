@@ -24,7 +24,8 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [ ] **Phase 9: P2P Audio Trading** - DMCA compliance, WebRTC file transfer, trade reputation, TURN relay
 - [x] **Phase 10: Positioning, Radar & Workspace Foundation** - Repositioned landing, The Radar as hero feature, public acquisition surfaces, Digger Memory primitives (completed 2026-03-28)
 - [x] **Phase 11: Security Hardening** - OWASP API coverage, security test suite, penetration testing (completed 2026-03-28)
-- [x] **Phase 12: Release Pages** - Public SEO-indexable page per release: Discogs link, YouTube embed, owners list, reviews (completed 2026-03-29)
+- [x] **Phase 12: Release Pages** - Public SEO-indexable page per release: Discogs link, YouTube embed, owners list, reviews
+ (completed 2026-03-29)
 - [ ] **Phase 13: Crates & Sets** - Pre-dig folder creation, add-to-crate from any surface, ordered sets with event metadata
 - [ ] **Phase 14: Trade V2** - Explicit proposal with quality specs + collection linking, P2P 1-min preview, waveform visualization, full transfer after preview acceptance
 - [ ] **Phase 15: Social V2** - Trade-scoped messaging thread, online presence in trade context
@@ -294,7 +295,12 @@ Plans:
   2. From any release card (search, radar, release page), user can add the release to a crate
   3. User can move a crate item to their wantlist or collection
   4. User can create a set inside a crate with draggable track order and optional event metadata (date, venue)
-**Plans**: TBD
+**Plans**: 4 plans
+Plans:
+- [ ] 13-01-PLAN.md -- Schema + data layer: crates/crate_items/sets/set_tracks tables, RLS, server actions, query functions, Zod validation
+- [ ] 13-02-PLAN.md -- Crates routes: /crates list page, /crates/[id] detail, CrateCard, SetBuilderPanel (@dnd-kit), SetsSection, [MY_CRATES →] on /perfil
+- [ ] 13-03-PLAN.md -- AddToCratePopover + AddToCrateButton: injection into CollectionCard, RecordSearchCard, and release page
+- [ ] 13-04-PLAN.md -- Unit tests (server actions + component), human verification checkpoint
 
 ### Phase 14: Trade V2
 **Goal**: Trade flow becomes a 3-phase negotiation: explicit proposal → P2P audio preview → full transfer
@@ -350,7 +356,7 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7 -> 8 -> 9 -> 10
 | 10. Positioning, Radar & Workspace Foundation | 5/5 | Complete   | 2026-03-28 |
 | 11. Security Hardening | 3/3 | Complete | 2026-03-28 |
 | 12. Release Pages | 2/3 | Complete    | 2026-03-29 |
-| 13. Crates & Sets | 0/TBD | Planned | - |
+| 13. Crates & Sets | 0/4 | Planned | - |
 | 14. Trade V2 | 0/TBD | Planned | - |
 | 15. Social V2 | 0/TBD | Planned | - |
 | 16. Monetization | 0/TBD | Planned | - |
