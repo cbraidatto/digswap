@@ -54,7 +54,7 @@ export default async function NewTradePage({ searchParams }: NewTradePageProps) 
 
 	// Fetch user's collection for offering release picker (D-02)
 	const { data: collectionItems } = await admin
-		.from("user_collections")
+		.from("collection_items")
 		.select("release_id, releases(id, title, artist, thumbnail_url)")
 		.eq("user_id", user.id)
 		.order("created_at", { ascending: false })
