@@ -35,10 +35,9 @@ async function requireUser() {
 export async function createTrade(formData: {
 	providerId: string;
 	releaseId?: string;
-	fileName: string;
-	fileFormat: string;
-	declaredBitrate: string;
-	fileSizeBytes: number;
+	offeringReleaseId: string;
+	declaredQuality: string;
+	conditionNotes: string;
 	message?: string;
 }): Promise<{ success?: boolean; tradeId?: string; error?: string; tradesRemaining?: number }> {
 	// D-03 server-side P2P gate check
@@ -72,23 +71,35 @@ export async function createTrade(formData: {
 		return { error: "Trade quota reached", tradesRemaining: 0 };
 	}
 
+	// Validate new proposal fields (D-02, D-05)
+	if (!formData.offeringReleaseId) {
+		return { error: "You must select a release you're offering" };
+	}
+	if (!formData.conditionNotes || formData.conditionNotes.trim().length < 10) {
+		return { error: "Condition notes must be at least 10 characters" };
+	}
+	if (!formData.declaredQuality || formData.declaredQuality.trim().length === 0) {
+		return { error: "Declared quality is required" };
+	}
+
 	// Compute expiry timestamp
 	const expiresAt = new Date(Date.now() + TRADE_EXPIRY_HOURS * 60 * 60 * 1000).toISOString();
 
-	// Insert trade request
+	// Insert trade request — metadata only at proposal time (D-02)
+	// File fields (file_name, file_format, declared_bitrate, file_size_bytes) are set in the lobby, not here
 	const { data: trade, error: insertError } = await admin
 		.from("trade_requests")
 		.insert({
 			requester_id: user.id,
 			provider_id: formData.providerId,
-			release_id: formData.releaseId ?? null,
-			status: TRADE_STATUS.PENDING,
-			message: formData.message ?? null,
+			release_id: formData.releaseId || null,
+			offering_release_id: formData.offeringReleaseId,
+			declared_quality: formData.declaredQuality.trim(),
+			condition_notes: formData.conditionNotes.trim(),
+			status: "lobby",
+			message: formData.message?.trim() || null,
 			expires_at: expiresAt,
-			file_name: formData.fileName,
-			file_format: formData.fileFormat,
-			declared_bitrate: formData.declaredBitrate,
-			file_size_bytes: formData.fileSizeBytes,
+			terms_accepted_at: new Date().toISOString(),
 		})
 		.select("id")
 		.single();
@@ -103,13 +114,13 @@ export async function createTrade(formData: {
 		user_id: formData.providerId,
 		type: "trade_request",
 		title: "New trade request",
-		body: `Someone wants to trade "${formData.fileName}" with you`,
+		body: "Someone wants to trade with you",
 		link: `/trades/${trade.id}`,
 	});
 
 	// Send trade request email (non-fatal)
 	try {
-		await sendTradeRequestEmail(formData.providerId, formData.fileName, trade.id);
+		await sendTradeRequestEmail(formData.providerId, "trade offer", trade.id);
 	} catch {
 		// Email failure should not break trade creation
 	}
