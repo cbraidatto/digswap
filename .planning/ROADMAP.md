@@ -281,7 +281,7 @@ Plans:
 **Plans**: 3 plans
 Plans:
 - [x] 12-01-PLAN.md — Data layer: release queries, YouTube server action, CSP frame-src, SearchResult/RadarMatch discogsId fix
-- [ ] 12-02-PLAN.md — Public /release/[discogsId] route: layout, page with generateMetadata, hero, YouTube embed, owners section, reviews section
+- [x] 12-02-PLAN.md — Public /release/[discogsId] route: layout, page with generateMetadata, hero, YouTube embed, owners section, reviews section
 - [ ] 12-03-PLAN.md — VIEW_RELEASE entry points (CollectionCard, RecordSearchCard, RadarSection) + unit test suite
 **UI hint**: yes
 
@@ -349,7 +349,7 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7 -> 8 -> 9 -> 10
 | 9. P2P Audio Trading | 2/6 | In Progress | - |
 | 10. Positioning, Radar & Workspace Foundation | 5/5 | Complete   | 2026-03-28 |
 | 11. Security Hardening | 3/3 | Complete | 2026-03-28 |
-| 12. Release Pages | 1/3 | In Progress|  |
+| 12. Release Pages | 2/3 | In Progress|  |
 | 13. Crates & Sets | 0/TBD | Planned | - |
 | 14. Trade V2 | 0/TBD | Planned | - |
 | 15. Social V2 | 0/TBD | Planned | - |
