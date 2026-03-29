@@ -298,7 +298,7 @@ Plans:
 **Plans**: 4 plans
 Plans:
 - [x] 13-01-PLAN.md -- Schema + data layer: crates/crate_items/sets/set_tracks tables, RLS, server actions, query functions, Zod validation
-- [ ] 13-02-PLAN.md -- Crates routes: /crates list page, /crates/[id] detail, CrateCard, SetBuilderPanel (@dnd-kit), SetsSection, [MY_CRATES →] on /perfil
+- [x] 13-02-PLAN.md -- Crates routes: /crates list page, /crates/[id] detail, CrateCard, SetBuilderPanel (@dnd-kit), SetsSection, [MY_CRATES →] on /perfil
 - [ ] 13-03-PLAN.md -- AddToCratePopover + AddToCrateButton: injection into CollectionCard, RecordSearchCard, and release page
 - [ ] 13-04-PLAN.md -- Unit tests (server actions + component), human verification checkpoint
 
@@ -356,7 +356,7 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7 -> 8 -> 9 -> 10
 | 10. Positioning, Radar & Workspace Foundation | 5/5 | Complete   | 2026-03-28 |
 | 11. Security Hardening | 3/3 | Complete | 2026-03-28 |
 | 12. Release Pages | 2/3 | Complete    | 2026-03-29 |
-| 13. Crates & Sets | 1/4 | In Progress|  |
+| 13. Crates & Sets | 2/4 | In Progress|  |
 | 14. Trade V2 | 0/TBD | Planned | - |
 | 15. Social V2 | 0/TBD | Planned | - |
 | 16. Monetization | 0/TBD | Planned | - |
