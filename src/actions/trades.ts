@@ -334,6 +334,8 @@ export async function updateTradeStatus(
 
 	// Validate state transitions
 	const validTransitions: Record<string, string[]> = {
+		[TRADE_STATUS.LOBBY]: [TRADE_STATUS.PREVIEWING],
+		[TRADE_STATUS.PREVIEWING]: [TRADE_STATUS.TRANSFERRING],
 		[TRADE_STATUS.ACCEPTED]: [TRADE_STATUS.TRANSFERRING],
 		[TRADE_STATUS.TRANSFERRING]: [TRADE_STATUS.COMPLETED],
 	};
@@ -688,6 +690,142 @@ export async function getActionableTradeCount(): Promise<number> {
 		.in("status", [TRADE_STATUS.ACCEPTED, TRADE_STATUS.TRANSFERRING]);
 
 	return (pendingCount ?? 0) + (activeCount ?? 0);
+}
+
+// ---------------------------------------------------------------------------
+// Accept Terms (negotiation phase)
+// ---------------------------------------------------------------------------
+
+export async function acceptTerms(
+	tradeId: string,
+): Promise<{ success?: boolean; error?: string; bothAccepted?: boolean }> {
+	const user = await requireUser();
+
+	const { success: rlSuccess } = await tradeRateLimit.limit(user.id);
+	if (!rlSuccess) {
+		return { error: "Too many requests. Please wait a moment." };
+	}
+
+	const admin = createAdminClient();
+
+	const { data: trade, error } = await admin
+		.from("trade_requests")
+		.select("id, requester_id, provider_id, status, terms_accepted_at, terms_accepted_by_recipient_at")
+		.eq("id", tradeId)
+		.single();
+
+	if (error || !trade) {
+		return { error: "Trade not found" };
+	}
+
+	if (trade.requester_id !== user.id && trade.provider_id !== user.id) {
+		return { error: "Not a participant in this trade" };
+	}
+
+	if (trade.status !== TRADE_STATUS.LOBBY) {
+		return { error: "Trade is not in lobby phase" };
+	}
+
+	// Determine which timestamp to set based on role
+	const isRequester = trade.requester_id === user.id;
+	const updateField = isRequester ? "terms_accepted_at" : "terms_accepted_by_recipient_at";
+
+	const { error: updateError } = await admin
+		.from("trade_requests")
+		.update({
+			[updateField]: new Date().toISOString(),
+			updated_at: new Date().toISOString(),
+		})
+		.eq("id", tradeId)
+		.eq("status", TRADE_STATUS.LOBBY);
+
+	if (updateError) {
+		return { error: "Failed to accept terms" };
+	}
+
+	// Check if both have now accepted
+	const otherField = isRequester ? "terms_accepted_by_recipient_at" : "terms_accepted_at";
+	const otherAlreadyAccepted = trade[otherField] !== null;
+
+	if (otherAlreadyAccepted) {
+		// Both accepted: advance status to previewing
+		await admin
+			.from("trade_requests")
+			.update({
+				status: TRADE_STATUS.PREVIEWING,
+				updated_at: new Date().toISOString(),
+			})
+			.eq("id", tradeId)
+			.eq("status", TRADE_STATUS.LOBBY);
+
+		return { success: true, bothAccepted: true };
+	}
+
+	return { success: true, bothAccepted: false };
+}
+
+// ---------------------------------------------------------------------------
+// Decline Terms (negotiation phase)
+// ---------------------------------------------------------------------------
+
+export async function declineTerms(
+	tradeId: string,
+): Promise<{ success?: boolean; error?: string }> {
+	const user = await requireUser();
+
+	const { success: rlSuccess } = await tradeRateLimit.limit(user.id);
+	if (!rlSuccess) {
+		return { error: "Too many requests. Please wait a moment." };
+	}
+
+	const admin = createAdminClient();
+
+	const { data: trade, error } = await admin
+		.from("trade_requests")
+		.select("id, requester_id, provider_id, status")
+		.eq("id", tradeId)
+		.single();
+
+	if (error || !trade) {
+		return { error: "Trade not found" };
+	}
+
+	if (trade.requester_id !== user.id && trade.provider_id !== user.id) {
+		return { error: "Not a participant in this trade" };
+	}
+
+	if (trade.status !== TRADE_STATUS.LOBBY) {
+		return { error: "Trade is not in lobby phase" };
+	}
+
+	const { error: updateError } = await admin
+		.from("trade_requests")
+		.update({
+			status: TRADE_STATUS.DECLINED,
+			updated_at: new Date().toISOString(),
+		})
+		.eq("id", tradeId)
+		.eq("status", TRADE_STATUS.LOBBY);
+
+	if (updateError) {
+		return { error: "Failed to decline terms" };
+	}
+
+	return { success: true };
+}
+
+// ---------------------------------------------------------------------------
+// Update Last Joined Lobby (audit timestamp)
+// ---------------------------------------------------------------------------
+
+export async function updateLastJoinedLobby(tradeId: string): Promise<void> {
+	const user = await requireUser();
+	const admin = createAdminClient();
+	await admin
+		.from("trade_requests")
+		.update({ last_joined_lobby_at: new Date().toISOString() })
+		.eq("id", tradeId)
+		.or(`requester_id.eq.${user.id},provider_id.eq.${user.id}`);
 }
 
 // ---------------------------------------------------------------------------
