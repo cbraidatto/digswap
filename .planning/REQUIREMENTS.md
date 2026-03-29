@@ -100,11 +100,11 @@
 
 ### Release Pages
 
-- [ ] **REL-01**: Each release/record has a dedicated public page at /release/[discogsId] (SEO-indexable, no login required)
-- [ ] **REL-02**: Release page shows a direct link to the corresponding Discogs release page
-- [ ] **REL-03**: Release page embeds a YouTube video (auto-searched by artist + title, cached in DB to avoid quota burn)
-- [ ] **REL-04**: Release page lists all platform users who have this release in their collection with links to their profiles
-- [ ] **REL-05**: Release page shows all reviews written for this release on the platform
+- [x] **REL-01**: Each release/record has a dedicated public page at /release/[discogsId] (SEO-indexable, no login required)
+- [x] **REL-02**: Release page shows a direct link to the corresponding Discogs release page
+- [x] **REL-03**: Release page embeds a YouTube video (auto-searched by artist + title, cached in DB to avoid quota burn)
+- [x] **REL-04**: Release page lists all platform users who have this release in their collection with links to their profiles
+- [x] **REL-05**: Release page shows all reviews written for this release on the platform
 
 ### Crates & Sets
 
