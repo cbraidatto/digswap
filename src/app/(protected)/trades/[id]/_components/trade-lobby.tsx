@@ -14,6 +14,8 @@ import { updateTradeStatus, cancelTrade } from "@/actions/trades";
 
 import { formatFileSize } from "@/lib/audio/file-metadata";
 
+import { useReceivedFileStore, triggerBlobDownload } from "@/lib/webrtc/received-file-store";
+
 import { TransferProgress } from "./transfer-progress";
 
 
@@ -36,7 +38,9 @@ type LobbyState =
 
 	| "complete"
 
-	| "failed";
+	| "failed"
+
+	| "disconnected";
 
 
 
@@ -102,6 +106,10 @@ export function TradeLobby({
 
 	const [cancelLoading, setCancelLoading] = useState(false);
 
+	const fileDownloadedRef = useRef(false);
+
+	const setReceivedFile = useReceivedFileStore((s) => s.setFile);
+
 	const channelRef = useRef<ReturnType<
 
 		ReturnType<typeof createClient>["channel"]
@@ -152,6 +160,10 @@ export function TradeLobby({
 
 			setLobbyState("complete");
 
+		} else if (peerState.status === "disconnected") {
+
+			setLobbyState("disconnected");
+
 		} else if (peerState.status === "failed") {
 
 			setLobbyState("failed");
@@ -159,6 +171,44 @@ export function TradeLobby({
 		}
 
 	}, [peerState.status]);
+
+
+
+	// -----------------------------------------------------------------------
+
+	// Persist received file: trigger download + populate Zustand store
+
+	// -----------------------------------------------------------------------
+
+
+
+	useEffect(() => {
+
+		if (
+
+			peerState.status === "complete" &&
+
+			peerState.receivedFile &&
+
+			peerState.receivedFileName &&
+
+			!fileDownloadedRef.current
+
+		) {
+
+			fileDownloadedRef.current = true;
+
+			// Save to Zustand store so review/spec-analysis page can access it
+
+			setReceivedFile(peerState.receivedFile, peerState.receivedFileName);
+
+			// Trigger browser file download — both sides receive the other's file
+
+			triggerBlobDownload(peerState.receivedFile, peerState.receivedFileName);
+
+		}
+
+	}, [peerState.status, peerState.receivedFile, peerState.receivedFileName, setReceivedFile]);
 
 
 
@@ -314,21 +364,13 @@ export function TradeLobby({
 
 	useEffect(() => {
 
-		if (
-
-			role === "sender" &&
-
-			selectedFile &&
-
-			peerState.status === "connecting"
-
-		) {
+		if (selectedFile && peerState.readyToSend) {
 
 			sendFile();
 
 		}
 
-	}, [role, selectedFile, peerState.status, sendFile]);
+	}, [selectedFile, peerState.readyToSend, sendFile]);
 
 
 
@@ -384,7 +426,7 @@ export function TradeLobby({
 
 		setLobbyState("waiting");
 
-		retry();
+		retry(); // retry() now preserves chunks for resume
 
 	}, [retry]);
 
@@ -416,13 +458,15 @@ export function TradeLobby({
 
 					<h1 className="text-3xl font-bold font-heading">
 
-						WAITING_FOR_PEER
+						{peerState.connectionAttempts > 0 ? "CONNECTING..." : "WAITING_FOR_PEER"}
 
 					</h1>
 
 					<p className="text-sm text-on-surface-variant">
 
-						Waiting for counterparty to join the lobby...
+						{peerState.connectionAttempts > 0
+							? `Establishing peer connection... (attempt ${peerState.connectionAttempts + 1}/11)`
+							: "Waiting for counterparty to join the lobby..."}
 
 					</p>
 
@@ -448,15 +492,15 @@ export function TradeLobby({
 
 
 
-					{/* Sender file selection prompt */}
+					{/* Both users must select their file to send */}
 
-					{role === "sender" && !selectedFile && (
+					{!selectedFile && (
 
 						<div className="mt-6 bg-surface-container-low rounded-lg p-4 border border-outline-variant/10">
 
 							<p className="text-[10px] font-mono text-on-surface-variant mb-2">
 
-								SELECT_FILE_TO_SEND:
+								SELECT_YOUR_FILE_TO_SWAP:
 
 							</p>
 
@@ -490,15 +534,13 @@ export function TradeLobby({
 
 
 
-					{role === "sender" && selectedFile && (
+					{selectedFile && (
 
 						<div className="mt-4 bg-surface-container-low rounded-lg p-3 border border-primary/20">
 
 							<p className="text-[10px] font-mono text-primary">
 
-								FILE_READY: {selectedFile.name} (
-
-								{formatFileSize(selectedFile.size)})
+								FILE_READY: {selectedFile.name} ({formatFileSize(selectedFile.size)})
 
 							</p>
 
@@ -586,13 +628,13 @@ export function TradeLobby({
 
 
 
-					{role === "sender" && !selectedFile && (
+					{!selectedFile && (
 
 						<div className="mt-4 bg-surface-container-low rounded-lg p-4 border border-secondary/20">
 
 							<p className="text-[10px] font-mono text-secondary mb-2">
 
-								SELECT_FILE_TO_SEND:
+								SELECT_YOUR_FILE_TO_SWAP:
 
 							</p>
 
@@ -608,11 +650,11 @@ export function TradeLobby({
 
 					)}
 
-					{role === "sender" && selectedFile && (
+					{selectedFile && (
 
 						<p className="text-[10px] font-mono text-primary mt-2">
 
-							FILE_READY: {selectedFile.name} � sending...
+							FILE_READY: {selectedFile.name}
 
 						</p>
 
@@ -624,7 +666,7 @@ export function TradeLobby({
 
 
 
-			{/* ---- TRANSFERRING state ---- */}
+			{/* ---- TRANSFERRING state (bidirectional — both upload & download simultaneously) ---- */}
 
 			{lobbyState === "transferring" && (
 
@@ -638,49 +680,220 @@ export function TradeLobby({
 
 					<h1 className="text-3xl font-bold font-heading text-primary">
 
-						TRANSFERRING
+						SWAPPING
 
 					</h1>
 
-					<div className="space-y-1">
+					{/* File picker: must remain visible if user hasn't selected yet (receiving can start before they pick) */}
+					{!selectedFile && (
+						<div className="bg-surface-container-low rounded-lg p-4 border border-primary/40">
+							<p className="text-[10px] font-mono text-primary mb-2">
+								SELECT_YOUR_FILE_TO_SWAP:
+							</p>
+							<label className="inline-block px-4 py-2 bg-primary text-on-primary text-sm font-mono rounded cursor-pointer hover:opacity-90 transition-opacity">
+								CHOOSE_FILE
+								<input type="file" accept="audio/*" onChange={handleFileSelect} className="hidden" />
+							</label>
+						</div>
+					)}
 
-						<p className="text-[10px] font-mono text-on-surface-variant">
+					{/* Upload direction: my file → them */}
+					<div className="space-y-1 text-left">
 
-							FILE: {fileName}
+						<p className="text-[10px] font-mono text-on-surface-variant">UPLOAD (your file)</p>
 
-						</p>
+						<TransferProgress
 
-						<p className="text-[10px] font-mono text-on-surface-variant">
+							progress={peerState.progress}
 
-							SIZE: {formatFileSize(fileSizeBytes)}
+							bytesTransferred={peerState.bytesTransferred}
 
-						</p>
+							totalBytes={peerState.totalBytes}
+
+							speed={peerState.speed}
+
+							eta={peerState.eta}
+
+						/>
 
 					</div>
 
+					{/* Download direction: their file → me */}
+					<div className="space-y-1 text-left">
+
+						<p className="text-[10px] font-mono text-on-surface-variant">DOWNLOAD (their file)</p>
+
+						<TransferProgress
+
+							progress={peerState.receiveProgress}
+
+							bytesTransferred={peerState.bytesReceived}
+
+							totalBytes={peerState.totalBytesToReceive}
+
+							speed={0}
+
+							eta={0}
+
+						/>
+
+					</div>
+
+				</div>
+
+			)}
 
 
-					<TransferProgress
 
-						progress={peerState.progress}
+			{/* ---- COMPLETE state (brief, before redirect) ---- */}
 
-						bytesTransferred={peerState.bytesTransferred}
+			{lobbyState === "complete" && (
 
-						totalBytes={peerState.totalBytes}
+				<div className="space-y-4">
 
-						speed={peerState.speed}
+					<span className="material-symbols-outlined text-primary text-5xl">
 
-						eta={peerState.eta}
+						check_circle
 
-					/>
+					</span>
 
+					<h1 className="text-3xl font-bold font-heading text-primary">
 
+						TRANSFER_COMPLETE
 
-					<p className="text-[10px] font-mono text-on-surface-variant mt-2">
+					</h1>
 
-						{role === "sender" ? "SENDING..." : "RECEIVING..."}
+					<p className="text-sm text-on-surface-variant">
+
+						Swap complete. File downloading. Redirecting...
 
 					</p>
+
+					{peerState.receivedFile && peerState.receivedFileName && (
+
+						<button
+
+							type="button"
+
+							onClick={() => triggerBlobDownload(peerState.receivedFile!, peerState.receivedFileName!)}
+
+							className="mt-4 px-6 py-2 bg-primary text-on-primary text-sm font-mono rounded hover:opacity-90 transition-opacity"
+
+						>
+
+							DOWNLOAD_AGAIN
+
+						</button>
+
+					)}
+
+				</div>
+
+			)}
+
+
+
+			{/* ---- DISCONNECTED state (mid-transfer, recoverable) ---- */}
+
+			{lobbyState === "disconnected" && (
+
+				<div className="space-y-4">
+
+					<span className="material-symbols-outlined text-warning text-5xl">
+
+						wifi_off
+
+					</span>
+
+					<h1 className="text-3xl font-bold font-heading text-warning">
+
+						CONNECTION_LOST
+
+					</h1>
+
+					<p className="text-sm text-on-surface-variant">
+
+						The peer-to-peer connection was interrupted during transfer.
+
+					</p>
+
+					{peerState.error && (
+
+						<p className="text-[10px] font-mono text-warning">
+
+							{peerState.error}
+
+						</p>
+
+					)}
+
+					{peerState.progress > 0 && (
+
+						<div className="mt-2 space-y-1">
+
+							<p className="text-[10px] font-mono text-on-surface-variant">
+
+								PROGRESS_SAVED: {peerState.progress}%
+
+							</p>
+
+							<div className="w-full h-2 bg-surface-container-high rounded-full overflow-hidden">
+
+								<div
+
+									className="h-full bg-warning rounded-full transition-all"
+
+									style={{ width: `${peerState.progress}%` }}
+
+								/>
+
+							</div>
+
+							<p className="text-[10px] font-mono text-on-surface-variant">
+
+								Transfer will resume from where it left off.
+
+							</p>
+
+						</div>
+
+					)}
+
+
+
+					<div className="flex items-center justify-center gap-4 mt-6">
+
+						<button
+
+							type="button"
+
+							onClick={handleRetry}
+
+							className="px-6 py-2 bg-primary text-on-primary text-sm font-mono rounded hover:opacity-90 transition-opacity"
+
+						>
+
+							RETRY_AND_RESUME
+
+						</button>
+
+						<button
+
+							type="button"
+
+							onClick={handleCancel}
+
+							disabled={cancelLoading}
+
+							className="px-6 py-2 bg-surface-container-high text-on-surface text-sm font-mono rounded hover:bg-surface-bright transition-colors disabled:opacity-50"
+
+						>
+
+							CANCEL_TRADE
+
+						</button>
+
+					</div>
 
 				</div>
 

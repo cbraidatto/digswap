@@ -24,6 +24,11 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [ ] **Phase 9: P2P Audio Trading** - DMCA compliance, WebRTC file transfer, trade reputation, TURN relay
 - [x] **Phase 10: Positioning, Radar & Workspace Foundation** - Repositioned landing, The Radar as hero feature, public acquisition surfaces, Digger Memory primitives (completed 2026-03-28)
 - [x] **Phase 11: Security Hardening** - OWASP API coverage, security test suite, penetration testing (completed 2026-03-28)
+- [ ] **Phase 12: Release Pages** - Public SEO-indexable page per release: Discogs link, YouTube embed, owners list, reviews
+- [ ] **Phase 13: Crates & Sets** - Pre-dig folder creation, add-to-crate from any surface, ordered sets with event metadata
+- [ ] **Phase 14: Trade V2** - Explicit proposal with quality specs + collection linking, P2P 1-min preview, waveform visualization, full transfer after preview acceptance
+- [ ] **Phase 15: Social V2** - Trade-scoped messaging thread, online presence in trade context
+- [ ] **Phase 16: Monetization** - Stripe freemium, trade quotas, premium features
 
 ## Phase Details
 
@@ -264,10 +269,66 @@ Plans:
 - [x] 11-02-PLAN.md -- Rate limiting on all server actions + input validation + 5 security test implementations
 - [x] 11-03-PLAN.md -- Auth bypass tests + RLS coverage tests + ZAP pen test prep + human verification
 
+### Phase 12: Release Pages
+**Goal**: Every record in the Discogs universe gets a public SEO-indexable page on DigSwap, turning every release into an acquisition surface
+**Depends on**: Phase 11
+**Requirements**: REL-01, REL-02, REL-03, REL-04, REL-05, NOTF-05, NAV-04
+**Success Criteria** (what must be TRUE):
+  1. /release/[discogsId] loads without authentication and is crawlable by search engines
+  2. Page shows Discogs link, YouTube embed (cached), owners list with profile links, and all platform reviews
+  3. Notification badge resets to 0 after user reads notifications — no stale count
+  4. Trade icon appears in navbar beside notification bell with its own unread count
+**Plans**: TBD
+
+### Phase 13: Crates & Sets
+**Goal**: Diggers can organize digging sessions into named crates and document played sets with track order
+**Depends on**: Phase 12
+**Requirements**: CRATE-01, CRATE-02, CRATE-03, CRATE-04, CRATE-05
+**Success Criteria** (what must be TRUE):
+  1. User can create a crate and see it in their workspace
+  2. From any release card (search, radar, release page), user can add the release to a crate
+  3. User can move a crate item to their wantlist or collection
+  4. User can create a set inside a crate with draggable track order and optional event metadata (date, venue)
+**Plans**: TBD
+
+### Phase 14: Trade V2
+**Goal**: Trade flow becomes a 3-phase negotiation: explicit proposal → P2P audio preview → full transfer
+**Depends on**: Phase 13
+**Requirements**: TRADE2-01, TRADE2-02, TRADE2-03, TRADE2-04, TRADE2-05, TRADE2-06, TRADE2-07, TRADE2-08, TRADE2-09, TRADE2-10
+**Success Criteria** (what must be TRUE):
+  1. Trade proposal shows what each party offers and requests explicitly, with quality metadata
+  2. Proposer can link a collection item directly (metadata auto-filled) or fill manually
+  3. Files under 1 minute are rejected at selection with a clear validation message
+  4. After both accept terms, a 1-minute random P2P preview plays in both browsers via Web Audio API
+  5. Waveform visualization generated client-side from the preview — no audio touches the server
+  6. Full P2P transfer only begins after both parties accept the preview
+  7. Both users receive an in-app alert when both are simultaneously online during the transfer window
+**Plans**: TBD
+
+### Phase 15: Social V2
+**Goal**: Trade participants can communicate within the trade context; presence is visible during active trades
+**Depends on**: Phase 14
+**Requirements**: SOC2-01, SOC2-02
+**Success Criteria** (what must be TRUE):
+  1. Each trade has a message thread visible to both participants within the trade page
+  2. Online presence indicator shows in trade lobby when both parties are connected
+**Plans**: TBD
+
+### Phase 16: Monetization
+**Goal**: Freemium model with Stripe — free tier trade limits, premium unlocks, subscription management
+**Depends on**: Phase 15
+**Requirements**: MON-01, MON-02, MON-03, MON-04, MON-05, MON-06, MON-07
+**Success Criteria** (what must be TRUE):
+  1. Free users see a trade counter and are blocked after 5 trades/month with an upgrade prompt
+  2. Premium users have no trade limit and access collection analytics, premium groups, priority matching
+  3. User can subscribe to premium via Stripe (monthly or annual) and cancel anytime
+  4. Subscription state syncs to the database via Stripe webhooks
+**Plans**: TBD
+
 ## Progress
 
 **Execution Order:**
-Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7 -> 8 -> 9 -> 10 -> 11
+Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7 -> 8 -> 9 -> 10 -> 11 -> 12 -> 13 -> 14 -> 15 -> 16
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
@@ -283,3 +344,8 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7 -> 8 -> 9 -> 10
 | 9. P2P Audio Trading | 2/6 | In Progress | - |
 | 10. Positioning, Radar & Workspace Foundation | 5/5 | Complete   | 2026-03-28 |
 | 11. Security Hardening | 3/3 | Complete | 2026-03-28 |
+| 12. Release Pages | 0/TBD | Planned | - |
+| 13. Crates & Sets | 0/TBD | Planned | - |
+| 14. Trade V2 | 0/TBD | Planned | - |
+| 15. Social V2 | 0/TBD | Planned | - |
+| 16. Monetization | 0/TBD | Planned | - |

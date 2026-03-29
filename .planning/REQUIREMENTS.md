@@ -92,6 +92,45 @@
 - [x] **NOTF-02**: User receives email notifications for: wantlist match, trade request
 - [ ] **NOTF-03**: User can enable browser push notifications
 - [x] **NOTF-04**: User can configure which notification types they want to receive
+- [ ] **NOTF-05**: Notification badge count resets to 0 after user reads all notifications (no stale count)
+
+### Navigation
+
+- [ ] **NAV-04**: Trade inbox icon visible in navbar beside the notification bell with its own unread count badge
+
+### Release Pages
+
+- [ ] **REL-01**: Each release/record has a dedicated public page at /release/[discogsId] (SEO-indexable, no login required)
+- [ ] **REL-02**: Release page shows a direct link to the corresponding Discogs release page
+- [ ] **REL-03**: Release page embeds a YouTube video (auto-searched by artist + title, cached in DB to avoid quota burn)
+- [ ] **REL-04**: Release page lists all platform users who have this release in their collection with links to their profiles
+- [ ] **REL-05**: Release page shows all reviews written for this release on the platform
+
+### Crates & Sets
+
+- [ ] **CRATE-01**: User can create a named crate before a digging session (e.g., "Festa Sábado 05/04")
+- [ ] **CRATE-02**: From any search result, radar card, or release page, user can add a release to an existing crate
+- [ ] **CRATE-03**: Within a crate, user can move any item to their wantlist or collection
+- [ ] **CRATE-04**: User can create a set within a crate — an ordered list of tracks representing a played set
+- [ ] **CRATE-05**: Set stores track order (position) and optional event metadata (date, venue name)
+
+### Trade V2
+
+- [ ] **TRADE2-01**: Trade proposal explicitly shows what each party is offering and requesting before acceptance
+- [ ] **TRADE2-02**: Proposer can link an item directly from their Discogs collection as the offer (metadata auto-filled)
+- [ ] **TRADE2-03**: Proposer fills in audio quality metadata: format (FLAC/MP3/WAV), bitrate, and condition notes
+- [ ] **TRADE2-04**: Recipient sees full offer details (record, quality specs, notes) before accepting or declining
+- [ ] **TRADE2-05**: After both accept trade terms, a P2P audio preview phase is initiated before full transfer
+- [ ] **TRADE2-06**: Preview is a random 1-minute segment of the file at original quality, sent P2P via WebRTC — no server involvement
+- [ ] **TRADE2-07**: Files shorter than 1 minute are rejected at selection time with a clear validation message
+- [ ] **TRADE2-08**: Preview plays via Web Audio API in the receiver's browser with waveform visualization generated client-side
+- [ ] **TRADE2-09**: After both parties accept the preview, the full P2P file transfer proceeds
+- [ ] **TRADE2-10**: Trade lobby notifies both users with an in-app alert when both parties are simultaneously online
+
+### Social V2
+
+- [ ] **SOC2-01**: Trade participants can exchange messages within a trade-specific thread (no global chat)
+- [ ] **SOC2-02**: Online presence indicator visible in trade lobby and on user profiles during active trade
 
 ### Monetization (Freemium)
 
