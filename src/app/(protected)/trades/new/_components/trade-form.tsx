@@ -139,17 +139,43 @@ export function TradeForm({
 						</div>
 					) : (
 						<>
+							{/* Selected record chip */}
+							{offeringReleaseId && (() => {
+								const sel = userCollection.find(i => i.releaseId === offeringReleaseId);
+								return sel ? (
+									<div className="flex items-center gap-2 bg-primary/10 border border-primary/30 rounded-lg px-3 py-2 mb-3">
+										{sel.thumbnailUrl ? (
+											<img src={sel.thumbnailUrl} alt={sel.title} className="w-8 h-8 rounded object-cover flex-shrink-0" />
+										) : (
+											<span className="material-symbols-outlined text-primary text-base flex-shrink-0">album</span>
+										)}
+										<div className="min-w-0 flex-1">
+											<div className="text-xs font-mono text-primary font-bold truncate">{sel.title}</div>
+											<div className="text-[10px] font-mono text-on-surface-variant truncate">{sel.artist}</div>
+										</div>
+										<button
+											type="button"
+											onClick={() => setOfferingReleaseId("")}
+											className="flex-shrink-0 text-on-surface-variant hover:text-on-surface transition-colors ml-1"
+											aria-label="Clear selection"
+										>
+											<span className="material-symbols-outlined text-base">close</span>
+										</button>
+									</div>
+								) : null;
+							})()}
+
 							{/* Search input */}
 							<input
 								type="text"
 								value={collectionSearch}
 								onChange={(e) => setCollectionSearch(e.target.value)}
 								placeholder="Search your collection..."
-								className="w-full bg-surface-container-lowest border border-outline-variant/20 rounded px-3 py-2 text-xs font-mono text-on-surface placeholder:text-on-surface-variant/40 focus:border-primary/40 focus:outline-none mb-3"
+								className="w-full bg-surface-container-lowest border border-outline-variant/20 rounded px-3 py-2 text-xs font-mono text-on-surface placeholder:text-on-surface-variant/40 focus:border-primary/40 focus:outline-none mb-2"
 							/>
 
 							{/* Scrollable collection list */}
-							<div className="max-h-[200px] overflow-y-auto space-y-1 pr-1">
+							<div className="max-h-[260px] overflow-y-auto space-y-0.5 pr-1">
 								{filteredCollection.length === 0 ? (
 									<div className="text-[10px] font-mono text-on-surface-variant/60 text-center py-4">
 										No releases match your search
@@ -162,18 +188,18 @@ export function TradeForm({
 											onClick={() => setOfferingReleaseId(item.releaseId)}
 											className={`w-full flex items-center gap-3 rounded-lg p-2 transition-all text-left ${
 												offeringReleaseId === item.releaseId
-													? "ring-2 ring-primary bg-surface-container-lowest"
-													: "hover:bg-surface-container-lowest/50"
+													? "bg-primary/10 border border-primary/30"
+													: "hover:bg-surface-container-lowest/60 border border-transparent"
 											}`}
 										>
 											{item.thumbnailUrl ? (
 												<img
 													src={item.thumbnailUrl}
 													alt={item.title}
-													className="w-10 h-10 rounded object-cover flex-shrink-0"
+													className="w-9 h-9 rounded object-cover flex-shrink-0"
 												/>
 											) : (
-												<div className="w-10 h-10 rounded bg-surface-container-high flex items-center justify-center flex-shrink-0">
+												<div className="w-9 h-9 rounded bg-surface-container-high flex items-center justify-center flex-shrink-0">
 													<span className="material-symbols-outlined text-on-surface-variant/40 text-sm">
 														album
 													</span>
@@ -187,6 +213,9 @@ export function TradeForm({
 													{item.artist}
 												</div>
 											</div>
+											{offeringReleaseId === item.releaseId && (
+												<span className="material-symbols-outlined text-primary text-base flex-shrink-0">check_circle</span>
+											)}
 										</button>
 									))
 								)}
