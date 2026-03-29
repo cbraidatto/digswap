@@ -11,10 +11,15 @@ import {
 	acceptTerms,
 	declineTerms,
 	updateLastJoinedLobby,
+	acceptPreview,
+	rejectPreview,
+	updateFileHash,
 } from "@/actions/trades";
 import { formatFileSize } from "@/lib/audio/file-metadata";
 import { useReceivedFileStore, triggerBlobDownload } from "@/lib/webrtc/received-file-store";
 import { TransferProgress } from "./transfer-progress";
+import { PreviewPlayer } from "./preview-player";
+import { SpectrogramCanvas } from "../../review/_components/spectrogram-canvas";
 
 // ---------------------------------------------------------------------------
 // Types
@@ -84,12 +89,24 @@ export function TradeLobby({
 	const [bothOnline, setBothOnline] = useState(false);
 	const fileDownloadedRef = useRef(false);
 	const setReceivedFile = useReceivedFileStore((s) => s.setFile);
+
+	// Preview subsystem state (Plan 14-04)
+	const [fileHash, setFileHash] = useState<string | null>(null);
+	const [hashingProgress, setHashingProgress] = useState<"idle" | "computing" | "ready">("idle");
+	const [fileDuration, setFileDuration] = useState<number | null>(null);
+	const [estimatedBitrate, setEstimatedBitrate] = useState<number | null>(null);
+	const [fileValidationError, setFileValidationError] = useState<string | null>(null);
+	const [sendingPreview, setSendingPreview] = useState(false);
+	const [acceptingPreview, setAcceptingPreview] = useState(false);
+	const [myPreviewAccepted, setMyPreviewAccepted] = useState(false);
+	const [showSpectrum, setShowSpectrum] = useState(false);
+	const [spectrumAudioEl, setSpectrumAudioEl] = useState<HTMLAudioElement | null>(null);
 	const presenceChannelRef = useRef<ReturnType<
 		ReturnType<typeof createClient>["channel"]
 	> | null>(null);
 
 	// Initialize PeerJS connection hook
-	const { state: peerState, sendFile, retry } = usePeerConnection(
+	const { state: peerState, sendFile, sendPreview: sendPreviewP2P, retry } = usePeerConnection(
 		tradeId,
 		userId,
 		counterpartyId,
@@ -287,14 +304,96 @@ export function TradeLobby({
 		}
 	}, [tradeId, router]);
 
+	// SHA-256 Web Worker implementation (D-09)
+	const computeFileHash = useCallback(
+		async (file: File) => {
+			setHashingProgress("computing");
+
+			const workerScript = `
+				self.onmessage = async (e) => {
+					try {
+						const buffer = e.data;
+						const hashBuffer = await crypto.subtle.digest('SHA-256', buffer);
+						const hashArray = Array.from(new Uint8Array(hashBuffer));
+						const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+						self.postMessage({ hash: hashHex });
+					} catch (err) {
+						self.postMessage({ error: err.message });
+					}
+				};
+			`;
+
+			const blob = new Blob([workerScript], { type: "application/javascript" });
+			const workerUrl = URL.createObjectURL(blob);
+			const worker = new Worker(workerUrl);
+
+			worker.onmessage = async (e: MessageEvent) => {
+				URL.revokeObjectURL(workerUrl);
+				worker.terminate();
+
+				if (e.data.error) {
+					toast.error("Hash computation failed");
+					setHashingProgress("idle");
+					return;
+				}
+
+				setFileHash(e.data.hash);
+				setHashingProgress("ready");
+
+				// Save hash to DB via server action
+				await updateFileHash(tradeId, e.data.hash);
+			};
+
+			const arrayBuffer = await file.arrayBuffer();
+			worker.postMessage(arrayBuffer, [arrayBuffer]);
+		},
+		[tradeId],
+	);
+
+	// File selection handler with duration validation (TRADE2-07: reject files < 1 minute)
 	const handleFileSelect = useCallback(
 		(e: React.ChangeEvent<HTMLInputElement>) => {
 			const file = e.target.files?.[0];
-			if (file) {
+			if (!file) return;
+
+			setFileValidationError(null);
+
+			// Check duration via <audio> element
+			const url = URL.createObjectURL(file);
+			const audio = new Audio();
+			audio.preload = "metadata";
+
+			audio.onloadedmetadata = () => {
+				URL.revokeObjectURL(url);
+				const duration = audio.duration;
+
+				if (duration < 60) {
+					setFileValidationError(
+						`File is ${Math.round(duration)}s — minimum 1 minute required. Select a longer file.`,
+					);
+					return;
+				}
+
+				setFileDuration(duration);
+				// Estimate bitrate: (file.size * 8) / duration (D-05)
+				const bitrateKbps = Math.round((file.size * 8) / duration / 1000);
+				setEstimatedBitrate(bitrateKbps);
 				setSelectedFile(file);
-			}
+
+				// Compute SHA-256 in Web Worker (D-09)
+				computeFileHash(file);
+			};
+
+			audio.onerror = () => {
+				URL.revokeObjectURL(url);
+				setFileValidationError(
+					"Could not read audio metadata. Make sure the file is a valid audio format.",
+				);
+			};
+
+			audio.src = url;
 		},
-		[],
+		[computeFileHash],
 	);
 
 	const handleRetry = useCallback(() => {
@@ -326,6 +425,89 @@ export function TradeLobby({
 			toast.info("Trade declined");
 		}
 	}, [tradeId]);
+
+	// -----------------------------------------------------------------------
+	// Preview send handler (D-03: first ~65s via Blob.slice)
+	// -----------------------------------------------------------------------
+
+	const handleSendPreview = useCallback(async () => {
+		if (!selectedFile || !estimatedBitrate) return;
+		setSendingPreview(true);
+
+		// Generate preview: first ~65s of audio at estimated bitrate (D-03)
+		const previewByteLength = Math.min(
+			selectedFile.size,
+			estimatedBitrate ? estimatedBitrate * 125 * 65 : 12_000_000,
+		);
+		const previewBlob = selectedFile.slice(0, previewByteLength);
+
+		await sendPreviewP2P(previewBlob);
+		setSendingPreview(false);
+
+		// After sending, if we also received the other party's preview, advance to previewing
+		if (peerState.previewReceived) {
+			setLobbyState("previewing");
+		}
+	}, [selectedFile, estimatedBitrate, sendPreviewP2P, peerState.previewReceived]);
+
+	// Auto-advance to previewing when both previews sent and received
+	useEffect(() => {
+		if (
+			lobbyState === "preview_selection" &&
+			peerState.previewReceived &&
+			peerState.previewSendProgress === 100
+		) {
+			setLobbyState("previewing");
+		}
+	}, [lobbyState, peerState.previewReceived, peerState.previewSendProgress]);
+
+	// -----------------------------------------------------------------------
+	// Preview accept/reject handlers
+	// -----------------------------------------------------------------------
+
+	const handleAcceptPreview = useCallback(async () => {
+		setAcceptingPreview(true);
+		const result = await acceptPreview(tradeId);
+		if (result.error) {
+			toast.error(result.error);
+		} else {
+			setMyPreviewAccepted(true);
+			toast.success("Preview accepted");
+			if (result.bothAccepted) {
+				setLobbyState("transferring");
+				// Trigger full file transfer
+				if (selectedFile) {
+					sendFile();
+				}
+			}
+		}
+		setAcceptingPreview(false);
+	}, [tradeId, selectedFile, sendFile]);
+
+	const handleRejectPreview = useCallback(async () => {
+		const result = await rejectPreview(tradeId);
+		if (result.error) {
+			toast.error(result.error);
+		} else {
+			setLobbyState("failed");
+			toast.info("Preview rejected. Trade cancelled.");
+		}
+	}, [tradeId]);
+
+	// -----------------------------------------------------------------------
+	// Spectrum modal: create hidden <audio> from preview blob
+	// -----------------------------------------------------------------------
+
+	useEffect(() => {
+		if (showSpectrum && peerState.previewReceived) {
+			const url = URL.createObjectURL(peerState.previewReceived);
+			const audio = new Audio(url);
+			setSpectrumAudioEl(audio);
+			return () => {
+				URL.revokeObjectURL(url);
+			};
+		}
+	}, [showSpectrum, peerState.previewReceived]);
 
 	// -----------------------------------------------------------------------
 	// Render states
@@ -440,15 +622,14 @@ export function TradeLobby({
 				</div>
 			)}
 
-			{/* ---- PREVIEW_SELECTION state (placeholder for Plan 14-04) ---- */}
+			{/* ---- PREVIEW_SELECTION state ---- */}
 			{lobbyState === "preview_selection" && (
 				<div className="text-center space-y-4">
 					<span className="material-symbols-outlined text-secondary text-5xl">audio_file</span>
-					<h2 className="text-xl font-heading font-bold mt-4">SELECT_FILES</h2>
+					<h2 className="text-xl font-heading font-bold mt-4">SELECT_YOUR_FILE</h2>
 					<p className="text-sm text-on-surface-variant mt-2">
-						Both parties accepted terms. Select your audio file to generate a preview.
+						Select the audio file you are sharing. A 60-second preview will be generated.
 					</p>
-					{/* File selection + SHA-256 + preview generation added in Plan 14-04 */}
 
 					{!selectedFile && (
 						<div className="mt-6 bg-surface-container-low rounded-lg p-4 border border-outline-variant/10">
@@ -470,13 +651,145 @@ export function TradeLobby({
 						</div>
 					)}
 
-					{selectedFile && (
-						<div className="mt-4 bg-surface-container-low rounded-lg p-3 border border-primary/20">
-							<p className="text-[10px] font-mono text-primary">
-								FILE_READY: {selectedFile.name} ({formatFileSize(selectedFile.size)})
+					{fileValidationError && (
+						<p className="text-destructive text-sm mt-2">{fileValidationError}</p>
+					)}
+
+					{selectedFile && !fileValidationError && (
+						<div className="mt-4 bg-surface-container rounded-lg p-4 border border-outline-variant/10 text-left">
+							<p className="text-[10px] font-mono">FILE: {selectedFile.name}</p>
+							<p className="text-[10px] font-mono">SIZE: {formatFileSize(selectedFile.size)}</p>
+							<p className="text-[10px] font-mono">DURATION: {fileDuration ? `${Math.round(fileDuration)}s` : "—"}</p>
+							<p className="text-[10px] font-mono">EST_BITRATE: ~{estimatedBitrate ?? "—"} kbps</p>
+							<p className="text-[10px] font-mono">
+								HASH:{" "}
+								{hashingProgress === "computing"
+									? "COMPUTING..."
+									: hashingProgress === "ready"
+										? `${fileHash?.slice(0, 16)}...`
+										: "—"}
 							</p>
 						</div>
 					)}
+
+					{hashingProgress === "ready" && (
+						<button
+							type="button"
+							onClick={handleSendPreview}
+							disabled={sendingPreview}
+							className="mt-4 px-6 py-2 bg-primary text-on-primary text-sm font-mono rounded hover:opacity-90 transition-opacity disabled:opacity-50"
+						>
+							{sendingPreview ? "SENDING..." : "SEND_PREVIEW"}
+						</button>
+					)}
+
+					{/* Preview send/receive progress */}
+					{sendingPreview && (
+						<div className="mt-4">
+							<p className="text-[10px] font-mono text-on-surface-variant">
+								SENDING_PREVIEW: {peerState.previewSendProgress}%
+							</p>
+							<div className="w-full h-1 bg-surface-container-high rounded mt-1">
+								<div
+									className="h-1 bg-primary rounded transition-all"
+									style={{ width: `${peerState.previewSendProgress}%` }}
+								/>
+							</div>
+						</div>
+					)}
+					{peerState.previewReceiveProgress > 0 && peerState.previewReceiveProgress < 100 && (
+						<div className="mt-4">
+							<p className="text-[10px] font-mono text-on-surface-variant">
+								RECEIVING_PREVIEW: {peerState.previewReceiveProgress}%
+							</p>
+							<div className="w-full h-1 bg-surface-container-high rounded mt-1">
+								<div
+									className="h-1 bg-secondary rounded transition-all"
+									style={{ width: `${peerState.previewReceiveProgress}%` }}
+								/>
+							</div>
+						</div>
+					)}
+				</div>
+			)}
+
+			{/* ---- PREVIEWING state ---- */}
+			{lobbyState === "previewing" && (
+				<div className="space-y-6">
+					<h2 className="text-xl font-heading font-bold text-center">PREVIEW_PHASE</h2>
+					<p className="text-sm text-on-surface-variant text-center">
+						Listen to each other&apos;s previews. Accept or reject before the full transfer.
+					</p>
+
+					<div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+						{/* Partner's preview (received via P2P) */}
+						{peerState.previewReceived && (
+							<PreviewPlayer
+								previewBlob={peerState.previewReceived}
+								label={`${counterpartyUsername.toUpperCase()}'S_PREVIEW`}
+								onAdvancedSpectrum={() => setShowSpectrum(true)}
+							/>
+						)}
+						{/* My preview info (sent to partner) */}
+						{selectedFile && (
+							<div className="bg-surface-container rounded-lg p-4 border border-outline-variant/10">
+								<span className="text-[10px] font-mono text-on-surface-variant tracking-[0.2em]">
+									YOUR_PREVIEW_SENT
+								</span>
+								<p className="text-xs mt-2">{selectedFile.name}</p>
+								<p className="text-[10px] font-mono text-on-surface-variant">
+									Waiting for @{counterpartyUsername} to listen...
+								</p>
+							</div>
+						)}
+					</div>
+
+					{/* Accept / Reject controls */}
+					<div className="flex gap-3 justify-center mt-4">
+						<button
+							type="button"
+							onClick={handleAcceptPreview}
+							disabled={acceptingPreview || myPreviewAccepted}
+							className="px-6 py-2 bg-primary text-on-primary text-sm font-mono rounded hover:opacity-90 transition-opacity disabled:opacity-50"
+						>
+							{myPreviewAccepted ? "PREVIEW_ACCEPTED" : "ACCEPT_PREVIEW"}
+						</button>
+						<button
+							type="button"
+							onClick={handleRejectPreview}
+							className="px-6 py-2 bg-surface-container-high text-on-surface text-sm font-mono rounded hover:bg-surface-bright transition-colors"
+						>
+							REJECT_PREVIEW
+						</button>
+					</div>
+					{myPreviewAccepted && (
+						<p className="text-xs text-primary text-center">
+							You accepted the preview. Waiting for @{counterpartyUsername}...
+						</p>
+					)}
+				</div>
+			)}
+
+			{/* ---- SPECTRUM modal ---- */}
+			{showSpectrum && spectrumAudioEl && (
+				<div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4">
+					<div className="bg-surface rounded-lg p-6 max-w-2xl w-full">
+						<div className="flex justify-between items-center mb-4">
+							<span className="text-[10px] font-mono text-on-surface-variant tracking-[0.2em]">
+								ADVANCED_SPECTRUM
+							</span>
+							<button
+								type="button"
+								onClick={() => setShowSpectrum(false)}
+								className="text-on-surface-variant hover:text-on-surface"
+							>
+								<span className="material-symbols-outlined">close</span>
+							</button>
+						</div>
+						<div style={{ height: "300px" }}>
+							<SpectrogramCanvas audioElement={spectrumAudioEl} isActive={showSpectrum} />
+						</div>
+					</div>
 				</div>
 			)}
 
