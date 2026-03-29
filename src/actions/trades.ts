@@ -400,10 +400,10 @@ export async function completeTrade(
 		return { error: "Not a participant in this trade" };
 	}
 
-	// Must be in transferring, accepted, or completed state
+	// Must be in transferring, previewing, or completed state (D-10: ACCEPTED removed, PREVIEWING added)
 	if (
 		trade.status !== TRADE_STATUS.TRANSFERRING &&
-		trade.status !== TRADE_STATUS.ACCEPTED &&
+		trade.status !== TRADE_STATUS.PREVIEWING &&
 		trade.status !== TRADE_STATUS.COMPLETED
 	) {
 		return { error: "Trade is not in an active state" };
@@ -515,7 +515,7 @@ export async function skipReview(tradeId: string): Promise<{ success?: boolean; 
 		return { error: "Not a participant in this trade" };
 	}
 
-	if (trade.status !== TRADE_STATUS.TRANSFERRING && trade.status !== TRADE_STATUS.ACCEPTED) {
+	if (trade.status !== TRADE_STATUS.TRANSFERRING && trade.status !== TRADE_STATUS.PREVIEWING) {
 		return { error: "Trade is not in an active state" };
 	}
 
