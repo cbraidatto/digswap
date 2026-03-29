@@ -40,8 +40,8 @@ export default async function TradePage({
 	}
 
 	// Determine P2P role:
-	//   requester = wants the file → receiver (downloads)
-	//   provider  = has the file   → sender   (uploads & sends)
+	//   requester = wants the file -> receiver (downloads)
+	//   provider  = has the file   -> sender   (uploads & sends)
 	const role: "sender" | "receiver" =
 		user.id === trade.requesterId ? "receiver" : "sender";
 
@@ -94,7 +94,7 @@ export default async function TradePage({
 		);
 	}
 
-	// Handle pending status: provider can accept or decline
+	// Handle pending status: provider can accept or decline (backward compat for old trades)
 	if (trade.status === "pending" && role === "sender") {
 		return (
 			<div className="max-w-2xl mx-auto px-4 md:px-8 py-16 text-center">
@@ -202,10 +202,11 @@ export default async function TradePage({
 		);
 	}
 
-	// Active trade: accepted or transferring — show the lobby
+	// For lobby, previewing, accepted, and transferring statuses: render the lobby
+	// The negotiation (accept/decline terms) happens inside the lobby component
 	const iceServers = await getTurnCredentials();
 
-	// provider (sender) → counterparty is requester; requester (receiver) → counterparty is provider
+	// provider (sender) -> counterparty is requester; requester (receiver) -> counterparty is provider
 	const counterpartyId =
 		role === "sender" ? trade.requesterId : trade.providerId;
 
@@ -219,6 +220,13 @@ export default async function TradePage({
 				iceServers={iceServers}
 				counterpartyUsername={trade.counterpartyUsername ?? "user"}
 				releaseTitle={trade.releaseTitle ?? "Unknown Release"}
+				offeringReleaseTitle={trade.offeringReleaseTitle ?? null}
+				offeringReleaseArtist={trade.offeringReleaseArtist ?? null}
+				declaredQuality={trade.declaredQuality ?? null}
+				conditionNotes={trade.conditionNotes ?? null}
+				termsAcceptedAt={trade.termsAcceptedAt ?? null}
+				termsAcceptedByRecipientAt={trade.termsAcceptedByRecipientAt ?? null}
+				tradeStatus={trade.status}
 				fileName={trade.fileName ?? "file"}
 				fileSizeBytes={trade.fileSizeBytes ?? 0}
 			/>

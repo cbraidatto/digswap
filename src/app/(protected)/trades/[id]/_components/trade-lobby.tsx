@@ -1,690 +1,494 @@
 "use client";
 
-
-
 import { useEffect, useRef, useState, useCallback } from "react";
-
 import { useRouter } from "next/navigation";
-
+import { toast } from "sonner";
 import { createClient } from "@/lib/supabase/client";
-
 import { usePeerConnection } from "@/lib/webrtc/use-peer-connection";
-
-import { updateTradeStatus, cancelTrade } from "@/actions/trades";
-
+import {
+	updateTradeStatus,
+	cancelTrade,
+	acceptTerms,
+	declineTerms,
+	updateLastJoinedLobby,
+} from "@/actions/trades";
 import { formatFileSize } from "@/lib/audio/file-metadata";
-
 import { useReceivedFileStore, triggerBlobDownload } from "@/lib/webrtc/received-file-store";
-
 import { TransferProgress } from "./transfer-progress";
 
-
-
 // ---------------------------------------------------------------------------
-
 // Types
-
 // ---------------------------------------------------------------------------
-
-
 
 type LobbyState =
-
-	| "waiting"
-
-	| "connecting"
-
+	| "waiting_both"
+	| "negotiation"
+	| "preview_selection"
+	| "previewing"
+	| "preview_accepted"
 	| "transferring"
-
 	| "complete"
-
 	| "failed"
-
 	| "disconnected";
 
-
-
 interface TradeLobbyProps {
-
 	tradeId: string;
-
 	userId: string;
-
 	counterpartyId: string;
-
 	role: "sender" | "receiver";
-
 	iceServers: RTCIceServer[];
-
 	counterpartyUsername: string;
-
 	releaseTitle: string;
-
+	offeringReleaseTitle: string | null;
+	offeringReleaseArtist: string | null;
+	declaredQuality: string | null;
+	conditionNotes: string | null;
+	termsAcceptedAt: string | null;
+	termsAcceptedByRecipientAt: string | null;
+	tradeStatus: string;
 	fileName: string;
-
 	fileSizeBytes: number;
-
 }
 
-
-
 // ---------------------------------------------------------------------------
-
 // Component
-
 // ---------------------------------------------------------------------------
-
-
 
 export function TradeLobby({
-
 	tradeId,
-
 	userId,
-
 	counterpartyId,
-
 	role,
-
 	iceServers,
-
 	counterpartyUsername,
-
 	releaseTitle,
-
+	offeringReleaseTitle,
+	offeringReleaseArtist,
+	declaredQuality,
+	conditionNotes,
+	termsAcceptedAt,
+	termsAcceptedByRecipientAt,
+	tradeStatus,
 	fileName,
-
 	fileSizeBytes,
-
 }: TradeLobbyProps) {
-
 	const router = useRouter();
-
-	const [lobbyState, setLobbyState] = useState<LobbyState>("waiting");
-
+	const [lobbyState, setLobbyState] = useState<LobbyState>("waiting_both");
 	const [selectedFile, setSelectedFile] = useState<File | undefined>(undefined);
-
 	const [cancelLoading, setCancelLoading] = useState(false);
-
+	const [acceptingTerms, setAcceptingTerms] = useState(false);
+	const [myTermsAccepted, setMyTermsAccepted] = useState(
+		role === "sender" ? !!termsAcceptedByRecipientAt : !!termsAcceptedAt,
+	);
+	const [partnerOnline, setPartnerOnline] = useState(false);
+	const [bothOnline, setBothOnline] = useState(false);
 	const fileDownloadedRef = useRef(false);
-
 	const setReceivedFile = useReceivedFileStore((s) => s.setFile);
-
-	const channelRef = useRef<ReturnType<
-
+	const presenceChannelRef = useRef<ReturnType<
 		ReturnType<typeof createClient>["channel"]
-
 	> | null>(null);
 
-
-
 	// Initialize PeerJS connection hook
-
 	const { state: peerState, sendFile, retry } = usePeerConnection(
-
 		tradeId,
-
 		userId,
-
 		counterpartyId,
-
 		role,
-
 		iceServers,
-
 		selectedFile,
-
 	);
 
-
-
 	// -----------------------------------------------------------------------
-
-	// Sync peer state to lobby state
-
+	// Initialize lobby state based on trade's current DB status (mount only)
 	// -----------------------------------------------------------------------
-
-
 
 	useEffect(() => {
-
-		if (peerState.status === "connecting") {
-
-			setLobbyState("connecting");
-
-		} else if (peerState.status === "transferring") {
-
+		if (tradeStatus === "previewing") {
+			setLobbyState("preview_selection");
+		} else if (tradeStatus === "transferring") {
 			setLobbyState("transferring");
-
-		} else if (peerState.status === "complete") {
-
-			setLobbyState("complete");
-
-		} else if (peerState.status === "disconnected") {
-
-			setLobbyState("disconnected");
-
-		} else if (peerState.status === "failed") {
-
-			setLobbyState("failed");
-
+		} else if (tradeStatus === "lobby") {
+			// Check if both terms already accepted (page reload case)
+			if (termsAcceptedAt && termsAcceptedByRecipientAt) {
+				setLobbyState("preview_selection");
+			}
+			// else: waiting_both (default), will advance to negotiation when bothOnline
 		}
-
-	}, [peerState.status]);
-
-
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, []);
 
 	// -----------------------------------------------------------------------
-
-	// Persist received file: trigger download + populate Zustand store
-
+	// Supabase Realtime Presence: detect counterparty online status
 	// -----------------------------------------------------------------------
-
-
 
 	useEffect(() => {
-
-		if (
-
-			peerState.status === "complete" &&
-
-			peerState.receivedFile &&
-
-			peerState.receivedFileName &&
-
-			!fileDownloadedRef.current
-
-		) {
-
-			fileDownloadedRef.current = true;
-
-			// Save to Zustand store so review/spec-analysis page can access it
-
-			setReceivedFile(peerState.receivedFile, peerState.receivedFileName);
-
-			// Trigger browser file download — both sides receive the other's file
-
-			triggerBlobDownload(peerState.receivedFile, peerState.receivedFileName);
-
-		}
-
-	}, [peerState.status, peerState.receivedFile, peerState.receivedFileName, setReceivedFile]);
-
-
-
-	// -----------------------------------------------------------------------
-
-	// Supabase Realtime: detect counterparty presence via status change
-
-	// -----------------------------------------------------------------------
-
-
-
-	useEffect(() => {
-
 		const supabase = createClient();
+		const channel = supabase.channel(`trade:${tradeId}`, {
+			config: { presence: { key: userId } },
+		});
 
-		const channel = supabase
-
-			.channel(`trade-lobby-${tradeId}`)
-
-			.on(
-
-				"postgres_changes",
-
-				{
-
-					event: "UPDATE",
-
-					schema: "public",
-
-					table: "trade_requests",
-
-					filter: `id=eq.${tradeId}`,
-
-				},
-
-				(payload) => {
-
-					const newStatus = (payload.new as { status: string }).status;
-
-
-
-					if (
-
-						newStatus === "transferring" &&
-
-						lobbyState === "waiting"
-
-					) {
-
-						setLobbyState("connecting");
-
-					} else if (newStatus === "completed") {
-
-						setLobbyState("complete");
-
-					} else if (
-
-						newStatus === "cancelled" ||
-
-						newStatus === "declined"
-
-					) {
-
-						setLobbyState("failed");
-
-					}
-
-				},
-
-			)
-
-			.subscribe();
-
-
-
-		channelRef.current = channel;
-
-
-
-		return () => {
-
-			supabase.removeChannel(channel);
-
-		};
-
-	}, [tradeId, lobbyState]);
-
-
-
-	// -----------------------------------------------------------------------
-
-	// Handle CONNECTING state: update trade status to transferring
-
-	// -----------------------------------------------------------------------
-
-
-
-	useEffect(() => {
-
-		if (lobbyState === "connecting" && role === "sender") {
-
-			updateTradeStatus(tradeId, "transferring").catch(() => {
-
-				// Non-fatal: status update failure shouldn't block connection
-
+		channel
+			.on("presence", { event: "sync" }, () => {
+				const state = channel.presenceState();
+				const onlineIds = Object.keys(state);
+				const partnerIsHere = onlineIds.includes(counterpartyId);
+				setPartnerOnline(partnerIsHere);
+				setBothOnline(onlineIds.includes(userId) && partnerIsHere);
+			})
+			.on("presence", { event: "join" }, ({ key }) => {
+				if (key === counterpartyId) {
+					toast.success(`@${counterpartyUsername} is online`, { id: "partner-online" });
+				}
+			})
+			.on("presence", { event: "leave" }, ({ key }) => {
+				if (key === counterpartyId) {
+					setPartnerOnline(false);
+					setBothOnline(false);
+					toast.info(`@${counterpartyUsername} left the lobby`, { id: "partner-offline" });
+				}
+			})
+			.subscribe(async (status) => {
+				if (status === "SUBSCRIBED") {
+					await channel.track({ userId, joinedAt: new Date().toISOString() });
+				}
 			});
 
-		}
+		presenceChannelRef.current = channel;
 
-	}, [lobbyState, tradeId, role]);
+		// Audit: update lastJoinedLobbyAt
+		updateLastJoinedLobby(tradeId);
 
-
+		return () => {
+			channel.unsubscribe();
+		};
+	}, [tradeId, userId, counterpartyId, counterpartyUsername]);
 
 	// -----------------------------------------------------------------------
-
-	// Handle COMPLETE state: redirect to review page
-
+	// Postgres changes: detect DB status changes from counterparty actions
 	// -----------------------------------------------------------------------
-
-
 
 	useEffect(() => {
+		const supabase = createClient();
+		const dbChannel = supabase
+			.channel(`trade-status:${tradeId}`)
+			.on(
+				"postgres_changes",
+				{
+					event: "UPDATE",
+					schema: "public",
+					table: "trade_requests",
+					filter: `id=eq.${tradeId}`,
+				},
+				(payload) => {
+					const newRow = payload.new as Record<string, unknown>;
+					const newStatus = newRow.status as string;
 
-		if (lobbyState === "complete") {
+					if (newStatus === "previewing" && lobbyState === "negotiation") {
+						setLobbyState("preview_selection");
+					} else if (newStatus === "transferring") {
+						setLobbyState("transferring");
+					} else if (newStatus === "declined" || newStatus === "cancelled") {
+						setLobbyState("failed");
+					}
 
-			updateTradeStatus(tradeId, "completed")
+					// Also check bilateral acceptance timestamps
+					if (newRow.terms_accepted_at && newRow.terms_accepted_by_recipient_at) {
+						setLobbyState("preview_selection");
+					}
+				},
+			)
+			.subscribe();
 
-				.catch(() => {
+		return () => {
+			dbChannel.unsubscribe();
+		};
+	}, [tradeId, lobbyState]);
 
-					// Non-fatal
+	// -----------------------------------------------------------------------
+	// State machine: advance from waiting_both -> negotiation when bothOnline
+	// -----------------------------------------------------------------------
 
-				})
-
-				.finally(() => {
-
-					router.push(`/trades/${tradeId}/complete`);
-
-				});
-
+	useEffect(() => {
+		if (lobbyState === "waiting_both" && bothOnline) {
+			setLobbyState("negotiation");
 		}
+	}, [lobbyState, bothOnline]);
 
+	// -----------------------------------------------------------------------
+	// Sync peer state to lobby state (transferring / complete / failed / disconnected)
+	// -----------------------------------------------------------------------
+
+	useEffect(() => {
+		if (peerState.status === "transferring") {
+			setLobbyState("transferring");
+		} else if (peerState.status === "complete") {
+			setLobbyState("complete");
+		} else if (peerState.status === "disconnected") {
+			setLobbyState("disconnected");
+		} else if (peerState.status === "failed") {
+			setLobbyState("failed");
+		}
+	}, [peerState.status]);
+
+	// -----------------------------------------------------------------------
+	// Persist received file: trigger download + populate Zustand store
+	// -----------------------------------------------------------------------
+
+	useEffect(() => {
+		if (
+			peerState.status === "complete" &&
+			peerState.receivedFile &&
+			peerState.receivedFileName &&
+			!fileDownloadedRef.current
+		) {
+			fileDownloadedRef.current = true;
+			setReceivedFile(peerState.receivedFile, peerState.receivedFileName);
+			triggerBlobDownload(peerState.receivedFile, peerState.receivedFileName);
+		}
+	}, [peerState.status, peerState.receivedFile, peerState.receivedFileName, setReceivedFile]);
+
+	// -----------------------------------------------------------------------
+	// Handle COMPLETE state: redirect to review page
+	// -----------------------------------------------------------------------
+
+	useEffect(() => {
+		if (lobbyState === "complete") {
+			updateTradeStatus(tradeId, "completed")
+				.catch(() => {
+					// Non-fatal
+				})
+				.finally(() => {
+					router.push(`/trades/${tradeId}/complete`);
+				});
+		}
 	}, [lobbyState, tradeId, router]);
 
-
-
 	// -----------------------------------------------------------------------
-
 	// Auto-send file when sender has file selected and peer is ready
-
 	// -----------------------------------------------------------------------
-
-
 
 	useEffect(() => {
-
 		if (selectedFile && peerState.readyToSend) {
-
 			sendFile();
-
 		}
-
 	}, [selectedFile, peerState.readyToSend, sendFile]);
 
-
-
 	// -----------------------------------------------------------------------
-
 	// Handlers
-
 	// -----------------------------------------------------------------------
-
-
 
 	const handleCancel = useCallback(async () => {
-
 		setCancelLoading(true);
-
 		try {
-
 			await cancelTrade(tradeId);
-
 			router.push("/trades");
-
 		} catch {
-
 			setCancelLoading(false);
-
 		}
-
 	}, [tradeId, router]);
 
-
-
 	const handleFileSelect = useCallback(
-
 		(e: React.ChangeEvent<HTMLInputElement>) => {
-
 			const file = e.target.files?.[0];
-
 			if (file) {
-
 				setSelectedFile(file);
-
 			}
-
 		},
-
 		[],
-
 	);
 
-
-
 	const handleRetry = useCallback(() => {
-
-		setLobbyState("waiting");
-
-		retry(); // retry() now preserves chunks for resume
-
+		setLobbyState("waiting_both");
+		retry();
 	}, [retry]);
 
+	const handleAcceptTerms = useCallback(async () => {
+		setAcceptingTerms(true);
+		const result = await acceptTerms(tradeId);
+		if (result.error) {
+			toast.error(result.error);
+		} else {
+			setMyTermsAccepted(true);
+			toast.success("Terms accepted");
+			if (result.bothAccepted) {
+				setLobbyState("preview_selection");
+			}
+		}
+		setAcceptingTerms(false);
+	}, [tradeId]);
 
+	const handleDeclineTerms = useCallback(async () => {
+		const result = await declineTerms(tradeId);
+		if (result.error) {
+			toast.error(result.error);
+		} else {
+			setLobbyState("failed");
+			toast.info("Trade declined");
+		}
+	}, [tradeId]);
 
 	// -----------------------------------------------------------------------
-
 	// Render states
-
 	// -----------------------------------------------------------------------
-
-
 
 	return (
-
 		<div aria-live="polite" className="space-y-6">
-
-			{/* ---- WAITING state ---- */}
-
-			{lobbyState === "waiting" && (
-
-				<div className="space-y-4">
-
-					<span className="material-symbols-outlined text-tertiary text-5xl">
-
-						hourglass_top
-
+			{/* ---- BOTH_ONLINE banner (shown in negotiation+ states) ---- */}
+			{bothOnline && lobbyState !== "waiting_both" && (
+				<div className="w-full px-4 py-2 bg-primary/10 border border-primary/20 rounded-lg mb-4 text-center">
+					<span className="text-[10px] font-mono text-primary tracking-[0.2em]">
+						BOTH_ONLINE -- READY_TO_CONNECT
 					</span>
+				</div>
+			)}
 
-					<h1 className="text-3xl font-bold font-heading">
-
-						{peerState.connectionAttempts > 0 ? "CONNECTING..." : "WAITING_FOR_PEER"}
-
-					</h1>
-
-					<p className="text-sm text-on-surface-variant">
-
-						{peerState.connectionAttempts > 0
-							? `Establishing peer connection... (attempt ${peerState.connectionAttempts + 1}/11)`
-							: "Waiting for counterparty to join the lobby..."}
-
+			{/* ---- WAITING_BOTH state ---- */}
+			{lobbyState === "waiting_both" && (
+				<div className="space-y-4 text-center">
+					<span className="material-symbols-outlined text-tertiary text-5xl">
+						hourglass_top
+					</span>
+					<h2 className="text-xl font-heading font-bold mt-4">WAITING_FOR_PARTNER</h2>
+					<p className="text-sm text-on-surface-variant mt-2">
+						Waiting for @{counterpartyUsername} to join the lobby...
 					</p>
-
-					<span className="blink inline-block w-3 h-5 bg-on-surface" />
-
-
+					{partnerOnline && (
+						<div className="mt-4 px-4 py-2 bg-primary/10 border border-primary/20 rounded-lg inline-block">
+							<span className="text-primary text-sm font-mono">PARTNER_ONLINE</span>
+						</div>
+					)}
 
 					<div className="space-y-1 mt-4">
-
 						<p className="text-[10px] font-mono text-on-surface-variant">
-
 							TRADE: {releaseTitle}
-
 						</p>
-
 						<p className="text-[10px] font-mono text-on-surface-variant">
-
 							WITH: @{counterpartyUsername}
-
 						</p>
-
 					</div>
-
-
-
-					{/* Both users must select their file to send */}
-
-					{!selectedFile && (
-
-						<div className="mt-6 bg-surface-container-low rounded-lg p-4 border border-outline-variant/10">
-
-							<p className="text-[10px] font-mono text-on-surface-variant mb-2">
-
-								SELECT_YOUR_FILE_TO_SWAP:
-
-							</p>
-
-							<label className="inline-block px-4 py-2 bg-primary text-on-primary text-sm font-mono rounded cursor-pointer hover:opacity-90 transition-opacity">
-
-								CHOOSE_FILE
-
-								<input
-
-									type="file"
-
-									accept="audio/*"
-
-									onChange={handleFileSelect}
-
-									className="hidden"
-
-								/>
-
-							</label>
-
-							<p className="text-[10px] font-mono text-on-surface-variant mt-2">
-
-								EXPECTED: {fileName} ({formatFileSize(fileSizeBytes)})
-
-							</p>
-
-						</div>
-
-					)}
-
-
-
-					{selectedFile && (
-
-						<div className="mt-4 bg-surface-container-low rounded-lg p-3 border border-primary/20">
-
-							<p className="text-[10px] font-mono text-primary">
-
-								FILE_READY: {selectedFile.name} ({formatFileSize(selectedFile.size)})
-
-							</p>
-
-						</div>
-
-					)}
-
-
-
-
 
 					<button
-
 						type="button"
-
 						onClick={handleCancel}
-
 						disabled={cancelLoading}
-
 						className="mt-6 px-6 py-2 bg-surface-container-high text-on-surface text-sm font-mono rounded hover:bg-surface-bright transition-colors disabled:opacity-50"
-
 					>
-
 						CANCEL_TRADE
-
 					</button>
-
 				</div>
-
 			)}
 
-
-
-			{/* ---- CONNECTING state ---- */}
-
-			{lobbyState === "connecting" && (
-
+			{/* ---- NEGOTIATION state ---- */}
+			{lobbyState === "negotiation" && (
 				<div className="space-y-4">
-
-					<span className="material-symbols-outlined text-secondary text-5xl">
-
-						lan
-
-					</span>
-
-					<h1 className="text-3xl font-bold font-heading text-secondary">
-
-						[ESTABLISHING_CONNECTION...]
-
-					</h1>
-
-					<p className="text-sm text-on-surface-variant">
-
-						Setting up secure peer-to-peer channel.
-
-					</p>
-
-					<div className="flex items-center justify-center gap-1 mt-2">
-
-						<span
-
-							className="w-2 h-2 bg-secondary rounded-full animate-pulse"
-
-							style={{ animationDelay: "0ms" }}
-
-						/>
-
-						<span
-
-							className="w-2 h-2 bg-secondary rounded-full animate-pulse"
-
-							style={{ animationDelay: "200ms" }}
-
-						/>
-
-						<span
-
-							className="w-2 h-2 bg-secondary rounded-full animate-pulse"
-
-							style={{ animationDelay: "400ms" }}
-
-						/>
-
+					<h2 className="text-xl font-heading font-bold text-center">REVIEW_TRADE_TERMS</h2>
+					<div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+						{/* Proposer's offer card */}
+						<div className="bg-surface-container rounded-lg p-4 border border-outline-variant/10">
+							<span className="text-[10px] font-mono text-on-surface-variant tracking-[0.2em]">
+								OFFERING
+							</span>
+							<p className="font-heading font-bold mt-1">
+								{offeringReleaseTitle ?? "Unknown Release"}
+							</p>
+							{offeringReleaseArtist && (
+								<p className="text-xs text-on-surface-variant">{offeringReleaseArtist}</p>
+							)}
+							<div className="mt-3 space-y-1">
+								{declaredQuality && (
+									<p className="text-[10px] font-mono">QUALITY: {declaredQuality}</p>
+								)}
+								{conditionNotes && (
+									<p className="text-[10px] font-mono">CONDITION: {conditionNotes}</p>
+								)}
+							</div>
+						</div>
+						{/* Requesting card */}
+						<div className="bg-surface-container rounded-lg p-4 border border-outline-variant/10">
+							<span className="text-[10px] font-mono text-on-surface-variant tracking-[0.2em]">
+								REQUESTING
+							</span>
+							<p className="font-heading font-bold mt-1">{releaseTitle}</p>
+						</div>
 					</div>
 
+					{/* Accept/Decline buttons */}
+					<div className="flex gap-3 mt-6 justify-center">
+						<button
+							type="button"
+							onClick={handleAcceptTerms}
+							className="px-6 py-2 bg-primary text-on-primary text-sm font-mono rounded hover:opacity-90 transition-opacity disabled:opacity-50"
+							disabled={acceptingTerms || myTermsAccepted}
+						>
+							{myTermsAccepted ? "TERMS_ACCEPTED" : "ACCEPT_TERMS"}
+						</button>
+						<button
+							type="button"
+							onClick={handleDeclineTerms}
+							className="px-6 py-2 bg-surface-container-high text-on-surface text-sm font-mono rounded hover:bg-surface-bright transition-colors"
+						>
+							DECLINE
+						</button>
+					</div>
 
+					{/* Status indicators */}
+					{myTermsAccepted && (
+						<p className="text-xs text-primary mt-2 text-center">
+							You accepted. Waiting for @{counterpartyUsername}...
+						</p>
+					)}
+				</div>
+			)}
+
+			{/* ---- PREVIEW_SELECTION state (placeholder for Plan 14-04) ---- */}
+			{lobbyState === "preview_selection" && (
+				<div className="text-center space-y-4">
+					<span className="material-symbols-outlined text-secondary text-5xl">audio_file</span>
+					<h2 className="text-xl font-heading font-bold mt-4">SELECT_FILES</h2>
+					<p className="text-sm text-on-surface-variant mt-2">
+						Both parties accepted terms. Select your audio file to generate a preview.
+					</p>
+					{/* File selection + SHA-256 + preview generation added in Plan 14-04 */}
 
 					{!selectedFile && (
-
-						<div className="mt-4 bg-surface-container-low rounded-lg p-4 border border-secondary/20">
-
-							<p className="text-[10px] font-mono text-secondary mb-2">
-
+						<div className="mt-6 bg-surface-container-low rounded-lg p-4 border border-outline-variant/10">
+							<p className="text-[10px] font-mono text-on-surface-variant mb-2">
 								SELECT_YOUR_FILE_TO_SWAP:
-
 							</p>
-
 							<label className="inline-block px-4 py-2 bg-primary text-on-primary text-sm font-mono rounded cursor-pointer hover:opacity-90 transition-opacity">
-
 								CHOOSE_FILE
-
-								<input type="file" accept="audio/*" onChange={handleFileSelect} className="hidden" />
-
+								<input
+									type="file"
+									accept="audio/*"
+									onChange={handleFileSelect}
+									className="hidden"
+								/>
 							</label>
-
+							<p className="text-[10px] font-mono text-on-surface-variant mt-2">
+								EXPECTED: {fileName} ({formatFileSize(fileSizeBytes)})
+							</p>
 						</div>
-
 					)}
 
 					{selectedFile && (
-
-						<p className="text-[10px] font-mono text-primary mt-2">
-
-							FILE_READY: {selectedFile.name}
-
-						</p>
-
+						<div className="mt-4 bg-surface-container-low rounded-lg p-3 border border-primary/20">
+							<p className="text-[10px] font-mono text-primary">
+								FILE_READY: {selectedFile.name} ({formatFileSize(selectedFile.size)})
+							</p>
+						</div>
 					)}
-
 				</div>
-
 			)}
 
-
-
-			{/* ---- TRANSFERRING state (bidirectional — both upload & download simultaneously) ---- */}
-
+			{/* ---- TRANSFERRING state (bidirectional) ---- */}
 			{lobbyState === "transferring" && (
-
 				<div className="space-y-4">
-
 					<span className="material-symbols-outlined text-primary text-5xl">
-
 						swap_horiz
-
 					</span>
-
 					<h1 className="text-3xl font-bold font-heading text-primary">
-
 						SWAPPING
-
 					</h1>
-
-					{/* File picker: must remain visible if user hasn't selected yet (receiving can start before they pick) */}
 					{!selectedFile && (
 						<div className="bg-surface-container-low rounded-lg p-4 border border-primary/40">
 							<p className="text-[10px] font-mono text-primary mb-2">
@@ -697,287 +501,146 @@ export function TradeLobby({
 						</div>
 					)}
 
-					{/* Upload direction: my file → them */}
+					{/* Upload direction: my file -> them */}
 					<div className="space-y-1 text-left">
-
 						<p className="text-[10px] font-mono text-on-surface-variant">UPLOAD (your file)</p>
-
 						<TransferProgress
-
 							progress={peerState.progress}
-
 							bytesTransferred={peerState.bytesTransferred}
-
 							totalBytes={peerState.totalBytes}
-
 							speed={peerState.speed}
-
 							eta={peerState.eta}
-
 						/>
-
 					</div>
-
-					{/* Download direction: their file → me */}
+					{/* Download direction: their file -> me */}
 					<div className="space-y-1 text-left">
-
 						<p className="text-[10px] font-mono text-on-surface-variant">DOWNLOAD (their file)</p>
-
 						<TransferProgress
-
 							progress={peerState.receiveProgress}
-
 							bytesTransferred={peerState.bytesReceived}
-
 							totalBytes={peerState.totalBytesToReceive}
-
 							speed={0}
-
 							eta={0}
-
 						/>
-
 					</div>
-
 				</div>
-
 			)}
-
-
 
 			{/* ---- COMPLETE state (brief, before redirect) ---- */}
-
 			{lobbyState === "complete" && (
-
 				<div className="space-y-4">
-
 					<span className="material-symbols-outlined text-primary text-5xl">
-
 						check_circle
-
 					</span>
-
 					<h1 className="text-3xl font-bold font-heading text-primary">
-
 						TRANSFER_COMPLETE
-
 					</h1>
-
 					<p className="text-sm text-on-surface-variant">
-
 						Swap complete. File downloading. Redirecting...
-
 					</p>
-
 					{peerState.receivedFile && peerState.receivedFileName && (
-
 						<button
-
 							type="button"
-
 							onClick={() => triggerBlobDownload(peerState.receivedFile!, peerState.receivedFileName!)}
-
 							className="mt-4 px-6 py-2 bg-primary text-on-primary text-sm font-mono rounded hover:opacity-90 transition-opacity"
-
 						>
-
 							DOWNLOAD_AGAIN
-
 						</button>
-
 					)}
-
 				</div>
-
 			)}
-
-
 
 			{/* ---- DISCONNECTED state (mid-transfer, recoverable) ---- */}
-
 			{lobbyState === "disconnected" && (
-
 				<div className="space-y-4">
-
 					<span className="material-symbols-outlined text-warning text-5xl">
-
 						wifi_off
-
 					</span>
-
 					<h1 className="text-3xl font-bold font-heading text-warning">
-
 						CONNECTION_LOST
-
 					</h1>
-
 					<p className="text-sm text-on-surface-variant">
-
 						The peer-to-peer connection was interrupted during transfer.
-
 					</p>
-
 					{peerState.error && (
-
 						<p className="text-[10px] font-mono text-warning">
-
 							{peerState.error}
-
 						</p>
-
 					)}
-
 					{peerState.progress > 0 && (
-
 						<div className="mt-2 space-y-1">
-
 							<p className="text-[10px] font-mono text-on-surface-variant">
-
 								PROGRESS_SAVED: {peerState.progress}%
-
 							</p>
-
 							<div className="w-full h-2 bg-surface-container-high rounded-full overflow-hidden">
-
 								<div
-
 									className="h-full bg-warning rounded-full transition-all"
-
 									style={{ width: `${peerState.progress}%` }}
-
 								/>
-
 							</div>
-
 							<p className="text-[10px] font-mono text-on-surface-variant">
-
 								Transfer will resume from where it left off.
-
 							</p>
-
 						</div>
-
 					)}
-
-
 
 					<div className="flex items-center justify-center gap-4 mt-6">
-
 						<button
-
 							type="button"
-
 							onClick={handleRetry}
-
 							className="px-6 py-2 bg-primary text-on-primary text-sm font-mono rounded hover:opacity-90 transition-opacity"
-
 						>
-
 							RETRY_AND_RESUME
-
 						</button>
-
 						<button
-
 							type="button"
-
 							onClick={handleCancel}
-
 							disabled={cancelLoading}
-
 							className="px-6 py-2 bg-surface-container-high text-on-surface text-sm font-mono rounded hover:bg-surface-bright transition-colors disabled:opacity-50"
-
 						>
-
 							CANCEL_TRADE
-
 						</button>
-
 					</div>
-
 				</div>
-
 			)}
-
-
 
 			{/* ---- FAILED state ---- */}
-
 			{lobbyState === "failed" && (
-
 				<div className="space-y-4">
-
 					<span className="material-symbols-outlined text-destructive text-5xl">
-
 						error_outline
-
 					</span>
-
 					<h1 className="text-3xl font-bold font-heading text-destructive">
-
 						CONNECTION_FAILED
-
 					</h1>
-
 					<p className="text-sm text-on-surface-variant">
-
-						The peer-to-peer connection was interrupted.
-
+						The peer-to-peer connection was interrupted or the trade was declined.
 					</p>
-
 					{peerState.error && (
-
 						<p className="text-[10px] font-mono text-destructive">
-
 							ERROR: {peerState.error}
-
 						</p>
-
 					)}
 
-
-
 					<div className="flex items-center justify-center gap-4 mt-6">
-
 						<button
-
 							type="button"
-
 							onClick={handleRetry}
-
 							className="px-6 py-2 bg-primary text-on-primary text-sm font-mono rounded hover:opacity-90 transition-opacity"
-
 						>
-
 							RETRY_CONNECTION
-
 						</button>
-
 						<button
-
 							type="button"
-
 							onClick={handleCancel}
-
 							disabled={cancelLoading}
-
 							className="px-6 py-2 bg-surface-container-high text-on-surface text-sm font-mono rounded hover:bg-surface-bright transition-colors disabled:opacity-50"
-
 						>
-
 							CANCEL_TRADE
-
 						</button>
-
 					</div>
-
 				</div>
-
 			)}
-
 		</div>
-
 	);
-
 }
-

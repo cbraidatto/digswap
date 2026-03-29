@@ -317,8 +317,8 @@ Plans:
 **Plans**: 5 plans
 Plans:
 - [x] 14-01-PLAN.md -- Schema migration + constants + status gate fixes + backpressure thresholds
-- [x] 14-02-PLAN.md -- Proposal form redesign: collection offering picker, quality metadata, no file upload
-- [ ] 14-03-PLAN.md -- Lobby state machine, Supabase Presence, bilateral negotiation phase
+- [ ] 14-02-PLAN.md -- Proposal form redesign: collection offering picker, quality metadata, no file upload
+- [x] 14-03-PLAN.md -- Lobby state machine, Supabase Presence, bilateral negotiation phase
 - [ ] 14-04-PLAN.md -- Preview subsystem: SHA-256, Blob.slice preview, P2P transfer, amplitude bars player, bilateral accept
 - [ ] 14-05-PLAN.md -- Unit tests + human verification checkpoint
 **UI hint**: yes
