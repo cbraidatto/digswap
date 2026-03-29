@@ -55,7 +55,7 @@ export default async function NewTradePage({ searchParams }: NewTradePageProps) 
 	// Fetch user's collection for offering release picker (D-02)
 	const { data: collectionItems } = await admin
 		.from("collection_items")
-		.select("release_id, releases(id, title, artist, thumbnail_url)")
+		.select("release_id, releases(id, title, artist, cover_image_url)")
 		.eq("user_id", user.id)
 		.order("created_at", { ascending: false })
 		.limit(500);
@@ -66,7 +66,7 @@ export default async function NewTradePage({ searchParams }: NewTradePageProps) 
 			releaseId: item.releases.id,
 			title: item.releases.title ?? "Unknown",
 			artist: item.releases.artist ?? "Unknown",
-			thumbnailUrl: item.releases.thumbnail_url ?? null,
+			thumbnailUrl: item.releases.cover_image_url ?? null,
 		}));
 
 	return (
