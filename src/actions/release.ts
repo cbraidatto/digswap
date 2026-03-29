@@ -6,6 +6,7 @@ import { releases } from "@/lib/db/schema/releases";
 import { eq } from "drizzle-orm";
 import { apiRateLimit } from "@/lib/rate-limit";
 import { createClient } from "@/lib/supabase/server";
+import { getReviewsForRelease } from "@/lib/community/queries";
 
 const YOUTUBE_SEARCH_URL = "https://www.googleapis.com/youtube/v3/search";
 
@@ -82,4 +83,12 @@ export async function searchYouTubeForRelease(
   }
 
   return { videoId };
+}
+
+/**
+ * Load more reviews for a release with cursor-based pagination.
+ * Wraps getReviewsForRelease for client component consumption.
+ */
+export async function getMoreReviews(releaseId: string, cursor: string, limit = 10) {
+  return getReviewsForRelease(releaseId, cursor, limit);
 }
