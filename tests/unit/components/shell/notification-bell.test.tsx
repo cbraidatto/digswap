@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { render, screen, waitFor, cleanup } from "@testing-library/react";
+import { render, screen, waitFor, cleanup, fireEvent } from "@testing-library/react";
 
 // ── Mocks ───────────────────────────────────────────────────────────────────
 
@@ -205,5 +205,29 @@ describe("NotificationBell", () => {
 		unmount();
 
 		expect(mockRemoveChannel).toHaveBeenCalled();
+	});
+
+	it("does not decrement unreadCount when markNotificationRead returns error", async () => {
+		mockGetUnreadCount.mockResolvedValue(3);
+		mockMarkNotificationRead.mockResolvedValue({ error: "Could not mark notification as read." });
+
+		render(<NotificationBell userId="user-123" />);
+
+		// Wait for initial data to load
+		await waitFor(() => {
+			expect(screen.getByText("3")).toBeInTheDocument();
+		});
+
+		// Click the first (unread) notification row
+		const notificationRows = screen.getAllByRole("listitem");
+		fireEvent.click(notificationRows[0]);
+
+		// Wait for the async markNotificationRead to resolve
+		await waitFor(() => {
+			expect(mockMarkNotificationRead).toHaveBeenCalledWith("n-1");
+		});
+
+		// Count should still be 3 because mark-read failed
+		expect(screen.getByText("3")).toBeInTheDocument();
 	});
 });

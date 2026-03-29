@@ -128,15 +128,23 @@ export function NotificationBell({ userId }: NotificationBellProps) {
 		const notification = recentNotifications.find((n) => n.id === notificationId);
 		if (!notification) return;
 
-		// Mark as read
-		markNotificationRead(notificationId);
-		setRecentNotifications((prev) =>
-			prev.map((n) => (n.id === notificationId ? { ...n, read: true } : n)),
-		);
-		setUnreadCount((prev) => Math.max(0, prev - 1));
-
-		// Close dropdown
+		// Close dropdown first for responsiveness
 		setIsOpen(false);
+
+		// Mark as read on server, only update local state on success
+		try {
+			const result = await markNotificationRead(notificationId);
+			if (result.success) {
+				setRecentNotifications((prev) =>
+					prev.map((n) => (n.id === notificationId ? { ...n, read: true } : n)),
+				);
+				if (!notification.read) {
+					setUnreadCount((prev) => Math.max(0, prev - 1));
+				}
+			}
+		} catch {
+			// Silent fail — count stays as-is, will re-sync on next open
+		}
 
 		// Navigate if link exists
 		if (notification.link) {
@@ -144,8 +152,35 @@ export function NotificationBell({ userId }: NotificationBellProps) {
 		}
 	};
 
+	const handleOpenChange = async (open: boolean) => {
+		setIsOpen(open);
+		if (open) {
+			// Re-sync with server on every open to catch any drift
+			try {
+				const [count, recent] = await Promise.all([
+					getUnreadCountAction(),
+					getRecentNotificationsAction(),
+				]);
+				setUnreadCount(count);
+				setRecentNotifications(
+					recent.map((n) => ({
+						id: n.id,
+						type: n.type,
+						title: n.title,
+						body: n.body,
+						link: n.link,
+						read: n.read,
+						createdAt: n.createdAt.toISOString(),
+					})),
+				);
+			} catch {
+				// Silent fail — keep existing local state
+			}
+		}
+	};
+
 	return (
-		<Popover open={isOpen} onOpenChange={setIsOpen}>
+		<Popover open={isOpen} onOpenChange={handleOpenChange}>
 			<PopoverTrigger
 				aria-label="Notifications"
 				aria-expanded={isOpen}
