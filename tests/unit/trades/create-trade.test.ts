@@ -98,10 +98,9 @@ describe("createTrade", () => {
 	const validFormData = {
 		providerId: "provider-1",
 		releaseId: "release-1",
-		fileName: "track.flac",
-		fileFormat: "FLAC",
-		declaredBitrate: "1411kbps",
-		fileSizeBytes: 30_000_000,
+		offeringReleaseId: "offering-release-1",
+		declaredQuality: "FLAC",
+		conditionNotes: "Original pressing, clean copy, no pops or clicks",
 		message: "Great record!",
 	};
 

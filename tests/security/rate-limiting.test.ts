@@ -266,8 +266,8 @@ describe("Server Action Rate Limiting", () => {
 			});
 
 			await createTrade({
-				providerId: "p1", fileName: "f.flac", fileFormat: "FLAC",
-				declaredBitrate: "1411kbps", fileSizeBytes: 1000,
+				providerId: "p1", offeringReleaseId: "release-1",
+				declaredQuality: "FLAC", conditionNotes: "Original pressing, clean copy",
 			});
 
 			expect(mockTradeLimit).toHaveBeenCalledWith("test-user-id");
@@ -277,8 +277,8 @@ describe("Server Action Rate Limiting", () => {
 			mockTradeLimit.mockResolvedValue({ success: false });
 
 			const result = await createTrade({
-				providerId: "p1", fileName: "f.flac", fileFormat: "FLAC",
-				declaredBitrate: "1411kbps", fileSizeBytes: 1000,
+				providerId: "p1", offeringReleaseId: "release-1",
+				declaredQuality: "FLAC", conditionNotes: "Original pressing, clean copy",
 			});
 
 			expect(result.error).toContain("Too many requests");

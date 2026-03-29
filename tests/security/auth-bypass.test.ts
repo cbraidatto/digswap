@@ -279,8 +279,8 @@ describe("Auth Bypass Prevention", () => {
 		it("should require authentication for createTrade", async () => {
 			await expect(
 				createTrade({
-					providerId: "uuid", fileName: "test.flac", fileFormat: "FLAC",
-					declaredBitrate: "1411kbps", fileSizeBytes: 1000,
+					providerId: "uuid", offeringReleaseId: "release-1",
+					declaredQuality: "FLAC", conditionNotes: "Original pressing, clean copy",
 				}),
 			).rejects.toThrow(/not authenticated/i);
 		});
