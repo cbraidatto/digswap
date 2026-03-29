@@ -4,6 +4,7 @@ import { createClient } from "@/lib/supabase/server";
 import { getReleaseByDiscogsId } from "@/lib/release/queries";
 import { getReviewsForRelease, getReviewCountForRelease } from "@/lib/community/queries";
 import { ReleaseHero } from "./_components/release-hero";
+import { ReleaseActions } from "./_components/release-actions";
 import { YouTubeEmbed } from "./_components/youtube-embed";
 import { OwnersSection } from "./_components/owners-section";
 import { ReviewsSection } from "./_components/reviews-section";
@@ -74,6 +75,16 @@ export default async function ReleasePage({ params }: ReleasePageProps) {
 					discogsWant: release.discogsWant,
 				}}
 			/>
+
+			{isAuthenticated && (
+				<ReleaseActions
+					releaseId={release.id}
+					discogsId={release.discogsId}
+					title={release.title}
+					artist={release.artist}
+					coverImageUrl={release.coverImageUrl ?? null}
+				/>
+			)}
 
 			<YouTubeEmbed
 				videoId={release.youtubeVideoId}

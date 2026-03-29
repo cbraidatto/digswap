@@ -5,6 +5,7 @@ import Link from "next/link";
 import type { SearchResult } from "@/lib/discovery/queries";
 import { getRarityTier } from "@/lib/collection/rarity";
 import { getReviewCountAction } from "@/actions/community";
+import { AddToCrateButton } from "@/components/crates/add-to-crate-button";
 import { OwnersList } from "./owners-list";
 import { ReviewsPanel } from "./reviews-panel";
 
@@ -96,6 +97,15 @@ export function RecordSearchCard({ release }: RecordSearchCardProps) {
 							<span className="material-symbols-outlined text-[12px]">arrow_forward</span>
 						</Link>
 					)}
+					<div className="mt-1">
+						<AddToCrateButton
+							releaseId={release.id}
+							discogsId={release.discogsId}
+							title={release.title}
+							artist={release.artist}
+							coverImageUrl={release.coverImageUrl ?? null}
+						/>
+					</div>
 				</div>
 
 				{/* Owner Count */}

@@ -4,6 +4,7 @@ import { getRadarMatchesPaginated } from "@/lib/wantlist/radar-queries";
 import { LeadAction } from "@/components/digger-memory/lead-action";
 import { ContextTooltip } from "@/components/digger-memory/context-tooltip";
 import { BackButton } from "@/components/shell/back-button";
+import { AddToCrateButton } from "@/components/crates/add-to-crate-button";
 import Link from "next/link";
 
 const RARITY_TIERS = [
@@ -140,6 +141,13 @@ export default async function RadarPage({ searchParams }: RadarPageProps) {
                     </div>
                   </div>
                   <div className="flex items-center gap-1 flex-shrink-0">
+                    <AddToCrateButton
+                      releaseId={match.releaseId ?? null}
+                      discogsId={match.discogsId ?? null}
+                      title={match.releaseTitle ?? null}
+                      artist={match.releaseArtist ?? null}
+                      coverImageUrl={null}
+                    />
                     <LeadAction type="user" id={match.matchUserId} />
                     <Link
                       href={`/perfil/${match.matchUsername}`}

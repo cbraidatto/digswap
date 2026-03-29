@@ -2,6 +2,7 @@ import Link from "next/link";
 import { getRadarMatches } from "@/lib/wantlist/radar-queries";
 import { LeadAction } from "@/components/digger-memory/lead-action";
 import { ContextTooltip } from "@/components/digger-memory/context-tooltip";
+import { AddToCrateButton } from "@/components/crates/add-to-crate-button";
 
 interface RadarSectionProps {
   userId: string;
@@ -114,6 +115,13 @@ export async function RadarSection({ userId }: RadarSectionProps) {
 
               {/* Actions */}
               <div className="flex items-center gap-1 flex-shrink-0">
+                <AddToCrateButton
+                  releaseId={match.releaseId ?? null}
+                  discogsId={match.discogsId ?? null}
+                  title={match.releaseTitle ?? null}
+                  artist={match.releaseArtist ?? null}
+                  coverImageUrl={null}
+                />
                 <LeadAction type="user" id={match.matchUserId} />
                 {match.discogsId && (
                   <Link
