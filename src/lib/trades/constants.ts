@@ -2,6 +2,8 @@ export const CHUNK_SIZE = 64 * 1024; // 64KB per D-10
 
 export const TRADE_STATUS = {
 	PENDING: "pending",
+	LOBBY: "lobby",
+	PREVIEWING: "previewing",
 	ACCEPTED: "accepted",
 	TRANSFERRING: "transferring",
 	COMPLETED: "completed",

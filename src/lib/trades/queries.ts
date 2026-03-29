@@ -33,6 +33,17 @@ export interface TradeDetail {
 	counterpartyAvatarUrl: string | null;
 	releaseTitle: string | null;
 	releaseArtist: string | null;
+	offeringReleaseId: string | null;
+	conditionNotes: string | null;
+	declaredQuality: string | null;
+	fileHash: string | null;
+	termsAcceptedAt: string | null;
+	termsAcceptedByRecipientAt: string | null;
+	previewAcceptedAt: string | null;
+	previewAcceptedByRecipientAt: string | null;
+	lastJoinedLobbyAt: string | null;
+	offeringReleaseTitle: string | null;
+	offeringReleaseArtist: string | null;
 }
 
 export interface TradeReputation {
@@ -63,8 +74,8 @@ export async function getTradeInbox(
 	const admin = createAdminClient();
 
 	const statusMap: Record<string, string[]> = {
-		pending: ["pending", "accepted"],
-		active: ["transferring"],
+		pending: ["pending", "lobby"],
+		active: ["previewing", "accepted", "transferring"],
 		completed: ["completed", "declined", "cancelled", "expired"],
 	};
 
@@ -188,6 +199,19 @@ export async function getTradeById(
 		releaseArtist = release?.artist ?? null;
 	}
 
+	// Fetch offering release info
+	let offeringReleaseTitle: string | null = null;
+	let offeringReleaseArtist: string | null = null;
+	if (trade.offering_release_id) {
+		const { data: offeringRelease } = await admin
+			.from("releases")
+			.select("title, artist")
+			.eq("id", trade.offering_release_id)
+			.single();
+		offeringReleaseTitle = offeringRelease?.title ?? null;
+		offeringReleaseArtist = offeringRelease?.artist ?? null;
+	}
+
 	return {
 		id: trade.id,
 		requesterId: trade.requester_id,
@@ -206,6 +230,17 @@ export async function getTradeById(
 		counterpartyAvatarUrl: profile?.avatar_url ?? null,
 		releaseTitle,
 		releaseArtist,
+		offeringReleaseId: trade.offering_release_id,
+		conditionNotes: trade.condition_notes,
+		declaredQuality: trade.declared_quality,
+		fileHash: trade.file_hash,
+		termsAcceptedAt: trade.terms_accepted_at,
+		termsAcceptedByRecipientAt: trade.terms_accepted_by_recipient_at,
+		previewAcceptedAt: trade.preview_accepted_at,
+		previewAcceptedByRecipientAt: trade.preview_accepted_by_recipient_at,
+		lastJoinedLobbyAt: trade.last_joined_lobby_at,
+		offeringReleaseTitle,
+		offeringReleaseArtist,
 	};
 }
 

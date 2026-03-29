@@ -18,13 +18,22 @@ export const tradeRequests = pgTable(
     requesterId: uuid("requester_id").notNull(),
     providerId: uuid("provider_id").notNull(),
     releaseId: uuid("release_id").references(() => releases.id),
-    status: varchar("status", { length: 20 }).default("pending").notNull(), // pending/accepted/transferring/declined/completed/cancelled/expired
+    status: varchar("status", { length: 20 }).default("pending").notNull(), // pending/lobby/previewing/accepted/transferring/declined/completed/cancelled/expired
     message: text("message"),
     expiresAt: timestamp("expires_at", { withTimezone: true }),
     fileName: varchar("file_name", { length: 255 }),
     fileFormat: varchar("file_format", { length: 50 }),
     declaredBitrate: varchar("declared_bitrate", { length: 50 }),
     fileSizeBytes: integer("file_size_bytes"),
+    offeringReleaseId: uuid("offering_release_id").references(() => releases.id),
+    conditionNotes: text("condition_notes"),
+    declaredQuality: varchar("declared_quality", { length: 50 }),
+    fileHash: varchar("file_hash", { length: 64 }),
+    termsAcceptedAt: timestamp("terms_accepted_at", { withTimezone: true }),
+    termsAcceptedByRecipientAt: timestamp("terms_accepted_by_recipient_at", { withTimezone: true }),
+    previewAcceptedAt: timestamp("preview_accepted_at", { withTimezone: true }),
+    previewAcceptedByRecipientAt: timestamp("preview_accepted_by_recipient_at", { withTimezone: true }),
+    lastJoinedLobbyAt: timestamp("last_joined_lobby_at", { withTimezone: true }),
     createdAt: timestamp("created_at", { withTimezone: true })
       .defaultNow()
       .notNull(),
