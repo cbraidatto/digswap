@@ -22,7 +22,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 7: Community + Reviews** - Genre/era groups, group activity feeds, pressing and release reviews (completed 2026-03-26)
 - [ ] **Phase 8: Gamification + Rankings** - Global/genre leaderboards, badges, titles, composite ranking formula
 - [ ] **Phase 9: P2P Audio Trading** - DMCA compliance, WebRTC file transfer, trade reputation, TURN relay
-- [x] **Phase 10: Positioning, Radar & Workspace Foundation** - Repositioned landing, The Radar as hero feature, public acquisition surfaces, Digger Memory primitives (completed 2026-03-28)
+- [x] **Phase 10: Positioning, Radar & Workspace Foundation** - Repositioned landing, The Radar as hero feature, public acquisition surfaces, Digger Memory primitives (completed 2026-03-28)
 - [x] **Phase 11: Security Hardening** - OWASP API coverage, security test suite, penetration testing (completed 2026-03-28)
 - [ ] **Phase 12: Release Pages** - Public SEO-indexable page per release: Discogs link, YouTube embed, owners list, reviews
 - [ ] **Phase 13: Crates & Sets** - Pre-dig folder creation, add-to-crate from any surface, ordered sets with event metadata
@@ -276,9 +276,14 @@ Plans:
 **Success Criteria** (what must be TRUE):
   1. /release/[discogsId] loads without authentication and is crawlable by search engines
   2. Page shows Discogs link, YouTube embed (cached), owners list with profile links, and all platform reviews
-  3. Notification badge resets to 0 after user reads notifications — no stale count
-  4. Trade icon appears in navbar beside notification bell with its own unread count
-**Plans**: TBD
+  3. Notification badge resets to 0 after user reads notifications — no stale count (COMPLETE — quick task 260328-tef)
+  4. Trade icon appears in navbar beside notification bell with its own unread count (COMPLETE — quick task 260328-tef)
+**Plans**: 3 plans
+Plans:
+- [ ] 12-01-PLAN.md — Data layer: release queries, YouTube server action, CSP frame-src, SearchResult/RadarMatch discogsId fix
+- [ ] 12-02-PLAN.md — Public /release/[discogsId] route: layout, page with generateMetadata, hero, YouTube embed, owners section, reviews section
+- [ ] 12-03-PLAN.md — VIEW_RELEASE entry points (CollectionCard, RecordSearchCard, RadarSection) + unit test suite
+**UI hint**: yes
 
 ### Phase 13: Crates & Sets
 **Goal**: Diggers can organize digging sessions into named crates and document played sets with track order
@@ -344,7 +349,7 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7 -> 8 -> 9 -> 10
 | 9. P2P Audio Trading | 2/6 | In Progress | - |
 | 10. Positioning, Radar & Workspace Foundation | 5/5 | Complete   | 2026-03-28 |
 | 11. Security Hardening | 3/3 | Complete | 2026-03-28 |
-| 12. Release Pages | 0/TBD | Planned | - |
+| 12. Release Pages | 0/3 | Planned | - |
 | 13. Crates & Sets | 0/TBD | Planned | - |
 | 14. Trade V2 | 0/TBD | Planned | - |
 | 15. Social V2 | 0/TBD | Planned | - |
