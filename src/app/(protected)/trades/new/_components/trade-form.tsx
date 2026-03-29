@@ -1,13 +1,9 @@
 "use client";
 
-import { useState, useRef, useCallback, useTransition } from "react";
+import { useState, useMemo, useTransition, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { createTrade } from "@/actions/trades";
-import {
-	ACCEPTED_AUDIO_TYPES,
-} from "@/lib/trades/constants";
-import { formatFileSize } from "@/lib/audio/file-metadata";
 
 // ---------------------------------------------------------------------------
 // Props
@@ -20,27 +16,27 @@ interface TradeFormProps {
 	counterpartyAvatar: string | null;
 	releaseTitle: string | null;
 	releaseArtist: string | null;
+	userCollection: Array<{
+		releaseId: string;
+		title: string;
+		artist: string;
+		thumbnailUrl: string | null;
+	}>;
 }
 
 // ---------------------------------------------------------------------------
-// Constants
+// Quality options
 // ---------------------------------------------------------------------------
 
-const LARGE_FILE_THRESHOLD = 500 * 1024 * 1024; // 500MB
-
-const AUDIO_ACCEPT = ACCEPTED_AUDIO_TYPES.join(",");
-
-function detectFormat(mimeType: string): string {
-	const map: Record<string, string> = {
-		"audio/flac": "FLAC",
-		"audio/wav": "WAV",
-		"audio/mp3": "MP3",
-		"audio/mpeg": "MP3",
-		"audio/ogg": "OGG",
-		"audio/aac": "AAC",
-	};
-	return map[mimeType] || mimeType.replace("audio/", "").toUpperCase();
-}
+const QUALITY_OPTIONS = [
+	{ value: "", label: "Select quality..." },
+	{ value: "FLAC", label: "FLAC" },
+	{ value: "MP3 320kbps", label: "MP3 320kbps" },
+	{ value: "MP3 V0", label: "MP3 V0" },
+	{ value: "MP3 192kbps", label: "MP3 192kbps" },
+	{ value: "WAV", label: "WAV" },
+	{ value: "Other", label: "Other" },
+] as const;
 
 // ---------------------------------------------------------------------------
 // Component
@@ -53,87 +49,56 @@ export function TradeForm({
 	counterpartyAvatar,
 	releaseTitle,
 	releaseArtist,
+	userCollection,
 }: TradeFormProps) {
 	const router = useRouter();
 	const [isPending, startTransition] = useTransition();
 
-	// File state
-	const [selectedFile, setSelectedFile] = useState<File | null>(null);
-	const [isDragOver, setIsDragOver] = useState(false);
-	const fileInputRef = useRef<HTMLInputElement>(null);
-
-	// Metadata
-	const [fileFormat, setFileFormat] = useState("");
-	const [bitrate, setBitrate] = useState("");
+	// New proposal fields (D-02, D-05)
+	const [offeringReleaseId, setOfferingReleaseId] = useState<string>("");
+	const [declaredQuality, setDeclaredQuality] = useState<string>("");
+	const [conditionNotes, setConditionNotes] = useState<string>("");
+	const [collectionSearch, setCollectionSearch] = useState<string>("");
 
 	// Message
 	const [message, setMessage] = useState("");
 
 	// -----------------------------------------------------------------------
-	// File handling
+	// Collection filtering
 	// -----------------------------------------------------------------------
 
-	const handleFileSelect = useCallback((file: File) => {
-		setSelectedFile(file);
-		setFileFormat(detectFormat(file.type));
-	}, []);
-
-	const handleDrop = useCallback(
-		(e: React.DragEvent) => {
-			e.preventDefault();
-			setIsDragOver(false);
-			const file = e.dataTransfer.files[0];
-			if (file) handleFileSelect(file);
-		},
-		[handleFileSelect],
-	);
-
-	const handleDragOver = useCallback((e: React.DragEvent) => {
-		e.preventDefault();
-		setIsDragOver(true);
-	}, []);
-
-	const handleDragLeave = useCallback((e: React.DragEvent) => {
-		e.preventDefault();
-		setIsDragOver(false);
-	}, []);
-
-	const handleInputChange = useCallback(
-		(e: React.ChangeEvent<HTMLInputElement>) => {
-			const file = e.target.files?.[0];
-			if (file) handleFileSelect(file);
-		},
-		[handleFileSelect],
-	);
-
-	const handleDropZoneKeyDown = useCallback(
-		(e: React.KeyboardEvent) => {
-			if (e.key === "Enter" || e.key === " ") {
-				e.preventDefault();
-				fileInputRef.current?.click();
-			}
-		},
-		[],
-	);
+	const filteredCollection = useMemo(() => {
+		if (!collectionSearch.trim()) return userCollection;
+		const query = collectionSearch.toLowerCase();
+		return userCollection.filter(
+			(item) =>
+				item.title.toLowerCase().includes(query) ||
+				item.artist.toLowerCase().includes(query),
+		);
+	}, [userCollection, collectionSearch]);
 
 	// -----------------------------------------------------------------------
 	// Submit
 	// -----------------------------------------------------------------------
 
-	const canSubmit = selectedFile && toUserId && !isPending;
+	const canSubmit =
+		!!toUserId &&
+		!!offeringReleaseId &&
+		conditionNotes.trim().length >= 10 &&
+		!!declaredQuality &&
+		!isPending;
 
 	const handleSubmit = useCallback(() => {
-		if (!selectedFile || !toUserId) return;
+		if (!toUserId || !offeringReleaseId) return;
 
 		startTransition(async () => {
 			const result = await createTrade({
 				providerId: toUserId,
-				releaseId: releaseId ?? undefined,
-				fileName: selectedFile.name,
-				fileFormat: fileFormat || detectFormat(selectedFile.type),
-				declaredBitrate: bitrate || "unknown",
-				fileSizeBytes: selectedFile.size,
-				message: message.trim() || undefined,
+				releaseId: releaseId || undefined,
+				offeringReleaseId,
+				declaredQuality,
+				conditionNotes,
+				message: message || undefined,
 			});
 
 			if (result.error) {
@@ -144,15 +109,7 @@ export function TradeForm({
 			toast.success("Trade request sent");
 			router.push("/trades");
 		});
-	}, [
-		selectedFile,
-		toUserId,
-		releaseId,
-		fileFormat,
-		bitrate,
-		message,
-		router,
-	]);
+	}, [toUserId, releaseId, offeringReleaseId, declaredQuality, conditionNotes, message, router]);
 
 	// -----------------------------------------------------------------------
 	// Render
@@ -162,100 +119,79 @@ export function TradeForm({
 		<>
 			{/* Two-column grid */}
 			<div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-				{/* Your_Offer card */}
+				{/* Your_Offer card — offering release picker */}
 				<div className="bg-surface-container-low rounded-xl p-6 border border-outline-variant/10">
 					<h2 className="text-xs font-mono uppercase tracking-widest text-on-surface-variant mb-4">
 						Your_Offer
 					</h2>
 
-					{/* File drop zone */}
-					<div
-						className={`rounded-lg p-8 flex flex-col items-center justify-center gap-3 cursor-pointer transition-colors min-h-[120px] ${
-							selectedFile
-								? "border-2 border-solid border-primary/30 bg-surface-container-lowest"
-								: isDragOver
-									? "border-2 border-dashed border-primary/50 bg-primary/5"
-									: "border-2 border-dashed border-outline-variant/30 hover:border-primary/30"
-						}`}
-						onDrop={handleDrop}
-						onDragOver={handleDragOver}
-						onDragLeave={handleDragLeave}
-						onClick={() => fileInputRef.current?.click()}
-						onKeyDown={handleDropZoneKeyDown}
-						role="button"
-						tabIndex={0}
-						aria-label="Select audio file to upload"
-					>
-						<input
-							ref={fileInputRef}
-							type="file"
-							accept="audio/*"
-							onChange={handleInputChange}
-							className="hidden"
-						/>
-
-						{selectedFile ? (
-							<>
-								<span className="material-symbols-outlined text-primary text-3xl">
-									audio_file
-								</span>
-								<div className="text-center">
-									<div className="text-xs font-mono text-on-surface font-bold truncate max-w-[200px]">
-										{selectedFile.name}
-									</div>
-									<div className="text-[10px] font-mono text-on-surface-variant mt-1">
-										{detectFormat(selectedFile.type)} &middot;{" "}
-										{formatFileSize(selectedFile.size)}
-									</div>
-									{selectedFile.size >= LARGE_FILE_THRESHOLD && (
-										<div className="text-[10px] font-mono text-yellow-400 mt-1">
-											Large file &mdash; transfer may take a while
-										</div>
-									)}
-								</div>
-							</>
-						) : (
-							<>
-								<span className="material-symbols-outlined text-on-surface-variant/40 text-4xl">
-									add_circle
-								</span>
-								<span className="text-xs font-mono text-on-surface-variant">
-									DROP_AUDIO_FILE_HERE
-								</span>
-								<span className="text-[10px] font-mono text-on-surface-variant/60">
-									FLAC, WAV, MP3, OGG, AAC
-								</span>
-							</>
-						)}
-					</div>
-
-					{/* Metadata fields */}
-					{selectedFile && (
-						<div className="mt-4 space-y-3">
-							<div>
-								<label className="text-[10px] font-mono text-on-surface-variant uppercase block mb-1">
-									FORMAT
-								</label>
-								<input
-									type="text"
-									value={fileFormat}
-									onChange={(e) => setFileFormat(e.target.value)}
-									className="w-full bg-surface-container-lowest border border-outline-variant/20 rounded px-3 py-2 font-mono text-xs text-on-surface focus:border-primary/40 focus:outline-none"
-								/>
+					{userCollection.length === 0 ? (
+						<div className="bg-surface-container-lowest rounded-lg p-8 flex flex-col items-center justify-center gap-3 border border-outline-variant/10 text-center">
+							<span className="material-symbols-outlined text-on-surface-variant/40 text-3xl">
+								library_music
+							</span>
+							<div className="text-xs font-mono text-on-surface-variant">
+								NO_COLLECTION_FOUND
 							</div>
-							<div>
-								<label className="text-[10px] font-mono text-on-surface-variant uppercase block mb-1">
-									BITRATE
-								</label>
-								<input
-									type="text"
-									value={bitrate}
-									onChange={(e) => setBitrate(e.target.value)}
-									placeholder="e.g. 320kbps, 16/44.1"
-									className="w-full bg-surface-container-lowest border border-outline-variant/20 rounded px-3 py-2 font-mono text-xs text-on-surface placeholder:text-on-surface-variant/40 focus:border-primary/40 focus:outline-none"
-								/>
-							</div>
+							<p className="text-[10px] font-mono text-on-surface-variant/60 max-w-[200px]">
+								Import your collection from Discogs first to make trade offers.
+							</p>
 						</div>
+					) : (
+						<>
+							{/* Search input */}
+							<input
+								type="text"
+								value={collectionSearch}
+								onChange={(e) => setCollectionSearch(e.target.value)}
+								placeholder="Search your collection..."
+								className="w-full bg-surface-container-lowest border border-outline-variant/20 rounded px-3 py-2 text-xs font-mono text-on-surface placeholder:text-on-surface-variant/40 focus:border-primary/40 focus:outline-none mb-3"
+							/>
+
+							{/* Scrollable collection list */}
+							<div className="max-h-[200px] overflow-y-auto space-y-1 pr-1">
+								{filteredCollection.length === 0 ? (
+									<div className="text-[10px] font-mono text-on-surface-variant/60 text-center py-4">
+										No releases match your search
+									</div>
+								) : (
+									filteredCollection.map((item) => (
+										<button
+											key={item.releaseId}
+											type="button"
+											onClick={() => setOfferingReleaseId(item.releaseId)}
+											className={`w-full flex items-center gap-3 rounded-lg p-2 transition-all text-left ${
+												offeringReleaseId === item.releaseId
+													? "ring-2 ring-primary bg-surface-container-lowest"
+													: "hover:bg-surface-container-lowest/50"
+											}`}
+										>
+											{item.thumbnailUrl ? (
+												<img
+													src={item.thumbnailUrl}
+													alt={item.title}
+													className="w-10 h-10 rounded object-cover flex-shrink-0"
+												/>
+											) : (
+												<div className="w-10 h-10 rounded bg-surface-container-high flex items-center justify-center flex-shrink-0">
+													<span className="material-symbols-outlined text-on-surface-variant/40 text-sm">
+														album
+													</span>
+												</div>
+											)}
+											<div className="min-w-0 flex-1">
+												<div className="text-xs font-mono text-on-surface font-bold truncate">
+													{item.title}
+												</div>
+												<div className="text-[10px] font-mono text-on-surface-variant truncate">
+													{item.artist}
+												</div>
+											</div>
+										</button>
+									))
+								)}
+							</div>
+						</>
 					)}
 				</div>
 
@@ -316,6 +252,56 @@ export function TradeForm({
 							</p>
 						</div>
 					)}
+				</div>
+			</div>
+
+			{/* Quality metadata section */}
+			<div className="bg-surface-container-low rounded-xl p-6 border border-outline-variant/10 mb-8">
+				<h2 className="text-[10px] font-mono text-on-surface-variant tracking-[0.2em] uppercase mb-4">
+					DECLARED_QUALITY
+				</h2>
+
+				<div className="space-y-4">
+					{/* Quality format dropdown */}
+					<div>
+						<select
+							value={declaredQuality}
+							onChange={(e) => setDeclaredQuality(e.target.value)}
+							className="w-full bg-surface-container-lowest border border-outline-variant/20 rounded px-3 py-2 font-mono text-xs text-on-surface focus:border-primary/40 focus:outline-none appearance-none cursor-pointer"
+						>
+							{QUALITY_OPTIONS.map((opt) => (
+								<option key={opt.value} value={opt.value}>
+									{opt.label}
+								</option>
+							))}
+						</select>
+					</div>
+				</div>
+			</div>
+
+			{/* Condition notes section */}
+			<div className="bg-surface-container-low rounded-xl p-6 border border-outline-variant/10 mb-8">
+				<h2 className="text-[10px] font-mono text-on-surface-variant tracking-[0.2em] uppercase mb-4">
+					CONDITION_NOTES
+				</h2>
+
+				<textarea
+					value={conditionNotes}
+					onChange={(e) => setConditionNotes(e.target.value)}
+					placeholder="Describe the pressing, condition, any known artifacts... (min 10 chars)"
+					rows={3}
+					className="w-full bg-surface-container-lowest border border-outline-variant/20 rounded px-3 py-2 font-mono text-xs text-on-surface placeholder:text-on-surface-variant/40 focus:border-primary/40 focus:outline-none resize-none"
+				/>
+				<div className="mt-1 text-right">
+					<span
+						className={`text-[10px] font-mono ${
+							conditionNotes.length > 0 && conditionNotes.trim().length < 10
+								? "text-red-400"
+								: "text-on-surface-variant/60"
+						}`}
+					>
+						{conditionNotes.trim().length}/10 minimum
+					</span>
 				</div>
 			</div>
 
