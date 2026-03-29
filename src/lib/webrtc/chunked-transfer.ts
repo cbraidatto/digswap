@@ -43,13 +43,29 @@ export interface ReceiverCompleteMessage {
 	type: "receiver-complete";
 }
 
+/** Preview chunk: smaller transfer for 60s audio preview (Plan 14-04) */
+export interface PreviewChunkMessage {
+	type: "preview-chunk";
+	index: number;
+	total: number;
+	data: ArrayBuffer;
+}
+
+/** Signal that all preview chunks have been sent */
+export interface PreviewDoneMessage {
+	type: "preview-done";
+	previewSize: number;
+}
+
 export type TransferMessage =
 	| ChunkMessage
 	| DoneMessage
 	| AckMessage
 	| ResumeRequestMessage
 	| ResumeResponseMessage
-	| ReceiverCompleteMessage;
+	| ReceiverCompleteMessage
+	| PreviewChunkMessage
+	| PreviewDoneMessage;
 
 /**
  * Validates that a chunk index is within valid bounds.

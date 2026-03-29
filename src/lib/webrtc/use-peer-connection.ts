@@ -37,6 +37,10 @@ export interface PeerState {
 	receiveProgress: number; // 0-100
 	bytesReceived: number;
 	totalBytesToReceive: number;
+	// Preview (Plan 14-04)
+	previewReceived: Blob | null;
+	previewSendProgress: number; // 0-100
+	previewReceiveProgress: number; // 0-100
 	// Outcome
 	error: string | null;
 	receivedFile: Blob | null;
@@ -57,6 +61,9 @@ const INITIAL_STATE: PeerState = {
 	receiveProgress: 0,
 	bytesReceived: 0,
 	totalBytesToReceive: 0,
+	previewReceived: null,
+	previewSendProgress: 0,
+	previewReceiveProgress: 0,
 	error: null,
 	receivedFile: null,
 	receivedFileName: null,
@@ -101,6 +108,7 @@ export function usePeerConnection(
 ): {
 	state: PeerState;
 	sendFile: () => Promise<void>;
+	sendPreview: (previewBlob: Blob) => Promise<void>;
 	retry: () => void;
 	cleanup: () => void;
 } {
@@ -110,6 +118,8 @@ export function usePeerConnection(
 
 	// Received chunks from the OTHER peer (their file coming to us)
 	const chunksRef = useRef<ArrayBuffer[]>([]);
+	// Preview chunks buffer (Plan 14-04)
+	const previewChunksRef = useRef<ArrayBuffer[] | null>(null);
 	// Transfer timers
 	const sendStartTimeRef = useRef<number>(0);
 	const receiveStartTimeRef = useRef<number>(0);
@@ -345,6 +355,28 @@ export function usePeerConnection(
 						bytesTransferred: prev.totalBytes,
 					}));
 					checkBothComplete();
+				}
+
+				// ---- PREVIEW transfer messages (Plan 14-04) ----
+				else if (data.type === "preview-chunk") {
+					const msg = data as { type: "preview-chunk"; index: number; total: number; data: ArrayBuffer };
+					if (!previewChunksRef.current) {
+						previewChunksRef.current = new Array(msg.total);
+					}
+					previewChunksRef.current[msg.index] = msg.data;
+					setState((prev) => ({
+						...prev,
+						previewReceiveProgress: Math.round(((msg.index + 1) / msg.total) * 100),
+					}));
+				}
+
+				else if (data.type === "preview-done") {
+					// Reassemble preview
+					const chunks = previewChunksRef.current;
+					if (chunks) {
+						const blob = new Blob(chunks.filter(Boolean));
+						setState((prev) => ({ ...prev, previewReceived: blob, previewReceiveProgress: 100 }));
+					}
 				}
 			});
 
@@ -609,6 +641,52 @@ export function usePeerConnection(
 	}, [file, checkBothComplete]);
 
 	// -----------------------------------------------------------------------
+	// Send preview — smaller transfer for 60s audio preview (Plan 14-04)
+	// -----------------------------------------------------------------------
+
+	const sendPreview = useCallback(async (previewBlob: Blob) => {
+		const conn = connRef.current;
+		if (!conn) return;
+
+		const totalChunks = Math.ceil(previewBlob.size / CHUNK_SIZE);
+		const buffer = await previewBlob.arrayBuffer();
+
+		for (let i = 0; i < totalChunks; i++) {
+			const start = i * CHUNK_SIZE;
+			const end = Math.min(start + CHUNK_SIZE, buffer.byteLength);
+			const chunkData = buffer.slice(start, end);
+
+			// Backpressure check (same as full transfer, D-08)
+			const dc = (conn as unknown as { _dc?: RTCDataChannel })._dc;
+			if (dc && dc.bufferedAmount > MAX_BUFFERED_AMOUNT) {
+				await new Promise<void>((resolve) => {
+					const onLow = () => {
+						dc.removeEventListener("bufferedamountlow", onLow);
+						resolve();
+					};
+					dc.bufferedAmountLowThreshold = 262_144;
+					dc.addEventListener("bufferedamountlow", onLow);
+				});
+			}
+
+			conn.send({
+				type: "preview-chunk",
+				index: i,
+				total: totalChunks,
+				data: chunkData,
+			} as TransferMessage);
+
+			// Update send progress
+			setState((prev) => ({
+				...prev,
+				previewSendProgress: Math.round(((i + 1) / totalChunks) * 100),
+			}));
+		}
+
+		conn.send({ type: "preview-done", previewSize: previewBlob.size } as TransferMessage);
+	}, []);
+
+	// -----------------------------------------------------------------------
 	// Retry: reconnect but PRESERVE received chunks for resume
 	// -----------------------------------------------------------------------
 
@@ -707,6 +785,7 @@ export function usePeerConnection(
 		if (connRef.current) { connRef.current.close(); connRef.current = null; }
 		if (peerRef.current) { peerRef.current.destroy(); peerRef.current = null; }
 		chunksRef.current = [];
+		previewChunksRef.current = null;
 		hadActiveTransferRef.current = false;
 		totalChunksExpectedRef.current = 0;
 		lastAckedIndexRef.current = -1;
@@ -721,5 +800,5 @@ export function usePeerConnection(
 		return cleanupFn;
 	}, [initPeer, cleanupFn]);
 
-	return { state, sendFile, retry, cleanup: cleanupFn };
+	return { state, sendFile, sendPreview, retry, cleanup: cleanupFn };
 }
