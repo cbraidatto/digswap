@@ -13,6 +13,7 @@ export function generateCspHeader(nonce: string, isDev: boolean): string {
 		"img-src 'self' data: https:",
 		"font-src 'self' https://fonts.gstatic.com https://fonts.googleapis.com",
 		"connect-src 'self' https://*.supabase.co wss://*.supabase.co https://0.peerjs.com wss://0.peerjs.com",
+		"frame-src 'self' https://www.youtube-nocookie.com",
 		"frame-ancestors 'none'",
 		"form-action 'self'",
 	];

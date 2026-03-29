@@ -10,6 +10,7 @@ export interface RadarMatch {
   matchUsername: string | null;
   matchAvatarUrl: string | null;
   releaseId: string;
+  discogsId: number | null;
   releaseTitle: string;
   releaseArtist: string;
   rarityScore: number | null;
@@ -50,6 +51,7 @@ export async function getRadarMatches(
       matchUsername: profiles.username,
       matchAvatarUrl: profiles.avatarUrl,
       releaseId: collectionItems.releaseId,
+      discogsId: releases.discogsId,
       releaseTitle: releases.title,
       releaseArtist: releases.artist,
       rarityScore: releases.rarityScore,
@@ -81,6 +83,7 @@ export async function getRadarMatches(
         matchUsername: m.matchUsername,
         matchAvatarUrl: m.matchAvatarUrl,
         releaseId: m.releaseId!,
+        discogsId: m.discogsId ?? null,
         releaseTitle: m.releaseTitle ?? "Unknown Title",
         releaseArtist: m.releaseArtist ?? "",
         rarityScore: m.rarityScore,

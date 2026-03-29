@@ -28,6 +28,7 @@ export interface RecordOwner {
 
 export interface SearchResult {
 	id: string;
+	discogsId: number | null;
 	title: string;
 	artist: string;
 	label: string | null;
@@ -42,6 +43,7 @@ export interface SearchResult {
 
 export interface BrowseResult {
 	id: string;
+	discogsId: number | null;
 	title: string;
 	artist: string;
 	label: string | null;
@@ -55,6 +57,7 @@ export interface BrowseResult {
 
 export interface SuggestionResult {
 	id: string;
+	discogsId: number | null;
 	title: string;
 	artist: string;
 	label: string | null;
@@ -87,6 +90,7 @@ export async function searchRecords(
 	const matchingReleases = await db
 		.select({
 			id: releases.id,
+			discogsId: releases.discogsId,
 			title: releases.title,
 			artist: releases.artist,
 			label: releases.label,
@@ -188,6 +192,7 @@ export async function browseRecords(
 	const rows = await db
 		.select({
 			id: releases.id,
+			discogsId: releases.discogsId,
 			title: releases.title,
 			artist: releases.artist,
 			label: releases.label,
@@ -203,6 +208,7 @@ export async function browseRecords(
 		.where(conditions.length > 0 ? and(...conditions) : undefined)
 		.groupBy(
 			releases.id,
+			releases.discogsId,
 			releases.title,
 			releases.artist,
 			releases.label,
@@ -268,6 +274,7 @@ export async function getSuggestedRecords(
 		const genreQuery = db
 			.select({
 				id: releases.id,
+				discogsId: releases.discogsId,
 				title: releases.title,
 				artist: releases.artist,
 				label: releases.label,
@@ -294,6 +301,7 @@ export async function getSuggestedRecords(
 			)
 			.groupBy(
 				releases.id,
+				releases.discogsId,
 				releases.title,
 				releases.artist,
 				releases.label,
@@ -326,6 +334,7 @@ export async function getSuggestedRecords(
 		const followQuery = db
 			.select({
 				id: releases.id,
+				discogsId: releases.discogsId,
 				title: releases.title,
 				artist: releases.artist,
 				label: releases.label,
@@ -351,6 +360,7 @@ export async function getSuggestedRecords(
 			)
 			.groupBy(
 				releases.id,
+				releases.discogsId,
 				releases.title,
 				releases.artist,
 				releases.label,
