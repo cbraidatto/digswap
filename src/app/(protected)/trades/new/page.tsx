@@ -52,6 +52,23 @@ export default async function NewTradePage({ searchParams }: NewTradePageProps) 
 		}
 	}
 
+	// Fetch user's collection for offering release picker (D-02)
+	const { data: collectionItems } = await admin
+		.from("user_collections")
+		.select("release_id, releases(id, title, artist, thumbnail_url)")
+		.eq("user_id", user.id)
+		.order("created_at", { ascending: false })
+		.limit(500);
+
+	const userCollection = (collectionItems ?? [])
+		.filter((item: any) => item.releases)
+		.map((item: any) => ({
+			releaseId: item.releases.id,
+			title: item.releases.title ?? "Unknown",
+			artist: item.releases.artist ?? "Unknown",
+			thumbnailUrl: item.releases.thumbnail_url ?? null,
+		}));
+
 	return (
 		<div className="max-w-4xl mx-auto px-4 md:px-8 py-8">
 			<div className="mb-8">
@@ -74,6 +91,7 @@ export default async function NewTradePage({ searchParams }: NewTradePageProps) 
 				counterpartyAvatar={counterparty?.avatarUrl ?? null}
 				releaseTitle={releaseInfo?.title ?? null}
 				releaseArtist={releaseInfo?.artist ?? null}
+				userCollection={userCollection}
 			/>
 		</div>
 	);
