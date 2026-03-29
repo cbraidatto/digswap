@@ -125,11 +125,13 @@ export function TradeLobby({
 		} else if (tradeStatus === "transferring") {
 			setLobbyState("transferring");
 		} else if (tradeStatus === "lobby") {
-			// Check if both terms already accepted (page reload case)
+			// Terms acceptance is async — go straight to negotiation, no need to wait for partner online.
+			// Once both accepted, switch to waiting_both (need simultaneous online for P2P preview).
 			if (termsAcceptedAt && termsAcceptedByRecipientAt) {
-				setLobbyState("preview_selection");
+				setLobbyState("waiting_both");
+			} else {
+				setLobbyState("negotiation");
 			}
-			// else: waiting_both (default), will advance to negotiation when bothOnline
 		}
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, []);
@@ -208,9 +210,9 @@ export function TradeLobby({
 						setLobbyState("failed");
 					}
 
-					// Also check bilateral acceptance timestamps
-					if (newRow.terms_accepted_at && newRow.terms_accepted_by_recipient_at) {
-						setLobbyState("preview_selection");
+					// When both terms accepted → move to waiting_both for P2P preview sync
+					if (newRow.terms_accepted_at && newRow.terms_accepted_by_recipient_at && newStatus !== "previewing") {
+						setLobbyState("waiting_both");
 					}
 				},
 			)
@@ -222,12 +224,14 @@ export function TradeLobby({
 	}, [tradeId, lobbyState]);
 
 	// -----------------------------------------------------------------------
-	// State machine: advance from waiting_both -> negotiation when bothOnline
+	// State machine: waiting_both is only used before the P2P preview phase.
+	// Terms acceptance (negotiation) is async — no need for both online simultaneously.
+	// Presence gates preview_selection → previewing only.
 	// -----------------------------------------------------------------------
 
 	useEffect(() => {
 		if (lobbyState === "waiting_both" && bothOnline) {
-			setLobbyState("negotiation");
+			setLobbyState("preview_selection");
 		}
 	}, [lobbyState, bothOnline]);
 
@@ -410,7 +414,8 @@ export function TradeLobby({
 			setMyTermsAccepted(true);
 			toast.success("Terms accepted");
 			if (result.bothAccepted) {
-				setLobbyState("preview_selection");
+				// Both accepted — now need both online simultaneously for P2P preview
+				setLobbyState("waiting_both");
 			}
 		}
 		setAcceptingTerms(false);
