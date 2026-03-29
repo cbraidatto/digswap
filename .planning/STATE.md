@@ -214,9 +214,10 @@ None yet.
 | 260328-8g4 | Fix race conditions, IDOR, chunk bounds, and retry timeout leak | 2026-03-28 | 5b60b0b | [260328-8g4-fix-all-4-critical-issues-from-the-code-](./quick/260328-8g4-fix-all-4-critical-issues-from-the-code-/) |
 | 260328-9gp | Lock trade lobby expiry to 24h fixed window | 2026-03-28 | dca9332 | [260328-9gp-lock-trade-lobby-expiry-to-24h-fixed-win](./quick/260328-9gp-lock-trade-lobby-expiry-to-24h-fixed-win/) |
 | 260328-a21 | Fix P0 RLS bypasses and P1 race conditions | 2026-03-28 | 6e7f9e1 | [260328-a21-fix-p0-rls-bypasses-and-p1-race-conditio](./quick/260328-a21-fix-p0-rls-bypasses-and-p1-race-conditio/) |
+| 260328-tef | Fix notification badge stale count, add trade icon badge | 2026-03-28 | 317a372 | [260328-tef-fix-notification-badge-stale-count-add-t](./quick/260328-tef-fix-notification-badge-stale-count-add-t/) |
 
 ## Session Continuity
 
-Last session: 2026-03-28T20:52:11Z
-Stopped at: Completed 11-03-PLAN.md — Phase 11 Security Hardening COMPLETE
+Last session: 2026-03-29T00:19:24Z
+Stopped at: Completed quick task 260328-tef
 Resume file: None
