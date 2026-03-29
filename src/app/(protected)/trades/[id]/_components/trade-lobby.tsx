@@ -19,7 +19,7 @@ import { formatFileSize } from "@/lib/audio/file-metadata";
 import { useReceivedFileStore, triggerBlobDownload } from "@/lib/webrtc/received-file-store";
 import { TransferProgress } from "./transfer-progress";
 import { PreviewPlayer } from "./preview-player";
-import { SpectrogramCanvas } from "../../review/_components/spectrogram-canvas";
+import { SpectrogramCanvas } from "../review/_components/spectrogram-canvas";
 
 // ---------------------------------------------------------------------------
 // Types
