@@ -26,7 +26,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 11: Security Hardening** - OWASP API coverage, security test suite, penetration testing (completed 2026-03-28)
 - [x] **Phase 12: Release Pages** - Public SEO-indexable page per release: Discogs link, YouTube embed, owners list, reviews
  (completed 2026-03-29)
-- [ ] **Phase 13: Crates & Sets** - Pre-dig folder creation, add-to-crate from any surface, ordered sets with event metadata
+- [x] **Phase 13: Crates & Sets** - Pre-dig folder creation, add-to-crate from any surface, ordered sets with event metadata (completed 2026-03-29)
 - [ ] **Phase 14: Trade V2** - Explicit proposal with quality specs + collection linking, P2P 1-min preview, waveform visualization, full transfer after preview acceptance
 - [ ] **Phase 15: Social V2** - Trade-scoped messaging thread, online presence in trade context
 - [ ] **Phase 16: Monetization** - Stripe freemium, trade quotas, premium features
@@ -356,7 +356,7 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7 -> 8 -> 9 -> 10
 | 10. Positioning, Radar & Workspace Foundation | 5/5 | Complete   | 2026-03-28 |
 | 11. Security Hardening | 3/3 | Complete | 2026-03-28 |
 | 12. Release Pages | 2/3 | Complete    | 2026-03-29 |
-| 13. Crates & Sets | 2/4 | In Progress|  |
+| 13. Crates & Sets | 4/4 | Complete | 2026-03-29 |
 | 14. Trade V2 | 0/TBD | Planned | - |
 | 15. Social V2 | 0/TBD | Planned | - |
 | 16. Monetization | 0/TBD | Planned | - |
