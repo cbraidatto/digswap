@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-stopped_at: Completed Phase 13 — Crates & Sets (4/4 plans, human-verified)
-last_updated: "2026-03-29T14:18:28.438Z"
-last_activity: 2026-03-29 -- Phase 14 execution started
+stopped_at: Completed 14-02-PLAN.md
+last_updated: "2026-03-29T14:31:16.498Z"
+last_activity: 2026-03-29
 progress:
   total_phases: 17
   completed_phases: 11
   total_plans: 68
-  completed_plans: 60
+  completed_plans: 62
   percent: 98
 ---
 
@@ -26,10 +26,10 @@ See: .planning/PROJECT.md (updated 2026-03-25)
 ## Current Position
 
 Phase: 14 (trade-v2) — EXECUTING
-Plan: 1 of 5
+Plan: 2 of 5
 Next: Phase 14 — Trade V2
-Status: Executing Phase 14
-Last activity: 2026-03-29 -- Phase 14 execution started
+Status: Ready to execute
+Last activity: 2026-03-29
 
 Progress: [█████████░] 98%
 
@@ -96,6 +96,7 @@ Progress: [█████████░] 98%
 | Phase 11 P03 | 3min | 2 tasks | 2 files |
 | Phase 12 P03 | 4min | 2 tasks | 6 files |
 | Phase 13 P01 | 4min | 2 tasks | 7 files |
+| Phase 14 P02 | 4min | 3 tasks | 6 files |
 
 ## Accumulated Context
 
@@ -205,6 +206,7 @@ Recent decisions affecting current work:
 - [Phase 13 P01]: Two-query + JS assembly pattern for getSetsForCrate (avoids complex multi-level join)
 - [Phase 13 P01]: ZodError.issues[0] not .errors[0] — TypeScript type only exposes .issues, auto-fixed during verification
 - [Phase 14 planning]: Trade V2 executes after a preflight blocker batch; 14-02 and 14-03 are serialized; Trade V2 remains asymmetric with proposer implicit terms acceptance
+- [Phase 14]: Status set to lobby on creation instead of pending per D-02; terms_accepted_at set implicitly on proposal creation
 
 ### Pending Todos
 
@@ -227,6 +229,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-29T06:00:00.000Z
-Stopped at: Completed Phase 13 — Crates & Sets (4/4 plans, human-verified)
-Resume file: .planning/phases/14-trade-v2/14-EXECUTION-ORDER.md
+Last session: 2026-03-29T14:31:16.490Z
+Stopped at: Completed 14-02-PLAN.md
+Resume file: None

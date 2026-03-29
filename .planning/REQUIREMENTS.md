@@ -117,9 +117,9 @@
 ### Trade V2
 
 - [x] **TRADE2-01**: Trade proposal explicitly shows what each party is offering and requesting before acceptance
-- [ ] **TRADE2-02**: Proposer can link an item directly from their Discogs collection as the offer (metadata auto-filled)
+- [x] **TRADE2-02**: Proposer can link an item directly from their Discogs collection as the offer (metadata auto-filled)
 - [x] **TRADE2-03**: Proposer fills in audio quality metadata: format (FLAC/MP3/WAV), bitrate, and condition notes
-- [ ] **TRADE2-04**: Recipient sees full offer details (record, quality specs, notes) before accepting or declining
+- [x] **TRADE2-04**: Recipient sees full offer details (record, quality specs, notes) before accepting or declining
 - [ ] **TRADE2-05**: After both accept trade terms, a P2P audio preview phase is initiated before full transfer
 - [ ] **TRADE2-06**: Preview is a random 1-minute segment of the file at original quality, sent P2P via WebRTC — no server involvement
 - [ ] **TRADE2-07**: Files shorter than 1 minute are rejected at selection time with a clear validation message
