@@ -3,6 +3,7 @@ import { render, screen } from "@testing-library/react";
 
 // ---------------------------------------------------------------------------
 // Mock AudioContext — jsdom does not provide Web Audio API
+// Use a class so `new AudioContext()` works correctly.
 // ---------------------------------------------------------------------------
 
 const mockDecodeAudioData = vi.fn().mockResolvedValue({
@@ -18,18 +19,16 @@ const mockCreateBufferSource = vi.fn(() => ({
 	onended: null,
 }));
 
-const mockAudioContextInstance = {
-	decodeAudioData: mockDecodeAudioData,
-	createBufferSource: mockCreateBufferSource,
-	destination: {},
-	currentTime: 0,
-	state: "running",
-	resume: vi.fn().mockResolvedValue(undefined),
-	close: vi.fn().mockResolvedValue(undefined),
-};
-
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-(globalThis as any).AudioContext = vi.fn(() => mockAudioContextInstance);
+(globalThis as any).AudioContext = class MockAudioContext {
+	decodeAudioData = mockDecodeAudioData;
+	createBufferSource = mockCreateBufferSource;
+	destination = {};
+	currentTime = 0;
+	state = "running";
+	resume = vi.fn().mockResolvedValue(undefined);
+	close = vi.fn().mockResolvedValue(undefined);
+};
 
 // ---------------------------------------------------------------------------
 // Mock canvas getContext — jsdom canvas has no rendering context
