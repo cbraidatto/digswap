@@ -64,8 +64,8 @@ const INITIAL_STATE: PeerState = {
 	connectionAttempts: 0,
 };
 
-// Max buffered amount before pausing sends (256 KB)
-const MAX_BUFFERED_AMOUNT = 256 * 1024;
+// Max buffered amount before pausing sends
+const MAX_BUFFERED_AMOUNT = 1_048_576; // 1MB — pause sending when buffer exceeds this (D-08)
 
 // Throttle progress updates to every 100ms
 const PROGRESS_THROTTLE_MS = 100;
@@ -554,7 +554,7 @@ export function usePeerConnection(
 				if (dc && dc.bufferedAmount > MAX_BUFFERED_AMOUNT) {
 					await new Promise<void>((resolve) => {
 						const onLow = () => { dc.removeEventListener("bufferedamountlow", onLow); resolve(); };
-						dc.bufferedAmountLowThreshold = CHUNK_SIZE;
+						dc.bufferedAmountLowThreshold = 262_144; // 256KB — resume sending when buffer drains to this (D-08)
 						dc.addEventListener("bufferedamountlow", onLow);
 					});
 				}
