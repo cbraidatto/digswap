@@ -316,7 +316,7 @@ Plans:
   7. Both users receive an in-app alert when both are simultaneously online during the transfer window
 **Plans**: 5 plans
 Plans:
-- [ ] 14-01-PLAN.md -- Schema migration + constants + status gate fixes + backpressure thresholds
+- [x] 14-01-PLAN.md -- Schema migration + constants + status gate fixes + backpressure thresholds
 - [ ] 14-02-PLAN.md -- Proposal form redesign: collection offering picker, quality metadata, no file upload
 - [ ] 14-03-PLAN.md -- Lobby state machine, Supabase Presence, bilateral negotiation phase
 - [ ] 14-04-PLAN.md -- Preview subsystem: SHA-256, Blob.slice preview, P2P transfer, amplitude bars player, bilateral accept
@@ -364,6 +364,6 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7 -> 8 -> 9 -> 10
 | 11. Security Hardening | 3/3 | Complete | 2026-03-28 |
 | 12. Release Pages | 2/3 | Complete    | 2026-03-29 |
 | 13. Crates & Sets | 4/4 | Complete | 2026-03-29 |
-| 14. Trade V2 | 0/5 | Planned | - |
+| 14. Trade V2 | 1/5 | In Progress|  |
 | 15. Social V2 | 0/TBD | Planned | - |
 | 16. Monetization | 0/TBD | Planned | - |
