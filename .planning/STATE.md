@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-stopped_at: Completed 14-03-PLAN.md (Lobby State Machine + Presence + Negotiation)
-last_updated: "2026-03-29T14:32:13.668Z"
+stopped_at: Completed 14-04-PLAN.md (Preview Subsystem)
+last_updated: "2026-03-29T14:42:28.835Z"
 last_activity: 2026-03-29
 progress:
   total_phases: 17
   completed_phases: 11
   total_plans: 68
-  completed_plans: 62
+  completed_plans: 64
   percent: 98
 ---
 
@@ -26,7 +26,7 @@ See: .planning/PROJECT.md (updated 2026-03-25)
 ## Current Position
 
 Phase: 14 (trade-v2) — EXECUTING
-Plan: 2 of 5
+Plan: 3 of 5
 Next: Phase 14 — Trade V2
 Status: Ready to execute
 Last activity: 2026-03-29
@@ -97,6 +97,7 @@ Progress: [█████████░] 98%
 | Phase 12 P03 | 4min | 2 tasks | 6 files |
 | Phase 13 P01 | 4min | 2 tasks | 7 files |
 | Phase 14 P03 | 4min | 3 tasks | 3 files |
+| Phase 14 P04 | 6min | 5 tasks | 5 files |
 
 ## Accumulated Context
 
@@ -208,6 +209,9 @@ Recent decisions affecting current work:
 - [Phase 14 planning]: Trade V2 executes after a preflight blocker batch; 14-02 and 14-03 are serialized; Trade V2 remains asymmetric with proposer implicit terms acceptance
 - [Phase 14]: Supabase Presence on channel trade:${tradeId} for real-time online detection (not postgres_changes)
 - [Phase 14]: Multi-phase lobby state machine initializes from DB status on mount for page reload resilience
+- [Phase 14]: Inline Web Worker for SHA-256 via URL.createObjectURL(Blob) pattern (no separate worker file)
+- [Phase 14]: Preview transfer uses distinct preview-chunk/preview-done message types separate from full transfer
+- [Phase 14]: Bilateral timestamp gate: all 4 timestamps non-null before advancing to transferring status (D-07)
 
 ### Pending Todos
 
@@ -230,6 +234,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-29T14:32:13.662Z
-Stopped at: Completed 14-03-PLAN.md (Lobby State Machine + Presence + Negotiation)
+Last session: 2026-03-29T14:42:28.829Z
+Stopped at: Completed 14-04-PLAN.md (Preview Subsystem)
 Resume file: None

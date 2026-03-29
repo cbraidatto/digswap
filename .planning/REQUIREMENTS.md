@@ -121,9 +121,9 @@
 - [x] **TRADE2-03**: Proposer fills in audio quality metadata: format (FLAC/MP3/WAV), bitrate, and condition notes
 - [x] **TRADE2-04**: Recipient sees full offer details (record, quality specs, notes) before accepting or declining
 - [x] **TRADE2-05**: After both accept trade terms, a P2P audio preview phase is initiated before full transfer
-- [ ] **TRADE2-06**: Preview is a random 1-minute segment of the file at original quality, sent P2P via WebRTC — no server involvement
-- [ ] **TRADE2-07**: Files shorter than 1 minute are rejected at selection time with a clear validation message
-- [ ] **TRADE2-08**: Preview plays via Web Audio API in the receiver's browser with waveform visualization generated client-side
+- [x] **TRADE2-06**: Preview is a random 1-minute segment of the file at original quality, sent P2P via WebRTC — no server involvement
+- [x] **TRADE2-07**: Files shorter than 1 minute are rejected at selection time with a clear validation message
+- [x] **TRADE2-08**: Preview plays via Web Audio API in the receiver's browser with waveform visualization generated client-side
 - [x] **TRADE2-09**: After both parties accept the preview, the full P2P file transfer proceeds
 - [x] **TRADE2-10**: Trade lobby notifies both users with an in-app alert when both parties are simultaneously online
 
