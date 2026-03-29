@@ -826,6 +826,147 @@ export async function declineTerms(
 }
 
 // ---------------------------------------------------------------------------
+// Update File Hash (D-09: SHA-256 saved to DB during preview selection)
+// ---------------------------------------------------------------------------
+
+export async function updateFileHash(
+	tradeId: string,
+	hash: string,
+): Promise<{ error?: string }> {
+	const user = await requireUser();
+	const admin = createAdminClient();
+
+	await admin
+		.from("trade_requests")
+		.update({ file_hash: hash, updated_at: new Date().toISOString() })
+		.eq("id", tradeId)
+		.or(`requester_id.eq.${user.id},provider_id.eq.${user.id}`);
+
+	return {};
+}
+
+// ---------------------------------------------------------------------------
+// Accept Preview (bilateral preview acceptance gates full transfer)
+// ---------------------------------------------------------------------------
+
+export async function acceptPreview(
+	tradeId: string,
+): Promise<{ success?: boolean; error?: string; bothAccepted?: boolean }> {
+	const user = await requireUser();
+
+	const { success: rlSuccess } = await tradeRateLimit.limit(user.id);
+	if (!rlSuccess) {
+		return { error: "Too many requests. Please wait a moment." };
+	}
+
+	const admin = createAdminClient();
+
+	const { data: trade, error } = await admin
+		.from("trade_requests")
+		.select(
+			"id, requester_id, provider_id, status, preview_accepted_at, preview_accepted_by_recipient_at, terms_accepted_at, terms_accepted_by_recipient_at",
+		)
+		.eq("id", tradeId)
+		.single();
+
+	if (error || !trade) {
+		return { error: "Trade not found" };
+	}
+
+	if (trade.requester_id !== user.id && trade.provider_id !== user.id) {
+		return { error: "Not a participant in this trade" };
+	}
+
+	if (trade.status !== TRADE_STATUS.PREVIEWING) {
+		return { error: "Trade is not in preview phase" };
+	}
+
+	const isRequester = trade.requester_id === user.id;
+	const updateField = isRequester
+		? "preview_accepted_at"
+		: "preview_accepted_by_recipient_at";
+
+	await admin
+		.from("trade_requests")
+		.update({
+			[updateField]: new Date().toISOString(),
+			updated_at: new Date().toISOString(),
+		})
+		.eq("id", tradeId)
+		.eq("status", TRADE_STATUS.PREVIEWING);
+
+	// Check if ALL 4 bilateral timestamps are now set (D-07)
+	const otherPreviewField = isRequester
+		? "preview_accepted_by_recipient_at"
+		: "preview_accepted_at";
+	const allFourSet =
+		trade.terms_accepted_at !== null &&
+		trade.terms_accepted_by_recipient_at !== null &&
+		trade[otherPreviewField] !== null; // The other party already accepted
+
+	if (allFourSet) {
+		await admin
+			.from("trade_requests")
+			.update({
+				status: TRADE_STATUS.TRANSFERRING,
+				updated_at: new Date().toISOString(),
+			})
+			.eq("id", tradeId)
+			.eq("status", TRADE_STATUS.PREVIEWING);
+
+		return { success: true, bothAccepted: true };
+	}
+
+	return { success: true, bothAccepted: false };
+}
+
+// ---------------------------------------------------------------------------
+// Reject Preview (cancels the trade)
+// ---------------------------------------------------------------------------
+
+export async function rejectPreview(
+	tradeId: string,
+): Promise<{ success?: boolean; error?: string }> {
+	const user = await requireUser();
+
+	const { success: rlSuccess } = await tradeRateLimit.limit(user.id);
+	if (!rlSuccess) {
+		return { error: "Too many requests. Please wait a moment." };
+	}
+
+	const admin = createAdminClient();
+
+	const { data: trade, error } = await admin
+		.from("trade_requests")
+		.select("id, requester_id, provider_id, status")
+		.eq("id", tradeId)
+		.single();
+
+	if (error || !trade) {
+		return { error: "Trade not found" };
+	}
+
+	if (trade.requester_id !== user.id && trade.provider_id !== user.id) {
+		return { error: "Not a participant in this trade" };
+	}
+
+	if (trade.status !== TRADE_STATUS.PREVIEWING) {
+		return { error: "Trade is not in preview phase" };
+	}
+
+	await admin
+		.from("trade_requests")
+		.update({
+			status: TRADE_STATUS.CANCELLED,
+			updated_at: new Date().toISOString(),
+		})
+		.eq("id", tradeId)
+		.eq("status", TRADE_STATUS.PREVIEWING);
+
+	return { success: true };
+}
+
+// ---------------------------------------------------------------------------
 // Update Last Joined Lobby (audit timestamp)
 // ---------------------------------------------------------------------------
 
