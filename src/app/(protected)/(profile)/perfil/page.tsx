@@ -17,7 +17,7 @@ import {
 	PAGE_SIZE,
 } from "@/lib/collection/queries";
 import { getFollowCounts } from "@/lib/social/queries";
-import { CollectionGrid } from "./_components/collection-grid";
+import { CollectionGridWithCrates } from "./_components/collection-grid-with-crates";
 import { CollectionSkeleton } from "./_components/collection-skeleton";
 import { FilterBar } from "./_components/filter-bar";
 import { FollowList } from "./_components/follow-list";
@@ -35,6 +35,7 @@ import { AddToWantlistDialog } from "./_components/add-to-wantlist-dialog";
 import { getUserRanking, getUserBadges } from "@/lib/gamification/queries";
 import { getTradeReputation } from "@/lib/trades/queries";
 import { TrustStrip } from "@/components/trust/trust-strip";
+import Link from "next/link";
 import { ShareSurface } from "@/components/share/share-surface";
 import { HolyGrailSelector } from "./_components/holy-grail-selector";
 import { RarityCardModal } from "./_components/rarity-card-modal";
@@ -366,6 +367,16 @@ export default async function PerfilPage({ searchParams }: PerfilPageProps) {
 				))}
 			</section>
 
+			{/* My Crates shortcut */}
+			<div className="mt-4 flex justify-end">
+				<Link
+					href="/crates"
+					className="font-mono text-[10px] text-primary hover:underline tracking-[0.15em]"
+				>
+					[MY_CRATES →]
+				</Link>
+			</div>
+
 			{/* Public Identity Controls */}
 			<section className="mt-12 grid grid-cols-1 md:grid-cols-3 gap-6">
 				{/* Holy Grail Selector */}
@@ -463,7 +474,7 @@ export default async function PerfilPage({ searchParams }: PerfilPageProps) {
 				/>
 
 				{/* Collection Grid */}
-				<CollectionGrid items={items} isOwner={true} />
+				<CollectionGridWithCrates items={items} />
 
 				{/* Pagination */}
 				{totalPages > 1 && (
