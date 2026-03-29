@@ -5,25 +5,7 @@ import { useRouter } from "next/navigation";
 import { analyzeAudioFile, formatDuration } from "@/lib/audio/file-metadata";
 import { acceptTrade, declineTrade } from "@/actions/trades";
 import { SpectrogramCanvas } from "./spectrogram-canvas";
-import { create } from "zustand";
-
-// ---------------------------------------------------------------------------
-// Zustand store for received file blob (set by lobby, read here)
-// ---------------------------------------------------------------------------
-
-interface ReceivedFileState {
-	file: Blob | null;
-	fileName: string | null;
-	setFile: (file: Blob, fileName: string) => void;
-	clearFile: () => void;
-}
-
-export const useReceivedFileStore = create<ReceivedFileState>((set) => ({
-	file: null,
-	fileName: null,
-	setFile: (file, fileName) => set({ file, fileName }),
-	clearFile: () => set({ file: null, fileName: null }),
-}));
+import { useReceivedFileStore } from "@/lib/webrtc/received-file-store";
 
 // ---------------------------------------------------------------------------
 // Types

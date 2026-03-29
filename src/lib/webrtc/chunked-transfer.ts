@@ -1,5 +1,8 @@
 export const CHUNK_SIZE = 64 * 1024; // 64KB
 
+// How many chunks between ACKs from receiver
+export const ACK_INTERVAL = 16; // ACK every 16 chunks (~1MB)
+
 export interface ChunkMessage {
 	type: "chunk";
 	index: number;
@@ -13,7 +16,40 @@ export interface DoneMessage {
 	fileSize: number;
 }
 
-export type TransferMessage = ChunkMessage | DoneMessage;
+/** Receiver -> Sender: acknowledge received chunks up to this index */
+export interface AckMessage {
+	type: "ack";
+	lastReceivedIndex: number;
+}
+
+/** Receiver -> Sender: on reconnect, tell sender where to resume */
+export interface ResumeRequestMessage {
+	type: "resume-request";
+	lastReceivedIndex: number; // -1 if no chunks received
+	totalExpected: number; // 0 if unknown (first connection attempt)
+}
+
+/** Sender -> Receiver: confirm resume point and total chunks */
+export interface ResumeResponseMessage {
+	type: "resume-response";
+	resumeFromIndex: number;
+	totalChunks: number;
+	fileName: string;
+	fileSize: number;
+}
+
+/** Receiver -> Sender: all chunks received, file reassembled */
+export interface ReceiverCompleteMessage {
+	type: "receiver-complete";
+}
+
+export type TransferMessage =
+	| ChunkMessage
+	| DoneMessage
+	| AckMessage
+	| ResumeRequestMessage
+	| ResumeResponseMessage
+	| ReceiverCompleteMessage;
 
 /**
  * Validates that a chunk index is within valid bounds.
@@ -51,6 +87,28 @@ export function sliceFileIntoChunks(file: File): {
  */
 export function reassembleChunks(chunks: ArrayBuffer[], _fileName: string): Blob {
 	return new Blob(chunks, { type: "application/octet-stream" });
+}
+
+/**
+ * Count how many chunks have been received (non-empty slots in the array).
+ */
+export function countReceivedChunks(chunks: ArrayBuffer[]): number {
+	let count = 0;
+	for (let i = 0; i < chunks.length; i++) {
+		if (chunks[i]) count++;
+	}
+	return count;
+}
+
+/**
+ * Find the highest contiguous chunk index received (from 0).
+ * Returns -1 if no chunks received.
+ */
+export function highestContiguousChunk(chunks: ArrayBuffer[]): number {
+	for (let i = 0; i < chunks.length; i++) {
+		if (!chunks[i]) return i - 1;
+	}
+	return chunks.length - 1;
 }
 
 /**

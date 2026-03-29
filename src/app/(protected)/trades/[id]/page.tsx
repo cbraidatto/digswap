@@ -39,9 +39,11 @@ export default async function TradePage({
 		redirect("/trades");
 	}
 
-	// Determine user role
+	// Determine P2P role:
+	//   requester = wants the file → receiver (downloads)
+	//   provider  = has the file   → sender   (uploads & sends)
 	const role: "sender" | "receiver" =
-		user.id === trade.requesterId ? "sender" : "receiver";
+		user.id === trade.requesterId ? "receiver" : "sender";
 
 	// Handle completed trades
 	if (trade.status === "completed") {
@@ -93,7 +95,7 @@ export default async function TradePage({
 	}
 
 	// Handle pending status: provider can accept or decline
-	if (trade.status === "pending" && role === "receiver") {
+	if (trade.status === "pending" && role === "sender") {
 		return (
 			<div className="max-w-2xl mx-auto px-4 md:px-8 py-16 text-center">
 				<span className="material-symbols-outlined text-secondary text-5xl">
@@ -164,8 +166,8 @@ export default async function TradePage({
 		);
 	}
 
-	// Handle pending status for sender: waiting for provider to accept
-	if (trade.status === "pending" && role === "sender") {
+	// Handle pending status for requester: waiting for provider to accept
+	if (trade.status === "pending" && role === "receiver") {
 		return (
 			<div className="max-w-2xl mx-auto px-4 md:px-8 py-16 text-center">
 				<span className="material-symbols-outlined text-tertiary text-5xl">
@@ -203,8 +205,9 @@ export default async function TradePage({
 	// Active trade: accepted or transferring — show the lobby
 	const iceServers = await getTurnCredentials();
 
+	// provider (sender) → counterparty is requester; requester (receiver) → counterparty is provider
 	const counterpartyId =
-		role === "sender" ? trade.providerId : trade.requesterId;
+		role === "sender" ? trade.requesterId : trade.providerId;
 
 	return (
 		<div className="max-w-2xl mx-auto px-4 md:px-8 py-16 text-center">
