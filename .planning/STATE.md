@@ -232,7 +232,7 @@ None yet.
 | 260328-9gp | Lock trade lobby expiry to 24h fixed window | 2026-03-28 | dca9332 | [260328-9gp-lock-trade-lobby-expiry-to-24h-fixed-win](./quick/260328-9gp-lock-trade-lobby-expiry-to-24h-fixed-win/) |
 | 260328-a21 | Fix P0 RLS bypasses and P1 race conditions | 2026-03-28 | 6e7f9e1 | [260328-a21-fix-p0-rls-bypasses-and-p1-race-conditio](./quick/260328-a21-fix-p0-rls-bypasses-and-p1-race-conditio/) |
 | 260328-tef | Fix notification badge stale count, add trade icon badge | 2026-03-28 | 317a372 | [260328-tef-fix-notification-badge-stale-count-add-t](./quick/260328-tef-fix-notification-badge-stale-count-add-t/) |
-| 260331-h7g | Rebaseline GSD: close phase 14, register Phase 17 desktop trade runtime, create ADR-002 | 2026-03-31 | (pending) | [260331-h7g-rebaseline-gsd-desktop-milestone](./quick/260331-h7g-rebaseline-gsd-desktop-milestone/) |
+| 260331-h7g | Rebaseline GSD: close phase 14, register Phase 17 desktop trade runtime, create ADR-002 | 2026-03-31 | 7de4aaa | [260331-h7g-rebaseline-gsd-desktop-milestone](./quick/260331-h7g-rebaseline-gsd-desktop-milestone/) |
 
 ## Session Continuity
 
