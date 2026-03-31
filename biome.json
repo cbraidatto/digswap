@@ -32,6 +32,11 @@
 		}
 	},
 	"files": {
-		"includes": ["src/**/*.ts", "src/**/*.tsx"]
+		"includes": [
+			"apps/**/*.ts",
+			"apps/**/*.tsx",
+			"packages/**/*.ts",
+			"packages/**/*.tsx"
+		]
 	}
 }

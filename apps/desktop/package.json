@@ -1,0 +1,18 @@
+{
+  "name": "@digswap/desktop",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "node -e \"console.log('Phase 17-02 scaffolds the Electron shell.')\"",
+    "build": "node -e \"console.log('Phase 17-02 scaffolds the Electron shell.')\"",
+    "typecheck": "tsc --noEmit -p tsconfig.json"
+  },
+  "dependencies": {
+    "@digswap/trade-domain": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/node": "^20",
+    "typescript": "^5"
+  }
+}
