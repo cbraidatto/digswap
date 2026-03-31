@@ -20,7 +20,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [ ] **Phase 5: Social Layer** - Follow system, activity feed, collection comparison, public profiles
 - [x] **Phase 6: Discovery + Notifications** - Cross-collection search, wantlist matching, in-app/email/push notifications (completed 2026-03-26)
 - [x] **Phase 7: Community + Reviews** - Genre/era groups, group activity feeds, pressing and release reviews (completed 2026-03-26)
-- [ ] **Phase 8: Gamification + Rankings** - Global/genre leaderboards, badges, titles, composite ranking formula
+- [x] **Phase 8: Gamification + Rankings** - Global/genre leaderboards, badges, titles, composite ranking formula (completed 2026-03-31)
 - [ ] **Phase 9: P2P Audio Trading** - DMCA compliance, WebRTC file transfer, trade reputation, TURN relay
 - [x] **Phase 10: Positioning, Radar & Workspace Foundation** - Repositioned landing, The Radar as hero feature, public acquisition surfaces, Digger Memory primitives (completed 2026-03-28)
 - [x] **Phase 11: Security Hardening** - OWASP API coverage, security test suite, penetration testing (completed 2026-03-28)
@@ -211,7 +211,7 @@ Plans:
 **Plans**: 5 plans
 Plans:
 - [x] 08-01-PLAN.md -- Data layer: gamification constants, badge utility, leaderboard queries, server actions, schema migration, badge seed
-- [ ] 08-02-PLAN.md -- Badge triggers in server actions + import worker, pg_cron ranking SQL function
+- [x] 08-02-PLAN.md -- Badge triggers in server actions + import worker, pg_cron ranking SQL function
 - [x] 08-03-PLAN.md -- RANKINGS tab on /explorar: LeaderboardRow, GenreFilter, RankingsTab components
 - [x] 08-04-PLAN.md -- Profile rewrite: RankCard + BadgeRow replacing XP/level, public profile rank + badges
 - [x] 08-05-PLAN.md -- Unit test suite (4 test files) and human verification checkpoint
@@ -380,7 +380,7 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 4.5 -> 5 -> 6 -> 7 -> 8 -> 
 | 5. Social Layer | 4/4 | Complete | 2026-03-26 |
 | 6. Discovery + Notifications | 5/5 | Complete   | 2026-03-26 |
 | 7. Community + Reviews | 5/5 | Complete   | 2026-03-26 |
-| 8. Gamification + Rankings | 4/5 | In Progress | - |
+| 8. Gamification + Rankings | 5/5 | Complete   | 2026-03-31 |
 | 9. P2P Audio Trading | - | Superseded — P2P moved to Desktop (Phase 17) | - |
 | 10. Positioning, Radar & Workspace Foundation | 5/5 | Complete   | 2026-03-28 |
 | 11. Security Hardening | 3/3 | Complete | 2026-03-28 |

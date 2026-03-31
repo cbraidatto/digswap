@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: verifying
-stopped_at: Completed 17-desktop-trade-runtime-06-PLAN.md
-last_updated: "2026-03-31T16:39:43.768Z"
+stopped_at: Completed 08-02-PLAN.md
+last_updated: "2026-03-31T18:22:53.637Z"
 last_activity: 2026-03-31
 progress:
   total_phases: 18
-  completed_phases: 12
-  total_plans: 74
-  completed_plans: 70
+  completed_phases: 13
+  total_plans: 75
+  completed_plans: 72
   percent: 98
 ---
 
@@ -222,6 +222,8 @@ Recent decisions affecting current work:
 - [Phase 17-desktop-trade-runtime]: InboxScreen polls getPendingTrades every 30s — Supabase Realtime not bridged to renderer
 - [Phase 17-desktop-trade-runtime]: Navigation state owned by AppShell via prop-callbacks; screens are stateless about routing
 - [Phase 17-desktop-trade-runtime]: IPC trade runtime types (DesktopBridgeTradeRuntime) defined by renderer, implemented by Codex in main process
+- [Phase 08]: social.ts not modified for gamification — follows captured by pg_cron batch (D-12)
+- [Phase 08]: Trade points excluded from ranking CTE until Phase 9 completes trade tracking
 
 ### Pending Todos
 
@@ -245,6 +247,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-31T16:39:43.763Z
-Stopped at: Completed 17-desktop-trade-runtime-06-PLAN.md
+Last session: 2026-03-31T18:22:38.869Z
+Stopped at: Completed 08-02-PLAN.md
 Resume file: None
