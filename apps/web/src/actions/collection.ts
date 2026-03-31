@@ -8,6 +8,7 @@ import { CONDITION_GRADES } from "@/lib/collection/filters";
 import { logActivity } from "@/actions/social";
 import { apiRateLimit } from "@/lib/rate-limit";
 import { checkWantlistMatches } from "@/lib/notifications/match";
+import { awardBadge } from "@/lib/gamification/badge-awards";
 
 /**
  * Search the Discogs database for releases matching a query string.
@@ -177,6 +178,32 @@ export async function addRecordToCollection(
 		await checkWantlistMatches(releaseId, user.id);
 	} catch {
 		// Non-blocking: match check failure should not fail the add-record action
+	}
+
+	// Badge checks (Phase 8, GAME-04)
+	try {
+		// Count user's collection items using admin client (already in scope as `admin`)
+		const { count: collectionCount } = await admin
+			.from("collection_items")
+			.select("*", { count: "exact", head: true })
+			.eq("user_id", user.id);
+
+		const itemCount = collectionCount ?? 0;
+
+		if (itemCount === 1) await awardBadge(user.id, "first_dig");
+		if (itemCount >= 100) await awardBadge(user.id, "century_club");
+
+		// Check rare_find: was the added release Ultra Rare? (rarityScore >= 2.0)
+		const { data: releaseData } = await admin
+			.from("releases")
+			.select("rarity_score")
+			.eq("id", releaseId)
+			.single();
+		if (releaseData && releaseData.rarity_score >= 2.0) {
+			await awardBadge(user.id, "rare_find");
+		}
+	} catch {
+		// Non-blocking: badge award failure should not fail the add-record action
 	}
 
 	return { success: true };

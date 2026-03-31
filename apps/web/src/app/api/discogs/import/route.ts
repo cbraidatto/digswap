@@ -6,6 +6,7 @@ import {
 } from "@/lib/discogs/import-worker";
 import { broadcastProgress } from "@/lib/discogs/broadcast";
 import { checkWantlistMatches } from "@/lib/notifications/match";
+import { awardBadge } from "@/lib/gamification/badge-awards";
 import type { ImportJobType } from "@/lib/discogs/types";
 
 /** Vercel Pro timeout (10s on Hobby, 60s on Pro) */
@@ -130,6 +131,41 @@ export async function POST(request: NextRequest) {
 			totalItems: completedJob?.total_items ?? 0,
 			currentRecord: null,
 		});
+
+		// Badge checks after import completion (Phase 8, GAME-04)
+		// Run ONCE after import completes, not per-record (performance)
+		if (job.type === "collection" || job.type === "sync") {
+			try {
+				// Count total collection items for this user
+				const { count: totalItems } = await admin
+					.from("collection_items")
+					.select("*", { count: "exact", head: true })
+					.eq("user_id", job.user_id);
+
+				const itemCount = totalItems ?? 0;
+
+				// first_dig: user has at least 1 record
+				if (itemCount >= 1) await awardBadge(job.user_id, "first_dig");
+
+				// century_club: user has 100+ records
+				if (itemCount >= 100) await awardBadge(job.user_id, "century_club");
+
+				// rare_find: check if any imported record has rarityScore >= 2.0
+				const { data: rareRecords } = await admin
+					.from("collection_items")
+					.select("release_id, releases!inner(rarity_score)")
+					.eq("user_id", job.user_id)
+					.gte("releases.rarity_score", 2.0)
+					.limit(1);
+
+				if (rareRecords && rareRecords.length > 0) {
+					await awardBadge(job.user_id, "rare_find");
+				}
+			} catch (err) {
+				// Non-blocking: badge check failure should not fail import completion
+				console.error("Post-import badge check failed:", err);
+			}
+		}
 
 		// Batch wantlist match check (Phase 6, DISC2-03)
 		// Run AFTER import completes to avoid notification flood during import

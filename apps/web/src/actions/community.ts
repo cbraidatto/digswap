@@ -9,6 +9,7 @@ import { reviews } from "@/lib/db/schema/reviews";
 import { profiles } from "@/lib/db/schema/users";
 import { eq, and, sql } from "drizzle-orm";
 import { logActivity } from "@/actions/social";
+import { awardBadge } from "@/lib/gamification/badge-awards";
 import { apiRateLimit } from "@/lib/rate-limit";
 import { slugify } from "@/lib/community/slugify";
 import { createPostSchema, createReviewSchema } from "@/lib/validations/community";
@@ -182,6 +183,13 @@ export async function joinGroupAction(
 		groupName: group.name,
 		groupSlug: group.slug,
 	});
+
+	// Badge check: CREW_MEMBER (Phase 8, GAME-04)
+	try {
+		await awardBadge(user.id, "crew_member");
+	} catch {
+		// Non-blocking
+	}
 
 	return { success: true };
 }
@@ -424,6 +432,13 @@ export async function createReviewAction(data: {
 		releaseId: data.releaseId,
 		rating,
 	});
+
+	// Badge check: CRITIC (Phase 8, GAME-04)
+	try {
+		await awardBadge(user.id, "critic");
+	} catch {
+		// Non-blocking
+	}
 
 	return { id: review.id };
 }

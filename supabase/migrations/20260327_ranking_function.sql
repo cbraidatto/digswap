@@ -1,0 +1,90 @@
+-- Phase 8: Gamification Ranking Function + pg_cron Schedule
+-- Per D-01, D-02, D-03, D-04, D-12
+
+-- Enable pg_cron extension (idempotent)
+CREATE EXTENSION IF NOT EXISTS pg_cron;
+
+-- Grant usage on cron schema to postgres role
+GRANT USAGE ON SCHEMA cron TO postgres;
+
+-- Create or replace the ranking recalculation function
+-- SECURITY DEFINER: runs as function owner (postgres), bypasses RLS
+CREATE OR REPLACE FUNCTION recalculate_rankings()
+RETURNS void
+LANGUAGE plpgsql
+SECURITY DEFINER
+AS $$
+DECLARE
+  threshold_rookie FLOAT := 50;
+  threshold_digger FLOAT := 200;
+  threshold_prophet FLOAT := 500;
+BEGIN
+  -- Upsert rankings for all users with collection items OR social activity
+  WITH rarity AS (
+    SELECT ci.user_id,
+           COALESCE(SUM(ln(1 + COALESCE(r.rarity_score, 0))), 0) AS rarity_score
+    FROM collection_items ci
+    JOIN releases r ON r.id = ci.release_id
+    GROUP BY ci.user_id
+  ),
+  contribution AS (
+    SELECT p.id AS user_id,
+           COALESCE(rev.cnt, 0) * 10 +     -- D-03: Review written = +10
+           COALESCE(gp.cnt, 0) * 3 +       -- D-03: Group post = +3
+           COALESCE(fg.cnt, 0) * 1 +       -- D-03: Following someone = +1
+           COALESCE(fr.cnt, 0) * 2          -- D-03: Receiving a follow = +2
+           AS contribution_score
+    FROM profiles p
+    LEFT JOIN (SELECT user_id, COUNT(*) AS cnt FROM reviews GROUP BY user_id) rev ON rev.user_id = p.id
+    LEFT JOIN (SELECT user_id, COUNT(*) AS cnt FROM group_posts GROUP BY user_id) gp ON gp.user_id = p.id
+    LEFT JOIN (SELECT follower_id AS user_id, COUNT(*) AS cnt FROM follows GROUP BY follower_id) fg ON fg.user_id = p.id
+    LEFT JOIN (SELECT following_id AS user_id, COUNT(*) AS cnt FROM follows GROUP BY following_id) fr ON fr.user_id = p.id
+  ),
+  scores AS (
+    SELECT
+      COALESCE(r.user_id, c.user_id) AS user_id,
+      COALESCE(r.rarity_score, 0) AS rarity_score,
+      COALESCE(c.contribution_score, 0) AS contribution_score,
+      COALESCE(r.rarity_score, 0) * 0.7 + COALESCE(c.contribution_score, 0) * 0.3 AS global_score
+    FROM rarity r
+    FULL OUTER JOIN contribution c ON r.user_id = c.user_id
+  ),
+  ranked AS (
+    SELECT
+      user_id,
+      rarity_score,
+      contribution_score,
+      global_score,
+      ROW_NUMBER() OVER (ORDER BY global_score DESC) AS global_rank,
+      CASE
+        WHEN global_score > threshold_prophet THEN 'Record Archaeologist'
+        WHEN global_score > threshold_digger THEN 'Wax Prophet'
+        WHEN global_score > threshold_rookie THEN 'Crate Digger'
+        ELSE 'Vinyl Rookie'
+      END AS title
+    FROM scores
+  )
+  INSERT INTO user_rankings (user_id, rarity_score, contribution_score, global_rank, title, updated_at)
+  SELECT user_id, rarity_score, contribution_score, global_rank, title, NOW()
+  FROM ranked
+  ON CONFLICT (user_id)
+  DO UPDATE SET
+    rarity_score = EXCLUDED.rarity_score,
+    contribution_score = EXCLUDED.contribution_score,
+    global_rank = EXCLUDED.global_rank,
+    title = EXCLUDED.title,
+    updated_at = NOW();
+END;
+$$;
+
+-- Create GIN index on releases.genre for efficient genre leaderboard queries
+-- The @> operator needs a GIN index to avoid sequential scans
+CREATE INDEX IF NOT EXISTS idx_releases_genre_gin ON releases USING gin(genre);
+
+-- Schedule via pg_cron: every 15 minutes (per D-12)
+-- Use cron.schedule with a unique job name for idempotent scheduling
+SELECT cron.schedule(
+  'recalculate-rankings',
+  '*/15 * * * *',
+  'SELECT recalculate_rankings()'
+);
