@@ -34,7 +34,7 @@ function mapSession(session: Session | null): SupabaseSession | null {
 export class DesktopSupabaseAuth {
   private readonly client;
   private pendingOAuth: PendingOAuthRequest | null = null;
-  private sessionListener: ((session: SupabaseSession | null) => void) | null = null;
+  private readonly sessionListeners = new Set<(session: SupabaseSession | null) => void>();
 
   constructor(
     private readonly config: DesktopSupabaseConfig | null,
@@ -61,7 +61,7 @@ export class DesktopSupabaseAuth {
     });
 
     this.client.auth.onAuthStateChange((_event, session) => {
-      this.sessionListener?.(mapSession(session));
+      this.emitSession(mapSession(session));
     });
   }
 
@@ -69,8 +69,20 @@ export class DesktopSupabaseAuth {
     return this.configError;
   }
 
-  setSessionListener(listener: (session: SupabaseSession | null) => void) {
-    this.sessionListener = listener;
+  onSessionChanged(listener: (session: SupabaseSession | null) => void) {
+    this.sessionListeners.add(listener);
+
+    return () => {
+      this.sessionListeners.delete(listener);
+    };
+  }
+
+  getClientOrThrow() {
+    if (!this.client) {
+      throw new Error(this.configError ?? "Desktop auth is not configured.");
+    }
+
+    return this.client;
   }
 
   async getSession() {
@@ -84,6 +96,19 @@ export class DesktopSupabaseAuth {
     }
 
     return mapSession(data.session);
+  }
+
+  async getAccessToken() {
+    if (!this.client) {
+      return null;
+    }
+
+    const { data, error } = await this.client.auth.getSession();
+    if (error) {
+      throw error;
+    }
+
+    return data.session?.access_token ?? null;
   }
 
   async startOAuthSignIn(provider: AuthProvider) {
@@ -168,7 +193,7 @@ export class DesktopSupabaseAuth {
     }
 
     await this.sessionStore.clearVault();
-    this.sessionListener?.(null);
+    this.emitSession(null);
   }
 
   private rejectPendingOAuth(error: Error) {
@@ -189,5 +214,11 @@ export class DesktopSupabaseAuth {
     clearTimeout(this.pendingOAuth.timeoutId);
     this.pendingOAuth.resolve();
     this.pendingOAuth = null;
+  }
+
+  private emitSession(session: SupabaseSession | null) {
+    for (const listener of this.sessionListeners) {
+      listener(session);
+    }
   }
 }

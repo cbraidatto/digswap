@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import type { SupabaseSession } from "../shared/ipc-types";
+import type { SupabaseSession } from "../../shared/ipc-types";
 
 interface Props {
   onAuthenticated: (session: SupabaseSession) => void;

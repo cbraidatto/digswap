@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import type { DesktopSettings, SupabaseSession } from "../shared/ipc-types";
+import type { DesktopSettings, SupabaseSession } from "../../shared/ipc-types";
 
 interface Props {
   session: SupabaseSession;

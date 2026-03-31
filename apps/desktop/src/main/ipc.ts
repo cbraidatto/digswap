@@ -1,16 +1,19 @@
-import { app, BrowserWindow, dialog, ipcMain } from "electron";
-import type { AuthProvider, DesktopProtocolPayload, SupabaseSession } from "../shared/ipc-types";
+import { app, BrowserWindow, dialog, ipcMain, shell } from "electron";
+import type { AuthProvider, SupabaseSession } from "../shared/ipc-types";
 import type { DesktopSupabaseAuth } from "./supabase-auth";
 import type { DesktopSessionStore } from "./session-store";
+import type { DesktopTradeRuntime } from "./trade-runtime";
 
 interface RegisterDesktopIpcOptions {
   authRuntime: DesktopSupabaseAuth;
   sessionStore: DesktopSessionStore;
+  tradeRuntime: DesktopTradeRuntime;
 }
 
 export function registerDesktopIpc({
   authRuntime,
   sessionStore,
+  tradeRuntime,
 }: RegisterDesktopIpcOptions) {
   ipcMain.handle("desktop:get-bootstrap-state", async () => ({
     appVersion: app.getVersion(),
@@ -27,15 +30,16 @@ export function registerDesktopIpc({
     authRuntime.startOAuthSignIn(provider),
   );
 
-  ipcMain.handle("desktop:sign-out", () => authRuntime.signOut());
-
-  ipcMain.handle("desktop:get-pending-trades", async () => []);
-
-  ipcMain.handle("desktop:open-trade-from-handoff", async (_event, handoffToken: string) => {
-    throw new Error(
-      `Trade runtime handoff activation for token ${handoffToken.slice(0, 6)}... lands in 17-06.`,
-    );
+  ipcMain.handle("desktop:sign-out", async () => {
+    await tradeRuntime.releaseAllLeases();
+    await authRuntime.signOut();
   });
+
+  ipcMain.handle("desktop:get-pending-trades", () => tradeRuntime.getPendingTrades());
+
+  ipcMain.handle("desktop:open-trade-from-handoff", (_event, handoffToken: string) =>
+    tradeRuntime.openTradeFromHandoff(handoffToken),
+  );
 
   ipcMain.handle("desktop:get-settings", () => sessionStore.getSettings());
 
@@ -59,9 +63,47 @@ export function registerDesktopIpc({
 
   ipcMain.handle("desktop:get-app-version", () => app.getVersion());
 
-  authRuntime.setSessionListener((session: SupabaseSession | null) => {
+  ipcMain.handle("desktop:get-trade-detail", (_event, tradeId: string) =>
+    tradeRuntime.getTradeDetail(tradeId),
+  );
+
+  ipcMain.handle("desktop:start-transfer", (_event, tradeId: string) =>
+    tradeRuntime.startTransfer(tradeId),
+  );
+
+  ipcMain.handle("desktop:cancel-transfer", (_event, tradeId: string) =>
+    tradeRuntime.cancelTransfer(tradeId),
+  );
+
+  ipcMain.handle("desktop:confirm-completion", (_event, tradeId: string, rating: number) =>
+    tradeRuntime.confirmCompletion(tradeId, rating),
+  );
+
+  ipcMain.handle("desktop:open-file-in-explorer", (_event, filePath: string) => {
+    shell.showItemInFolder(filePath);
+  });
+
+  authRuntime.onSessionChanged((session: SupabaseSession | null) => {
     for (const window of BrowserWindow.getAllWindows()) {
       window.webContents.send("desktop:session-changed", session);
+    }
+  });
+
+  tradeRuntime.onLobbyStateChanged((event) => {
+    for (const window of BrowserWindow.getAllWindows()) {
+      window.webContents.send("desktop:lobby-state-changed", event);
+    }
+  });
+
+  tradeRuntime.onTransferProgress((event) => {
+    for (const window of BrowserWindow.getAllWindows()) {
+      window.webContents.send("desktop:transfer-progress", event);
+    }
+  });
+
+  tradeRuntime.onTransferComplete((event) => {
+    for (const window of BrowserWindow.getAllWindows()) {
+      window.webContents.send("desktop:transfer-complete", event);
     }
   });
 }

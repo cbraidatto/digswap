@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import type { TradeDetail, LobbyStateEvent } from "../shared/ipc-types";
+import type { TradeDetail, LobbyStateEvent } from "../../shared/ipc-types";
 
 interface Props {
   tradeId: string;

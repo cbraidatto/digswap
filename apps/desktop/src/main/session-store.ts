@@ -1,14 +1,24 @@
+import { randomUUID } from "node:crypto";
 import path from "node:path";
 import { app, safeStorage } from "electron";
 import Store from "electron-store";
+import type { TradeTransferReceipt } from "@digswap/trade-domain";
 import type {
   DesktopProtocolPayload,
   DesktopSettings,
   DesktopStorageHealth,
 } from "../shared/ipc-types";
 
+export interface PendingTransferReceiptRecord extends TradeTransferReceipt {
+  lastAttemptAt: string | null;
+  lastError: string | null;
+  queuedAt: string;
+}
+
 interface PersistedDesktopState {
   authVaultCiphertext?: string;
+  deviceId?: string;
+  pendingTransferReceipts: PendingTransferReceiptRecord[];
   settings: DesktopSettings;
   lastProtocolPayload: DesktopProtocolPayload | null;
 }
@@ -36,6 +46,7 @@ export class DesktopSessionStore {
         updateChannel: "stable",
       },
       lastProtocolPayload: null,
+      pendingTransferReceipts: [],
     },
   });
 
@@ -67,6 +78,49 @@ export class DesktopSessionStore {
 
   setLastProtocolPayload(payload: DesktopProtocolPayload | null) {
     this.store.set("lastProtocolPayload", payload);
+  }
+
+  getOrCreateDeviceId() {
+    const existingDeviceId = this.store.get("deviceId");
+    if (existingDeviceId) {
+      return existingDeviceId;
+    }
+
+    const deviceId = randomUUID();
+    this.store.set("deviceId", deviceId);
+    return deviceId;
+  }
+
+  getPendingTransferReceipts() {
+    return this.store.get("pendingTransferReceipts");
+  }
+
+  upsertPendingTransferReceipt(receipt: PendingTransferReceiptRecord) {
+    const receipts = this.getPendingTransferReceipts();
+    const nextReceipts = receipts.filter(
+      (currentReceipt) =>
+        !(
+          currentReceipt.tradeId === receipt.tradeId &&
+          currentReceipt.deviceId === receipt.deviceId &&
+          currentReceipt.fileHashSha256 === receipt.fileHashSha256
+        ),
+    );
+
+    nextReceipts.push(receipt);
+    this.store.set("pendingTransferReceipts", nextReceipts);
+  }
+
+  removePendingTransferReceipt(tradeId: string, deviceId: string, fileHashSha256: string) {
+    const nextReceipts = this.getPendingTransferReceipts().filter(
+      (receipt) =>
+        !(
+          receipt.tradeId === tradeId &&
+          receipt.deviceId === deviceId &&
+          receipt.fileHashSha256 === fileHashSha256
+        ),
+    );
+
+    this.store.set("pendingTransferReceipts", nextReceipts);
   }
 
   async getVaultItem(key: string) {

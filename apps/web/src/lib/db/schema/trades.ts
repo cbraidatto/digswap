@@ -127,3 +127,71 @@ export const handoffTokens = pgTable(
     }),
   ],
 );
+
+/**
+ * Desktop runtime authority per trade participant.
+ * Only RPCs should mutate these rows; direct table access stays blocked.
+ *
+ * See: Phase 17 / ADR-002 D-06
+ */
+export const tradeRuntimeSessions = pgTable(
+  "trade_runtime_sessions",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    tradeId: uuid("trade_id")
+      .notNull()
+      .references(() => tradeRequests.id, { onDelete: "cascade" }),
+    userId: uuid("user_id").notNull(),
+    deviceId: varchar("device_id", { length: 255 }).notNull(),
+    clientKind: varchar("client_kind", { length: 20 }).default("desktop").notNull(),
+    desktopVersion: integer("desktop_version").default(1).notNull(),
+    tradeProtocolVersion: integer("trade_protocol_version").default(1).notNull(),
+    lastIceCandidateType: varchar("last_ice_candidate_type", { length: 16 }),
+    acquiredAt: timestamp("acquired_at", { withTimezone: true }).defaultNow().notNull(),
+    heartbeatAt: timestamp("heartbeat_at", { withTimezone: true }).defaultNow().notNull(),
+    releasedAt: timestamp("released_at", { withTimezone: true }),
+    createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
+    updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow().notNull(),
+  },
+  () => [
+    pgPolicy("trade_runtime_sessions_no_direct_access", {
+      for: "all",
+      to: authenticatedRole,
+      using: sql`false`,
+    }),
+  ],
+);
+
+/**
+ * Finalized transfer receipts written after the receiver has the full file.
+ * Local pending receipts live in Electron until they can be reconciled here.
+ *
+ * See: Phase 17 / ADR-002 D-06
+ */
+export const tradeTransferReceipts = pgTable(
+  "trade_transfer_receipts",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    tradeId: uuid("trade_id")
+      .notNull()
+      .references(() => tradeRequests.id, { onDelete: "cascade" }),
+    userId: uuid("user_id").notNull(),
+    deviceId: varchar("device_id", { length: 255 }).notNull(),
+    fileName: varchar("file_name", { length: 255 }).notNull(),
+    fileSizeBytes: integer("file_size_bytes").notNull(),
+    fileHashSha256: varchar("file_hash_sha256", { length: 64 }).notNull(),
+    iceCandidateType: varchar("ice_candidate_type", { length: 16 }).notNull(),
+    tradeProtocolVersion: integer("trade_protocol_version").default(1).notNull(),
+    completedAt: timestamp("completed_at", { withTimezone: true }).notNull(),
+    reconciledAt: timestamp("reconciled_at", { withTimezone: true }).defaultNow().notNull(),
+    createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
+    updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow().notNull(),
+  },
+  () => [
+    pgPolicy("trade_transfer_receipts_no_direct_access", {
+      for: "all",
+      to: authenticatedRole,
+      using: sql`false`,
+    }),
+  ],
+);

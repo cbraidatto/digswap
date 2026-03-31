@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import type { SupabaseSession, TransferCompleteEvent } from "../shared/ipc-types";
+import type { SupabaseSession, TransferCompleteEvent } from "../../shared/ipc-types";
 import { LoginScreen } from "./LoginScreen";
 import { InboxScreen } from "./InboxScreen";
 import { SettingsScreen } from "./SettingsScreen";

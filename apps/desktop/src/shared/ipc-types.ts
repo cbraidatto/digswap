@@ -58,6 +58,10 @@ export interface PendingTrade {
   counterpartyAvatarUrl: string | null;
   status: TradeStatus;
   updatedAt: string;
+  /**
+   * Compatibility shim for the current renderer contract.
+   * Inbox-originated opens tunnel the trade id here until 17-06 renames it.
+   */
   handoffToken: string;
 }
 

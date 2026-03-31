@@ -3,10 +3,15 @@ import type {
   AuthProvider,
   DesktopBootstrapState,
   DesktopBridge,
+  DesktopBridgeTradeRuntime,
   DesktopProtocolPayload,
   DesktopSettings,
+  LobbyStateEvent,
   PendingTrade,
   SupabaseSession,
+  TradeDetail,
+  TransferCompleteEvent,
+  TransferProgressEvent,
 } from "../shared/ipc-types";
 
 function subscribe<T>(channel: string, listener: (payload: T) => void) {
@@ -18,7 +23,7 @@ function subscribe<T>(channel: string, listener: (payload: T) => void) {
   };
 }
 
-const desktopBridge: DesktopBridge = {
+const desktopBridge: DesktopBridge & DesktopBridgeTradeRuntime = {
   getBootstrapState: () =>
     ipcRenderer.invoke("desktop:get-bootstrap-state") as Promise<DesktopBootstrapState>,
   getSession: () => ipcRenderer.invoke("desktop:get-session") as Promise<SupabaseSession | null>,
@@ -37,6 +42,20 @@ const desktopBridge: DesktopBridge = {
     subscribe("desktop:protocol-payload", listener),
   onSessionChanged: (listener: (session: SupabaseSession | null) => void) =>
     subscribe("desktop:session-changed", listener),
+  getTradeDetail: (tradeId: string) =>
+    ipcRenderer.invoke("desktop:get-trade-detail", tradeId) as Promise<TradeDetail>,
+  startTransfer: (tradeId: string) => ipcRenderer.invoke("desktop:start-transfer", tradeId),
+  cancelTransfer: (tradeId: string) => ipcRenderer.invoke("desktop:cancel-transfer", tradeId),
+  confirmCompletion: (tradeId: string, rating: number) =>
+    ipcRenderer.invoke("desktop:confirm-completion", tradeId, rating),
+  openFileInExplorer: (filePath: string) =>
+    ipcRenderer.invoke("desktop:open-file-in-explorer", filePath),
+  onTransferProgress: (listener: (event: TransferProgressEvent) => void) =>
+    subscribe("desktop:transfer-progress", listener),
+  onTransferComplete: (listener: (event: TransferCompleteEvent) => void) =>
+    subscribe("desktop:transfer-complete", listener),
+  onLobbyStateChanged: (listener: (event: LobbyStateEvent) => void) =>
+    subscribe("desktop:lobby-state-changed", listener),
 };
 
 contextBridge.exposeInMainWorld("desktopBridge", desktopBridge);

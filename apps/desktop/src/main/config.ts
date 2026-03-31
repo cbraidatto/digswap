@@ -5,6 +5,8 @@ export interface DesktopSupabaseConfig {
   url: string;
   publishableKey: string;
   redirectTo: string;
+  siteUrl: string;
+  desktopVersionCode: number;
 }
 
 const ENV_KEY_ALIASES = {
@@ -15,6 +17,8 @@ const ENV_KEY_ALIASES = {
     "NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY",
   ],
   redirectTo: ["DESKTOP_SUPABASE_REDIRECT_URL", "VITE_SUPABASE_REDIRECT_URL"],
+  siteUrl: ["DESKTOP_WEB_APP_URL", "NEXT_PUBLIC_APP_URL", "NEXT_PUBLIC_SITE_URL"],
+  desktopVersionCode: ["DESKTOP_VERSION_CODE", "VITE_DESKTOP_VERSION_CODE"],
 } as const;
 
 function parseDotEnvFile(filePath: string): Record<string, string> {
@@ -77,6 +81,16 @@ function readEnvValue(keys: readonly string[], fallbackEnv: Record<string, strin
   return null;
 }
 
+function readIntegerEnvValue(keys: readonly string[], fallbackEnv: Record<string, string>, fallback: number) {
+  const rawValue = readEnvValue(keys, fallbackEnv);
+  if (!rawValue) {
+    return fallback;
+  }
+
+  const parsed = Number.parseInt(rawValue, 10);
+  return Number.isNaN(parsed) ? fallback : parsed;
+}
+
 export function resolveDesktopSupabaseConfig(): {
   config: DesktopSupabaseConfig | null;
   error: string | null;
@@ -87,6 +101,13 @@ export function resolveDesktopSupabaseConfig(): {
   const publishableKey = readEnvValue(ENV_KEY_ALIASES.publishableKey, fallbackEnv);
   const redirectTo =
     readEnvValue(ENV_KEY_ALIASES.redirectTo, fallbackEnv) ?? "digswap://auth/callback";
+  const siteUrl =
+    readEnvValue(ENV_KEY_ALIASES.siteUrl, fallbackEnv) ?? "http://localhost:3000";
+  const desktopVersionCode = readIntegerEnvValue(
+    ENV_KEY_ALIASES.desktopVersionCode,
+    fallbackEnv,
+    1,
+  );
 
   if (!url || !publishableKey) {
     return {
@@ -101,6 +122,8 @@ export function resolveDesktopSupabaseConfig(): {
       url,
       publishableKey,
       redirectTo,
+      siteUrl,
+      desktopVersionCode,
     },
     error: null,
   };

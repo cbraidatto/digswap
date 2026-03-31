@@ -5,6 +5,7 @@ import { resolveDesktopSupabaseConfig } from "./config";
 import { extractProtocolUrlFromArgv, parseProtocolUrl, registerProtocolClient } from "./protocol";
 import { DesktopSessionStore } from "./session-store";
 import { DesktopSupabaseAuth } from "./supabase-auth";
+import { DesktopTradeRuntime } from "./trade-runtime";
 import { createMainWindow, getMainWindow } from "./window";
 
 const gotLock = app.requestSingleInstanceLock();
@@ -18,6 +19,7 @@ app.setAppUserModelId("com.digswap.desktop");
 const queuedProtocolUrls: string[] = [];
 let sessionStore: DesktopSessionStore | null = null;
 let authRuntime: DesktopSupabaseAuth | null = null;
+let tradeRuntime: DesktopTradeRuntime | null = null;
 
 function focusMainWindow() {
   const mainWindow = getMainWindow();
@@ -89,10 +91,13 @@ app.whenReady().then(async () => {
 
   const { config, error } = resolveDesktopSupabaseConfig();
   authRuntime = new DesktopSupabaseAuth(config, error, sessionStore);
+  tradeRuntime = new DesktopTradeRuntime(config, authRuntime, sessionStore);
+  await tradeRuntime.initialize();
 
   registerDesktopIpc({
     authRuntime,
     sessionStore,
+    tradeRuntime,
   });
 
   await createMainWindow();
@@ -114,6 +119,14 @@ app.whenReady().then(async () => {
 
     focusMainWindow();
   });
+});
+
+app.on("before-quit", () => {
+  if (!tradeRuntime) {
+    return;
+  }
+
+  void tradeRuntime.shutdown();
 });
 
 app.on("window-all-closed", () => {

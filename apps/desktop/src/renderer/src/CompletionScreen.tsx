@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import type { TransferCompleteEvent } from "../shared/ipc-types";
+import type { TransferCompleteEvent } from "../../shared/ipc-types";
 
 interface Props {
   event: TransferCompleteEvent;

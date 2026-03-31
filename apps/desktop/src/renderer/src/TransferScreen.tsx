@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import type { TransferProgressEvent, TransferCompleteEvent } from "../shared/ipc-types";
+import type { TransferProgressEvent, TransferCompleteEvent } from "../../shared/ipc-types";
 
 interface Props {
   tradeId: string;

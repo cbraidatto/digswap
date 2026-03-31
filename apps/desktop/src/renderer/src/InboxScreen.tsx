@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useCallback } from "react";
 import { TRADE_STATUS } from "@digswap/trade-domain";
 import type { TradeStatus } from "@digswap/trade-domain";
-import type { PendingTrade, SupabaseSession } from "../shared/ipc-types";
+import type { PendingTrade, SupabaseSession } from "../../shared/ipc-types";
 
 interface Props {
   session: SupabaseSession;
