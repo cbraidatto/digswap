@@ -330,7 +330,12 @@ Plans:
 **Success Criteria** (what must be TRUE):
   1. Each trade has a message thread visible to both participants within the trade page
   2. Online presence indicator shows in trade lobby when both parties are connected
-**Plans**: TBD
+Plans:
+- [ ] 15-01-PLAN.md — Data layer: trade_messages schema + RLS + query helpers + server actions (Codex)
+- [ ] 15-02-PLAN.md — Web trade surfaces: /trades inbox + /trades/[id] detail + message thread + composer (Codex)
+- [ ] 15-03-PLAN.md — Presence + live sync: derive from trade_runtime_sessions, Supabase Realtime on messages (Codex)
+- [ ] 15-04-PLAN.md — Verification + polish: data layer tests + human checkpoint (split)
+**UI hint**: yes
 
 ### Phase 16: Monetization
 **Goal**: Freemium model with Stripe — free tier trade limits, premium unlocks, subscription management
@@ -388,6 +393,6 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 4.5 -> 5 -> 6 -> 7 -> 8 -> 
 | 12. Release Pages | 3/3 | Complete | 2026-03-29 |
 | 13. Crates & Sets | 4/4 | Complete | 2026-03-29 |
 | 14. Trade V2 | 4/5 | Complete* | 2026-03-31 |
-| 15. Social V2 | 0/TBD | Planned | - |
+| 15. Social V2 | 0/4 | Planned | - |
 | 16. Monetization | 0/TBD | Planned | - |
 | 17. Desktop Trade Runtime | 8/8 | Complete | 2026-03-31 |
