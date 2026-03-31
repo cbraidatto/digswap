@@ -388,4 +388,4 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 4.5 -> 5 -> 6 -> 7 -> 8 -> 
 | 14. Trade V2 | 4/5 | Complete* | 2026-03-31 |
 | 15. Social V2 | 0/TBD | Planned | - |
 | 16. Monetization | 0/TBD | Planned | - |
-| 17. Desktop Trade Runtime | 0/6 | Planned | - |
+| 17. Desktop Trade Runtime | 0/1 | Planned    |  |

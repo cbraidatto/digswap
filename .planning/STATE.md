@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-stopped_at: Phase 14 complete — web P2P layer removed (commit 096b3be), desktop trade runtime is next axis
-last_updated: "2026-03-31T00:00:00.000Z"
+stopped_at: Completed 17-05-PLAN.md (Web Handoff Page + Download Gate)
+last_updated: "2026-03-31T15:51:21.268Z"
 last_activity: 2026-03-31
 progress:
-  total_phases: 17
+  total_phases: 18
   completed_phases: 12
-  total_plans: 68
-  completed_plans: 64
+  total_plans: 69
+  completed_plans: 65
   percent: 98
 ---
 
@@ -26,10 +26,10 @@ See: .planning/PROJECT.md (updated 2026-03-25)
 ## Current Position
 
 Phase: 14 (trade-v2) — COMPLETE (web P2P layer removed)
-Plan: 4 of 5 executed (14-05 unit tests skipped — web layer removed)
+Plan: 5 of 5 executed (14-05 unit tests skipped — web layer removed)
 Next: Phase 17 — Desktop Trade Runtime (Electron app)
-Status: Rebaseline complete — ready to plan Phase 17
-Last activity: 2026-03-29
+Status: Ready to execute
+Last activity: 2026-03-31
 
 Progress: [█████████░] 98%
 
@@ -98,6 +98,7 @@ Progress: [█████████░] 98%
 | Phase 13 P01 | 4min | 2 tasks | 7 files |
 | Phase 14 P03 | 4min | 3 tasks | 3 files |
 | Phase 14 P04 | 6min | 5 tasks | 5 files |
+| Phase 17 P05 | 6min | 2 tasks | 7 files |
 
 ## Accumulated Context
 
@@ -213,6 +214,8 @@ Recent decisions affecting current work:
 - [Phase 14]: Preview transfer uses distinct preview-chunk/preview-done message types separate from full transfer
 - [Phase 14]: Bilateral timestamp gate: all 4 timestamps non-null before advancing to transferring status (D-07)
 - [Phase 14 / Architectural]: Web P2P trade layer removed (commit 096b3be) — web = discovery/social only, desktop = trade runtime (Electron). See ADR-002-desktop-trade-runtime.md
+- [Phase 17]: handoffTokens RLS blocks all direct authenticated access (sql false) — server actions use Drizzle db client directly which bypasses RLS
+- [Phase 17]: OpenInDesktop uses styled anchor tags for download CTAs (not Button asChild) — Base UI button component does not expose asChild prop
 
 ### Pending Todos
 
@@ -236,6 +239,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-29T14:42:28.829Z
-Stopped at: Completed 14-04-PLAN.md (Preview Subsystem)
+Last session: 2026-03-31T15:51:21.262Z
+Stopped at: Completed 17-05-PLAN.md (Web Handoff Page + Download Gate)
 Resume file: None
