@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
+import { createClient } from "@/lib/supabase/client";
 import type { TradeThreadMessage } from "@/lib/trades/messages";
 
 function formatTime(iso: string) {
@@ -59,10 +60,69 @@ function MessageBubble({ message, showSender }: MessageBubbleProps) {
 
 interface Props {
 	messages: TradeThreadMessage[];
+	tradeId: string;
+	currentUserId: string;
+	counterpartyUsername: string;
+	counterpartyAvatarUrl: string | null;
 }
 
-export function TradeMessageThread({ messages }: Props) {
+export function TradeMessageThread({
+	messages: initialMessages,
+	tradeId,
+	currentUserId,
+	counterpartyUsername,
+	counterpartyAvatarUrl,
+}: Props) {
+	const [messages, setMessages] = useState<TradeThreadMessage[]>(initialMessages);
 	const bottomRef = useRef<HTMLDivElement>(null);
+
+	// Supabase Realtime: append new messages as they arrive
+	useEffect(() => {
+		const supabase = createClient();
+		const channel = supabase
+			.channel(`trade-messages:${tradeId}`)
+			.on(
+				"postgres_changes",
+				{
+					event: "INSERT",
+					schema: "public",
+					table: "trade_messages",
+					filter: `trade_id=eq.${tradeId}`,
+				},
+				(payload) => {
+					const row = payload.new as {
+						id: string;
+						trade_id: string;
+						sender_id: string;
+						kind: string;
+						body: string;
+						created_at: string;
+					};
+					setMessages((prev) => {
+						// Deduplicate — optimistic inserts may already be in the list
+						if (prev.some((m) => m.id === row.id)) return prev;
+						const isOwn = row.sender_id === currentUserId;
+						const newMessage: TradeThreadMessage = {
+							body: row.body,
+							createdAt: row.created_at,
+							id: row.id,
+							isOwn,
+							kind: row.kind === "system" ? "system" : "user",
+							senderAvatarUrl: isOwn ? null : counterpartyAvatarUrl,
+							senderId: row.sender_id,
+							senderUsername: isOwn ? null : counterpartyUsername,
+							tradeId: row.trade_id,
+						};
+						return [...prev, newMessage];
+					});
+				},
+			)
+			.subscribe();
+
+		return () => {
+			void supabase.removeChannel(channel);
+		};
+	}, [tradeId, currentUserId, counterpartyUsername, counterpartyAvatarUrl]);
 
 	useEffect(() => {
 		bottomRef.current?.scrollIntoView({ behavior: "instant" });

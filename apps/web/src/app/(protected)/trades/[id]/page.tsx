@@ -2,10 +2,12 @@ import { notFound, redirect } from "next/navigation";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { getTradeThread } from "@/lib/trades/messages";
+import { deriveTradePresence } from "@/lib/trades/presence";
 import { markTradeThreadRead } from "@/actions/trade-messages";
 import { TradeDetailHeader } from "./_components/TradeDetailHeader";
 import { TradeMessageThread } from "./_components/TradeMessageThread";
 import { TradeMessageComposer } from "./_components/TradeMessageComposer";
+import { TradePresenceIndicator } from "./_components/TradePresenceIndicator";
 
 interface Props {
 	params: Promise<{ id: string }>;
@@ -27,7 +29,10 @@ export default async function TradeDetailPage({ params }: Props) {
 		notFound();
 	}
 
-	// Mark thread as read on load — fire and forget, never block render
+	// Presence — best-effort, never block render
+	const presence = await deriveTradePresence(id, user.id).catch(() => null);
+
+	// Mark thread as read on load — fire and forget
 	void markTradeThreadRead(id).catch(() => undefined);
 
 	return (
@@ -43,8 +48,26 @@ export default async function TradeDetailPage({ params }: Props) {
 
 			<TradeDetailHeader thread={thread} />
 
+			{/* Presence indicator */}
+			{presence && (
+				<div className="mb-4">
+					<TradePresenceIndicator
+						tradeId={thread.tradeId}
+						userId={user.id}
+						counterpartyId={thread.counterpartyId}
+						initialState={presence.state}
+					/>
+				</div>
+			)}
+
 			<div className="min-h-[300px]">
-				<TradeMessageThread messages={thread.messages} />
+				<TradeMessageThread
+					messages={thread.messages}
+					tradeId={thread.tradeId}
+					currentUserId={user.id}
+					counterpartyUsername={thread.counterpartyUsername}
+					counterpartyAvatarUrl={thread.counterpartyAvatarUrl}
+				/>
 			</div>
 
 			<TradeMessageComposer tradeId={thread.tradeId} status={thread.status} />
