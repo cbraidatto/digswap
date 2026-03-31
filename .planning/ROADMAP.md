@@ -136,7 +136,7 @@ Plans:
   6. All routes and buttons point to correct destinations
 **Plans**: 2 plans
 Plans:
-- [ ] 04.5-01-PLAN.md -- Shell alignment: rename sidebar labels, remove Popular Crews, collapse bottom bar to 4-tab, fix header nav
+- [x] 04.5-01-PLAN.md -- Shell alignment: rename sidebar labels, remove Popular Crews, collapse bottom bar to 4-tab, fix header nav
 - [x] 04.5-02-PLAN.md -- Page alignment: feed empty state, comunidade empty states, remove broken perfil ADD_RECORD link
 **UI hint**: yes
 

@@ -36,7 +36,7 @@ export function AppHeader({ xp = 0, userId }: AppHeaderProps) {
 					href="/explorar"
 					className="font-mono text-[10px] uppercase tracking-[0.2em] text-on-surface-variant hover:text-on-surface transition-colors"
 				>
-					Dig
+					Explorar
 				</Link>
 				<Link
 					href="/perfil"
