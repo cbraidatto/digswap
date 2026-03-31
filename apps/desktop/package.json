@@ -9,10 +9,14 @@
     "typecheck": "tsc --noEmit -p tsconfig.json"
   },
   "dependencies": {
-    "@digswap/trade-domain": "workspace:*"
+    "@digswap/trade-domain": "workspace:*",
+    "react": "^18",
+    "react-dom": "^18"
   },
   "devDependencies": {
     "@types/node": "^20",
+    "@types/react": "^18",
+    "@types/react-dom": "^18",
     "typescript": "^5"
   }
 }
