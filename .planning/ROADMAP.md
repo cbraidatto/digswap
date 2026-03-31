@@ -2,7 +2,7 @@
 
 ## Overview
 
-DigSwap delivers a social network for vinyl diggers in 11 phases, moving from foundation (auth, database, design system) through Discogs integration (the cold-start hook), collection management, social features, discovery and matching, community and reviews, gamification, P2P audio trading (with DMCA compliance as a prerequisite), monetization, and a final security hardening pass. Each phase delivers a complete, verifiable capability that unblocks the next.
+DigSwap delivers a social network for vinyl diggers in 17 phases, moving from foundation (auth, database, design system) through Discogs integration (the cold-start hook), collection management, social features, discovery and matching, community and reviews, gamification, positioning and radar, security hardening, release pages, crates, trade V2, social V2, monetization, and an Electron desktop trade runtime. Each phase delivers a complete, verifiable capability that unblocks the next.
 
 ## Phases
 
@@ -343,10 +343,31 @@ Plans:
   4. Subscription state syncs to the database via Stripe webhooks
 **Plans**: TBD
 
+### Phase 17: Desktop Trade Runtime
+**Goal**: Electron desktop app as trade runtime — monorepo bootstrap, shared trade-domain package, auth handoff from web, IPC bridge, WebRTC transfer, filesystem, and desktop UI
+**Depends on**: Phase 16 (can be developed in parallel with 16 completing)
+**Requirements**: DESK-01, DESK-02, DESK-03, DESK-04, DESK-05, DESK-06
+**Success Criteria** (what must be TRUE):
+  1. Monorepo with pnpm workspaces contains packages/trade-domain with enums, types, Zod schemas, and protocol constants — no Drizzle schema, no server actions
+  2. Electron app launches, handles oauth-callback protocol, stores tokens via safeStorage, and shows correct screen based on auth state
+  3. Desktop app joins a trade lobby via Supabase RPC lease, sends heartbeats, and reconciles receipts — no Realtime Presence for authority
+  4. Renderer shell renders login, inbox, and settings using shared trade-domain types
+  5. Web app shows download/update gate with CTA pointing to desktop app when user initiates a trade
+  6. Full lobby + file transfer flow works end-to-end: web handoff -> desktop auth -> lobby join -> WebRTC transfer -> file saved to ~/Music/DigSwap/Incoming/<counterparty>/<trade-id>_<filename>
+**Plans**: 6 plans
+Plans:
+- [ ] 17-01-PLAN.md — Monorepo workspaces bootstrap + packages/trade-domain skeleton (Codex)
+- [ ] 17-02-PLAN.md — Electron shell + auth callback + secure token storage + protocol handler (Codex)
+- [ ] 17-03-PLAN.md — Lease RPC + heartbeat + reconciliation receipts + ICE telemetry (Codex)
+- [ ] 17-04-PLAN.md — Desktop renderer shell: login, inbox, settings (Claude)
+- [ ] 17-05-PLAN.md — Web handoff/download/update gate + CTA integration (Claude)
+- [ ] 17-06-PLAN.md — Lobby/transfer integration: Codex=runtime/IPC, Claude=renderer/UX (split)
+**UI hint**: yes
+
 ## Progress
 
 **Execution Order:**
-Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7 -> 8 -> 9 -> 10 -> 11 -> 12 -> 13 -> 14 -> 15 -> 16
+Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 4.5 -> 5 -> 6 -> 7 -> 8 -> 9(superseded) -> 10 -> 11 -> 12 -> 13 -> 14 -> 15 -> 16 -> 17
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
@@ -355,15 +376,16 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7 -> 8 -> 9 -> 10
 | 3. Discogs Integration | 6/6 | Complete   | 2026-03-25 |
 | 4. Collection Management | 4/4 | Complete | 2026-03-25 |
 | 4.5. Template Alignment | 2/2 | Complete | 2026-03-25 |
-| 5. Social Layer | 0/4 | Planned | - |
+| 5. Social Layer | 4/4 | Complete | 2026-03-26 |
 | 6. Discovery + Notifications | 5/5 | Complete   | 2026-03-26 |
 | 7. Community + Reviews | 5/5 | Complete   | 2026-03-26 |
-| 8. Gamification + Rankings | 0/5 | Planned | - |
-| 9. P2P Audio Trading | 2/6 | In Progress | - |
+| 8. Gamification + Rankings | 4/5 | In Progress | - |
+| 9. P2P Audio Trading | - | Superseded — P2P moved to Desktop (Phase 17) | - |
 | 10. Positioning, Radar & Workspace Foundation | 5/5 | Complete   | 2026-03-28 |
 | 11. Security Hardening | 3/3 | Complete | 2026-03-28 |
-| 12. Release Pages | 2/3 | Complete    | 2026-03-29 |
+| 12. Release Pages | 3/3 | Complete | 2026-03-29 |
 | 13. Crates & Sets | 4/4 | Complete | 2026-03-29 |
-| 14. Trade V2 | 4/5 | In Progress|  |
+| 14. Trade V2 | 4/5 | Complete* | 2026-03-31 |
 | 15. Social V2 | 0/TBD | Planned | - |
 | 16. Monetization | 0/TBD | Planned | - |
+| 17. Desktop Trade Runtime | 0/6 | Planned | - |
