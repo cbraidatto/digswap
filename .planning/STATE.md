@@ -3,12 +3,12 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-stopped_at: Completed 14-04-PLAN.md (Preview Subsystem)
-last_updated: "2026-03-29T14:42:28.835Z"
-last_activity: 2026-03-29
+stopped_at: Phase 14 complete — web P2P layer removed (commit 096b3be), desktop trade runtime is next axis
+last_updated: "2026-03-31T00:00:00.000Z"
+last_activity: 2026-03-31
 progress:
   total_phases: 17
-  completed_phases: 11
+  completed_phases: 12
   total_plans: 68
   completed_plans: 64
   percent: 98
@@ -21,14 +21,14 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-25)
 
 **Core value:** A digger opens the app and immediately finds who has the record they've been hunting -- and sees where they stand in the community.
-**Current focus:** Phase 14 — trade-v2
+**Current focus:** Phase 17 — desktop-trade-runtime
 
 ## Current Position
 
-Phase: 14 (trade-v2) — EXECUTING
-Plan: 3 of 5
-Next: Phase 14 — Trade V2
-Status: Ready to execute
+Phase: 14 (trade-v2) — COMPLETE (web P2P layer removed)
+Plan: 4 of 5 executed (14-05 unit tests skipped — web layer removed)
+Next: Phase 17 — Desktop Trade Runtime (Electron app)
+Status: Rebaseline complete — ready to plan Phase 17
 Last activity: 2026-03-29
 
 Progress: [█████████░] 98%
@@ -212,6 +212,7 @@ Recent decisions affecting current work:
 - [Phase 14]: Inline Web Worker for SHA-256 via URL.createObjectURL(Blob) pattern (no separate worker file)
 - [Phase 14]: Preview transfer uses distinct preview-chunk/preview-done message types separate from full transfer
 - [Phase 14]: Bilateral timestamp gate: all 4 timestamps non-null before advancing to transferring status (D-07)
+- [Phase 14 / Architectural]: Web P2P trade layer removed (commit 096b3be) — web = discovery/social only, desktop = trade runtime (Electron). See ADR-002-desktop-trade-runtime.md
 
 ### Pending Todos
 
@@ -231,6 +232,7 @@ None yet.
 | 260328-9gp | Lock trade lobby expiry to 24h fixed window | 2026-03-28 | dca9332 | [260328-9gp-lock-trade-lobby-expiry-to-24h-fixed-win](./quick/260328-9gp-lock-trade-lobby-expiry-to-24h-fixed-win/) |
 | 260328-a21 | Fix P0 RLS bypasses and P1 race conditions | 2026-03-28 | 6e7f9e1 | [260328-a21-fix-p0-rls-bypasses-and-p1-race-conditio](./quick/260328-a21-fix-p0-rls-bypasses-and-p1-race-conditio/) |
 | 260328-tef | Fix notification badge stale count, add trade icon badge | 2026-03-28 | 317a372 | [260328-tef-fix-notification-badge-stale-count-add-t](./quick/260328-tef-fix-notification-badge-stale-count-add-t/) |
+| 260331-h7g | Rebaseline GSD: close phase 14, register Phase 17 desktop trade runtime, create ADR-002 | 2026-03-31 | (pending) | [260331-h7g-rebaseline-gsd-desktop-milestone](./quick/260331-h7g-rebaseline-gsd-desktop-milestone/) |
 
 ## Session Continuity
 
