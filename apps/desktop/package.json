@@ -2,14 +2,17 @@
   "name": "@digswap/desktop",
   "version": "0.1.0",
   "private": true,
-  "type": "module",
+  "main": "out/main/index.js",
   "scripts": {
-    "dev": "node -e \"console.log('Phase 17-02 scaffolds the Electron shell.')\"",
-    "build": "node -e \"console.log('Phase 17-02 scaffolds the Electron shell.')\"",
+    "dev": "electron-vite dev",
+    "build": "electron-vite build",
+    "preview": "electron-vite preview",
     "typecheck": "tsc --noEmit -p tsconfig.json"
   },
   "dependencies": {
     "@digswap/trade-domain": "workspace:*",
+    "@supabase/supabase-js": "^2.101.0",
+    "electron-store": "^11.0.2",
     "react": "^18",
     "react-dom": "^18"
   },
@@ -17,6 +20,10 @@
     "@types/node": "^20",
     "@types/react": "^18",
     "@types/react-dom": "^18",
-    "typescript": "^5"
+    "@vitejs/plugin-react": "^5.1.4",
+    "electron": "^41.1.0",
+    "electron-vite": "^5.0.0",
+    "typescript": "^5",
+    "vite": "^7.3.1"
   }
 }

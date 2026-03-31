@@ -1,0 +1,163 @@
+:root {
+  color: #f7f1e3;
+  background:
+    radial-gradient(circle at top, rgba(201, 154, 70, 0.16), transparent 45%),
+    linear-gradient(180deg, #130f0b 0%, #0b0907 100%);
+  font-family:
+    "IBM Plex Sans",
+    "Segoe UI",
+    sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  background: transparent;
+}
+
+button {
+  border: 0;
+  border-radius: 999px;
+  padding: 0.85rem 1.2rem;
+  background: linear-gradient(135deg, #d8a34c, #b76c27);
+  color: #120e09;
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+  transition:
+    transform 120ms ease,
+    opacity 120ms ease;
+}
+
+button:hover:not(:disabled) {
+  transform: translateY(-1px);
+}
+
+button:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.button-secondary {
+  background: rgba(255, 255, 255, 0.08);
+  color: #f7f1e3;
+}
+
+.shell {
+  max-width: 1120px;
+  margin: 0 auto;
+  padding: 3rem 1.5rem 4rem;
+}
+
+.hero {
+  margin-bottom: 1.5rem;
+}
+
+.hero h1,
+.panel h2 {
+  margin: 0 0 0.5rem;
+  font-family:
+    "Georgia",
+    serif;
+  letter-spacing: -0.03em;
+}
+
+.hero h1 {
+  font-size: clamp(2.4rem, 5vw, 4rem);
+}
+
+.eyebrow {
+  margin: 0 0 0.4rem;
+  color: #d8a34c;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+
+.muted {
+  color: rgba(247, 241, 227, 0.72);
+}
+
+.grid {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  margin-bottom: 1rem;
+}
+
+.panel {
+  border: 1px solid rgba(216, 163, 76, 0.18);
+  border-radius: 28px;
+  padding: 1.25rem;
+  background: rgba(18, 14, 9, 0.72);
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.22);
+  backdrop-filter: blur(12px);
+}
+
+.panel-warning {
+  border-color: rgba(216, 163, 76, 0.42);
+}
+
+.panel-error {
+  border-color: rgba(255, 120, 90, 0.4);
+}
+
+.details {
+  margin: 0;
+}
+
+.details div {
+  display: grid;
+  grid-template-columns: 120px 1fr;
+  gap: 0.75rem;
+  padding: 0.35rem 0;
+}
+
+.details dt {
+  color: rgba(247, 241, 227, 0.6);
+}
+
+.details dd {
+  margin: 0;
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-top: 1rem;
+}
+
+.protocol-card,
+.session-card {
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.04);
+  padding: 1rem;
+}
+
+.mono {
+  font-family:
+    "IBM Plex Mono",
+    "SFMono-Regular",
+    monospace;
+}
+
+.small {
+  font-size: 0.9rem;
+}
+
+@media (max-width: 720px) {
+  .shell {
+    padding: 1.25rem 1rem 2rem;
+  }
+
+  .details div {
+    grid-template-columns: 1fr;
+    gap: 0.2rem;
+  }
+}

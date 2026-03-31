@@ -1,14 +1,16 @@
 import type { TradeStatus } from "@digswap/trade-domain";
 
+export type AuthProvider = "google" | "email";
+
 /**
- * Minimal session shape the renderer needs — mirrors Supabase Session,
+ * Minimal session shape the renderer needs â€” mirrors Supabase Session,
  * without importing @supabase/supabase-js into the renderer bundle directly.
  * Preload populates this from the stored safeStorage token.
  */
 export interface SupabaseSession {
   accessToken: string;
   refreshToken: string;
-  expiresAt: number; // Unix timestamp (seconds)
+  expiresAt: number;
   user: {
     id: string;
     email: string | null;
@@ -25,65 +27,67 @@ export interface DesktopSettings {
   updateChannel: "stable" | "beta";
 }
 
+export interface DesktopStorageHealth {
+  encryptionAvailable: boolean;
+  backend: string | null;
+  secure: boolean;
+}
+
+export interface TradeHandoffPayload {
+  kind: "trade-handoff";
+  tradeId: string;
+  handoffToken: string;
+  rawUrl: string;
+  receivedAt: string;
+}
+
+export interface AuthCallbackPayload {
+  kind: "auth-callback";
+  code: string | null;
+  errorCode: string | null;
+  errorDescription: string | null;
+  rawUrl: string;
+  receivedAt: string;
+}
+
+export type DesktopProtocolPayload = TradeHandoffPayload | AuthCallbackPayload;
+
 export interface PendingTrade {
   tradeId: string;
   counterpartyUsername: string;
   counterpartyAvatarUrl: string | null;
   status: TradeStatus;
-  /** ISO 8601 datetime */
   updatedAt: string;
-  /** Short-TTL handoff token used to open the trade lobby */
   handoffToken: string;
+}
+
+export interface DesktopBootstrapState {
+  appVersion: string;
+  configError: string | null;
+  storage: DesktopStorageHealth;
+  settings: DesktopSettings;
+  session: SupabaseSession | null;
+  lastProtocolPayload: DesktopProtocolPayload | null;
 }
 
 /**
  * The IPC bridge exposed on window.desktopBridge by the Electron preload script.
- * Renderer calls these methods; Codex implements them in apps/desktop/src/preload.ts.
- *
- * Contract rules:
- * - All methods are async (return Promise) — IPC is always async.
- * - Methods that write state return void.
- * - The renderer NEVER calls require('electron') directly — only via this bridge.
+ * Renderer calls these methods; the main process is the only place that touches
+ * Electron or Supabase directly.
  */
 export interface DesktopBridge {
-  /** Returns the stored session or null if none/expired. */
+  getBootstrapState(): Promise<DesktopBootstrapState>;
   getSession(): Promise<SupabaseSession | null>;
-
-  /**
-   * Opens the system browser to the OAuth page for the given provider.
-   * Resolves when the OAuth callback arrives via the digswap:// protocol handler
-   * and the session has been written to safeStorage.
-   * Rejects on timeout (>5 min) or user cancellation.
-   */
-  openOAuth(provider: "google" | "email"): Promise<void>;
-
-  /** Signs out: clears safeStorage session, resolves when done. */
+  openOAuth(provider: AuthProvider): Promise<void>;
   signOut(): Promise<void>;
-
-  /** Fetches pending trades from Supabase using the stored session. */
   getPendingTrades(): Promise<PendingTrade[]>;
-
-  /**
-   * Navigates to the trade lobby for the given handoff token.
-   * The desktop app opens the lobby screen in the renderer.
-   * Triggers main-process navigation — renderer listens via ipcRenderer.on('navigate-to-lobby').
-   */
   openTradeFromHandoff(handoffToken: string): Promise<void>;
-
-  /** Reads current settings from Electron store (electron-store or similar). */
   getSettings(): Promise<DesktopSettings>;
-
-  /** Persists updated settings. Partial update: only provided keys are changed. */
   setSettings(settings: Partial<DesktopSettings>): Promise<void>;
-
-  /**
-   * Opens the OS-native folder picker dialog.
-   * Returns the selected path, or null if user cancelled.
-   */
   selectDownloadPath(): Promise<string | null>;
-
-  /** Returns the current app version string (from app.getVersion()). */
   getAppVersion(): Promise<string>;
+  onProtocolPayload(listener: (payload: DesktopProtocolPayload) => void): () => void;
+  onSessionChanged(listener: (session: SupabaseSession | null) => void): () => void;
 }
 
 declare global {
@@ -91,3 +95,5 @@ declare global {
     desktopBridge: DesktopBridge;
   }
 }
+
+export {};
