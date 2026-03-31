@@ -11,6 +11,7 @@ import { sql } from "drizzle-orm";
 import { authenticatedRole, authUid } from "drizzle-orm/supabase";
 import { releases } from "./releases";
 
+
 export const tradeRequests = pgTable(
   "trade_requests",
   {
@@ -90,6 +91,40 @@ export const tradeReviews = pgTable(
               ELSE tr.requester_id
             END
         )`,
+    }),
+  ],
+);
+
+/**
+ * Short-TTL HMAC-SHA256 signed tokens for web→desktop handoff.
+ * RLS blocks all direct access — only server actions (using the Drizzle db client
+ * directly) can read or write this table.
+ *
+ * See: src/lib/desktop/handoff-token.ts
+ * See: ADR-002-desktop-trade-runtime.md D-08
+ */
+export const handoffTokens = pgTable(
+  "handoff_tokens",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    tradeId: uuid("trade_id")
+      .notNull()
+      .references(() => tradeRequests.id, { onDelete: "cascade" }),
+    userId: uuid("user_id").notNull(),
+    /** Hex-encoded HMAC-SHA256 of the plaintext token — never store plaintext */
+    tokenHmac: varchar("token_hmac", { length: 64 }).notNull(),
+    expiresAt: timestamp("expires_at", { withTimezone: true }).notNull(),
+    /** Set atomically on first consumption — second call finds usedAt IS NOT NULL */
+    usedAt: timestamp("used_at", { withTimezone: true }),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .defaultNow()
+      .notNull(),
+  },
+  () => [
+    pgPolicy("handoff_tokens_no_direct_access", {
+      for: "all",
+      to: authenticatedRole,
+      using: sql`false`, // All access via Drizzle db client in server actions (bypasses RLS)
     }),
   ],
 );
