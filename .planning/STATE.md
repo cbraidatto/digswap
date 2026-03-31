@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: verifying
-stopped_at: Completed 17-desktop-trade-runtime-04-PLAN.md
-last_updated: "2026-03-31T16:11:03.533Z"
+stopped_at: Completed 17-desktop-trade-runtime-06-PLAN.md
+last_updated: "2026-03-31T16:39:43.768Z"
 last_activity: 2026-03-31
 progress:
   total_phases: 18
   completed_phases: 12
-  total_plans: 72
-  completed_plans: 68
+  total_plans: 74
+  completed_plans: 70
   percent: 98
 ---
 
@@ -100,6 +100,7 @@ Progress: [█████████░] 98%
 | Phase 14 P04 | 6min | 5 tasks | 5 files |
 | Phase 17 P05 | 6min | 2 tasks | 7 files |
 | Phase 17-desktop-trade-runtime P04 | 25 | 3 tasks | 9 files |
+| Phase 17-desktop-trade-runtime P06 | 3 | 3 tasks | 6 files |
 
 ## Accumulated Context
 
@@ -219,6 +220,8 @@ Recent decisions affecting current work:
 - [Phase 17]: OpenInDesktop uses styled anchor tags for download CTAs (not Button asChild) — Base UI button component does not expose asChild prop
 - [Phase 17-desktop-trade-runtime]: DesktopBridge interface is the sole IPC contract — renderer never imports Electron directly
 - [Phase 17-desktop-trade-runtime]: InboxScreen polls getPendingTrades every 30s — Supabase Realtime not bridged to renderer
+- [Phase 17-desktop-trade-runtime]: Navigation state owned by AppShell via prop-callbacks; screens are stateless about routing
+- [Phase 17-desktop-trade-runtime]: IPC trade runtime types (DesktopBridgeTradeRuntime) defined by renderer, implemented by Codex in main process
 
 ### Pending Todos
 
@@ -242,6 +245,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-31T16:11:03.526Z
-Stopped at: Completed 17-desktop-trade-runtime-04-PLAN.md
+Last session: 2026-03-31T16:39:43.763Z
+Stopped at: Completed 17-desktop-trade-runtime-06-PLAN.md
 Resume file: None

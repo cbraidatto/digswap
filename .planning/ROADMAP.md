@@ -357,11 +357,11 @@ Plans:
 **Plans**: 6 plans
 Plans:
 - [x] 17-01-PLAN.md — Monorepo workspaces bootstrap + packages/trade-domain skeleton (Codex)
-- [ ] 17-02-PLAN.md — Electron shell + auth callback + secure token storage + protocol handler (Codex)
+- [x] 17-02-PLAN.md — Electron shell + auth callback + secure token storage + protocol handler (Codex)
 - [ ] 17-03-PLAN.md — Lease RPC + heartbeat + reconciliation receipts + ICE telemetry (Codex)
 - [x] 17-04-PLAN.md — Desktop renderer shell: login, inbox, settings (Claude)
 - [x] 17-05-PLAN.md — Web handoff/download/update gate + CTA integration (Claude)
-- [ ] 17-06-PLAN.md — Lobby/transfer integration: Codex=runtime/IPC, Claude=renderer/UX (split)
+- [x] 17-06-PLAN.md — Lobby/transfer integration: Codex=runtime/IPC, Claude=renderer/UX (split)
 **UI hint**: yes
 
 ## Progress
@@ -388,4 +388,4 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 4.5 -> 5 -> 6 -> 7 -> 8 -> 
 | 14. Trade V2 | 4/5 | Complete* | 2026-03-31 |
 | 15. Social V2 | 0/TBD | Planned | - |
 | 16. Monetization | 0/TBD | Planned | - |
-| 17. Desktop Trade Runtime | 3/4 | In Progress|  |
+| 17. Desktop Trade Runtime | 5/6 | In Progress|  |
