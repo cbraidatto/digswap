@@ -90,9 +90,70 @@ export interface DesktopBridge {
   onSessionChanged(listener: (session: SupabaseSession | null) => void): () => void;
 }
 
+// ─────────────────────────────────────────────────────────────────────────────
+// TRADE RUNTIME — defined by 17-06 Claude (renderer); implemented by 17-06 Codex (main)
+// ─────────────────────────────────────────────────────────────────────────────
+
+/** Metadata for one side of a trade proposal leg. */
+export interface TradeLeg {
+  title: string;
+  artist: string;
+  format: string;
+  quality: string;
+  notes: string | null;
+  fileNameHint: string | null;
+  fileSizeBytes: number | null;
+}
+
+/** Full proposal context shown in LobbyScreen. */
+export interface TradeDetail {
+  tradeId: string;
+  status: TradeStatus;
+  myLeg: TradeLeg;
+  counterpartyLeg: TradeLeg;
+  counterpartyUsername: string;
+  counterpartyAvatarUrl: string | null;
+  createdAt: string;
+  expiresAt: string | null;
+}
+
+/** Fired by onTransferProgress listener as chunks arrive. */
+export interface TransferProgressEvent {
+  bytesReceived: number;
+  totalBytes: number;
+  peerConnected: boolean;
+}
+
+/** Fired once by onTransferComplete when all chunks verified. */
+export interface TransferCompleteEvent {
+  filePath: string;
+  sha256: string;
+  tradeId: string;
+}
+
+/** Fired by onLobbyStateChanged when lease or presence changes. */
+export interface LobbyStateEvent {
+  status: TradeStatus;
+  bothOnline: boolean;
+  leaseHolder: "me" | "counterparty" | null;
+}
+
+/** Extend DesktopBridge with trade runtime methods (Codex implements). */
+export interface DesktopBridgeTradeRuntime {
+  getTradeDetail(tradeId: string): Promise<TradeDetail>;
+  startTransfer(tradeId: string): Promise<void>;
+  cancelTransfer(tradeId: string): Promise<void>;
+  confirmCompletion(tradeId: string, rating: number): Promise<void>;
+  openFileInExplorer(filePath: string): Promise<void>;
+  onTransferProgress(listener: (event: TransferProgressEvent) => void): () => void;
+  onTransferComplete(listener: (event: TransferCompleteEvent) => void): () => void;
+  onLobbyStateChanged(listener: (event: LobbyStateEvent) => void): () => void;
+}
+
 declare global {
   interface Window {
-    desktopBridge: DesktopBridge;
+    // Augment: trade runtime methods merged at runtime by the preload script
+    desktopBridge: DesktopBridge & DesktopBridgeTradeRuntime;
   }
 }
 

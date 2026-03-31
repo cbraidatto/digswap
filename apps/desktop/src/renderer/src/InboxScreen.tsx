@@ -5,6 +5,7 @@ import type { PendingTrade, SupabaseSession } from "../shared/ipc-types";
 
 interface Props {
   session: SupabaseSession;
+  onOpenTrade: (tradeId: string) => void;
 }
 
 const STATUS_LABELS: Record<TradeStatus, { label: string; className: string }> = {
@@ -30,10 +31,9 @@ const ACTIVE_STATUSES: TradeStatus[] = [
   TRADE_STATUS.TRANSFERRING,
 ];
 
-export function InboxScreen({ session: _session }: Props) {
+export function InboxScreen({ session: _session, onOpenTrade }: Props) {
   const [trades, setTrades] = useState<PendingTrade[]>([]);
   const [loading, setLoading] = useState(true);
-  const [openingTradeId, setOpeningTradeId] = useState<string | null>(null);
 
   const fetchTrades = useCallback(async () => {
     try {
@@ -50,13 +50,8 @@ export function InboxScreen({ session: _session }: Props) {
     return () => clearInterval(interval);
   }, [fetchTrades]);
 
-  async function handleOpenTrade(trade: PendingTrade) {
-    setOpeningTradeId(trade.tradeId);
-    try {
-      await window.desktopBridge.openTradeFromHandoff(trade.handoffToken);
-    } finally {
-      setOpeningTradeId(null);
-    }
+  function handleOpenTrade(trade: PendingTrade) {
+    onOpenTrade(trade.tradeId);
   }
 
   if (loading) {
@@ -86,7 +81,6 @@ export function InboxScreen({ session: _session }: Props) {
       {trades.map((trade) => {
         const badge = STATUS_LABELS[trade.status];
         const isActive = ACTIVE_STATUSES.includes(trade.status);
-        const isOpening = openingTradeId === trade.tradeId;
 
         return (
           <div
@@ -132,11 +126,10 @@ export function InboxScreen({ session: _session }: Props) {
             {isActive && (
               <button
                 type="button"
-                disabled={isOpening}
                 onClick={() => handleOpenTrade(trade)}
-                className="ml-1 text-xs font-medium text-[#c8914a] hover:text-[#e8a85a] disabled:opacity-50 transition-colors whitespace-nowrap"
+                className="ml-1 text-xs font-medium text-[#c8914a] hover:text-[#e8a85a] transition-colors whitespace-nowrap"
               >
-                {isOpening ? "Opening…" : "Open Trade"}
+                Open Trade
               </button>
             )}
           </div>
