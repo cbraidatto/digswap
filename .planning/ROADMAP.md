@@ -333,7 +333,7 @@ Plans:
 Plans:
 - [x] 15-01-PLAN.md — Data layer: trade_messages schema + RLS + query helpers + server actions (Codex)
 - [x] 15-02-PLAN.md — Web trade surfaces: /trades inbox + /trades/[id] detail + message thread + composer (Claude)
-- [ ] 15-03-PLAN.md — Presence + live sync: derive from trade_runtime_sessions, Supabase Realtime on messages (Codex)
+- [x] 15-03-PLAN.md — Presence + live sync: derive from trade_runtime_sessions, Supabase Realtime on messages (split)
 - [ ] 15-04-PLAN.md — Verification + polish: data layer tests + human checkpoint (split)
 **UI hint**: yes
 
