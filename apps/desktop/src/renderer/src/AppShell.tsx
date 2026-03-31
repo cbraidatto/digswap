@@ -1,5 +1,9 @@
 import React, { useEffect, useState } from "react";
-import type { SupabaseSession, TransferCompleteEvent, TradeHandoffPayload } from "../../shared/ipc-types";
+import type {
+  DesktopProtocolPayload,
+  SupabaseSession,
+  TransferCompleteEvent,
+} from "../../shared/ipc-types";
 import { LoginScreen } from "./LoginScreen";
 import { InboxScreen } from "./InboxScreen";
 import { SettingsScreen } from "./SettingsScreen";
@@ -21,14 +25,19 @@ export function AppShell() {
 
   useEffect(() => {
     window.desktopBridge
-      .getSession()
-      .then((s) => setSession(s))
+      .getBootstrapState()
+      .then((state) => {
+        setSession(state.session);
+        if (state.session && state.lastProtocolPayload?.kind === "trade-handoff") {
+          handleOpenTrade(state.lastProtocolPayload.tradeId);
+        }
+      })
       .finally(() => setLoading(false));
   }, []);
 
   useEffect(() => {
     if (!session) return;
-    const unsub = window.desktopBridge.onProtocolPayload((payload: TradeHandoffPayload) => {
+    const unsub = window.desktopBridge.onProtocolPayload((payload: DesktopProtocolPayload) => {
       if (payload.kind === "trade-handoff") {
         handleOpenTrade(payload.tradeId);
       }
