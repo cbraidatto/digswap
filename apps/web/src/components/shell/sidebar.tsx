@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 
 const NAV_ITEMS = [
 	{ href: "/feed", label: "Feed", icon: "history" },
+	{ href: "/trades", label: "Trades", icon: "swap_horiz" },
 	{ href: "/comunidade", label: "Community", icon: "group" },
 	{ href: "/perfil", label: "Collection", icon: "database" },
 ] as const;
