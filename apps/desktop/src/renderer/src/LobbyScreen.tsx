@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import type { TradeDetail, LobbyStateEvent } from "../../shared/ipc-types";
 
-const TRANSFER_SOURCE_SELECTION_CANCELLED_MESSAGE = "Transfer source selection cancelled.";
+const USER_CANCELLED_PICKER_MESSAGE = "File picker cancelled by user";
 
 interface Props {
   tradeId: string;
@@ -71,10 +71,7 @@ export function LobbyScreen({ tradeId, onClose, onTransferStarted }: Props) {
       await window.desktopBridge.startTransfer(tradeId);
       onTransferStarted();
     } catch (error) {
-      if (
-        error instanceof Error &&
-        error.message === TRANSFER_SOURCE_SELECTION_CANCELLED_MESSAGE
-      ) {
+      if (error instanceof Error && error.message === USER_CANCELLED_PICKER_MESSAGE) {
         return;
       }
 

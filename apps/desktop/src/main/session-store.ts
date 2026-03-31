@@ -85,13 +85,8 @@ export class DesktopSessionStore {
     return this.store.get("lastSourceDirectory") ?? null;
   }
 
-  setLastSourceDirectory(directoryPath: string | null) {
-    if (directoryPath) {
-      this.store.set("lastSourceDirectory", directoryPath);
-      return;
-    }
-
-    this.store.delete("lastSourceDirectory");
+  setLastSourceDirectory(directoryPath: string) {
+    this.store.set("lastSourceDirectory", directoryPath);
   }
 
   getOrCreateDeviceId() {

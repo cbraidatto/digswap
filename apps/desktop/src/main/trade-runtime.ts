@@ -91,7 +91,13 @@ const UUID_PATTERN =
 const DEFAULT_TRANSFER_BYTES = 6 * 1024 * 1024;
 const MIN_TRANSFER_BYTES = 512 * 1024;
 const MAX_TRANSFER_BYTES = 8 * 1024 * 1024;
-const TRANSFER_SOURCE_SELECTION_CANCELLED_MESSAGE = "Transfer source selection cancelled.";
+
+class UserCancelledPickerError extends Error {
+  constructor() {
+    super("File picker cancelled by user");
+    this.name = "UserCancelledPickerError";
+  }
+}
 
 export class DesktopTradeRuntime {
   private readonly deviceId: string;
@@ -746,10 +752,6 @@ export class DesktopTradeRuntime {
         this.emitTransferComplete(completion);
       }
     } catch (error) {
-      if (error instanceof Error && error.message === TRANSFER_SOURCE_SELECTION_CANCELLED_MESSAGE) {
-        return;
-      }
-
       console.error("[trade-runtime] sender session failed", error);
     } finally {
       await this.finishSession(tradeId);
@@ -858,7 +860,7 @@ export class DesktopTradeRuntime {
 
     const selectedFilePath = result.filePaths[0] ?? null;
     if (result.canceled || !selectedFilePath) {
-      throw new Error(TRANSFER_SOURCE_SELECTION_CANCELLED_MESSAGE);
+      throw new UserCancelledPickerError();
     }
 
     this.sessionStore.setLastSourceDirectory(path.dirname(selectedFilePath));
