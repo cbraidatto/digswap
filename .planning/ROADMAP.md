@@ -362,7 +362,7 @@ Plans:
 - [x] 17-04-PLAN.md — Desktop renderer shell: login, inbox, settings (Claude)
 - [x] 17-05-PLAN.md — Web handoff/download/update gate + CTA integration (Claude)
 - [x] 17-06-PLAN.md — Lobby/transfer integration: Codex=runtime/IPC, Claude=renderer/UX (split)
-- [ ] 17-07-PLAN.md — Transport swap: replace local shim with real WebRTC/DataChannel via PeerJS (Codex)
+- [x] 17-07-PLAN.md — Transport swap: replace local shim with real WebRTC/DataChannel via PeerJS (Codex)
 **UI hint**: yes
 
 ## Progress
@@ -389,4 +389,4 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 4.5 -> 5 -> 6 -> 7 -> 8 -> 
 | 14. Trade V2 | 4/5 | Complete* | 2026-03-31 |
 | 15. Social V2 | 0/TBD | Planned | - |
 | 16. Monetization | 0/TBD | Planned | - |
-| 17. Desktop Trade Runtime | 6/7 | In Progress|  |
+| 17. Desktop Trade Runtime | 7/7 | In Progress*|  |
