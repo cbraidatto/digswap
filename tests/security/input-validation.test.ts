@@ -1,7 +1,6 @@
 import { describe, it, expect } from "vitest";
 import { uuidSchema, sanitizeWildcards, urlSchema } from "@/lib/validations/common";
 import { createPostSchema, createReviewSchema } from "@/lib/validations/community";
-import { createTradeRequestSchema, tradeReviewSchema } from "@/lib/validations/trade";
 import { updateProfileSchema, showcaseSearchSchema } from "@/lib/validations/profile";
 
 describe("Input Validation", () => {
@@ -188,68 +187,6 @@ describe("Input Validation", () => {
 				body: "x".repeat(5001),
 			});
 			expect(result.success).toBe(false);
-		});
-	});
-
-	// -------------------------------------------------------------------
-	// createTradeRequestSchema
-	// -------------------------------------------------------------------
-	describe("createTradeRequestSchema", () => {
-		it("accepts valid trade request data", () => {
-			const result = createTradeRequestSchema.safeParse({
-				recipientId: "550e8400-e29b-41d4-a716-446655440000",
-				releaseId: "660e8400-e29b-41d4-a716-446655440000",
-			});
-			expect(result.success).toBe(true);
-		});
-
-		it("rejects non-UUID recipientId", () => {
-			const result = createTradeRequestSchema.safeParse({
-				recipientId: "not-a-uuid",
-				releaseId: "660e8400-e29b-41d4-a716-446655440000",
-			});
-			expect(result.success).toBe(false);
-		});
-
-		it("rejects non-UUID releaseId", () => {
-			const result = createTradeRequestSchema.safeParse({
-				recipientId: "550e8400-e29b-41d4-a716-446655440000",
-				releaseId: "bad-id",
-			});
-			expect(result.success).toBe(false);
-		});
-	});
-
-	// -------------------------------------------------------------------
-	// tradeReviewSchema
-	// -------------------------------------------------------------------
-	describe("tradeReviewSchema", () => {
-		it("accepts valid trade review", () => {
-			const result = tradeReviewSchema.safeParse({
-				tradeId: "550e8400-e29b-41d4-a716-446655440000",
-				rating: 5,
-			});
-			expect(result.success).toBe(true);
-		});
-
-		it("rejects non-UUID tradeId", () => {
-			const result = tradeReviewSchema.safeParse({
-				tradeId: "invalid",
-				rating: 5,
-			});
-			expect(result.success).toBe(false);
-		});
-
-		it("rejects rating outside 1-5 range", () => {
-			expect(tradeReviewSchema.safeParse({
-				tradeId: "550e8400-e29b-41d4-a716-446655440000",
-				rating: 0,
-			}).success).toBe(false);
-
-			expect(tradeReviewSchema.safeParse({
-				tradeId: "550e8400-e29b-41d4-a716-446655440000",
-				rating: 6,
-			}).success).toBe(false);
 		});
 	});
 

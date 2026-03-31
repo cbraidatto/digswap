@@ -56,8 +56,11 @@ export default async function RootLayout({
 					rel="stylesheet"
 				/>
 				{/* Prevent theme flash on load */}
+				{/* suppressHydrationWarning: browsers strip nonce from DOM after parse (security),
+				    causing React hydration mismatch between server nonce and empty client DOM */}
 				<script
 					nonce={nonce}
+					suppressHydrationWarning
 					dangerouslySetInnerHTML={{
 						__html: `try{var t=localStorage.getItem('app-theme');if(t)document.documentElement.setAttribute('data-theme',t)}catch(e){}`,
 					}}

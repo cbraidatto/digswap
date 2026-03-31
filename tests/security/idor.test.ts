@@ -56,22 +56,6 @@ vi.mock("@/lib/supabase/admin", () => ({
 	})),
 }));
 
-// ---------------------------------------------------------------------------
-// Mock dependencies for trades module
-// ---------------------------------------------------------------------------
-vi.mock("@/lib/trades/constants", () => ({
-	TRADE_STATUS: {
-		PENDING: "pending", ACCEPTED: "accepted", TRANSFERRING: "transferring",
-		COMPLETED: "completed", DECLINED: "declined", CANCELLED: "cancelled",
-		EXPIRED: "expired",
-	},
-	TRADE_EXPIRY_HOURS: 24,
-	MAX_FREE_TRADES_PER_MONTH: 5,
-	isP2PEnabled: vi.fn().mockReturnValue(true),
-}));
-vi.mock("@/lib/trades/queries", () => ({
-	getTradeCountThisMonth: vi.fn().mockResolvedValue({ count: 0, plan: "free" }),
-}));
 vi.mock("@/actions/social", () => ({
 	logActivity: vi.fn(),
 }));
@@ -169,7 +153,6 @@ vi.mock("next/cache", () => ({
 // Import after mocks
 // ---------------------------------------------------------------------------
 import { updateConditionGrade } from "@/actions/collection";
-import { acceptTrade, declineTrade } from "@/actions/trades";
 import { markNotificationRead } from "@/actions/notifications";
 import { removeFromWantlist } from "@/actions/wantlist";
 import { updateProfile } from "@/actions/profile";
@@ -193,53 +176,6 @@ describe("IDOR Prevention", () => {
 
 			// The eq chain should include user_id filter with user-A
 			expect(result.error).toBe("Not found");
-		});
-	});
-
-	describe("acceptTrade participant check", () => {
-		it("rejects accept from non-provider", async () => {
-			// Trade where user-A is neither requester nor provider
-			mockFrom.mockImplementation((table: string) => {
-				if (table === "trade_requests") {
-					return createQueryChain({
-						data: {
-							id: "trade-1",
-							requester_id: "user-X",
-							provider_id: "user-Y",
-							status: "pending",
-							file_name: "track.flac",
-						},
-					});
-				}
-				return createQueryChain({ data: null, error: null });
-			});
-
-			const result = await acceptTrade("trade-1");
-
-			expect(result.error).toBe("Only the provider can accept a trade");
-		});
-	});
-
-	describe("declineTrade participant check", () => {
-		it("rejects decline from non-provider", async () => {
-			mockFrom.mockImplementation((table: string) => {
-				if (table === "trade_requests") {
-					return createQueryChain({
-						data: {
-							id: "trade-1",
-							requester_id: "user-X",
-							provider_id: "user-Y",
-							status: "pending",
-							file_name: "track.flac",
-						},
-					});
-				}
-				return createQueryChain({ data: null, error: null });
-			});
-
-			const result = await declineTrade("trade-1");
-
-			expect(result.error).toBe("Only the provider can decline a trade");
 		});
 	});
 

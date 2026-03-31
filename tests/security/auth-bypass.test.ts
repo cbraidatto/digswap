@@ -170,18 +170,6 @@ vi.mock("@/lib/gamification/queries", () => ({
 	getLeaderboardCount: vi.fn().mockResolvedValue(0),
 	getGenreLeaderboardCount: vi.fn().mockResolvedValue(0),
 }));
-vi.mock("@/lib/trades/constants", () => ({
-	TRADE_STATUS: {
-		PENDING: "pending", ACCEPTED: "accepted", TRANSFERRING: "transferring",
-		COMPLETED: "completed", DECLINED: "declined", CANCELLED: "cancelled", EXPIRED: "expired",
-	},
-	TRADE_EXPIRY_HOURS: 24,
-	MAX_FREE_TRADES_PER_MONTH: 5,
-	isP2PEnabled: vi.fn().mockReturnValue(true),
-}));
-vi.mock("@/lib/trades/queries", () => ({
-	getTradeCountThisMonth: vi.fn().mockResolvedValue({ count: 0, plan: "free" }),
-}));
 vi.mock("@/lib/community/slugify", () => ({ slugify: vi.fn().mockReturnValue("test-slug") }));
 vi.mock("@/lib/community/queries", () => ({
 	getGroupPosts: vi.fn(), getGenreGroups: vi.fn(), getMemberGroups: vi.fn(),
@@ -248,7 +236,6 @@ vi.mock("@/lib/validations/common", () => ({
 // ---------------------------------------------------------------------------
 // Import actions AFTER mocks
 // ---------------------------------------------------------------------------
-import { createTrade, acceptTrade } from "@/actions/trades";
 import { createGroupAction, joinGroupAction } from "@/actions/community";
 import { followUser, searchUsers } from "@/actions/social";
 import { searchRecordsAction } from "@/actions/discovery";
@@ -273,21 +260,6 @@ describe("Auth Bypass Prevention", () => {
 		// Default: unauthenticated user
 		mockGetUser.mockResolvedValue({ data: { user: null }, error: null });
 		mockFrom.mockReturnValue(createQueryChain({ data: null, error: null }));
-	});
-
-	describe("trades.ts auth guard", () => {
-		it("should require authentication for createTrade", async () => {
-			await expect(
-				createTrade({
-					providerId: "uuid", offeringReleaseId: "release-1",
-					declaredQuality: "FLAC", conditionNotes: "Original pressing, clean copy",
-				}),
-			).rejects.toThrow(/not authenticated/i);
-		});
-
-		it("should require authentication for acceptTrade", async () => {
-			await expect(acceptTrade("trade-id")).rejects.toThrow(/not authenticated/i);
-		});
 	});
 
 	describe("community.ts auth guard", () => {

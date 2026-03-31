@@ -21,7 +21,6 @@ export interface NotificationData {
 interface NotificationRowProps {
 	notification: NotificationData;
 	onClick?: (id: string) => void;
-	p2pEnabled?: boolean;
 }
 
 function getRelativeTime(dateStr: string): string {
@@ -62,20 +61,9 @@ function getTypeIcon(type: string | null): { icon: string; className: string } {
 	}
 }
 
-export function NotificationRow({ notification, onClick, p2pEnabled = false }: NotificationRowProps) {
+export function NotificationRow({ notification, onClick }: NotificationRowProps) {
 	const { icon, className: iconClassName } = getTypeIcon(notification.type);
 	const relativeTime = getRelativeTime(notification.createdAt);
-
-	// Build trade request URL from wantlist_match metadata
-	const showTradeLink =
-		p2pEnabled &&
-		notification.type === "wantlist_match" &&
-		notification.metadata?.matchUserId &&
-		notification.metadata?.releaseId;
-
-	const tradeUrl = showTradeLink
-		? `/trades/new?to=${notification.metadata!.matchUserId}&release=${notification.metadata!.releaseId}`
-		: null;
 
 	return (
 		<div
@@ -105,15 +93,6 @@ export function NotificationRow({ notification, onClick, p2pEnabled = false }: N
 				)}
 				<div className="font-mono text-[10px] text-on-surface-variant">{relativeTime}</div>
 			</div>
-			{tradeUrl && (
-				<Link
-					href={tradeUrl}
-					className="font-mono text-[10px] text-primary border border-primary/20 px-2 py-1 rounded hover:bg-primary/10 transition-colors flex-shrink-0 self-start"
-					onClick={(e) => e.stopPropagation()}
-				>
-					REQUEST_TRADE
-				</Link>
-			)}
 		</div>
 	);
 }

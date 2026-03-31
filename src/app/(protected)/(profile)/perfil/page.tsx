@@ -33,7 +33,6 @@ import { WantlistAddButton } from "./_components/wantlist-add-button";
 import { WantlistGrid } from "./_components/wantlist-grid";
 import { AddToWantlistDialog } from "./_components/add-to-wantlist-dialog";
 import { getUserRanking, getUserBadges } from "@/lib/gamification/queries";
-import { getTradeReputation } from "@/lib/trades/queries";
 import { TrustStrip } from "@/components/trust/trust-strip";
 import Link from "next/link";
 import { ShareSurface } from "@/components/share/share-surface";
@@ -102,7 +101,7 @@ export default async function PerfilPage({ searchParams }: PerfilPageProps) {
 	].filter((id): id is string => Boolean(id));
 
 	// Fetch collection data, social counts and activity stats in parallel
-	const [items, totalCount, genres, formats, followCounts, [{ weeklyAdds }], topGenres, showcaseReleases, [{ tradesThisWeek }], [{ wantlistCount }], wantlistData, wantlistTotal, [{ tradesTotal }], ranking, userBadgeData, tradeReputation] = await Promise.all([
+	const [items, totalCount, genres, formats, followCounts, [{ weeklyAdds }], topGenres, showcaseReleases, [{ tradesThisWeek }], [{ wantlistCount }], wantlistData, wantlistTotal, [{ tradesTotal }], ranking, userBadgeData] = await Promise.all([
 		getCollectionPage(user.id, filters),
 		getCollectionCount(user.id, filters),
 		getUniqueGenres(user.id),
@@ -133,7 +132,6 @@ export default async function PerfilPage({ searchParams }: PerfilPageProps) {
 		.where(or(eq(tradeRequests.requesterId, user.id), eq(tradeRequests.providerId, user.id))),
 	getUserRanking(user.id),
 	getUserBadges(user.id),
-	getTradeReputation(user.id),
 	]);
 
 	const rankTitle = ranking?.title ?? "Vinyl Rookie";

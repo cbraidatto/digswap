@@ -63,21 +63,6 @@ vi.mock("@/lib/supabase/admin", () => ({
 // Mock dependencies needed by action modules
 // ---------------------------------------------------------------------------
 
-vi.mock("@/lib/trades/constants", () => ({
-	TRADE_STATUS: {
-		PENDING: "pending", ACCEPTED: "accepted", TRANSFERRING: "transferring",
-		COMPLETED: "completed", DECLINED: "declined", CANCELLED: "cancelled",
-		EXPIRED: "expired",
-	},
-	TRADE_EXPIRY_HOURS: 24,
-	MAX_FREE_TRADES_PER_MONTH: 5,
-	isP2PEnabled: vi.fn().mockReturnValue(true),
-}));
-
-vi.mock("@/lib/trades/queries", () => ({
-	getTradeCountThisMonth: vi.fn().mockResolvedValue({ count: 0, plan: "free" }),
-}));
-
 vi.mock("@/actions/social", async (importOriginal) => {
 	const actual = await importOriginal<typeof import("@/actions/social")>();
 	return {
@@ -239,7 +224,6 @@ vi.mock("next/navigation", () => ({
 // ---------------------------------------------------------------------------
 // Import actions after mocks
 // ---------------------------------------------------------------------------
-import { createTrade } from "@/actions/trades";
 import { followUser } from "@/actions/social";
 import { searchCollectionForShowcase } from "@/actions/profile";
 import { loadGlobalLeaderboard } from "@/actions/gamification";
@@ -254,36 +238,6 @@ describe("Server Action Rate Limiting", () => {
 			data: { user: { id: "test-user-id" } },
 		});
 		mockFrom.mockReturnValue(createQueryChain({ data: null, error: null }));
-	});
-
-	describe("trades actions use tradeRateLimit", () => {
-		it("calls tradeRateLimit.limit with user.id on createTrade", async () => {
-			mockTradeLimit.mockResolvedValue({ success: true });
-			mockFrom.mockImplementation((table: string) => {
-				if (table === "profiles") return createQueryChain({ data: { trades_tos_accepted_at: "2026-01-01" } });
-				if (table === "trade_requests") return createQueryChain({ data: { id: "trade-1" } });
-				return createQueryChain({ data: null, error: null });
-			});
-
-			await createTrade({
-				providerId: "p1", offeringReleaseId: "release-1",
-				declaredQuality: "FLAC", conditionNotes: "Original pressing, clean copy",
-			});
-
-			expect(mockTradeLimit).toHaveBeenCalledWith("test-user-id");
-		});
-
-		it("returns error when tradeRateLimit denies on createTrade", async () => {
-			mockTradeLimit.mockResolvedValue({ success: false });
-
-			const result = await createTrade({
-				providerId: "p1", offeringReleaseId: "release-1",
-				declaredQuality: "FLAC", conditionNotes: "Original pressing, clean copy",
-			});
-
-			expect(result.error).toContain("Too many requests");
-			expect(result.success).toBeUndefined();
-		});
 	});
 
 	describe("social actions use apiRateLimit", () => {
