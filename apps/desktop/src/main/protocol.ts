@@ -42,16 +42,17 @@ export function parseProtocolUrl(rawUrl: string): DesktopProtocolPayload | null 
 
     if (parsed.hostname === "trade") {
       const tradeId = parsed.pathname.replace(/^\/+/u, "");
-      const handoffToken = parsed.searchParams.get("handoff");
+      const token = parsed.searchParams.get("handoff");
 
-      if (!tradeId || !handoffToken) {
+      if (!tradeId || !token) {
         return null;
       }
 
       const payload: TradeHandoffPayload = {
         kind: "trade-handoff",
         tradeId,
-        handoffToken,
+        token,
+        handoffToken: token,
         ...createPayloadBase(rawUrl),
       };
 

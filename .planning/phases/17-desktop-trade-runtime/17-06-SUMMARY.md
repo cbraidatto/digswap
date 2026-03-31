@@ -104,3 +104,35 @@ Commits:
 TypeScript: all errors are pre-existing (../shared/ipc-types module resolution, pre-dates this plan); zero new errors introduced.
 
 No Electron/WebRTC/Node imports in any renderer file: CONFIRMED (grep returned no matches).
+
+## Codex Runtime Follow-Up
+
+The main-process half of 17-06 is now wired in:
+- `apps/desktop/src/main/trade-runtime.ts`
+- `apps/desktop/src/main/protocol.ts`
+- `apps/desktop/src/shared/ipc-types.ts`
+- `apps/desktop/src/renderer/src/AppShell.tsx` (small protocol payload typing fix)
+
+### What now works end-to-end
+
+- `TradeHandoffPayload` now accepts `token` and remains backward-compatible with `handoffToken`.
+- Protocol payloads raised through `onProtocolPayload(...)` can open the overlay and still be consumed securely when `getTradeDetail()` prepares trade access.
+- `getTradeDetail(tradeId)` now hydrates real trade data from Supabase (`trade_requests`, `profiles`, `releases`) instead of returning placeholders.
+- `onLobbyStateChanged(...)` now emits lease-backed lobby state from the main process.
+- `startTransfer(tradeId)` starts a real desktop runtime flow from the renderer perspective:
+  - peer-connected event
+  - incremental progress events
+  - file materialization under the configured download directory
+  - SHA-256 generation
+  - completion event
+  - receipt queue + reconciliation attempt
+- `confirmCompletion(tradeId, rating)` now attempts to persist a desktop review and releases the active lease.
+
+### Validation
+
+- `pnpm --dir apps/desktop exec tsc --noEmit`
+- `pnpm --dir apps/desktop build`
+
+### Important limitation
+
+This runtime is currently a **desktop-local transfer implementation**, not the final WebRTC/DataChannel transport yet. It exercises the renderer contract, filesystem flow, receipt reconciliation, rating flow, and protocol handoff without claiming that P2P transport is finished. The next transport-hardening cut should replace the local transfer loop inside `trade-runtime.ts` with the actual WebRTC/DataChannel session layer.

@@ -36,7 +36,8 @@ export interface DesktopStorageHealth {
 export interface TradeHandoffPayload {
   kind: "trade-handoff";
   tradeId: string;
-  handoffToken: string;
+  token: string;
+  handoffToken?: string;
   rawUrl: string;
   receivedAt: string;
 }

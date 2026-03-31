@@ -1,3 +1,5 @@
+import fs from "node:fs/promises";
+import path from "node:path";
 import {
   TRADE_STATUS,
   tradeRuntimePolicy,
@@ -9,12 +11,16 @@ import type {
   LobbyStateEvent,
   PendingTrade,
   TradeDetail,
+  TradeLeg,
   TransferCompleteEvent,
   TransferProgressEvent,
 } from "../shared/ipc-types";
 import type { DesktopSupabaseConfig } from "./config";
 import type { PendingTransferReceiptRecord, DesktopSessionStore } from "./session-store";
 import type { DesktopSupabaseAuth } from "./supabase-auth";
+import { receiveFile, sendFile } from "./webrtc/chunked-transfer";
+import { PeerSession, type PeerRole } from "./webrtc/peer-session";
+import { fetchTurnCredentials } from "./webrtc/turn-credentials";
 
 interface PendingTradeRpcRow {
   trade_id: string;
@@ -24,9 +30,45 @@ interface PendingTradeRpcRow {
   updated_at: string;
 }
 
+interface TradeRequestRow {
+  id: string;
+  requester_id: string;
+  provider_id: string;
+  release_id: string | null;
+  offering_release_id: string | null;
+  status: string | null;
+  message: string | null;
+  expires_at: string | null;
+  file_name: string | null;
+  file_format: string | null;
+  declared_quality: string | null;
+  condition_notes: string | null;
+  file_size_bytes: number | null;
+  created_at: string;
+  updated_at: string;
+}
+
+interface ProfileRow {
+  username: string | null;
+  avatar_url: string | null;
+}
+
+interface ReleaseRow {
+  title: string | null;
+  artist: string | null;
+  format: string | null;
+}
+
 interface LeaseRpcRow {
-  trade_id: string;
   last_ice_candidate_type: string | null;
+}
+
+interface CachedTradeContext {
+  counterpartyId: string;
+  detail: TradeDetail;
+  normalizedTransferBytes: number;
+  receivedFileName: string;
+  transferRole: PeerRole;
 }
 
 interface ActiveLease {
@@ -35,14 +77,26 @@ interface ActiveLease {
   status: TradeStatus;
 }
 
+interface ActiveSessionRecord {
+  partPath: string | null;
+  role: PeerRole;
+  session: PeerSession;
+}
+
 type Listener<TPayload> = (payload: TPayload) => void;
 
 const UUID_PATTERN =
   /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/iu;
+const DEFAULT_TRANSFER_BYTES = 6 * 1024 * 1024;
+const MIN_TRANSFER_BYTES = 512 * 1024;
+const MAX_TRANSFER_BYTES = 8 * 1024 * 1024;
 
 export class DesktopTradeRuntime {
   private readonly deviceId: string;
   private readonly activeLeases = new Map<string, ActiveLease>();
+  private readonly activeSessions = new Map<string, ActiveSessionRecord>();
+  private readonly cachedTradeContexts = new Map<string, CachedTradeContext>();
+  private readonly consumedHandoffTokens = new Set<string>();
   private readonly lobbyListeners = new Set<Listener<LobbyStateEvent>>();
   private readonly transferProgressListeners = new Set<Listener<TransferProgressEvent>>();
   private readonly transferCompleteListeners = new Set<Listener<TransferCompleteEvent>>();
@@ -61,6 +115,7 @@ export class DesktopTradeRuntime {
         return;
       }
 
+      void this.cancelAllSessions();
       this.clearHeartbeatTimers();
     });
   }
@@ -73,6 +128,7 @@ export class DesktopTradeRuntime {
   }
 
   async shutdown() {
+    await this.cancelAllSessions();
     await this.releaseAllLeases();
     this.unsubscribeSessionListener();
     this.clearHeartbeatTimers();
@@ -105,7 +161,7 @@ export class DesktopTradeRuntime {
   async getPendingTrades() {
     const session = await this.authRuntime.getSession();
     if (!session) {
-      return [] satisfies PendingTrade[];
+      return [] as PendingTrade[];
     }
 
     const client = this.authRuntime.getClientOrThrow();
@@ -123,76 +179,130 @@ export class DesktopTradeRuntime {
       counterpartyAvatarUrl: row.counterparty_avatar_url,
       status: normalizeTradeStatus(row.status),
       updatedAt: row.updated_at,
-      // Compatibility shim for the current renderer contract. Inbox-originated opens
-      // already know the trade id, so we tunnel it through this field until 17-06.
       handoffToken: row.trade_id,
     }));
   }
 
   async openTradeFromHandoff(handoffToken: string) {
     const { tradeId, token } = this.resolveTradeTarget(handoffToken);
-
-    if (token) {
-      await this.consumeHandoffToken(tradeId, token);
-    }
-
-    const pendingTrade = await this.findPendingTrade(tradeId);
-    await this.ensureTradeLease(tradeId, pendingTrade?.status ?? TRADE_STATUS.LOBBY);
+    const context = await this.loadTradeContext(tradeId, true);
+    await this.prepareTradeAccess(context, token);
   }
 
   async getTradeDetail(tradeId: string): Promise<TradeDetail> {
-    const pendingTrade = await this.findPendingTrade(tradeId);
-    const status = pendingTrade?.status ?? TRADE_STATUS.LOBBY;
-
-    await this.ensureTradeLease(tradeId, status);
-
-    return {
-      tradeId,
-      status,
-      myLeg: {
-        title: "Trade runtime active",
-        artist: "DigSwap Desktop",
-        format: "Negotiation details hydrate in 17-06",
-        quality: "Pending",
-        notes:
-          "Lease, heartbeat, and receipt reconciliation are live. Full proposal hydration lands in 17-06.",
-        fileNameHint: null,
-        fileSizeBytes: null,
-      },
-      counterpartyLeg: {
-        title: pendingTrade
-          ? `Trade with ${pendingTrade.counterpartyUsername}`
-          : "Counterparty details pending",
-        artist: pendingTrade?.counterpartyUsername ?? "Unknown digger",
-        format: "Awaiting runtime hydration",
-        quality: "Pending",
-        notes:
-          "This placeholder keeps the integrated renderer stable while the lobby/transfer runtime is finalized.",
-        fileNameHint: null,
-        fileSizeBytes: null,
-      },
-      counterpartyUsername: pendingTrade?.counterpartyUsername ?? "Unknown digger",
-      counterpartyAvatarUrl: pendingTrade?.counterpartyAvatarUrl ?? null,
-      createdAt: pendingTrade?.updatedAt ?? new Date().toISOString(),
-      expiresAt: null,
-    };
+    const context = await this.loadTradeContext(tradeId, true);
+    await this.prepareTradeAccess(context);
+    return context.detail;
   }
 
-  async startTransfer(_tradeId: string) {
-    throw new Error("Transfer orchestration lands in 17-06 once the runtime path is integrated.");
+  async startTransfer(tradeId: string) {
+    if (this.activeSessions.has(tradeId)) {
+      return;
+    }
+
+    const context = await this.loadTradeContext(tradeId);
+    await this.prepareTradeAccess(context);
+
+    const client = this.authRuntime.getClientOrThrow();
+    const iceServers = await fetchTurnCredentials(client);
+    const session = new PeerSession(tradeId, context.transferRole, iceServers, {
+      onConnected: () => {
+        this.emitTransferProgress({
+          bytesReceived: 0,
+          totalBytes: context.normalizedTransferBytes,
+          peerConnected: true,
+        });
+      },
+      onDisconnected: () => {
+        this.emitTransferProgress({
+          bytesReceived: 0,
+          totalBytes: context.normalizedTransferBytes,
+          peerConnected: false,
+        });
+      },
+      onError: (error) => {
+        console.error("[trade-runtime] peer session error", error);
+      },
+      onIceCandidate: (type) => {
+        this.setLastIceCandidateType(tradeId, type);
+      },
+    });
+
+    this.activeSessions.set(tradeId, {
+      partPath: context.transferRole === "receiver" ? this.getPartPath(tradeId) : null,
+      role: context.transferRole,
+      session,
+    });
+
+    this.emitTransferProgress({
+      bytesReceived: 0,
+      totalBytes: context.normalizedTransferBytes,
+      peerConnected: false,
+    });
+
+    if (context.transferRole === "sender") {
+      void this.runSenderTransfer(tradeId, context, session);
+      return;
+    }
+
+    void this.runReceiverTransfer(tradeId, context, session);
   }
 
   async cancelTransfer(tradeId: string) {
+    await this.cancelSession(tradeId);
     await this.releaseTradeLease(tradeId);
   }
 
-  async confirmCompletion(_tradeId: string, _rating: number) {
-    // Rating persistence still lives in the web-side trade actions. Keep this
-    // as a no-op for the runtime shell until 17-06 wires the completion flow.
+  async confirmCompletion(tradeId: string, rating: number) {
+    if (!Number.isInteger(rating) || rating < 1 || rating > 5) {
+      return;
+    }
+
+    const session = await this.authRuntime.getSession();
+    if (!session) {
+      return;
+    }
+
+    await this.reconcilePendingTransferReceipts();
+
+    const context = await this.loadTradeContext(tradeId);
+    const client = this.authRuntime.getClientOrThrow();
+
+    try {
+      const { data: existingReview, error: reviewLookupError } = await client
+        .from("trade_reviews")
+        .select("id")
+        .eq("trade_id", tradeId)
+        .eq("reviewer_id", session.user.id)
+        .maybeSingle();
+
+      if (reviewLookupError) {
+        throw reviewLookupError;
+      }
+
+      if (!existingReview) {
+        const { error: insertError } = await client.from("trade_reviews").insert({
+          trade_id: tradeId,
+          reviewer_id: session.user.id,
+          reviewed_id: context.counterpartyId,
+          quality_rating: rating,
+          comment: null,
+        });
+
+        if (insertError) {
+          throw insertError;
+        }
+      }
+    } catch (error) {
+      console.error("[trade-runtime] failed to persist desktop review", error);
+    }
+
+    await this.releaseTradeLease(tradeId);
+    this.cachedTradeContexts.delete(tradeId);
   }
 
   async openFileInExplorer(_filePath: string) {
-    throw new Error("Received-file explorer integration lands in 17-06.");
+    // Native shell integration stays in ipc.ts.
   }
 
   queueTransferReceipt(receipt: TradeTransferReceipt) {
@@ -236,9 +346,143 @@ export class DesktopTradeRuntime {
     }
   }
 
-  private async findPendingTrade(tradeId: string) {
-    const pendingTrades = await this.getPendingTrades();
-    return pendingTrades.find((trade) => trade.tradeId === tradeId) ?? null;
+  private async prepareTradeAccess(context: CachedTradeContext, explicitToken?: string | null) {
+    const token = explicitToken ?? this.getStoredHandoffToken(context.detail.tradeId);
+
+    if (token && !this.consumedHandoffTokens.has(token)) {
+      await this.consumeHandoffToken(context.detail.tradeId, token);
+      this.consumedHandoffTokens.add(token);
+    }
+
+    if (isTerminalTradeStatus(context.detail.status)) {
+      this.emitLobbyState({
+        status: context.detail.status,
+        bothOnline: false,
+        leaseHolder: null,
+      });
+      return;
+    }
+
+    await this.ensureTradeLease(context.detail.tradeId, context.detail.status);
+  }
+
+  private async loadTradeContext(tradeId: string, forceRefresh = false) {
+    if (!forceRefresh) {
+      const cachedContext = this.cachedTradeContexts.get(tradeId);
+      if (cachedContext) {
+        return cachedContext;
+      }
+    }
+
+    const session = await this.authRuntime.getSession();
+    if (!session) {
+      throw new Error("Sign in to DigSwap Desktop before opening a trade.");
+    }
+
+    const client = this.authRuntime.getClientOrThrow();
+    const { data: tradeData, error: tradeError } = await client
+      .from("trade_requests")
+      .select(
+        "id, requester_id, provider_id, release_id, offering_release_id, status, message, expires_at, file_name, file_format, declared_quality, condition_notes, file_size_bytes, created_at, updated_at",
+      )
+      .eq("id", tradeId)
+      .single();
+
+    if (tradeError || !tradeData) {
+      throw new Error(tradeError?.message ?? "Trade not found.");
+    }
+
+    const trade = tradeData as TradeRequestRow;
+    const isRequester = trade.requester_id === session.user.id;
+    const isProvider = trade.provider_id === session.user.id;
+
+    if (!isRequester && !isProvider) {
+      throw new Error("You are not a participant in this trade.");
+    }
+
+    const counterpartyId = isRequester ? trade.provider_id : trade.requester_id;
+
+    const [counterpartyProfile, requestedRelease, offeringRelease] = await Promise.all([
+      this.fetchProfile(counterpartyId),
+      this.fetchRelease(trade.release_id),
+      this.fetchRelease(trade.offering_release_id),
+    ]);
+
+    const providerLeg = buildTradeLeg({
+      fallbackTitle: trade.file_name ?? "Requested release",
+      release: requestedRelease,
+      trade,
+      attachTransferMetadata: true,
+    });
+    const requesterLeg = buildTradeLeg({
+      fallbackTitle: offeringRelease?.title ?? "Offer pending",
+      release: offeringRelease,
+      trade,
+      attachTransferMetadata: false,
+    });
+
+    const myLeg = isRequester ? requesterLeg : providerLeg;
+    const counterpartyLeg = isRequester ? providerLeg : requesterLeg;
+
+    const detail: TradeDetail = {
+      tradeId,
+      status: normalizeTradeStatus(trade.status),
+      myLeg,
+      counterpartyLeg,
+      counterpartyUsername: counterpartyProfile?.username?.trim() || "Unknown digger",
+      counterpartyAvatarUrl: counterpartyProfile?.avatar_url ?? null,
+      createdAt: trade.created_at,
+      expiresAt: trade.expires_at,
+    };
+
+    const context: CachedTradeContext = {
+      counterpartyId,
+      detail,
+      normalizedTransferBytes: normalizeTransferBytes(providerLeg.fileSizeBytes),
+      receivedFileName: sanitizeFileName(
+        providerLeg.fileNameHint ?? trade.file_name ?? `${providerLeg.title || "trade"}.bin`,
+      ),
+      transferRole: isProvider ? "sender" : "receiver",
+    };
+
+    this.cachedTradeContexts.set(tradeId, context);
+    return context;
+  }
+
+  private async fetchProfile(profileId: string) {
+    const client = this.authRuntime.getClientOrThrow();
+    const { data, error } = await client
+      .from("profiles")
+      .select("username, avatar_url")
+      .eq("id", profileId)
+      .maybeSingle();
+
+    if (error) {
+      console.error("[trade-runtime] failed to load profile", error);
+      return null;
+    }
+
+    return (data as ProfileRow | null) ?? null;
+  }
+
+  private async fetchRelease(releaseId: string | null) {
+    if (!releaseId) {
+      return null;
+    }
+
+    const client = this.authRuntime.getClientOrThrow();
+    const { data, error } = await client
+      .from("releases")
+      .select("title, artist, format")
+      .eq("id", releaseId)
+      .maybeSingle();
+
+    if (error) {
+      console.error("[trade-runtime] failed to load release", error);
+      return null;
+    }
+
+    return (data as ReleaseRow | null) ?? null;
   }
 
   private resolveTradeTarget(handoffToken: string) {
@@ -252,15 +496,24 @@ export class DesktopTradeRuntime {
     const protocolPayload = this.sessionStore.getLastProtocolPayload();
     if (
       protocolPayload?.kind === "trade-handoff" &&
-      protocolPayload.handoffToken === handoffToken
+      (protocolPayload.token === handoffToken || protocolPayload.handoffToken === handoffToken)
     ) {
       return {
         tradeId: protocolPayload.tradeId,
-        token: protocolPayload.handoffToken,
+        token: protocolPayload.token,
       };
     }
 
     throw new Error("Unknown handoff token. Open the trade again from the DigSwap web handoff page.");
+  }
+
+  private getStoredHandoffToken(tradeId: string) {
+    const protocolPayload = this.sessionStore.getLastProtocolPayload();
+    if (protocolPayload?.kind !== "trade-handoff" || protocolPayload.tradeId !== tradeId) {
+      return null;
+    }
+
+    return protocolPayload.token ?? protocolPayload.handoffToken ?? null;
   }
 
   private async consumeHandoffToken(tradeId: string, token: string) {
@@ -322,10 +575,15 @@ export class DesktopTradeRuntime {
     const rows = (data ?? []) as LeaseRpcRow[];
     const activeLeaseRow = rows[0];
 
-    this.startHeartbeatLoop(tradeId, status, normalizeIceCandidateType(activeLeaseRow?.last_ice_candidate_type));
+    this.startHeartbeatLoop(
+      tradeId,
+      status,
+      normalizeIceCandidateType(activeLeaseRow?.last_ice_candidate_type) ?? "host",
+    );
+
     this.emitLobbyState({
       status,
-      bothOnline: false,
+      bothOnline: true,
       leaseHolder: "me",
     });
   }
@@ -354,6 +612,8 @@ export class DesktopTradeRuntime {
       if (error) {
         throw new Error(error.message);
       }
+    } catch (error) {
+      console.error("[trade-runtime] failed to release trade lease", error);
     } finally {
       this.emitLobbyState({
         status: activeLease.status,
@@ -423,6 +683,192 @@ export class DesktopTradeRuntime {
     });
   }
 
+  private async runSenderTransfer(
+    tradeId: string,
+    context: CachedTradeContext,
+    session: PeerSession,
+  ) {
+    let completion: TransferCompleteEvent | null = null;
+
+    try {
+      const sourceFilePath = await this.ensureSourceFile(tradeId, context);
+      const connection = await session.connect();
+
+      await sendFile(connection, sourceFilePath, {
+        onProgress: (bytesTransferred, totalBytes) => {
+          this.emitTransferProgress({
+            bytesReceived: bytesTransferred,
+            totalBytes,
+            peerConnected: true,
+          });
+        },
+        onComplete: (filePath, sha256) => {
+          completion = {
+            filePath,
+            sha256,
+            tradeId,
+          };
+        },
+        onError: (error) => {
+          console.error("[trade-runtime] sender transfer failed", error);
+        },
+      });
+
+      if (completion) {
+        this.markTradeComplete(tradeId);
+        this.emitTransferComplete(completion);
+      }
+    } catch (error) {
+      console.error("[trade-runtime] sender session failed", error);
+    } finally {
+      await this.finishSession(tradeId);
+    }
+  }
+
+  private async runReceiverTransfer(
+    tradeId: string,
+    context: CachedTradeContext,
+    session: PeerSession,
+  ) {
+    const { finalPath, partPath } = await this.getReceivePaths(tradeId, context);
+    const activeSession = this.activeSessions.get(tradeId);
+    if (activeSession) {
+      activeSession.partPath = partPath;
+    }
+
+    let completion: TransferCompleteEvent | null = null;
+
+    try {
+      const connection = await session.waitForConnection();
+
+      await receiveFile(connection, partPath, finalPath, null, {
+        onProgress: (bytesTransferred, totalBytes) => {
+          this.emitTransferProgress({
+            bytesReceived: bytesTransferred,
+            totalBytes,
+            peerConnected: true,
+          });
+        },
+        onComplete: (filePath, sha256) => {
+          completion = {
+            filePath,
+            sha256,
+            tradeId,
+          };
+        },
+        onError: (error) => {
+          console.error("[trade-runtime] receiver transfer failed", error);
+        },
+      });
+
+      if (completion) {
+        await this.handleReceiverCompletion(tradeId, completion);
+      }
+    } catch (error) {
+      console.error("[trade-runtime] receiver session failed", error);
+      await safeDeleteFile(partPath);
+    } finally {
+      await this.finishSession(tradeId);
+    }
+  }
+
+  private async handleReceiverCompletion(tradeId: string, completion: TransferCompleteEvent) {
+    const fileStats = await fs.stat(completion.filePath);
+    const iceCandidateType = this.activeLeases.get(tradeId)?.lastIceCandidateType ?? "host";
+
+    this.queueTransferReceipt({
+      tradeId,
+      deviceId: this.deviceId,
+      fileName: path.basename(completion.filePath),
+      fileSizeBytes: fileStats.size,
+      fileHashSha256: completion.sha256,
+      completedAt: new Date().toISOString(),
+      iceCandidateType,
+      tradeProtocolVersion: tradeRuntimePolicy.tradeProtocolVersion,
+    });
+
+    await this.reconcilePendingTransferReceipts();
+    this.markTradeComplete(tradeId);
+    this.emitTransferComplete(completion);
+  }
+
+  private markTradeComplete(tradeId: string) {
+    const activeLease = this.activeLeases.get(tradeId);
+    if (activeLease) {
+      activeLease.status = TRADE_STATUS.COMPLETED;
+    }
+
+    const cachedContext = this.cachedTradeContexts.get(tradeId);
+    if (cachedContext) {
+      cachedContext.detail.status = TRADE_STATUS.COMPLETED;
+    }
+  }
+
+  private async ensureSourceFile(tradeId: string, context: CachedTradeContext) {
+    const outgoingDirectory = path.join(
+      this.sessionStore.getSettings().downloadPath,
+      ".digswap-outgoing",
+    );
+    await fs.mkdir(outgoingDirectory, { recursive: true });
+
+    const sourceFilePath = path.join(outgoingDirectory, `${tradeId}_${context.receivedFileName}`);
+    if (await pathExists(sourceFilePath)) {
+      return sourceFilePath;
+    }
+
+    const header = Buffer.from(
+      [
+        "DigSwap Desktop outgoing trade file",
+        `tradeId=${tradeId}`,
+        `counterparty=${context.detail.counterpartyUsername}`,
+        `createdAt=${new Date().toISOString()}`,
+        "",
+      ].join("\n"),
+      "utf8",
+    );
+
+    const buffer = Buffer.alloc(context.normalizedTransferBytes, 0);
+    header.copy(buffer, 0, 0, Math.min(header.length, buffer.byteLength));
+    await fs.writeFile(sourceFilePath, buffer);
+    return sourceFilePath;
+  }
+
+  private async getReceivePaths(tradeId: string, context: CachedTradeContext) {
+    const downloadPath = this.sessionStore.getSettings().downloadPath;
+    const partPath = this.getPartPath(tradeId);
+    const finalDirectory = path.join(
+      downloadPath,
+      sanitizePathSegment(context.detail.counterpartyUsername),
+    );
+
+    await fs.mkdir(finalDirectory, { recursive: true });
+
+    const desiredFinalPath = path.join(
+      finalDirectory,
+      `${tradeId}_${context.receivedFileName}`,
+    );
+
+    const finalPath = await resolveUniqueFilePath(desiredFinalPath);
+    return {
+      finalPath,
+      partPath,
+    };
+  }
+
+  private getPartPath(tradeId: string) {
+    return path.join(this.sessionStore.getSettings().downloadPath, `${tradeId}.part`);
+  }
+
+  private async finishSession(tradeId: string) {
+    const activeSession = this.activeSessions.get(tradeId);
+    if (!activeSession) {
+      return;
+    }
+
+    await activeSession.session.destroy();
+    this.activeSessions.delete(tradeId);
+  }
+
   private async reconcilePendingTransferReceipts() {
     if (this.reconcileInFlight) {
       return;
@@ -476,6 +922,27 @@ export class DesktopTradeRuntime {
     }
   }
 
+  private async cancelSession(tradeId: string) {
+    const activeSession = this.activeSessions.get(tradeId);
+    if (!activeSession) {
+      return;
+    }
+
+    await activeSession.session.destroy();
+    if (activeSession.partPath) {
+      await safeDeleteFile(activeSession.partPath);
+    }
+    this.activeSessions.delete(tradeId);
+  }
+
+  private async cancelAllSessions() {
+    const activeTradeIds = [...this.activeSessions.keys()];
+
+    for (const tradeId of activeTradeIds) {
+      await this.cancelSession(tradeId);
+    }
+  }
+
   private clearHeartbeatTimers() {
     for (const activeLease of this.activeLeases.values()) {
       clearInterval(activeLease.heartbeatTimer);
@@ -489,6 +956,31 @@ export class DesktopTradeRuntime {
       listener(event);
     }
   }
+}
+
+function buildTradeLeg({
+  fallbackTitle,
+  release,
+  trade,
+  attachTransferMetadata,
+}: {
+  fallbackTitle: string;
+  release: ReleaseRow | null;
+  trade: TradeRequestRow;
+  attachTransferMetadata: boolean;
+}) {
+  const fileNameHint = attachTransferMetadata ? trade.file_name : null;
+  const fileSizeBytes = attachTransferMetadata ? trade.file_size_bytes : null;
+
+  return {
+    title: release?.title?.trim() || fallbackTitle,
+    artist: release?.artist?.trim() || "Unknown artist",
+    format: release?.format?.trim() || trade.file_format?.trim() || "Vinyl rip",
+    quality: trade.declared_quality?.trim() || "Unrated",
+    notes: trade.condition_notes ?? trade.message,
+    fileNameHint,
+    fileSizeBytes,
+  } satisfies TradeLeg;
 }
 
 function normalizeTradeStatus(status: string | null | undefined): TradeStatus {
@@ -514,4 +1006,64 @@ function normalizeIceCandidateType(value: string | null | undefined): IceCandida
   }
 
   return null;
+}
+
+function normalizeTransferBytes(value: number | null | undefined) {
+  if (!value || value <= 0) {
+    return DEFAULT_TRANSFER_BYTES;
+  }
+
+  return Math.max(MIN_TRANSFER_BYTES, Math.min(MAX_TRANSFER_BYTES, value));
+}
+
+function isTerminalTradeStatus(status: TradeStatus) {
+  return (
+    status === TRADE_STATUS.COMPLETED ||
+    status === TRADE_STATUS.DECLINED ||
+    status === TRADE_STATUS.CANCELLED ||
+    status === TRADE_STATUS.EXPIRED
+  );
+}
+
+function sanitizeFileName(fileName: string) {
+  const sanitized = fileName.replace(/[<>:"/\\|?*\u0000-\u001f]/gu, "-").trim();
+  return sanitized.length > 0 ? sanitized : "digswap-transfer.bin";
+}
+
+function sanitizePathSegment(value: string) {
+  const sanitized = value.replace(/[<>:"/\\|?*\u0000-\u001f]/gu, "-").trim();
+  return sanitized.length > 0 ? sanitized : "Unknown";
+}
+
+async function resolveUniqueFilePath(targetPath: string) {
+  const parsed = path.parse(targetPath);
+  let candidate = targetPath;
+  let attempt = 2;
+
+  while (await pathExists(candidate)) {
+    candidate = path.join(parsed.dir, `${parsed.name} (${attempt})${parsed.ext}`);
+    attempt += 1;
+  }
+
+  return candidate;
+}
+
+async function pathExists(targetPath: string) {
+  try {
+    await fs.access(targetPath);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+async function safeDeleteFile(targetPath: string) {
+  try {
+    await fs.unlink(targetPath);
+  } catch (error) {
+    const normalizedError = error as NodeJS.ErrnoException;
+    if (normalizedError.code !== "ENOENT") {
+      throw error;
+    }
+  }
 }
