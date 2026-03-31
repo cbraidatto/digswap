@@ -1,5 +1,6 @@
 import fs from "node:fs/promises";
 import path from "node:path";
+import { dialog } from "electron";
 import {
   TRADE_STATUS,
   tradeRuntimePolicy,
@@ -90,6 +91,7 @@ const UUID_PATTERN =
 const DEFAULT_TRANSFER_BYTES = 6 * 1024 * 1024;
 const MIN_TRANSFER_BYTES = 512 * 1024;
 const MAX_TRANSFER_BYTES = 8 * 1024 * 1024;
+const TRANSFER_SOURCE_SELECTION_CANCELLED_MESSAGE = "Transfer source selection cancelled.";
 
 export class DesktopTradeRuntime {
   private readonly deviceId: string;
@@ -202,50 +204,72 @@ export class DesktopTradeRuntime {
 
     const context = await this.loadTradeContext(tradeId);
     await this.prepareTradeAccess(context);
+    let sourceFilePath: string | null = null;
 
-    const client = this.authRuntime.getClientOrThrow();
-    const iceServers = await fetchTurnCredentials(client);
-    const session = new PeerSession(tradeId, context.transferRole, iceServers, {
-      onConnected: () => {
-        this.emitTransferProgress({
-          bytesReceived: 0,
-          totalBytes: context.normalizedTransferBytes,
-          peerConnected: true,
-        });
-      },
-      onDisconnected: () => {
-        this.emitTransferProgress({
-          bytesReceived: 0,
-          totalBytes: context.normalizedTransferBytes,
-          peerConnected: false,
-        });
-      },
-      onError: (error) => {
-        console.error("[trade-runtime] peer session error", error);
-      },
-      onIceCandidate: (type) => {
-        this.setLastIceCandidateType(tradeId, type);
-      },
-    });
+    try {
+      if (context.transferRole === "sender") {
+        sourceFilePath = await this.pickSourceFile(context);
+        const sourceFileStats = await fs.stat(sourceFilePath);
 
-    this.activeSessions.set(tradeId, {
-      partPath: context.transferRole === "receiver" ? this.getPartPath(tradeId) : null,
-      role: context.transferRole,
-      session,
-    });
+        if (!sourceFileStats.isFile()) {
+          throw new Error("Selected transfer source is not a file.");
+        }
 
-    this.emitTransferProgress({
-      bytesReceived: 0,
-      totalBytes: context.normalizedTransferBytes,
-      peerConnected: false,
-    });
+        if (sourceFileStats.size <= 0) {
+          throw new Error("Selected transfer source file is empty.");
+        }
 
-    if (context.transferRole === "sender") {
-      void this.runSenderTransfer(tradeId, context, session);
-      return;
+        context.normalizedTransferBytes = sourceFileStats.size;
+        context.receivedFileName = sanitizeFileName(path.basename(sourceFilePath));
+      }
+
+      const client = this.authRuntime.getClientOrThrow();
+      const iceServers = await fetchTurnCredentials(client);
+      const session = new PeerSession(tradeId, context.transferRole, iceServers, {
+        onConnected: () => {
+          this.emitTransferProgress({
+            bytesReceived: 0,
+            totalBytes: context.normalizedTransferBytes,
+            peerConnected: true,
+          });
+        },
+        onDisconnected: () => {
+          this.emitTransferProgress({
+            bytesReceived: 0,
+            totalBytes: context.normalizedTransferBytes,
+            peerConnected: false,
+          });
+        },
+        onError: (error) => {
+          console.error("[trade-runtime] peer session error", error);
+        },
+        onIceCandidate: (type) => {
+          this.setLastIceCandidateType(tradeId, type);
+        },
+      });
+
+      this.activeSessions.set(tradeId, {
+        partPath: context.transferRole === "receiver" ? this.getPartPath(tradeId) : null,
+        role: context.transferRole,
+        session,
+      });
+
+      this.emitTransferProgress({
+        bytesReceived: 0,
+        totalBytes: context.normalizedTransferBytes,
+        peerConnected: false,
+      });
+
+      if (context.transferRole === "sender") {
+        void this.runSenderTransfer(tradeId, session, sourceFilePath);
+        return;
+      }
+
+      void this.runReceiverTransfer(tradeId, context, session);
+    } catch (error) {
+      await this.releaseTradeLease(tradeId);
+      throw error;
     }
-
-    void this.runReceiverTransfer(tradeId, context, session);
   }
 
   async cancelTransfer(tradeId: string) {
@@ -685,13 +709,16 @@ export class DesktopTradeRuntime {
 
   private async runSenderTransfer(
     tradeId: string,
-    context: CachedTradeContext,
     session: PeerSession,
+    sourceFilePath: string | null,
   ) {
     let completion: TransferCompleteEvent | null = null;
 
     try {
-      const sourceFilePath = await this.ensureSourceFile(tradeId, context);
+      if (!sourceFilePath) {
+        throw new Error("Sender transfer started without a selected source file.");
+      }
+
       const connection = await session.connect();
 
       await sendFile(connection, sourceFilePath, {
@@ -719,6 +746,10 @@ export class DesktopTradeRuntime {
         this.emitTransferComplete(completion);
       }
     } catch (error) {
+      if (error instanceof Error && error.message === TRANSFER_SOURCE_SELECTION_CANCELLED_MESSAGE) {
+        return;
+      }
+
       console.error("[trade-runtime] sender session failed", error);
     } finally {
       await this.finishSession(tradeId);
@@ -804,33 +835,34 @@ export class DesktopTradeRuntime {
     }
   }
 
-  private async ensureSourceFile(tradeId: string, context: CachedTradeContext) {
-    const outgoingDirectory = path.join(
-      this.sessionStore.getSettings().downloadPath,
-      ".digswap-outgoing",
-    );
-    await fs.mkdir(outgoingDirectory, { recursive: true });
+  private async pickSourceFile(context: CachedTradeContext) {
+    const defaultPath =
+      this.sessionStore.getLastSourceDirectory() ?? this.sessionStore.getSettings().downloadPath;
 
-    const sourceFilePath = path.join(outgoingDirectory, `${tradeId}_${context.receivedFileName}`);
-    if (await pathExists(sourceFilePath)) {
-      return sourceFilePath;
+    const result = await dialog.showOpenDialog({
+      buttonLabel: "Use This File",
+      defaultPath,
+      filters: [
+        {
+          extensions: ["wav", "flac", "aif", "aiff", "mp3", "m4a", "ogg", "opus"],
+          name: "Audio Files",
+        },
+        {
+          extensions: ["*"],
+          name: "All Files",
+        },
+      ],
+      properties: ["openFile"],
+      title: `Choose the file to send to ${context.detail.counterpartyUsername}`,
+    });
+
+    const selectedFilePath = result.filePaths[0] ?? null;
+    if (result.canceled || !selectedFilePath) {
+      throw new Error(TRANSFER_SOURCE_SELECTION_CANCELLED_MESSAGE);
     }
 
-    const header = Buffer.from(
-      [
-        "DigSwap Desktop outgoing trade file",
-        `tradeId=${tradeId}`,
-        `counterparty=${context.detail.counterpartyUsername}`,
-        `createdAt=${new Date().toISOString()}`,
-        "",
-      ].join("\n"),
-      "utf8",
-    );
-
-    const buffer = Buffer.alloc(context.normalizedTransferBytes, 0);
-    header.copy(buffer, 0, 0, Math.min(header.length, buffer.byteLength));
-    await fs.writeFile(sourceFilePath, buffer);
-    return sourceFilePath;
+    this.sessionStore.setLastSourceDirectory(path.dirname(selectedFilePath));
+    return selectedFilePath;
   }
 
   private async getReceivePaths(tradeId: string, context: CachedTradeContext) {

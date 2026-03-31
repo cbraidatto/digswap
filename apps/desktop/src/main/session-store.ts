@@ -18,6 +18,7 @@ export interface PendingTransferReceiptRecord extends TradeTransferReceipt {
 interface PersistedDesktopState {
   authVaultCiphertext?: string;
   deviceId?: string;
+  lastSourceDirectory?: string;
   pendingTransferReceipts: PendingTransferReceiptRecord[];
   settings: DesktopSettings;
   lastProtocolPayload: DesktopProtocolPayload | null;
@@ -78,6 +79,19 @@ export class DesktopSessionStore {
 
   setLastProtocolPayload(payload: DesktopProtocolPayload | null) {
     this.store.set("lastProtocolPayload", payload);
+  }
+
+  getLastSourceDirectory() {
+    return this.store.get("lastSourceDirectory") ?? null;
+  }
+
+  setLastSourceDirectory(directoryPath: string | null) {
+    if (directoryPath) {
+      this.store.set("lastSourceDirectory", directoryPath);
+      return;
+    }
+
+    this.store.delete("lastSourceDirectory");
   }
 
   getOrCreateDeviceId() {
