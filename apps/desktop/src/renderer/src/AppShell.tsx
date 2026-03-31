@@ -1,8 +1,11 @@
 import React, { useEffect, useState } from "react";
-import type { SupabaseSession } from "../shared/ipc-types";
+import type { SupabaseSession, TransferCompleteEvent } from "../shared/ipc-types";
 import { LoginScreen } from "./LoginScreen";
 import { InboxScreen } from "./InboxScreen";
 import { SettingsScreen } from "./SettingsScreen";
+import { LobbyScreen } from "./LobbyScreen";
+import { TransferScreen } from "./TransferScreen";
+import { CompletionScreen } from "./CompletionScreen";
 
 type Tab = "inbox" | "settings";
 
@@ -11,12 +14,44 @@ export function AppShell() {
   const [session, setSession] = useState<SupabaseSession | null>(null);
   const [activeTab, setActiveTab] = useState<Tab>("inbox");
 
+  // Trade overlay state
+  const [activeTradeId, setActiveTradeId] = useState<string | null>(null);
+  const [tradePhase, setTradePhase] = useState<"lobby" | "transfer" | "completion">("lobby");
+  const [completionEvent, setCompletionEvent] = useState<TransferCompleteEvent | null>(null);
+
   useEffect(() => {
     window.desktopBridge
       .getSession()
       .then((s) => setSession(s))
       .finally(() => setLoading(false));
   }, []);
+
+  function handleOpenTrade(tradeId: string) {
+    setActiveTradeId(tradeId);
+    setTradePhase("lobby");
+  }
+
+  function handleTradeClose() {
+    setActiveTradeId(null);
+  }
+
+  function handleTransferStarted() {
+    setTradePhase("transfer");
+  }
+
+  function handleTransferComplete(event: TransferCompleteEvent) {
+    setCompletionEvent(event);
+    setTradePhase("completion");
+  }
+
+  function handleTransferCancel() {
+    setActiveTradeId(null);
+  }
+
+  function handleTradeDone() {
+    setActiveTradeId(null);
+    setCompletionEvent(null);
+  }
 
   if (loading) {
     return (
@@ -33,7 +68,7 @@ export function AppShell() {
   }
 
   return (
-    <div className="flex flex-col h-screen bg-[#0d0d0d] text-[#e8dcc8]">
+    <div className="relative flex flex-col h-screen bg-[#0d0d0d] text-[#e8dcc8]">
       {/* Tab bar */}
       <nav className="flex items-center gap-0 border-b border-[#2a2218] bg-[#111008]">
         {(["inbox", "settings"] as Tab[]).map((tab) => (
@@ -56,11 +91,34 @@ export function AppShell() {
       {/* Screen area */}
       <main className="flex-1 overflow-y-auto">
         {activeTab === "inbox" ? (
-          <InboxScreen session={session} />
+          <InboxScreen session={session} onOpenTrade={handleOpenTrade} />
         ) : (
           <SettingsScreen session={session} onSignOut={() => setSession(null)} />
         )}
       </main>
+
+      {/* Trade overlay — absolute inset-0 z-10, rendered on top of tab shell when trade is active */}
+      {activeTradeId && (
+        <div className="absolute inset-0 z-10 bg-[#0d0d0d] flex flex-col">
+          {tradePhase === "lobby" && (
+            <LobbyScreen
+              tradeId={activeTradeId}
+              onClose={handleTradeClose}
+              onTransferStarted={handleTransferStarted}
+            />
+          )}
+          {tradePhase === "transfer" && (
+            <TransferScreen
+              tradeId={activeTradeId}
+              onComplete={handleTransferComplete}
+              onCancel={handleTransferCancel}
+            />
+          )}
+          {tradePhase === "completion" && completionEvent && (
+            <CompletionScreen event={completionEvent} onDone={handleTradeDone} />
+          )}
+        </div>
+      )}
     </div>
   );
 }
