@@ -363,6 +363,7 @@ Plans:
 - [x] 17-05-PLAN.md — Web handoff/download/update gate + CTA integration (Claude)
 - [x] 17-06-PLAN.md — Lobby/transfer integration: Codex=runtime/IPC, Claude=renderer/UX (split)
 - [x] 17-07-PLAN.md — Transport swap: replace local shim with real WebRTC/DataChannel via PeerJS (Codex)
+- [ ] 17-08-PLAN.md — Real file picker for sender: replace synthetic source with dialog.showOpenDialog (Codex)
 **UI hint**: yes
 
 ## Progress
@@ -389,4 +390,4 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 4.5 -> 5 -> 6 -> 7 -> 8 -> 
 | 14. Trade V2 | 4/5 | Complete* | 2026-03-31 |
 | 15. Social V2 | 0/TBD | Planned | - |
 | 16. Monetization | 0/TBD | Planned | - |
-| 17. Desktop Trade Runtime | 7/7 | In Progress*|  |
+| 17. Desktop Trade Runtime | 7/8 | In Progress|  |
