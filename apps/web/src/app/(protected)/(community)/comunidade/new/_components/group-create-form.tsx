@@ -76,7 +76,7 @@ export function GroupCreateForm() {
 			<div>
 				<label
 					htmlFor="name"
-					className="font-mono text-[10px] uppercase tracking-[0.2em] text-outline block mb-2"
+					className="font-mono text-xs uppercase tracking-[0.2em] text-outline block mb-2"
 				>
 					GROUP_NAME
 				</label>
@@ -90,13 +90,13 @@ export function GroupCreateForm() {
 				/>
 				<div className="flex items-center justify-between mt-1">
 					{errors.name ? (
-						<span className="font-mono text-[10px] text-destructive">
+						<span className="font-mono text-xs text-destructive">
 							{errors.name.message}
 						</span>
 					) : (
 						<span />
 					)}
-					<span className="font-mono text-[10px] text-on-surface-variant">
+					<span className="font-mono text-xs text-on-surface-variant">
 						{nameValue.length}/80
 					</span>
 				</div>
@@ -106,7 +106,7 @@ export function GroupCreateForm() {
 			<div>
 				<label
 					htmlFor="description"
-					className="font-mono text-[10px] uppercase tracking-[0.2em] text-outline block mb-2"
+					className="font-mono text-xs uppercase tracking-[0.2em] text-outline block mb-2"
 				>
 					DESCRIPTION (optional)
 				</label>
@@ -122,7 +122,7 @@ export function GroupCreateForm() {
 			<div>
 				<label
 					htmlFor="category"
-					className="font-mono text-[10px] uppercase tracking-[0.2em] text-outline block mb-2"
+					className="font-mono text-xs uppercase tracking-[0.2em] text-outline block mb-2"
 				>
 					CATEGORY{" "}
 					<span className="normal-case tracking-normal text-on-surface-variant">
@@ -142,7 +142,7 @@ export function GroupCreateForm() {
 			<div>
 				<label
 					htmlFor="visibility"
-					className="font-mono text-[10px] uppercase tracking-[0.2em] text-outline block mb-2"
+					className="font-mono text-xs uppercase tracking-[0.2em] text-outline block mb-2"
 				>
 					VISIBILITY
 				</label>
@@ -160,14 +160,14 @@ export function GroupCreateForm() {
 			<div className="flex items-center justify-between mt-8">
 				<Link
 					href="/comunidade"
-					className="font-mono text-[10px] text-on-surface-variant hover:text-on-surface px-4 py-2 transition-colors"
+					className="font-mono text-xs text-on-surface-variant hover:text-on-surface px-4 py-2 transition-colors"
 				>
 					[Cancel]
 				</Link>
 				<button
 					type="submit"
 					disabled={isSubmitting}
-					className="font-mono text-[10px] bg-primary text-primary-foreground px-4 py-2 rounded disabled:opacity-50 transition-colors hover:bg-primary/90"
+					className="font-mono text-xs bg-primary text-primary-foreground px-4 py-2 rounded disabled:opacity-50 transition-colors hover:bg-primary/90"
 				>
 					{isSubmitting ? "[Creating...]" : "[Create Group]"}
 				</button>

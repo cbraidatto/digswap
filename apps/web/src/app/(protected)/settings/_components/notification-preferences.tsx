@@ -168,7 +168,7 @@ export function NotificationPreferences() {
 								{group.title}
 							</span>
 							{group.phaseBadge && (
-								<span className="font-mono text-[10px] font-semibold uppercase bg-surface-container-high text-on-surface-variant px-2 py-1 rounded border border-outline-variant/20">
+								<span className="font-mono text-xs font-semibold uppercase bg-surface-container-high text-on-surface-variant px-2 py-1 rounded border border-outline-variant/20">
 									[{group.phaseBadge}]
 								</span>
 							)}
@@ -193,7 +193,7 @@ export function NotificationPreferences() {
 										handleToggle(group.inappField, e.target.checked)
 									}
 								/>
-								<span className="font-mono text-[10px] text-on-surface-variant">
+								<span className="font-mono text-xs text-on-surface-variant">
 									In-app
 								</span>
 							</label>
@@ -214,7 +214,7 @@ export function NotificationPreferences() {
 											handleToggle(group.emailField!, e.target.checked)
 										}
 									/>
-									<span className="font-mono text-[10px] text-on-surface-variant">
+									<span className="font-mono text-xs text-on-surface-variant">
 										Email
 									</span>
 								</label>

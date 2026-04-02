@@ -5,9 +5,9 @@ import { usePathname } from "next/navigation";
 
 const TABS = [
 	{ href: "/feed", label: "Feed", icon: "home" },
-	{ href: "/explorar", label: "Explorar", icon: "explore" },
-	{ href: "/comunidade", label: "Comunidade", icon: "group" },
-	{ href: "/perfil", label: "Perfil", icon: "person" },
+	{ href: "/explorar", label: "Explore", icon: "explore" },
+	{ href: "/comunidade", label: "Community", icon: "group" },
+	{ href: "/perfil", label: "Profile", icon: "person" },
 ] as const;
 
 export function BottomBar() {
@@ -36,7 +36,7 @@ export function BottomBar() {
 						>
 							{tab.icon}
 						</span>
-						<span className="text-[10px] font-mono uppercase">{tab.label}</span>
+						<span className="text-xs font-mono uppercase">{tab.label}</span>
 					</Link>
 				);
 			})}

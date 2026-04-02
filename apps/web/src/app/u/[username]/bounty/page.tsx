@@ -88,7 +88,7 @@ export default async function BountyPage({ params }: BountyPageProps) {
       <div className="relative z-10 max-w-lg mx-auto">
         {/* Header */}
         <div className="mb-8 text-center">
-          <div className="font-mono text-[10px] text-primary tracking-[0.2em] mb-2">
+          <div className="font-mono text-xs text-primary tracking-[0.2em] mb-2">
             [BOUNTY_LINK]
           </div>
           <div className="flex items-center justify-center gap-3 mb-4">
@@ -110,7 +110,7 @@ export default async function BountyPage({ params }: BountyPageProps) {
               <h1 className="font-heading text-2xl font-extrabold text-on-surface">
                 {targetProfile.displayName ?? username}
               </h1>
-              <p className="font-mono text-[10px] text-on-surface-variant">
+              <p className="font-mono text-xs text-on-surface-variant">
                 @{username} is hunting these records
               </p>
             </div>
@@ -119,7 +119,7 @@ export default async function BountyPage({ params }: BountyPageProps) {
 
         {/* Holy Grail records */}
         {grailItems.length === 0 ? (
-          <div className="text-center font-mono text-[11px] text-on-surface-variant py-8">
+          <div className="text-center font-mono text-xs text-on-surface-variant py-8">
             [NO_GRAILS_SET] // {username} hasn&apos;t selected their Holy Grails
             yet.
           </div>
@@ -164,7 +164,7 @@ export default async function BountyPage({ params }: BountyPageProps) {
                         {item.releaseTitle ?? "Unknown Title"}
                       </div>
                       {item.releaseArtist && (
-                        <div className="font-mono text-[10px] text-on-surface-variant mt-0.5">
+                        <div className="font-mono text-xs text-on-surface-variant mt-0.5">
                           {item.releaseArtist}
                         </div>
                       )}
@@ -176,14 +176,14 @@ export default async function BountyPage({ params }: BountyPageProps) {
                     {user ? (
                       <Link
                         href={`/perfil/${username}`}
-                        className="block w-full text-center font-mono text-[10px] bg-primary-container text-on-primary-container py-2 rounded hover:brightness-110 transition-all"
+                        className="block w-full text-center font-mono text-xs bg-primary-container text-on-primary-container py-2 rounded hover:brightness-110 transition-all"
                       >
                         I HAVE THIS RECORD → CONNECT
                       </Link>
                     ) : (
                       <Link
                         href={`/signup?ref=bounty&from=${username}`}
-                        className="block w-full text-center font-mono text-[10px] bg-primary-container text-on-primary-container py-2 rounded hover:brightness-110 transition-all"
+                        className="block w-full text-center font-mono text-xs bg-primary-container text-on-primary-container py-2 rounded hover:brightness-110 transition-all"
                       >
                         CREATE ACCOUNT TO CONNECT →
                       </Link>
@@ -200,7 +200,7 @@ export default async function BountyPage({ params }: BountyPageProps) {
           <ShareSurface url={bountyUrl} label="SHARE_THIS_BOUNTY" />
           <Link
             href="/signup"
-            className="block mt-4 font-mono text-[10px] text-on-surface-variant hover:text-primary"
+            className="block mt-4 font-mono text-xs text-on-surface-variant hover:text-primary"
           >
             Join DigSwap - find who has YOUR Holy Grails →
           </Link>

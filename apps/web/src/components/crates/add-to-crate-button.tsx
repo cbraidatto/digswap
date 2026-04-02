@@ -27,7 +27,7 @@ export function AddToCrateButton({
     >
       <button
         type="button"
-        className="inline-flex items-center gap-1 font-mono text-[10px] text-on-surface-variant hover:text-primary transition-colors"
+        className="inline-flex items-center gap-1 font-mono text-xs text-on-surface-variant hover:text-primary transition-colors"
         title="Add to crate"
         aria-label="Add to crate"
       >

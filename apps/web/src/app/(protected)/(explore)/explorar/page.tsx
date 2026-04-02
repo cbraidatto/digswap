@@ -44,7 +44,7 @@ export default function ExplorarPage() {
 					<button
 						type="button"
 						onClick={() => setActiveTab("diggers")}
-						className={`px-4 py-2 font-mono text-[10px] uppercase tracking-widest transition-colors ${
+						className={`px-4 py-2 font-mono text-xs uppercase tracking-widest transition-colors ${
 							activeTab === "diggers"
 								? "text-primary border-b-2 border-primary font-bold"
 								: "text-on-surface-variant hover:text-on-surface font-normal"
@@ -57,7 +57,7 @@ export default function ExplorarPage() {
 					<button
 						type="button"
 						onClick={() => setActiveTab("records")}
-						className={`px-4 py-2 font-mono text-[10px] uppercase tracking-widest transition-colors ${
+						className={`px-4 py-2 font-mono text-xs uppercase tracking-widest transition-colors ${
 							activeTab === "records"
 								? "text-primary border-b-2 border-primary font-bold"
 								: "text-on-surface-variant hover:text-on-surface font-normal"

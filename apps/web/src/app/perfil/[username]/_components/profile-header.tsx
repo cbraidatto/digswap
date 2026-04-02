@@ -69,7 +69,7 @@ export function ProfileHeader({
 						</p>
 					)}
 					{/* Rank + Badges */}
-					<p className="font-mono text-[10px] mt-1 flex flex-wrap items-center gap-1.5">
+					<p className="font-mono text-xs mt-1 flex flex-wrap items-center gap-1.5">
 						<span className="text-secondary">{ranking?.title ?? "Vinyl Rookie"}</span>
 						<span className="text-outline">&middot;</span>
 						<span className="text-on-surface-variant">
@@ -100,12 +100,12 @@ export function ProfileHeader({
 							{profile.bio}
 						</p>
 					)}
-					<p className="text-[10px] font-mono text-on-surface-variant mt-2">
+					<p className="text-xs font-mono text-on-surface-variant mt-2">
 						Member since {memberYear} / Vinyl Network
 					</p>
 
 					{/* Counts */}
-					<div className="flex items-center gap-4 mt-4 font-mono text-[10px]">
+					<div className="flex items-center gap-4 mt-4 font-mono text-xs">
 						<span>
 							<span className="text-secondary">{followCounts.followingCount}</span>{" "}
 							<span className="text-on-surface-variant">following</span>
@@ -128,7 +128,7 @@ export function ProfileHeader({
 							/>
 							<Link
 								href={`/perfil/${profile.username}/compare`}
-								className="inline-flex items-center gap-2 border border-outline-variant text-on-surface-variant bg-transparent hover:bg-surface-container-high font-mono text-[10px] uppercase tracking-wider px-4 py-2 rounded-lg transition-colors h-11 md:h-8"
+								className="inline-flex items-center gap-2 border border-outline-variant text-on-surface-variant bg-transparent hover:bg-surface-container-high font-mono text-xs uppercase tracking-wider px-4 py-2 rounded-lg transition-colors h-11 md:h-8"
 							>
 								<span className="material-symbols-outlined text-[16px]">
 									compare_arrows

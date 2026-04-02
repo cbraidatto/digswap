@@ -38,10 +38,10 @@ function SetCard({ set }: SetCardProps) {
         onClick={() => setIsOpen((prev) => !prev)}
         className="w-full flex items-center justify-between text-left"
       >
-        <span className="font-mono text-[10px] text-on-surface-variant">
+        <span className="font-mono text-xs text-on-surface-variant">
           {summary}
         </span>
-        <span className="font-mono text-[10px] text-primary ml-2 flex-shrink-0">
+        <span className="font-mono text-xs text-primary ml-2 flex-shrink-0">
           {isOpen ? "[−]" : "[+]"}
         </span>
       </button>
@@ -53,14 +53,14 @@ function SetCard({ set }: SetCardProps) {
               key={track.id}
               className="flex items-center gap-2"
             >
-              <span className="font-mono text-[10px] text-on-surface-variant w-4 flex-shrink-0 text-right">
+              <span className="font-mono text-xs text-on-surface-variant w-4 flex-shrink-0 text-right">
                 {track.position}
               </span>
               <span className="font-heading text-xs text-on-surface truncate flex-1">
                 {track.item.title ?? "Unknown"}
               </span>
               {track.item.artist && (
-                <span className="font-mono text-[10px] text-on-surface-variant flex-shrink-0 truncate max-w-[120px]">
+                <span className="font-mono text-xs text-on-surface-variant flex-shrink-0 truncate max-w-[120px]">
                   {track.item.artist}
                 </span>
               )}
@@ -77,7 +77,7 @@ export function SetsSection({ sets }: SetsSectionProps) {
 
   return (
     <section className="mt-8">
-      <div className="font-mono text-[10px] text-on-surface-variant tracking-[0.15em] mb-3">
+      <div className="font-mono text-xs text-on-surface-variant tracking-[0.15em] mb-3">
         [SETS]
       </div>
       <div className="space-y-2">

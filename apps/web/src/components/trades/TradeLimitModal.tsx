@@ -53,7 +53,7 @@ export function TradeLimitModal({ open, onClose, tradesUsed, tradesLimit = 5 }: 
 						<div className="text-[#e8dcc8] font-mono text-sm font-bold">
 							MONTHLY LIMIT REACHED
 						</div>
-						<div className="text-[#4a4035] font-mono text-[10px] mt-0.5">
+						<div className="text-[#4a4035] font-mono text-xs mt-0.5">
 							{tradesUsed} / {tradesLimit} trades this month
 						</div>
 					</div>
@@ -70,7 +70,7 @@ export function TradeLimitModal({ open, onClose, tradesUsed, tradesLimit = 5 }: 
 						disabled={isPending}
 						className="w-full bg-[#c8914a] text-[#0d0d0d] font-mono text-xs font-bold py-2.5 rounded hover:brightness-110 transition-all disabled:opacity-50"
 					>
-						{isPending ? "..." : "UPGRADE_TO_PREMIUM"}
+						{isPending ? "..." : "Upgrade to Premium"}
 					</button>
 					<Link
 						href="/pricing"

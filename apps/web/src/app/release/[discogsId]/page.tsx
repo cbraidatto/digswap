@@ -56,7 +56,7 @@ export default async function ReleasePage({ params }: ReleasePageProps) {
 
 	return (
 		<div className="max-w-4xl mx-auto px-4 py-6 space-y-8">
-			<span className="font-mono text-[10px] text-primary tracking-[0.2em]">RELEASE_PAGE</span>
+			<span className="font-mono text-xs text-primary tracking-[0.2em]">RELEASE_PAGE</span>
 
 			<ReleaseHero
 				release={{

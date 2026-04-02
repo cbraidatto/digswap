@@ -18,20 +18,20 @@ export function ReviewPostCard({ post }: { post: GroupPost }) {
 		<div className="bg-surface-container border border-outline-variant/10 rounded p-4">
 			{/* Header: > username . timestamp . review . */}
 			<div className="flex items-center gap-1.5 mb-2">
-				<span className="font-mono text-[10px] text-primary">&gt;</span>
+				<span className="font-mono text-xs text-primary">&gt;</span>
 				<Link
 					href={`/perfil/${post.username}`}
-					className="font-mono text-[10px] text-on-surface hover:text-primary transition-colors"
+					className="font-mono text-xs text-on-surface hover:text-primary transition-colors"
 				>
 					{post.username}
 				</Link>
-				<span className="font-mono text-[10px] text-on-surface-variant">
+				<span className="font-mono text-xs text-on-surface-variant">
 					&middot;
 				</span>
-				<span className="font-mono text-[10px] text-on-surface-variant">
+				<span className="font-mono text-xs text-on-surface-variant">
 					{formatRelativeTime(post.createdAt)}
 				</span>
-				<span className="font-mono text-[10px] text-on-surface-variant">
+				<span className="font-mono text-xs text-on-surface-variant">
 					&middot; review &middot;
 				</span>
 			</div>
@@ -50,7 +50,7 @@ export function ReviewPostCard({ post }: { post: GroupPost }) {
 
 			{/* Pressing details */}
 			{post.reviewIsPressingSpecific && post.reviewPressingDetails && (
-				<p className="font-mono text-[10px] text-on-surface-variant mb-2">
+				<p className="font-mono text-xs text-on-surface-variant mb-2">
 					Pressing: {post.reviewPressingDetails}
 				</p>
 			)}

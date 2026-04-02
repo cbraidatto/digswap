@@ -94,10 +94,10 @@ export function FeedShowcase() {
 		<section className="mb-10 -mx-4 md:-mx-8">
 			{/* Header */}
 			<div className="px-4 md:px-8 mb-4 flex items-center justify-between">
-				<span className="font-mono text-[10px] uppercase tracking-[0.2em] text-on-surface-variant">
+				<span className="font-mono text-xs uppercase tracking-[0.2em] text-on-surface-variant">
 					featured
 				</span>
-				<span className="font-mono text-[10px] text-outline">
+				<span className="font-mono text-xs text-outline">
 					// feed showcase
 				</span>
 			</div>
@@ -168,7 +168,7 @@ export function FeedShowcase() {
 									<h3 className="font-heading text-white font-bold text-lg leading-tight mb-1">
 										{item.title}
 									</h3>
-									<p className="font-mono text-white/45 text-[10px] leading-relaxed">
+									<p className="font-mono text-white/45 text-xs leading-relaxed">
 										{item.subtitle}
 									</p>
 								</div>

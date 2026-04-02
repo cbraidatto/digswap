@@ -149,7 +149,7 @@ export function CoverBanner({
 							}}
 						/>
 						<div className="absolute inset-0 flex items-center justify-center">
-							<span className="font-mono text-[10px] uppercase tracking-[0.3em] text-outline border border-outline/20 px-4 py-2">
+							<span className="font-mono text-xs uppercase tracking-[0.3em] text-outline border border-outline/20 px-4 py-2">
 								profile_cover
 							</span>
 						</div>
@@ -161,7 +161,7 @@ export function CoverBanner({
 					<button
 						type="button"
 						onClick={() => fileInputRef.current?.click()}
-						className="absolute bottom-3 right-3 flex items-center gap-1.5 font-mono text-[10px] uppercase tracking-[0.15em] px-3 py-1.5 rounded bg-black/60 text-white border border-white/20 opacity-0 group-hover:opacity-100 transition-opacity hover:bg-black/80"
+						className="absolute bottom-3 right-3 flex items-center gap-1.5 font-mono text-xs uppercase tracking-[0.15em] px-3 py-1.5 rounded bg-black/60 text-white border border-white/20 opacity-0 group-hover:opacity-100 transition-opacity hover:bg-black/80"
 					>
 						<span className="material-symbols-outlined text-sm leading-none">
 							photo_camera
@@ -185,7 +185,7 @@ export function CoverBanner({
 					<div className="w-full max-w-3xl px-4">
 						{/* Header */}
 						<div className="flex items-center justify-between mb-4">
-							<span className="font-mono text-[10px] uppercase tracking-[0.2em] text-on-surface-variant">
+							<span className="font-mono text-xs uppercase tracking-[0.2em] text-on-surface-variant">
 								// arraste para reposicionar
 							</span>
 							<div className="flex gap-3">
@@ -193,7 +193,7 @@ export function CoverBanner({
 									type="button"
 									onClick={handleCancel}
 									disabled={isUploading}
-									className="font-mono text-[10px] uppercase tracking-[0.15em] px-4 py-2 border border-outline/30 text-on-surface-variant hover:text-on-surface transition-colors rounded"
+									className="font-mono text-xs uppercase tracking-[0.15em] px-4 py-2 border border-outline/30 text-on-surface-variant hover:text-on-surface transition-colors rounded"
 								>
 									cancelar
 								</button>
@@ -201,7 +201,7 @@ export function CoverBanner({
 									type="button"
 									onClick={handleSave}
 									disabled={isUploading}
-									className="font-mono text-[10px] uppercase tracking-[0.15em] px-4 py-2 bg-primary text-on-primary rounded hover:bg-primary/90 transition-colors disabled:opacity-50"
+									className="font-mono text-xs uppercase tracking-[0.15em] px-4 py-2 bg-primary text-on-primary rounded hover:bg-primary/90 transition-colors disabled:opacity-50"
 								>
 									{isUploading ? "salvando..." : "salvar"}
 								</button>

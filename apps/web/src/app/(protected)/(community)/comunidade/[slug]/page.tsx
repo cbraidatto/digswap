@@ -32,7 +32,7 @@ export default async function GroupDetailPage({
 		return (
 			<div className="max-w-4xl mx-auto px-4 md:px-8 py-8">
 				<div className="flex flex-col items-center justify-center py-16 text-center">
-					<span className="font-mono text-[10px] uppercase tracking-[0.2em] text-outline mb-4">
+					<span className="font-mono text-xs uppercase tracking-[0.2em] text-outline mb-4">
 						[GROUP_NOT_FOUND]
 					</span>
 					<p className="text-sm text-on-surface-variant mb-6">
@@ -40,9 +40,9 @@ export default async function GroupDetailPage({
 					</p>
 					<Link
 						href="/comunidade"
-						className="font-mono text-[10px] text-primary border border-primary px-3 py-1 rounded hover:bg-primary/10 transition-colors"
+						className="font-mono text-xs text-primary border border-primary px-3 py-1 rounded hover:bg-primary/10 transition-colors"
 					>
-						[BACK_TO_COMMUNITY]
+						← Back to community
 					</Link>
 				</div>
 			</div>
@@ -69,7 +69,7 @@ export default async function GroupDetailPage({
 
 			{isPrivateAndNotMember ? (
 				<div className="flex flex-col items-center justify-center py-16 text-center">
-					<span className="font-mono text-[10px] uppercase tracking-[0.2em] text-outline mb-4">
+					<span className="font-mono text-xs uppercase tracking-[0.2em] text-outline mb-4">
 						[INVITE_ONLY]
 					</span>
 					<p className="text-sm text-on-surface-variant">

@@ -13,7 +13,7 @@ export function OwnersList({ owners }: OwnersListProps) {
 
 	if (!owners || owners.length === 0) {
 		return (
-			<div className="font-mono text-[10px] text-on-surface-variant py-2 pl-16">
+			<div className="font-mono text-xs text-on-surface-variant py-2 pl-16">
 				[NO_OWNERS_IN_NETWORK]
 			</div>
 		);
@@ -38,7 +38,7 @@ export function OwnersList({ owners }: OwnersListProps) {
 								className="w-full h-full object-cover rounded"
 							/>
 						) : (
-							<span className="text-[10px] font-mono font-bold text-primary">
+							<span className="text-xs font-mono font-bold text-primary">
 								{(owner.username || "?").charAt(0).toUpperCase()}
 							</span>
 						)}
@@ -48,19 +48,19 @@ export function OwnersList({ owners }: OwnersListProps) {
 					{owner.username ? (
 						<Link
 							href={`/perfil/${owner.username}`}
-							className="font-mono text-[10px] text-on-surface hover:text-primary transition-colors"
+							className="font-mono text-xs text-on-surface hover:text-primary transition-colors"
 						>
 							{owner.username}
 						</Link>
 					) : (
-						<span className="font-mono text-[10px] text-on-surface-variant">
+						<span className="font-mono text-xs text-on-surface-variant">
 							unknown
 						</span>
 					)}
 
 					{/* Condition Badge */}
 					{owner.conditionGrade && (
-						<span className="font-mono text-[10px] text-on-surface-variant border border-outline-variant/20 px-1 rounded">
+						<span className="font-mono text-xs text-on-surface-variant border border-outline-variant/20 px-1 rounded">
 							{owner.conditionGrade}
 						</span>
 					)}
@@ -69,7 +69,7 @@ export function OwnersList({ owners }: OwnersListProps) {
 					{owner.username && (
 						<Link
 							href={`/perfil/${owner.username}`}
-							className="font-mono text-[10px] text-on-surface-variant hover:text-primary transition-colors ml-auto"
+							className="font-mono text-xs text-on-surface-variant hover:text-primary transition-colors ml-auto"
 						>
 							VIEW_PROFILE &rarr;
 						</Link>
@@ -82,7 +82,7 @@ export function OwnersList({ owners }: OwnersListProps) {
 				<button
 					type="button"
 					onClick={() => setExpanded(true)}
-					className="font-mono text-[10px] text-primary hover:underline"
+					className="font-mono text-xs text-primary hover:underline"
 				>
 					+{hiddenCount} more
 				</button>

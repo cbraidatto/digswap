@@ -26,7 +26,7 @@ export function NewSetSection({ crateId, items }: NewSetSectionProps) {
     <button
       type="button"
       onClick={() => setIsOpen(true)}
-      className="font-mono text-[10px] px-3 py-1.5 rounded border border-outline-variant/20 text-on-surface-variant hover:bg-surface-container-high transition-colors"
+      className="font-mono text-xs px-3 py-1.5 rounded border border-outline-variant/20 text-on-surface-variant hover:bg-surface-container-high transition-colors"
     >
       [+ NEW_SET]
     </button>

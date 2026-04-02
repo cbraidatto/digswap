@@ -6,9 +6,10 @@ import { PremiumBadge } from "@/components/ui/PremiumBadge";
 
 const NAV_ITEMS = [
 	{ href: "/feed", label: "Feed", icon: "history" },
+	{ href: "/explorar", label: "Explore", icon: "explore" },
 	{ href: "/trades", label: "Trades", icon: "swap_horiz" },
 	{ href: "/comunidade", label: "Community", icon: "group" },
-	{ href: "/perfil", label: "Collection", icon: "database" },
+	{ href: "/perfil", label: "Profile", icon: "database" },
 ] as const;
 
 interface SidebarProps {
@@ -32,7 +33,7 @@ export function Sidebar({ displayName, rank = "Digger", subscriptionTier }: Side
 							{displayName ?? "DIGGER"}
 						</div>
 						<div className="flex items-center gap-1.5">
-							<span className="text-on-surface-variant text-[10px] font-mono uppercase tracking-widest">
+							<span className="text-on-surface-variant text-xs font-mono uppercase tracking-widest">
 								{rank}
 							</span>
 							{(subscriptionTier === "premium_monthly" || subscriptionTier === "premium_annual") && (
@@ -46,13 +47,13 @@ export function Sidebar({ displayName, rank = "Digger", subscriptionTier }: Side
 					className="w-full bg-primary-container text-on-primary-container font-mono font-bold py-2 rounded text-xs hover:brightness-110 transition-all flex items-center justify-center gap-2"
 				>
 					<span className="material-symbols-outlined text-sm">add</span>
-					NEW_COLLECTION
+					New collection
 				</Link>
 			</div>
 
 			<nav className="flex-1 overflow-y-auto py-4">
 				<div className="px-4 mb-4">
-					<span className="text-[10px] font-mono text-outline uppercase tracking-widest px-2">
+					<span className="text-xs font-mono text-outline uppercase tracking-widest px-2">
 						Navigation
 					</span>
 					<div className="mt-2 space-y-1">

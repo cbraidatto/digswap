@@ -94,7 +94,7 @@ export function PricingCards({ currentPlan, monthlyPriceId, annualPriceId }: Pro
 				{/* Free card */}
 				<div className="bg-surface-container border border-outline-variant rounded p-6 flex flex-col gap-5">
 					<div>
-						<div className="text-[10px] font-mono text-muted-foreground uppercase tracking-widest mb-1">
+						<div className="text-xs font-mono text-muted-foreground uppercase tracking-widest mb-1">
 							Free
 						</div>
 						<div className="text-foreground font-mono text-2xl font-bold">
@@ -118,7 +118,7 @@ export function PricingCards({ currentPlan, monthlyPriceId, annualPriceId }: Pro
 								href="/signup"
 								className="w-full block text-center bg-surface-container-low border border-outline-variant text-muted-foreground font-mono text-xs py-2.5 rounded hover:border-outline transition-colors"
 							>
-								GET_STARTED_FREE
+								Get started free
 							</a>
 						) : (
 							<div className="w-full text-center bg-surface-container border border-outline-variant text-muted-foreground font-mono text-xs py-2.5 rounded cursor-default">
@@ -138,7 +138,7 @@ export function PricingCards({ currentPlan, monthlyPriceId, annualPriceId }: Pro
 					</div>
 
 					<div>
-						<div className="text-[10px] font-mono text-primary uppercase tracking-widest mb-1">
+						<div className="text-xs font-mono text-primary uppercase tracking-widest mb-1">
 							Premium
 						</div>
 						<div className="text-foreground font-mono text-2xl font-bold">
@@ -146,7 +146,7 @@ export function PricingCards({ currentPlan, monthlyPriceId, annualPriceId }: Pro
 							<span className="text-xs text-muted-foreground font-normal ml-1">/month</span>
 						</div>
 						{billing === "annual" && (
-							<div className="text-[10px] font-mono text-tertiary mt-0.5">
+							<div className="text-xs font-mono text-tertiary mt-0.5">
 								{ANNUAL_PRICE}/year — billed annually
 							</div>
 						)}
@@ -175,7 +175,7 @@ export function PricingCards({ currentPlan, monthlyPriceId, annualPriceId }: Pro
 								href="/signup"
 								className="w-full block text-center bg-primary text-background font-mono text-xs font-bold py-2.5 rounded hover:brightness-110 transition-all"
 							>
-								UPGRADE_TO_PREMIUM
+								Upgrade to Premium
 							</a>
 						) : (
 							<button
@@ -183,7 +183,7 @@ export function PricingCards({ currentPlan, monthlyPriceId, annualPriceId }: Pro
 								disabled={isPending}
 								className="w-full bg-primary text-background font-mono text-xs font-bold py-2.5 rounded hover:brightness-110 transition-all disabled:opacity-50"
 							>
-								{isPending ? "..." : "UPGRADE_TO_PREMIUM"}
+								{isPending ? "..." : "Upgrade to Premium"}
 							</button>
 						)}
 					</div>

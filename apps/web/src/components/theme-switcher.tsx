@@ -35,7 +35,7 @@ export function ThemeSwitcher() {
 									className="w-4 h-4 rounded-full flex-shrink-0 border border-white/10"
 									style={{ background: t.primary }}
 								/>
-								<span className="font-mono text-[10px] text-on-surface-variant whitespace-nowrap">
+								<span className="font-mono text-xs text-on-surface-variant whitespace-nowrap">
 									{t.name}
 								</span>
 								{theme === t.id && (

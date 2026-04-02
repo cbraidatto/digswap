@@ -61,7 +61,7 @@ export function TradePresenceIndicator({ tradeId, userId, counterpartyId, initia
 	return (
 		<div className="flex items-center gap-1.5">
 			<span className={`w-1.5 h-1.5 rounded-full flex-shrink-0 ${config.dotClass}`} />
-			<span className={`font-mono text-[10px] ${config.textClass}`}>{config.label}</span>
+			<span className={`font-mono text-xs ${config.textClass}`}>{config.label}</span>
 		</div>
 	);
 }

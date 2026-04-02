@@ -91,7 +91,7 @@ export function NotificationRow({ notification, onClick }: NotificationRowProps)
 						{notification.body}
 					</div>
 				)}
-				<div className="font-mono text-[10px] text-on-surface-variant">{relativeTime}</div>
+				<div className="font-mono text-xs text-on-surface-variant">{relativeTime}</div>
 			</div>
 		</div>
 	);

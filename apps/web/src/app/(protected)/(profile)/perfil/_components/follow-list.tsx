@@ -78,7 +78,7 @@ export function FollowList({ userId, type, count }: FollowListProps) {
 											className="w-full h-full object-cover rounded"
 										/>
 									) : (
-										<span className="text-[10px] font-mono font-bold text-primary">
+										<span className="text-xs font-mono font-bold text-primary">
 											{(user.displayName || user.username || "?")
 												.charAt(0)
 												.toUpperCase()}
@@ -90,19 +90,19 @@ export function FollowList({ userId, type, count }: FollowListProps) {
 								{user.username ? (
 									<Link
 										href={`/perfil/${user.username}`}
-										className="font-mono text-[10px] text-on-surface hover:text-primary transition-colors"
+										className="font-mono text-xs text-on-surface hover:text-primary transition-colors"
 									>
 										{user.username}
 									</Link>
 								) : (
-									<span className="font-mono text-[10px] text-on-surface-variant">
+									<span className="font-mono text-xs text-on-surface-variant">
 										unknown
 									</span>
 								)}
 
 								{/* Display name */}
 								{user.displayName && (
-									<span className="text-[10px] text-on-surface-variant">
+									<span className="text-xs text-on-surface-variant">
 										{user.displayName}
 									</span>
 								)}

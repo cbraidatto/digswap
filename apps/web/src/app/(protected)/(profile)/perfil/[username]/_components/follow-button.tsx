@@ -52,7 +52,7 @@ export function FollowButton({
 					? `Unfollow ${targetUsername}`
 					: `Follow ${targetUsername}`
 			}
-			className={`group inline-flex items-center gap-2 font-mono text-[10px] uppercase tracking-wider px-4 py-2 rounded-lg transition-all h-11 md:h-8 ${
+			className={`group inline-flex items-center gap-2 font-mono text-xs uppercase tracking-wider px-4 py-2 rounded-lg transition-all h-11 md:h-8 ${
 				isPending ? "opacity-50 pointer-events-none" : ""
 			} ${
 				optimistic.isFollowing

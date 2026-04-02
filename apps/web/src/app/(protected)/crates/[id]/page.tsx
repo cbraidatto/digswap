@@ -62,7 +62,7 @@ export default async function CrateDetailPage({ params }: CrateDetailPageProps) 
   return (
     <div>
       {/* Breadcrumb */}
-      <nav className="flex items-center gap-2 font-mono text-[10px] text-on-surface-variant mb-6">
+      <nav className="flex items-center gap-2 font-mono text-xs text-on-surface-variant mb-6">
         <span className="text-primary">[WORKSPACE]</span>
         <span>/</span>
         <Link href="/crates" className="hover:text-primary transition-colors">
@@ -80,12 +80,12 @@ export default async function CrateDetailPage({ params }: CrateDetailPageProps) 
           </h1>
           <div className="flex items-center gap-3 mt-1.5">
             <span
-              className={`font-mono text-[10px] px-1.5 py-0.5 rounded border ${chip.className}`}
+              className={`font-mono text-xs px-1.5 py-0.5 rounded border ${chip.className}`}
             >
               {chip.label}
             </span>
             {displayDate && (
-              <span className="font-mono text-[10px] text-on-surface-variant">
+              <span className="font-mono text-xs text-on-surface-variant">
                 {displayDate}
               </span>
             )}
@@ -95,12 +95,12 @@ export default async function CrateDetailPage({ params }: CrateDetailPageProps) 
 
       {/* Items list */}
       <section className="mb-8">
-        <div className="font-mono text-[10px] text-on-surface-variant tracking-[0.15em] mb-3">
+        <div className="font-mono text-xs text-on-surface-variant tracking-[0.15em] mb-3">
           [ITEMS] — {items.length}
         </div>
 
         {items.length === 0 ? (
-          <p className="font-mono text-[10px] text-on-surface-variant/60">
+          <p className="font-mono text-xs text-on-surface-variant/60">
             No items yet. Add records from any search result, radar card, or release page.
           </p>
         ) : (

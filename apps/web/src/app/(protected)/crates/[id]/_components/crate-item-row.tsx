@@ -71,7 +71,7 @@ export function CrateItemRow({ item }: CrateItemRowProps) {
           {item.title ?? "Unknown"}
         </p>
         {item.artist && (
-          <p className="font-mono text-[10px] text-on-surface-variant truncate">
+          <p className="font-mono text-xs text-on-surface-variant truncate">
             {item.artist}
           </p>
         )}
@@ -80,7 +80,7 @@ export function CrateItemRow({ item }: CrateItemRowProps) {
       {/* Status / actions */}
       <div className="flex-shrink-0 flex items-center gap-2">
         {item.status === "found" ? (
-          <span className="font-mono text-[10px] px-1.5 py-0.5 rounded border text-tertiary border-tertiary/30">
+          <span className="font-mono text-xs px-1.5 py-0.5 rounded border text-tertiary border-tertiary/30">
             [FOUND]
           </span>
         ) : (
@@ -88,14 +88,14 @@ export function CrateItemRow({ item }: CrateItemRowProps) {
             <button
               onClick={handleMoveToWantlist}
               disabled={isMoving}
-              className="font-mono text-[10px] px-2 py-1 rounded border border-outline-variant/20 text-on-surface-variant hover:bg-surface-container-high transition-colors disabled:opacity-50"
+              className="font-mono text-xs px-2 py-1 rounded border border-outline-variant/20 text-on-surface-variant hover:bg-surface-container-high transition-colors disabled:opacity-50"
             >
               [→ WANTLIST]
             </button>
             <button
               onClick={handleMoveToCollection}
               disabled={isMoving}
-              className="font-mono text-[10px] px-2 py-1 rounded border border-outline-variant/20 text-on-surface-variant hover:bg-surface-container-high transition-colors disabled:opacity-50"
+              className="font-mono text-xs px-2 py-1 rounded border border-outline-variant/20 text-on-surface-variant hover:bg-surface-container-high transition-colors disabled:opacity-50"
             >
               [→ COLLECTION]
             </button>

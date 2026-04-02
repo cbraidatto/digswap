@@ -54,7 +54,7 @@ export async function TrustStrip({
 
   if (variant === "compact") {
     return (
-      <div className="flex items-center gap-3 font-mono text-[10px]">
+      <div className="flex items-center gap-3 font-mono text-xs">
         {metrics.map((m) => (
           <span key={m.label} className="text-on-surface-variant">
             <span className="text-on-surface-variant/60">{m.label}: </span>

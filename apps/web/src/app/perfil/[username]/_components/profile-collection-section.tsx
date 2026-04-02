@@ -36,7 +36,7 @@ export function ProfileCollectionSection({
 		<section>
 			<div className="flex items-center justify-between mb-6">
 				<div>
-					<span className="font-mono text-[10px] text-primary tracking-[0.2em] uppercase">
+					<span className="font-mono text-xs text-primary tracking-[0.2em] uppercase">
 						COLLECTION
 					</span>
 					<h2 className="text-2xl font-bold font-heading text-on-surface mt-1">

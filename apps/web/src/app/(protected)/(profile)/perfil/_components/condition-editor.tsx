@@ -65,7 +65,7 @@ export function ConditionEditor({
 	return (
 		<Popover open={open} onOpenChange={setOpen}>
 			<PopoverTrigger
-				className="font-mono text-[10px] px-2 py-0.5 rounded border border-outline-variant/20 hover:bg-surface-container-high transition-colors inline-flex items-center gap-1"
+				className="font-mono text-xs px-2 py-0.5 rounded border border-outline-variant/20 hover:bg-surface-container-high transition-colors inline-flex items-center gap-1"
 			>
 				{isUpdating ? (
 					<span className="material-symbols-outlined animate-spin text-[12px] text-primary">
@@ -81,7 +81,7 @@ export function ConditionEditor({
 				</span>
 			</PopoverTrigger>
 			<PopoverContent className="w-56 p-1.5" align="start" side="top">
-				<div className="text-[10px] font-mono text-on-surface-variant uppercase tracking-widest px-2 py-1.5 mb-0.5">
+				<div className="text-xs font-mono text-on-surface-variant uppercase tracking-widest px-2 py-1.5 mb-0.5">
 					Condition Grade
 				</div>
 				<div className="space-y-0.5">
@@ -104,7 +104,7 @@ export function ConditionEditor({
 									<span className="font-mono text-xs font-medium w-8">
 										{grade}
 									</span>
-									<span className="text-[10px] text-on-surface-variant">
+									<span className="text-xs text-on-surface-variant">
 										{GRADE_DESCRIPTIONS[grade]}
 									</span>
 								</div>

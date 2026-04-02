@@ -61,7 +61,7 @@ export function ReleaseHero({ release }: ReleaseHeroProps) {
 
 				{/* Metadata row */}
 				{metaParts.length > 0 && (
-					<p className="font-mono text-[11px] text-on-surface-variant">
+					<p className="font-mono text-xs text-on-surface-variant">
 						{metaParts.join(" / ")}
 					</p>
 				)}
@@ -70,7 +70,7 @@ export function ReleaseHero({ release }: ReleaseHeroProps) {
 				{release.genre && release.genre.length > 0 && (
 					<div className="flex flex-wrap gap-1.5">
 						{release.genre.map((g) => (
-							<Badge key={g} variant="outline" className="text-[10px]">
+							<Badge key={g} variant="outline" className="text-xs">
 								{g}
 							</Badge>
 						))}
@@ -80,14 +80,14 @@ export function ReleaseHero({ release }: ReleaseHeroProps) {
 				{/* Rarity badge */}
 				{rarityTier && (
 					<div>
-						<Badge variant={rarityVariant} className="text-[10px]">
+						<Badge variant={rarityVariant} className="text-xs">
 							{rarityTier.toUpperCase()}
 						</Badge>
 					</div>
 				)}
 
 				{/* Discogs stats */}
-				<p className="font-mono text-[10px] text-on-surface-variant">
+				<p className="font-mono text-xs text-on-surface-variant">
 					HAVE: {release.discogsHave} / WANT: {release.discogsWant}
 				</p>
 
@@ -97,7 +97,7 @@ export function ReleaseHero({ release }: ReleaseHeroProps) {
 						href={`https://www.discogs.com/release/${release.discogsId}`}
 						target="_blank"
 						rel="noopener noreferrer"
-						className="inline-flex items-center gap-1 font-mono text-[10px] text-primary hover:underline"
+						className="inline-flex items-center gap-1 font-mono text-xs text-primary hover:underline"
 					>
 						VIEW_ON_DISCOGS
 						<span className="material-symbols-outlined text-[12px]">open_in_new</span>

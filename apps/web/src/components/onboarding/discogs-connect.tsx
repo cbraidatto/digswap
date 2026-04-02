@@ -60,7 +60,7 @@ export function DiscogsConnect() {
 					)}
 				</Button>
 
-				<p className="font-mono text-[10px] text-on-surface-variant text-center mt-4">
+				<p className="font-mono text-xs text-on-surface-variant text-center mt-4">
 					<span className="text-tertiary">[REQUIRED]</span> // Connect Discogs to activate the Radar. Without Discogs, the Radar is blind.
 				</p>
 			</div>

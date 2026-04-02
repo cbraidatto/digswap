@@ -37,11 +37,11 @@ export function HolyGrailSelector({
 
   return (
     <div className="space-y-2">
-      <div className="font-mono text-[10px] text-on-surface-variant tracking-[0.15em]">
+      <div className="font-mono text-xs text-on-surface-variant tracking-[0.15em]">
         [HOLY_GRAILS] // Select up to 3 records from your wantlist
       </div>
       {wantlistItems.length === 0 ? (
-        <p className="font-mono text-[10px] text-outline/60">
+        <p className="font-mono text-xs text-outline/60">
           Add items to your wantlist first.
         </p>
       ) : (
@@ -61,7 +61,7 @@ export function HolyGrailSelector({
                 onChange={() => toggle(item.id)}
                 className="accent-primary"
               />
-              <span className="font-mono text-[10px] text-on-surface truncate flex-1">
+              <span className="font-mono text-xs text-on-surface truncate flex-1">
                 {item.releaseTitle ?? "Unknown"}{" "}
                 {item.releaseArtist ? `- ${item.releaseArtist}` : ""}
               </span>
@@ -78,7 +78,7 @@ export function HolyGrailSelector({
         type="button"
         onClick={handleSave}
         disabled={saving}
-        className="font-mono text-[10px] text-primary hover:underline disabled:opacity-50"
+        className="font-mono text-xs text-primary hover:underline disabled:opacity-50"
       >
         {saving ? "SAVING..." : "SAVE_SELECTION"}
       </button>

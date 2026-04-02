@@ -41,7 +41,7 @@ export function SearchSection() {
 	return (
 		<div>
 			{/* Section Header */}
-			<div className="font-mono text-[10px] text-on-surface-variant uppercase tracking-[0.2em] mb-4">
+			<div className="font-mono text-xs text-on-surface-variant uppercase tracking-[0.2em] mb-4">
 				search_diggers
 			</div>
 
@@ -63,7 +63,7 @@ export function SearchSection() {
 			{/* Results */}
 			{searched && results.length > 0 && (
 				<>
-					<div className="font-mono text-[10px] text-on-surface-variant mt-4 mb-4">
+					<div className="font-mono text-xs text-on-surface-variant mt-4 mb-4">
 						RESULTS: {results.length} diggers found
 					</div>
 					<div className="space-y-3" role="list">
@@ -104,7 +104,7 @@ export function SearchSection() {
 											unknown
 										</span>
 									)}
-									<div className="font-mono text-[10px] text-on-surface-variant">
+									<div className="font-mono text-xs text-on-surface-variant">
 										{result.displayName || ""} &middot; {result.recordCount}{" "}
 										records &middot; {result.followerCount} followers
 									</div>
@@ -130,7 +130,7 @@ export function SearchSection() {
 			)}
 
 			{isPending && !searched && (
-				<div className="font-mono text-[10px] text-on-surface-variant text-center py-8">
+				<div className="font-mono text-xs text-on-surface-variant text-center py-8">
 					searching...
 				</div>
 			)}

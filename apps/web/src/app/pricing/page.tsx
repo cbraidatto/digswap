@@ -40,7 +40,7 @@ export default async function PricingPage() {
 			<div className="max-w-2xl mx-auto">
 				{/* Header */}
 				<div className="text-center mb-12">
-					<div className="text-[10px] font-mono text-muted-foreground uppercase tracking-widest mb-3">
+					<div className="text-xs font-mono text-muted-foreground uppercase tracking-widest mb-3">
 						Pricing
 					</div>
 					<h1 className="text-foreground font-heading text-3xl font-bold mb-3">
@@ -58,7 +58,7 @@ export default async function PricingPage() {
 				/>
 
 				{/* Footer note */}
-				<p className="text-center text-outline-variant font-mono text-[10px] mt-10">
+				<p className="text-center text-outline-variant font-mono text-xs mt-10">
 					Cancel anytime. No hidden fees. Prices in USD.
 				</p>
 			</div>

@@ -77,14 +77,14 @@ export function ReviewsSection({ releaseId, initialReviews, initialCount }: Revi
 	return (
 		<section className="space-y-3">
 			<div className="flex items-center gap-2">
-				<span className="font-mono text-[10px] text-primary tracking-[0.2em]">REVIEWS</span>
-				<span className="font-mono text-[10px] text-on-surface-variant bg-surface-container-high rounded-full px-2 py-0.5">
+				<span className="font-mono text-xs text-primary tracking-[0.2em]">REVIEWS</span>
+				<span className="font-mono text-xs text-on-surface-variant bg-surface-container-high rounded-full px-2 py-0.5">
 					{initialCount}
 				</span>
 			</div>
 
 			{reviews.length === 0 ? (
-				<p className="font-mono text-[11px] text-on-surface-variant">
+				<p className="font-mono text-xs text-on-surface-variant">
 					No reviews yet. Be the first to review this release.
 				</p>
 			) : (
@@ -114,12 +114,12 @@ export function ReviewsSection({ releaseId, initialReviews, initialCount }: Revi
 									{review.username ? (
 										<Link
 											href={`/perfil/${review.username}`}
-											className="font-mono text-[11px] text-on-surface hover:text-primary transition-colors truncate"
+											className="font-mono text-xs text-on-surface hover:text-primary transition-colors truncate"
 										>
 											{review.username}
 										</Link>
 									) : (
-										<span className="font-mono text-[11px] text-on-surface-variant truncate">
+										<span className="font-mono text-xs text-on-surface-variant truncate">
 											Anonymous
 										</span>
 									)}
@@ -162,7 +162,7 @@ export function ReviewsSection({ releaseId, initialReviews, initialCount }: Revi
 								type="button"
 								onClick={handleLoadMore}
 								disabled={isLoading}
-								className="font-mono text-[10px] text-primary hover:underline disabled:opacity-50"
+								className="font-mono text-xs text-primary hover:underline disabled:opacity-50"
 							>
 								{isLoading ? "LOADING..." : "LOAD_MORE"}
 							</button>

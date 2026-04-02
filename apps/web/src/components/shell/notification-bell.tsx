@@ -189,7 +189,7 @@ export function NotificationBell({ userId }: NotificationBellProps) {
 				<span className="material-symbols-outlined text-[20px]">notifications</span>
 				{unreadCount > 0 && (
 					<span
-						className="absolute -top-0.5 -right-0.5 bg-destructive text-destructive-foreground text-[10px] font-mono font-semibold rounded-full min-w-[18px] h-[18px] flex items-center justify-center px-1"
+						className="absolute -top-0.5 -right-0.5 bg-destructive text-destructive-foreground text-xs font-mono font-semibold rounded-full min-w-[18px] h-[18px] flex items-center justify-center px-1"
 						aria-label={`${unreadCount} unread notifications`}
 					>
 						{unreadCount > 9 ? "9+" : unreadCount}
@@ -208,7 +208,7 @@ export function NotificationBell({ userId }: NotificationBellProps) {
 						Notifications
 					</span>
 					{unreadCount > 0 && (
-						<span className="font-mono text-[10px] text-on-surface-variant">
+						<span className="font-mono text-xs text-on-surface-variant">
 							({unreadCount})
 						</span>
 					)}
@@ -240,13 +240,13 @@ export function NotificationBell({ userId }: NotificationBellProps) {
 					<button
 						type="button"
 						onClick={handleMarkAllRead}
-						className="font-mono text-[10px] text-primary hover:underline"
+						className="font-mono text-xs text-primary hover:underline"
 					>
 						Mark all read
 					</button>
 					<Link
 						href="/notifications"
-						className="font-mono text-[10px] text-secondary hover:underline"
+						className="font-mono text-xs text-secondary hover:underline"
 						onClick={() => setIsOpen(false)}
 					>
 						View all notifications

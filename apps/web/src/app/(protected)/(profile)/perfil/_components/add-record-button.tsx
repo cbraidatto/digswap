@@ -11,7 +11,7 @@ export function AddRecordButton() {
 			<button
 				type="button"
 				onClick={() => setOpen(true)}
-				className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-primary/10 border border-primary/20 text-primary hover:bg-primary/20 transition-colors font-mono text-[10px] uppercase tracking-widest"
+				className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-primary/10 border border-primary/20 text-primary hover:bg-primary/20 transition-colors font-mono text-xs uppercase tracking-widest"
 			>
 				<span className="material-symbols-outlined text-sm">add</span>
 				Add Record

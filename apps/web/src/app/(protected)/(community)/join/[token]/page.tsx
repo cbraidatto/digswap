@@ -29,7 +29,7 @@ export default async function JoinByTokenPage({
 	if (!invite) {
 		return (
 			<div className="max-w-md mx-auto px-4 py-16 text-center">
-				<span className="font-mono text-[10px] uppercase tracking-[0.2em] text-outline block mb-4">
+				<span className="font-mono text-xs uppercase tracking-[0.2em] text-outline block mb-4">
 					[INVITE_INVALID]
 				</span>
 				<p className="text-sm text-on-surface-variant mb-6">
@@ -37,9 +37,9 @@ export default async function JoinByTokenPage({
 				</p>
 				<Link
 					href="/comunidade"
-					className="font-mono text-[10px] text-primary border border-primary px-3 py-1 rounded hover:bg-primary/10 transition-colors"
+					className="font-mono text-xs text-primary border border-primary px-3 py-1 rounded hover:bg-primary/10 transition-colors"
 				>
-					[BACK_TO_COMMUNITY]
+					← Back to community
 				</Link>
 			</div>
 		);
@@ -51,7 +51,7 @@ export default async function JoinByTokenPage({
 	if (membership.isMember) {
 		return (
 			<div className="max-w-md mx-auto px-4 py-16 text-center">
-				<span className="font-mono text-[10px] uppercase tracking-[0.2em] text-outline block mb-4">
+				<span className="font-mono text-xs uppercase tracking-[0.2em] text-outline block mb-4">
 					[ALREADY_MEMBER]
 				</span>
 				<p className="text-sm text-on-surface-variant mb-6">
@@ -59,7 +59,7 @@ export default async function JoinByTokenPage({
 				</p>
 				<Link
 					href={`/comunidade/${invite.groupSlug}`}
-					className="font-mono text-[10px] text-primary border border-primary px-3 py-1 rounded hover:bg-primary/10 transition-colors"
+					className="font-mono text-xs text-primary border border-primary px-3 py-1 rounded hover:bg-primary/10 transition-colors"
 				>
 					[GO_TO_GROUP]
 				</Link>
@@ -70,13 +70,13 @@ export default async function JoinByTokenPage({
 	// Valid invite - show join option
 	return (
 		<div className="max-w-md mx-auto px-4 py-16 text-center">
-			<span className="font-mono text-[10px] uppercase tracking-[0.2em] text-outline block mb-4">
+			<span className="font-mono text-xs uppercase tracking-[0.2em] text-outline block mb-4">
 				PRIVATE GROUP INVITE
 			</span>
 			<h1 className="font-heading text-xl font-semibold text-on-surface mb-2">
 				{invite.groupName}
 			</h1>
-			<p className="font-mono text-[10px] text-on-surface-variant mb-8">
+			<p className="font-mono text-xs text-on-surface-variant mb-8">
 				{invite.memberCount}{" "}
 				{invite.memberCount === 1 ? "member" : "members"} &middot; private
 				group
@@ -91,7 +91,7 @@ export default async function JoinByTokenPage({
 			<div className="mt-4">
 				<Link
 					href="/comunidade"
-					className="font-mono text-[10px] text-on-surface-variant hover:text-on-surface transition-colors"
+					className="font-mono text-xs text-on-surface-variant hover:text-on-surface transition-colors"
 				>
 					Decline
 				</Link>

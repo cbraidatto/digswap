@@ -27,7 +27,7 @@ export function TradeDetailHeader({ thread }: Props) {
 			{/* Status row */}
 			<div className="flex items-center gap-2 mb-4">
 				<span className={`w-1.5 h-1.5 rounded-full flex-shrink-0 ${status.dot}`} />
-				<span className={`font-mono text-[10px] uppercase tracking-widest ${status.text}`}>
+				<span className={`font-mono text-xs uppercase tracking-widest ${status.text}`}>
 					{status.label}
 				</span>
 			</div>
@@ -51,7 +51,7 @@ export function TradeDetailHeader({ thread }: Props) {
 					<p className="text-foreground font-mono text-sm font-medium">
 						{thread.counterpartyUsername}
 					</p>
-					<p className="text-muted-foreground font-mono text-[10px] uppercase tracking-widest">
+					<p className="text-muted-foreground font-mono text-xs uppercase tracking-widest">
 						Counterparty
 					</p>
 				</div>

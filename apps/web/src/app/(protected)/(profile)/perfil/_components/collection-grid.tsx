@@ -25,7 +25,7 @@ export function CollectionGrid({ items, isOwner, renderAction, filterToIds }: Co
 					</span>
 				</div>
 				<div>
-					<div className="text-[10px] font-mono text-primary uppercase tracking-widest mb-2">
+					<div className="text-xs font-mono text-primary uppercase tracking-widest mb-2">
 						EMPTY_REPOSITORY
 					</div>
 					<h3 className="text-lg font-bold font-heading text-on-surface mb-2">

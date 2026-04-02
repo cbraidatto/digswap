@@ -8,7 +8,7 @@ export function CrateEmptyState() {
 
   return (
     <div className="flex flex-col items-center justify-center py-16 gap-4">
-      <div className="font-mono text-[10px] text-on-surface-variant tracking-[0.15em]">
+      <div className="font-mono text-xs text-on-surface-variant tracking-[0.15em]">
         [NO_CRATES_YET]
       </div>
       <p className="font-mono text-sm text-on-surface-variant text-center max-w-xs">
@@ -24,7 +24,7 @@ export function CrateEmptyState() {
       ) : (
         <button
           onClick={() => setIsCreating(true)}
-          className="font-mono text-[10px] px-3 py-1.5 rounded border border-primary/40 text-primary hover:bg-primary/10 transition-colors"
+          className="font-mono text-xs px-3 py-1.5 rounded border border-primary/40 text-primary hover:bg-primary/10 transition-colors"
         >
           [+ NEW_CRATE]
         </button>

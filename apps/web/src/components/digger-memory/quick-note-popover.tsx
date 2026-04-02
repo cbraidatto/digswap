@@ -53,7 +53,7 @@ export function QuickNotePopover({
       </PopoverTrigger>
       <PopoverContent className="w-72 p-4 bg-surface-container border-outline-variant/20">
         <div className="space-y-3">
-          <p className="font-mono text-[10px] text-primary tracking-[0.15em]">
+          <p className="font-mono text-xs text-primary tracking-[0.15em]">
             [ADD_NOTE]
           </p>
           <Textarea
@@ -61,16 +61,16 @@ export function QuickNotePopover({
             onChange={(e) => setNote(e.target.value)}
             onBlur={handleSave}
             placeholder="Notes on this lead..."
-            className="font-mono text-[11px] bg-surface-container-low border-outline-variant/20 resize-none h-20"
+            className="font-mono text-xs bg-surface-container-low border-outline-variant/20 resize-none h-20"
           />
           <Select
             value={status}
             onValueChange={(v) => setStatus(v as LeadStatus)}
           >
-            <SelectTrigger className="font-mono text-[11px] bg-surface-container-low border-outline-variant/20 h-8">
+            <SelectTrigger className="font-mono text-xs bg-surface-container-low border-outline-variant/20 h-8">
               <SelectValue />
             </SelectTrigger>
-            <SelectContent className="bg-surface-container border-outline-variant/20 font-mono text-[11px]">
+            <SelectContent className="bg-surface-container border-outline-variant/20 font-mono text-xs">
               <SelectItem value="watching">[WATCHING]</SelectItem>
               <SelectItem value="contacted">[CONTACTED]</SelectItem>
               <SelectItem value="dead_end">[DEAD_END]</SelectItem>
@@ -80,7 +80,7 @@ export function QuickNotePopover({
           <Button
             onClick={handleSave}
             size="sm"
-            className="w-full font-mono text-[10px] bg-primary-container text-on-primary-container h-7"
+            className="w-full font-mono text-xs bg-primary-container text-on-primary-container h-7"
             disabled={isLoading}
           >
             SAVE_LEAD

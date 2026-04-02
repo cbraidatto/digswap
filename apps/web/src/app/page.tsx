@@ -29,15 +29,15 @@ export default function Home() {
 
 				{/* Three monospace status lines */}
 				<div className="mb-12 space-y-2 text-left max-w-sm mx-auto">
-					<div className="font-mono text-[11px]">
+					<div className="font-mono text-xs">
 						<span className="text-primary">[RADAR_ACTIVE]</span>
 						<span className="text-on-surface-variant">{"    "}// wantlist matches across the network</span>
 					</div>
-					<div className="font-mono text-[11px]">
+					<div className="font-mono text-xs">
 						<span className="text-secondary">[COLLECTION_ID]</span>
 						<span className="text-on-surface-variant">{"   "}// your Discogs library, now discoverable</span>
 					</div>
-					<div className="font-mono text-[11px]">
+					<div className="font-mono text-xs">
 						<span className="text-tertiary">[TRUST_LAYER]</span>
 						<span className="text-on-surface-variant">{"    "}// verified diggers, real trades, real reputation</span>
 					</div>
@@ -53,20 +53,20 @@ export default function Home() {
 								className="w-full bg-primary-container text-on-primary-container font-mono font-bold py-3 rounded text-sm hover:brightness-110 transition-all flex items-center justify-center gap-2"
 							>
 								<span className="material-symbols-outlined text-sm">add_circle</span>
-								START_DIGGING
+								Start digging
 							</Link>
 							<Link
 								href="/signin"
 								className="w-full bg-transparent text-on-surface-variant font-mono text-sm py-3 rounded hover:bg-surface-container-high transition-all flex items-center justify-center gap-2 border border-outline-variant/20"
 							>
 								<span className="material-symbols-outlined text-sm">login</span>
-								SIGN_IN
+								Sign in
 							</Link>
 						</div>
 					</div>
 				</div>
 
-				<p className="mt-8 font-mono text-[10px] text-on-surface-variant/50">
+				<p className="mt-8 font-mono text-xs text-on-surface-variant/50">
 					<span className="text-primary">[RADAR_ACTIVE]</span>{" "}
 					// wantlist matching for serious diggers
 				</p>

@@ -37,23 +37,23 @@ export function GroupFeedCard({ item }: { item: FeedItem }) {
 			{/* Header row */}
 			<div className="px-4 pt-3 pb-2">
 				<div className="flex items-center gap-1.5">
-					<span className="font-mono text-[10px] text-primary">
+					<span className="font-mono text-xs text-primary">
 						&gt;
 					</span>
 					<Link
 						href={`/perfil/${item.username}`}
-						className="font-mono text-[10px] text-on-surface hover:text-primary transition-colors"
+						className="font-mono text-xs text-on-surface hover:text-primary transition-colors"
 					>
 						{item.username}
 					</Link>
-					<span className="font-mono text-[10px] text-on-surface-variant">
+					<span className="font-mono text-xs text-on-surface-variant">
 						{" \u00B7 "}
 						{formatRelativeTime(item.createdAt)}
 					</span>
 				</div>
 
 				{/* Second header line: posted in group */}
-				<div className="font-mono text-[10px] text-on-surface-variant mt-0.5">
+				<div className="font-mono text-xs text-on-surface-variant mt-0.5">
 					posted in{" "}
 					{groupSlug ? (
 						<Link
@@ -84,7 +84,7 @@ export function GroupFeedCard({ item }: { item: FeedItem }) {
 					{groupSlug && (
 						<Link
 							href={`/comunidade/${groupSlug}`}
-							className="font-mono text-[10px] text-primary hover:underline"
+							className="font-mono text-xs text-primary hover:underline"
 						>
 							[more]
 						</Link>
@@ -95,7 +95,7 @@ export function GroupFeedCard({ item }: { item: FeedItem }) {
 			{/* Linked record reference */}
 			{releaseId && linkedTitle && (
 				<div className="px-4 pb-3">
-					<span className="font-mono text-[10px] text-on-surface-variant">
+					<span className="font-mono text-xs text-on-surface-variant">
 						{"\u2514"} LINKED: {linkedTitle}
 					</span>
 				</div>

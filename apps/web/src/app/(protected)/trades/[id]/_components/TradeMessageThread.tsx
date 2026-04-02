@@ -22,7 +22,7 @@ function formatDate(iso: string) {
 function SystemMessage({ message }: { message: TradeThreadMessage }) {
 	return (
 		<div className="flex justify-center my-3">
-			<span className="text-muted-foreground font-mono text-[10px] italic px-3 py-1 rounded border border-outline-variant bg-background">
+			<span className="text-muted-foreground font-mono text-xs italic px-3 py-1 rounded border border-outline-variant bg-background">
 				{message.body}
 			</span>
 		</div>
@@ -38,7 +38,7 @@ function MessageBubble({ message, showSender }: MessageBubbleProps) {
 	return (
 		<div className={`flex flex-col gap-1 ${message.isOwn ? "items-end" : "items-start"}`}>
 			{showSender && !message.isOwn && (
-				<span className="text-muted-foreground font-mono text-[10px] px-1">
+				<span className="text-muted-foreground font-mono text-xs px-1">
 					{message.senderUsername ?? "Unknown digger"}
 				</span>
 			)}
@@ -157,7 +157,7 @@ export function TradeMessageThread({
 					{/* Date separator */}
 					<div className="flex items-center gap-3 my-4">
 						<div className="flex-1 h-px bg-outline-variant" />
-						<span className="text-muted-foreground font-mono text-[10px]">{group.date}</span>
+						<span className="text-muted-foreground font-mono text-xs">{group.date}</span>
 						<div className="flex-1 h-px bg-outline-variant" />
 					</div>
 

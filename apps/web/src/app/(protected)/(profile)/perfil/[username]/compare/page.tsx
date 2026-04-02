@@ -41,12 +41,12 @@ function ComparisonColumn({
 			{/* Header */}
 			<div className="flex items-center justify-between mb-4">
 				<span
-					className={`font-mono text-[10px] uppercase tracking-[0.2em] ${accentColor}`}
+					className={`font-mono text-xs uppercase tracking-[0.2em] ${accentColor}`}
 				>
 					{label}
 				</span>
 				<span
-					className={`font-mono text-[10px] px-2 py-0.5 rounded ${accentColor} ${bgOpacity}`}
+					className={`font-mono text-xs px-2 py-0.5 rounded ${accentColor} ${bgOpacity}`}
 				>
 					{items.length}
 				</span>
@@ -71,13 +71,13 @@ function ComparisonColumn({
 								key={item.releaseId}
 								className="px-4 py-3 border-b border-outline-variant/5 last:border-0"
 							>
-								<div className="font-mono text-[10px] text-on-surface-variant">
+								<div className="font-mono text-xs text-on-surface-variant">
 									{item.artist}
 								</div>
 								<div className="font-heading text-sm font-bold text-on-surface truncate">
 									{item.title}
 								</div>
-								<div className={`font-mono text-[10px] mt-1 ${rarityColor}`}>
+								<div className={`font-mono text-xs mt-1 ${rarityColor}`}>
 									RARITY:{" "}
 									{item.rarityScore !== null
 										? item.rarityScore.toFixed(1)
@@ -132,7 +132,7 @@ export default async function ComparePage({ params }: ComparePageProps) {
 				{/* Back link */}
 				<Link
 					href={`/perfil/${username}`}
-					className="font-mono text-[10px] text-on-surface-variant hover:text-primary flex items-center gap-1"
+					className="font-mono text-xs text-on-surface-variant hover:text-primary flex items-center gap-1"
 				>
 					<span className="material-symbols-outlined text-base">
 						arrow_back
@@ -146,7 +146,7 @@ export default async function ComparePage({ params }: ComparePageProps) {
 					<p className="font-mono text-sm text-on-surface-variant">
 						you need records in your collection to compare.
 					</p>
-					<p className="font-mono text-[10px] text-outline mt-2">
+					<p className="font-mono text-xs text-outline mt-2">
 						import from Discogs or add records manually.
 					</p>
 				</div>
@@ -162,7 +162,7 @@ export default async function ComparePage({ params }: ComparePageProps) {
 			{/* Page header */}
 			<Link
 				href={`/perfil/${username}`}
-				className="font-mono text-[10px] text-on-surface-variant hover:text-primary flex items-center gap-1"
+				className="font-mono text-xs text-on-surface-variant hover:text-primary flex items-center gap-1"
 			>
 				<span className="material-symbols-outlined text-base">arrow_back</span>
 				&lt; back to @{username}
@@ -170,7 +170,7 @@ export default async function ComparePage({ params }: ComparePageProps) {
 			<h1 className="text-3xl font-heading font-bold text-on-surface mt-2">
 				COLLECTION_COMPARISON
 			</h1>
-			<p className="font-mono text-[10px] text-on-surface-variant mt-1">
+			<p className="font-mono text-xs text-on-surface-variant mt-1">
 				Your collection vs @{username}
 			</p>
 

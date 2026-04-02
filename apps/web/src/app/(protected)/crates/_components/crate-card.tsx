@@ -54,18 +54,18 @@ export function CrateCard({ crate }: CrateCardProps) {
           {crate.name}
         </span>
         <span
-          className={`font-mono text-[10px] px-1.5 py-0.5 rounded border flex-shrink-0 ${chip.className}`}
+          className={`font-mono text-xs px-1.5 py-0.5 rounded border flex-shrink-0 ${chip.className}`}
         >
           {chip.label}
         </span>
       </div>
       <div className="flex items-center justify-between">
         {displayDate && (
-          <span className="font-mono text-[10px] text-on-surface-variant">
+          <span className="font-mono text-xs text-on-surface-variant">
             {displayDate}
           </span>
         )}
-        <span className="font-mono text-[10px] text-on-surface-variant ml-auto">
+        <span className="font-mono text-xs text-on-surface-variant ml-auto">
           {crate.itemCount} {crate.itemCount === 1 ? "item" : "items"}
         </span>
       </div>

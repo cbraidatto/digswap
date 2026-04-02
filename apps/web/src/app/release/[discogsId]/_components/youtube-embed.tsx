@@ -38,7 +38,7 @@ export function YouTubeEmbed({ videoId: initialVideoId, releaseId, isAuthenticat
 	if (videoId) {
 		return (
 			<section className="space-y-2">
-				<span className="font-mono text-[10px] text-primary tracking-[0.2em]">YOUTUBE_PREVIEW</span>
+				<span className="font-mono text-xs text-primary tracking-[0.2em]">YOUTUBE_PREVIEW</span>
 				<div className="aspect-video w-full rounded-lg overflow-hidden">
 					<iframe
 						src={`https://www.youtube-nocookie.com/embed/${videoId}`}
@@ -58,9 +58,9 @@ export function YouTubeEmbed({ videoId: initialVideoId, releaseId, isAuthenticat
 	if (isAuthenticated) {
 		return (
 			<section className="space-y-2">
-				<span className="font-mono text-[10px] text-primary tracking-[0.2em]">YOUTUBE_PREVIEW</span>
+				<span className="font-mono text-xs text-primary tracking-[0.2em]">YOUTUBE_PREVIEW</span>
 				{searchDone ? (
-					<p className="font-mono text-[11px] text-on-surface-variant">
+					<p className="font-mono text-xs text-on-surface-variant">
 						No video found for this release.
 					</p>
 				) : (
@@ -68,7 +68,7 @@ export function YouTubeEmbed({ videoId: initialVideoId, releaseId, isAuthenticat
 						type="button"
 						onClick={handleSearch}
 						disabled={isPending}
-						className="font-mono text-[10px] bg-surface-container-low border border-outline-variant/20 rounded px-3 py-2 hover:border-primary/30 transition-colors disabled:opacity-50"
+						className="font-mono text-xs bg-surface-container-low border border-outline-variant/20 rounded px-3 py-2 hover:border-primary/30 transition-colors disabled:opacity-50"
 					>
 						{isPending ? "SEARCHING..." : "SEARCH_YOUTUBE"}
 					</button>

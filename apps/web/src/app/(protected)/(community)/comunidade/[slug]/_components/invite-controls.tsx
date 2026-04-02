@@ -68,12 +68,12 @@ export function InviteControls({ groupId, groupSlug }: InviteControlsProps) {
 						}}
 						placeholder="Username to invite..."
 						autoFocus
-						className="font-mono text-[10px] bg-surface-container-low border border-outline-variant/20 rounded px-2 py-1 text-on-surface placeholder:text-on-surface-variant/50 outline-none focus:border-primary transition-colors"
+						className="font-mono text-xs bg-surface-container-low border border-outline-variant/20 rounded px-2 py-1 text-on-surface placeholder:text-on-surface-variant/50 outline-none focus:border-primary transition-colors"
 					/>
 					<button
 						type="submit"
 						disabled={isPending || !username.trim()}
-						className="font-mono text-[10px] text-primary border border-primary px-2 py-0.5 rounded hover:bg-primary/10 transition-colors disabled:opacity-50"
+						className="font-mono text-xs text-primary border border-primary px-2 py-0.5 rounded hover:bg-primary/10 transition-colors disabled:opacity-50"
 					>
 						[Send]
 					</button>
@@ -84,12 +84,12 @@ export function InviteControls({ groupId, groupSlug }: InviteControlsProps) {
 							setInviteError(null);
 							setUsername("");
 						}}
-						className="font-mono text-[10px] text-on-surface-variant hover:text-on-surface transition-colors"
+						className="font-mono text-xs text-on-surface-variant hover:text-on-surface transition-colors"
 					>
 						[Cancel]
 					</button>
 					{inviteError && (
-						<span className="font-mono text-[10px] text-destructive">
+						<span className="font-mono text-xs text-destructive">
 							{inviteError}
 						</span>
 					)}
@@ -98,7 +98,7 @@ export function InviteControls({ groupId, groupSlug }: InviteControlsProps) {
 				<button
 					type="button"
 					onClick={() => setShowInviteInput(true)}
-					className="font-mono text-[10px] text-on-surface-variant hover:text-on-surface transition-colors"
+					className="font-mono text-xs text-on-surface-variant hover:text-on-surface transition-colors"
 				>
 					[Invite member]
 				</button>
@@ -109,7 +109,7 @@ export function InviteControls({ groupId, groupSlug }: InviteControlsProps) {
 				type="button"
 				onClick={handleCopyInviteLink}
 				disabled={isPending}
-				className="font-mono text-[10px] text-on-surface-variant hover:text-on-surface transition-colors disabled:opacity-50"
+				className="font-mono text-xs text-on-surface-variant hover:text-on-surface transition-colors disabled:opacity-50"
 			>
 				[Copy invite link]
 			</button>

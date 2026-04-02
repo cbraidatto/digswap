@@ -15,18 +15,18 @@ export default async function ComunidadePage() {
 			{/* Header */}
 			<div className="flex items-center justify-between">
 				<div>
-					<span className="font-mono text-[10px] uppercase tracking-[0.2em] text-outline">
+					<span className="font-mono text-xs uppercase tracking-[0.2em] text-outline">
 						COMMUNITY_HUB
 					</span>
-					<p className="font-mono text-[10px] text-on-surface-variant mt-1">
+					<p className="font-mono text-xs text-on-surface-variant mt-1">
 						// {totalGroups} active groups
 					</p>
 				</div>
 				<Link
 					href="/comunidade/new"
-					className="font-mono text-[10px] border border-primary text-primary px-3 py-1 rounded hover:bg-primary/10 transition-colors"
+					className="font-mono text-xs border border-primary text-primary px-3 py-1 rounded hover:bg-primary/10 transition-colors"
 				>
-					[+ CREATE_GROUP]
+					+ Create group
 				</Link>
 			</div>
 

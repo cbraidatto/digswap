@@ -63,20 +63,20 @@ export function FeedCard({ item }: { item: FeedItem }) {
 
 				<Link
 					href={`/perfil/${item.username}`}
-					className="font-mono text-[10px] text-on-surface hover:text-primary transition-colors"
+					className="font-mono text-xs text-on-surface hover:text-primary transition-colors"
 				>
 					{item.username}
 				</Link>
 
-				<span className="font-mono text-[10px] text-outline">
+				<span className="font-mono text-xs text-outline">
 					#{item.id.slice(0, 4)}
 				</span>
 
-				<span className="font-mono text-[10px] text-on-surface-variant">
+				<span className="font-mono text-xs text-on-surface-variant">
 					{formatRelativeTime(item.createdAt)}
 				</span>
 
-				<span className="font-mono text-[10px] text-primary bg-primary/10 px-1.5 py-0.5 rounded border border-primary/20 ml-auto">
+				<span className="font-mono text-xs text-primary bg-primary/10 px-1.5 py-0.5 rounded border border-primary/20 ml-auto">
 					[NEW_FIND]
 				</span>
 			</div>
@@ -100,27 +100,27 @@ export function FeedCard({ item }: { item: FeedItem }) {
 
 				{/* Metadata */}
 				<div className="flex flex-col gap-1 min-w-0">
-					<div className="font-mono text-[10px]">
+					<div className="font-mono text-xs">
 						<span className="text-on-surface-variant">ARTIST:</span>{" "}
 						<span className="text-on-surface">{item.releaseArtist ?? "Unknown"}</span>
 					</div>
-					<div className="font-mono text-[10px]">
+					<div className="font-mono text-xs">
 						<span className="text-on-surface-variant">TITLE:</span>{" "}
 						<span className="text-on-surface">{item.releaseTitle ?? "Unknown"}</span>
 					</div>
-					<div className="font-mono text-[10px]">
+					<div className="font-mono text-xs">
 						<span className="text-on-surface-variant">GENRE:</span>{" "}
 						<span className="text-on-surface">
 							{item.releaseGenre?.[0] ?? "Unknown"}
 						</span>
 					</div>
-					<div className="font-mono text-[10px]">
+					<div className="font-mono text-xs">
 						<span className="text-on-surface-variant">LABEL:</span>{" "}
 						<span className="text-on-surface">{item.releaseLabel ?? "Unknown"}</span>
 					</div>
 
 					{/* Rarity badge */}
-					<div className={`font-mono text-[10px] font-bold mt-2 ${rarityTextColor}`}>
+					<div className={`font-mono text-xs font-bold mt-2 ${rarityTextColor}`}>
 						RARITY:{" "}
 						{item.releaseRarityScore !== null
 							? item.releaseRarityScore.toFixed(1)

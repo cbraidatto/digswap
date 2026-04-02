@@ -158,7 +158,7 @@ export function AddToWantlistDialog({ open, onOpenChange }: AddToWantlistDialogP
 					<button
 						type="button"
 						onClick={() => setTab("discogs")}
-						className={`flex-1 flex items-center justify-center gap-1.5 py-1.5 rounded-md font-mono text-[10px] uppercase tracking-widest transition-colors ${
+						className={`flex-1 flex items-center justify-center gap-1.5 py-1.5 rounded-md font-mono text-xs uppercase tracking-widest transition-colors ${
 							tab === "discogs"
 								? "bg-surface-container-highest text-on-surface"
 								: "text-on-surface-variant hover:text-on-surface"
@@ -170,7 +170,7 @@ export function AddToWantlistDialog({ open, onOpenChange }: AddToWantlistDialogP
 					<button
 						type="button"
 						onClick={() => setTab("youtube")}
-						className={`flex-1 flex items-center justify-center gap-1.5 py-1.5 rounded-md font-mono text-[10px] uppercase tracking-widest transition-colors ${
+						className={`flex-1 flex items-center justify-center gap-1.5 py-1.5 rounded-md font-mono text-xs uppercase tracking-widest transition-colors ${
 							tab === "youtube"
 								? "bg-surface-container-highest text-on-surface"
 								: "text-on-surface-variant hover:text-on-surface"
@@ -238,7 +238,7 @@ export function AddToWantlistDialog({ open, onOpenChange }: AddToWantlistDialogP
 											{adding ? (
 												<span className="material-symbols-outlined animate-spin text-secondary text-sm">progress_activity</span>
 											) : (
-												<div className="text-[10px] font-mono text-on-surface-variant">
+												<div className="text-xs font-mono text-on-surface-variant">
 													{result.year && <div>{result.year}</div>}
 													{result.format && <div className="text-on-surface-variant/60">{result.format}</div>}
 												</div>

@@ -39,7 +39,7 @@ export function BrowseFilters({
 		<div className="space-y-4">
 			{/* Genre Row */}
 			<div className="flex flex-wrap items-center gap-2">
-				<span className="font-mono text-[10px] uppercase tracking-[0.2em] text-outline mr-2">
+				<span className="font-mono text-xs uppercase tracking-[0.2em] text-outline mr-2">
 					Genre:
 				</span>
 				{BROWSE_GENRES.map((genre) => {
@@ -49,7 +49,7 @@ export function BrowseFilters({
 							key={genre}
 							type="button"
 							onClick={() => onGenreChange(isActive ? null : genre)}
-							className={`px-4 py-1 rounded-full font-mono text-[10px] transition-colors ${
+							className={`px-4 py-1 rounded-full font-mono text-xs transition-colors ${
 								isActive
 									? "bg-primary/10 text-primary border border-primary"
 									: "bg-surface-container-low text-on-surface-variant border border-outline-variant/20 hover:bg-surface-container hover:text-on-surface"
@@ -64,7 +64,7 @@ export function BrowseFilters({
 
 			{/* Decade Row */}
 			<div className="flex flex-wrap items-center gap-2">
-				<span className="font-mono text-[10px] uppercase tracking-[0.2em] text-outline mr-2">
+				<span className="font-mono text-xs uppercase tracking-[0.2em] text-outline mr-2">
 					Decade:
 				</span>
 				{DECADES.map((decade) => {
@@ -76,7 +76,7 @@ export function BrowseFilters({
 							onClick={() =>
 								onDecadeChange(isActive ? null : decade.label)
 							}
-							className={`px-4 py-1 rounded-full font-mono text-[10px] transition-colors ${
+							className={`px-4 py-1 rounded-full font-mono text-xs transition-colors ${
 								isActive
 									? "bg-primary/10 text-primary border border-primary"
 									: "bg-surface-container-low text-on-surface-variant border border-outline-variant/20 hover:bg-surface-container hover:text-on-surface"

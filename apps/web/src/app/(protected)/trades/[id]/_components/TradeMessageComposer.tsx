@@ -76,7 +76,7 @@ export function TradeMessageComposer({ tradeId, status }: Props) {
 				/>
 				{nearLimit && (
 					<span
-						className={`absolute bottom-2.5 right-3 font-mono text-[10px] ${
+						className={`absolute bottom-2.5 right-3 font-mono text-xs ${
 							charsLeft < 100 ? "text-destructive" : "text-muted-foreground"
 						}`}
 					>

@@ -20,10 +20,10 @@ export function ProgressBanner({
 		<div className="bg-surface-container-low rounded-lg p-6 mb-8 border border-outline-variant/10">
 			{/* Header row */}
 			<div className="flex justify-between items-center mb-3">
-				<span className="font-mono text-[10px] text-on-surface-variant uppercase tracking-[0.2em]">
+				<span className="font-mono text-xs text-on-surface-variant uppercase tracking-[0.2em]">
 					Onboarding_Progress
 				</span>
-				<span className="font-mono text-[10px] text-primary">
+				<span className="font-mono text-xs text-primary">
 					{completedSteps} / 3 COMPLETE
 				</span>
 			</div>
@@ -40,7 +40,7 @@ export function ProgressBanner({
 							<span className="material-symbols-outlined text-primary text-base">
 								check_circle
 							</span>
-							<span className="font-mono text-[10px] text-primary line-through">
+							<span className="font-mono text-xs text-primary line-through">
 								Connect Discogs
 							</span>
 						</>
@@ -51,7 +51,7 @@ export function ProgressBanner({
 							</span>
 							<Link
 								href="/settings"
-								className="font-mono text-[10px] text-on-surface hover:text-primary transition-colors"
+								className="font-mono text-xs text-on-surface hover:text-primary transition-colors"
 							>
 								Connect Discogs
 							</Link>
@@ -66,7 +66,7 @@ export function ProgressBanner({
 							<span className="material-symbols-outlined text-primary text-base">
 								check_circle
 							</span>
-							<span className="font-mono text-[10px] text-primary line-through">
+							<span className="font-mono text-xs text-primary line-through">
 								Follow 3 diggers
 							</span>
 						</>
@@ -77,7 +77,7 @@ export function ProgressBanner({
 							</span>
 							<Link
 								href="/explorar"
-								className="font-mono text-[10px] text-on-surface hover:text-primary transition-colors"
+								className="font-mono text-xs text-on-surface hover:text-primary transition-colors"
 							>
 								{followingCount > 0
 									? `Follow 3 diggers (${followingCount}/3)`
@@ -92,10 +92,10 @@ export function ProgressBanner({
 					<span className="material-symbols-outlined text-outline text-base">
 						lock
 					</span>
-					<span className="font-mono text-[10px] text-outline line-through">
+					<span className="font-mono text-xs text-outline line-through">
 						Join a group
 					</span>
-					<span className="font-mono text-[10px] text-outline border border-outline-variant/20 px-1.5 py-0.5 rounded">
+					<span className="font-mono text-xs text-outline border border-outline-variant/20 px-1.5 py-0.5 rounded">
 						[PHASE_7]
 					</span>
 				</div>

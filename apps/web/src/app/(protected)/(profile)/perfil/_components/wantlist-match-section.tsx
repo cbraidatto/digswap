@@ -39,7 +39,7 @@ export function WantlistMatchSection({
 				{/* Header */}
 				<div className="flex items-center justify-between mb-3">
 					<div>
-						<div className="font-mono text-[10px] text-primary tracking-[0.2em]">
+						<div className="font-mono text-xs text-primary tracking-[0.2em]">
 							RADAR_MATCH
 						</div>
 						<p className="font-mono text-[12px] text-on-surface mt-0.5">
@@ -51,7 +51,7 @@ export function WantlistMatchSection({
 					<button
 						type="button"
 						onClick={handleToggleFilter}
-						className={`font-mono text-[10px] px-3 py-1.5 rounded border transition-colors ${
+						className={`font-mono text-xs px-3 py-1.5 rounded border transition-colors ${
 							filterActive
 								? "border-primary text-primary bg-primary/10"
 								: "border-outline-variant/30 text-on-surface-variant hover:border-primary hover:text-primary"
@@ -96,7 +96,7 @@ export function WantlistMatchSection({
 					})}
 					{intersections.length > 6 && (
 						<div className="flex-shrink-0 w-24 h-24 rounded bg-surface-container-high flex items-center justify-center">
-							<span className="font-mono text-[10px] text-on-surface-variant">
+							<span className="font-mono text-xs text-on-surface-variant">
 								+{intersections.length - 6} more
 							</span>
 						</div>

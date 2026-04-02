@@ -14,7 +14,7 @@ export function GenreFilter({
 	disabled,
 }: GenreFilterProps) {
 	const chipBase =
-		"px-3 py-2 font-mono text-[10px] uppercase tracking-wider rounded-md border whitespace-nowrap flex-shrink-0 transition-colors";
+		"px-3 py-2 font-mono text-xs uppercase tracking-wider rounded-md border whitespace-nowrap flex-shrink-0 transition-colors";
 	const chipActive =
 		"bg-secondary/15 text-secondary border-secondary/30 font-bold";
 	const chipInactive =

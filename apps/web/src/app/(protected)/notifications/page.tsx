@@ -86,7 +86,7 @@ export default function NotificationsPage() {
 				</div>
 			) : notifications.length === 0 ? (
 				<div className="text-center py-16">
-					<div className="font-mono text-[10px] text-on-surface-variant">
+					<div className="font-mono text-xs text-on-surface-variant">
 						[NO_NOTIFICATIONS]
 					</div>
 					<div className="font-mono text-sm text-on-surface-variant mt-2">
@@ -115,7 +115,7 @@ export default function NotificationsPage() {
 							type="button"
 							disabled={currentPage === 1}
 							onClick={() => setCurrentPage((p) => p - 1)}
-							className="font-mono text-[10px] text-primary hover:underline disabled:opacity-50 disabled:cursor-not-allowed"
+							className="font-mono text-xs text-primary hover:underline disabled:opacity-50 disabled:cursor-not-allowed"
 						>
 							&lt; Previous
 						</button>
@@ -123,7 +123,7 @@ export default function NotificationsPage() {
 							type="button"
 							disabled={currentPage * PAGE_SIZE >= totalCount}
 							onClick={() => setCurrentPage((p) => p + 1)}
-							className="font-mono text-[10px] text-primary hover:underline disabled:opacity-50 disabled:cursor-not-allowed"
+							className="font-mono text-xs text-primary hover:underline disabled:opacity-50 disabled:cursor-not-allowed"
 						>
 							Next &gt;
 						</button>

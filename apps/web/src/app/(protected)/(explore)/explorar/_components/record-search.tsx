@@ -41,7 +41,7 @@ export function RecordSearch() {
 	return (
 		<div>
 			{/* Section Header */}
-			<div className="font-mono text-[10px] text-on-surface-variant uppercase tracking-[0.2em] mb-4">
+			<div className="font-mono text-xs text-on-surface-variant uppercase tracking-[0.2em] mb-4">
 				search_records
 			</div>
 
@@ -62,7 +62,7 @@ export function RecordSearch() {
 
 			{/* Loading State */}
 			{isPending && !searched && (
-				<div className="font-mono text-[10px] text-on-surface-variant text-center py-8">
+				<div className="font-mono text-xs text-on-surface-variant text-center py-8">
 					searching...
 				</div>
 			)}
@@ -70,7 +70,7 @@ export function RecordSearch() {
 			{/* Results Header */}
 			{searched && results.length > 0 && (
 				<>
-					<div className="font-mono text-[10px] text-on-surface-variant mt-4 mb-4">
+					<div className="font-mono text-xs text-on-surface-variant mt-4 mb-4">
 						<span className="text-primary">{results.length}</span> results
 						found
 					</div>

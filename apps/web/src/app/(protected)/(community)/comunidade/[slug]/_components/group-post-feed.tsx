@@ -56,7 +56,7 @@ export function GroupPostFeed({ groupId, initialPosts }: GroupPostFeedProps) {
 	if (posts.length === 0 && !isPending) {
 		return (
 			<div className="flex flex-col items-center justify-center py-16 text-center">
-				<span className="font-mono text-[10px] uppercase tracking-[0.2em] text-outline mb-4">
+				<span className="font-mono text-xs uppercase tracking-[0.2em] text-outline mb-4">
 					[NO_POSTS_YET]
 				</span>
 				<p className="font-mono text-sm text-on-surface-variant">
@@ -103,7 +103,7 @@ export function GroupPostFeed({ groupId, initialPosts }: GroupPostFeedProps) {
 			{/* Load more sentinel */}
 			{hasMore && (
 				<div className="text-center py-4">
-					<span className="font-mono text-[10px] text-on-surface-variant">
+					<span className="font-mono text-xs text-on-surface-variant">
 						[load more posts]
 					</span>
 					<div
@@ -116,7 +116,7 @@ export function GroupPostFeed({ groupId, initialPosts }: GroupPostFeedProps) {
 
 			{/* End of feed */}
 			{!hasMore && posts.length > 0 && (
-				<div className="font-mono text-[10px] text-outline text-center py-8">
+				<div className="font-mono text-xs text-outline text-center py-8">
 					[END_OF_FEED]
 				</div>
 			)}

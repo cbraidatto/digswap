@@ -16,7 +16,7 @@ export function WantlistGrid({ items, isOwner }: WantlistGridProps) {
 					</span>
 				</div>
 				<div>
-					<div className="text-[10px] font-mono text-secondary uppercase tracking-widest mb-2">
+					<div className="text-xs font-mono text-secondary uppercase tracking-widest mb-2">
 						EMPTY_WANTLIST
 					</div>
 					<h3 className="text-lg font-bold font-heading text-on-surface mb-2">

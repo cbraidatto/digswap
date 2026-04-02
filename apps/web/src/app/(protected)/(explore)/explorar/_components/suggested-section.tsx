@@ -40,7 +40,7 @@ export function SuggestedSection() {
 	return (
 		<div>
 			{/* Section Header */}
-			<div className="font-mono text-[10px] uppercase tracking-[0.2em] text-outline mb-4">
+			<div className="font-mono text-xs uppercase tracking-[0.2em] text-outline mb-4">
 				SUGGESTED_FOR_YOU
 			</div>
 
@@ -59,7 +59,7 @@ export function SuggestedSection() {
 			{/* Empty State */}
 			{loaded && suggestions.length === 0 && (
 				<div className="py-4">
-					<div className="font-mono text-[10px] text-on-surface-variant">
+					<div className="font-mono text-xs text-on-surface-variant">
 						[NO_SUGGESTIONS_YET]
 					</div>
 					<div className="font-mono text-sm text-on-surface-variant mt-2">
@@ -101,7 +101,7 @@ export function SuggestedSection() {
 									</span>
 									{rarityTier && (
 										<span
-											className={`text-[10px] font-mono px-1.5 py-0.5 rounded border ${getRarityColors(rarityTier)}`}
+											className={`text-xs font-mono px-1.5 py-0.5 rounded border ${getRarityColors(rarityTier)}`}
 										>
 											[{rarityTier.toUpperCase()}]
 										</span>
@@ -109,12 +109,12 @@ export function SuggestedSection() {
 								</div>
 
 								{/* Artist */}
-								<div className="font-mono text-[10px] text-on-surface-variant truncate">
+								<div className="font-mono text-xs text-on-surface-variant truncate">
 									{record.artist}
 								</div>
 
 								{/* Owner Count */}
-								<div className="font-mono text-[10px] text-on-surface-variant mt-2">
+								<div className="font-mono text-xs text-on-surface-variant mt-2">
 									{record.ownerCount}{" "}
 									{record.ownerCount === 1 ? "owner" : "owners"}
 								</div>

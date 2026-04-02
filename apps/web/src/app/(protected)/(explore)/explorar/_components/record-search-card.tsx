@@ -61,13 +61,13 @@ export function RecordSearchCard({ release }: RecordSearchCardProps) {
 						</span>
 						{rarityTier && (
 							<span
-								className={`text-[10px] font-mono px-1.5 py-0.5 rounded border ${getRarityColors(rarityTier)}`}
+								className={`text-xs font-mono px-1.5 py-0.5 rounded border ${getRarityColors(rarityTier)}`}
 							>
 								[{rarityTier.toUpperCase()}]
 							</span>
 						)}
 					</div>
-					<div className="flex flex-wrap items-center gap-3 text-[10px] text-on-surface-variant font-mono">
+					<div className="flex flex-wrap items-center gap-3 text-xs text-on-surface-variant font-mono">
 						<span>{release.artist}</span>
 						{release.label && (
 							<>
@@ -91,9 +91,9 @@ export function RecordSearchCard({ release }: RecordSearchCardProps) {
 					{release.discogsId && (
 						<Link
 							href={`/release/${release.discogsId}`}
-							className="font-mono text-[10px] text-on-surface-variant hover:text-primary transition-colors inline-flex items-center gap-0.5 mt-1"
+							className="font-mono text-xs text-on-surface-variant hover:text-primary transition-colors inline-flex items-center gap-0.5 mt-1"
 						>
-							VIEW_RELEASE
+							View release
 							<span className="material-symbols-outlined text-[12px]">arrow_forward</span>
 						</Link>
 					)}
@@ -110,7 +110,7 @@ export function RecordSearchCard({ release }: RecordSearchCardProps) {
 
 				{/* Owner Count */}
 				<div className="flex flex-col items-end gap-1 flex-shrink-0">
-					<span className="text-[10px] font-mono text-on-surface-variant">
+					<span className="text-xs font-mono text-on-surface-variant">
 						{release.ownerCount}{" "}
 						{release.ownerCount === 1 ? "owner" : "owners"}
 					</span>
@@ -126,7 +126,7 @@ export function RecordSearchCard({ release }: RecordSearchCardProps) {
 					<button
 						type="button"
 						onClick={() => setIsReviewsExpanded((prev) => !prev)}
-						className="font-mono text-[10px] text-primary hover:underline cursor-pointer"
+						className="font-mono text-xs text-primary hover:underline cursor-pointer"
 						aria-expanded={isReviewsExpanded}
 						aria-controls={`reviews-panel-${release.id}`}
 					>

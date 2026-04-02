@@ -83,11 +83,11 @@ export default async function PublicProfilePage({
 		<div className="max-w-7xl mx-auto px-4 md:px-6 py-8">
 			{/* Visitor CTA */}
 			{!user && (
-				<div className="mb-6 p-4 bg-surface-container-low border border-outline-variant/20 rounded font-mono text-[11px]">
+				<div className="mb-6 p-4 bg-surface-container-low border border-outline-variant/20 rounded font-mono text-xs">
 					<span className="text-tertiary">[VISITOR]</span>
 					<span className="text-on-surface-variant">{" "}// </span>
 					<span className="text-on-surface">Create an account to follow this digger and initiate trades.</span>
-					<Link href="/signup" className="ml-3 text-primary hover:underline">START_DIGGING &rarr;</Link>
+					<Link href="/signup" className="ml-3 text-primary hover:underline">Start digging &rarr;</Link>
 				</div>
 			)}
 

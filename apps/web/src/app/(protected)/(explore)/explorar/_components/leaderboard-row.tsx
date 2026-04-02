@@ -34,15 +34,15 @@ export function LeaderboardRow({
 			</span>
 
 			{/* Dot separator */}
-			<span className="font-mono text-[10px] text-outline">&middot;</span>
+			<span className="font-mono text-xs text-outline">&middot;</span>
 
 			{/* Username */}
-			<span className="font-mono text-[10px] text-on-surface flex-1 truncate">
+			<span className="font-mono text-xs text-on-surface flex-1 truncate">
 				{username ?? "unknown"}
 			</span>
 
 			{/* Title */}
-			<span className="font-mono text-[10px] text-secondary flex-shrink-0">
+			<span className="font-mono text-xs text-secondary flex-shrink-0">
 				{title ?? ""}
 			</span>
 

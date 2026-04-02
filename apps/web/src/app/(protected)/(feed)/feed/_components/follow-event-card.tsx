@@ -22,7 +22,7 @@ export function FollowEventCard({ item }: { item: FeedItem }) {
 		<div className="bg-surface-container-low/50 rounded-lg px-4 py-3 flex items-center gap-3 border border-outline-variant/5">
 			<Avatar size="sm">
 				{item.avatarUrl && <AvatarImage src={item.avatarUrl} alt={item.username ?? ""} />}
-				<AvatarFallback className="font-mono text-[10px]">
+				<AvatarFallback className="font-mono text-xs">
 					{(item.username ?? "?")[0].toUpperCase()}
 				</AvatarFallback>
 			</Avatar>
@@ -43,7 +43,7 @@ export function FollowEventCard({ item }: { item: FeedItem }) {
 				</Link>
 			</span>
 
-			<span className="font-mono text-[10px] text-outline ml-auto flex-shrink-0">
+			<span className="font-mono text-xs text-outline ml-auto flex-shrink-0">
 				{formatRelativeTime(item.createdAt)}
 			</span>
 		</div>

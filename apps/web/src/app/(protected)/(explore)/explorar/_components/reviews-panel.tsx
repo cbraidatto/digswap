@@ -74,7 +74,7 @@ export function ReviewsPanel({ releaseId, isExpanded }: ReviewsPanelProps) {
 	if (isLoading && reviews.length === 0) {
 		return (
 			<div className="bg-surface-container-lowest border-t border-outline-variant/10 px-4 pt-3 pb-3">
-				<div className="font-mono text-[10px] uppercase tracking-[0.2em] text-outline pb-2">
+				<div className="font-mono text-xs uppercase tracking-[0.2em] text-outline pb-2">
 					REVIEWS
 				</div>
 				{/* Skeleton review rows */}
@@ -95,14 +95,14 @@ export function ReviewsPanel({ releaseId, isExpanded }: ReviewsPanelProps) {
 	if (!isLoading && reviews.length === 0) {
 		return (
 			<div className="bg-surface-container-lowest border-t border-outline-variant/10 px-4 pt-3 pb-3">
-				<div className="font-mono text-[10px] uppercase tracking-[0.2em] text-outline pb-2">
+				<div className="font-mono text-xs uppercase tracking-[0.2em] text-outline pb-2">
 					REVIEWS
 				</div>
 				<div className="py-2">
-					<div className="font-mono text-[10px] text-on-surface-variant">
+					<div className="font-mono text-xs text-on-surface-variant">
 						[NO_REVIEWS_YET]
 					</div>
-					<div className="font-mono text-[10px] text-on-surface-variant mt-1">
+					<div className="font-mono text-xs text-on-surface-variant mt-1">
 						Be the first to review this record.
 					</div>
 				</div>
@@ -112,7 +112,7 @@ export function ReviewsPanel({ releaseId, isExpanded }: ReviewsPanelProps) {
 
 	return (
 		<div className="bg-surface-container-lowest border-t border-outline-variant/10 px-4 pt-3 pb-3">
-			<div className="font-mono text-[10px] uppercase tracking-[0.2em] text-outline pb-2">
+			<div className="font-mono text-xs uppercase tracking-[0.2em] text-outline pb-2">
 				REVIEWS
 			</div>
 
@@ -126,11 +126,11 @@ export function ReviewsPanel({ releaseId, isExpanded }: ReviewsPanelProps) {
 							<StarRating rating={review.rating} />
 							<Link
 								href={`/perfil/${review.username}`}
-								className="font-mono text-[10px] text-on-surface hover:text-primary transition-colors"
+								className="font-mono text-xs text-on-surface hover:text-primary transition-colors"
 							>
 								@{review.username}
 							</Link>
-							<span className="font-mono text-[10px] text-on-surface-variant">
+							<span className="font-mono text-xs text-on-surface-variant">
 								{" \u00B7 "}
 								{formatRelativeTime(review.createdAt)}
 							</span>
@@ -151,7 +151,7 @@ export function ReviewsPanel({ releaseId, isExpanded }: ReviewsPanelProps) {
 						type="button"
 						onClick={loadMore}
 						disabled={isLoading}
-						className="font-mono text-[10px] text-on-surface-variant hover:text-on-surface transition-colors"
+						className="font-mono text-xs text-on-surface-variant hover:text-on-surface transition-colors"
 					>
 						{isLoading ? "[loading...]" : "[load more reviews]"}
 					</button>

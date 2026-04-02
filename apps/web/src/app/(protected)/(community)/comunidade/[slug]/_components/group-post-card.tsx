@@ -17,17 +17,17 @@ export function GroupPostCard({ post }: { post: GroupPost }) {
 		<div className="py-4 flex flex-col gap-2">
 			{/* Header: > username . timestamp */}
 			<div className="flex items-center gap-1.5">
-				<span className="font-mono text-[10px] text-primary">&gt;</span>
+				<span className="font-mono text-xs text-primary">&gt;</span>
 				<Link
 					href={`/perfil/${post.username}`}
-					className="font-mono text-[10px] text-on-surface hover:text-primary transition-colors"
+					className="font-mono text-xs text-on-surface hover:text-primary transition-colors"
 				>
 					{post.username}
 				</Link>
-				<span className="font-mono text-[10px] text-on-surface-variant">
+				<span className="font-mono text-xs text-on-surface-variant">
 					&middot;
 				</span>
-				<span className="font-mono text-[10px] text-on-surface-variant">
+				<span className="font-mono text-xs text-on-surface-variant">
 					{formatRelativeTime(post.createdAt)}
 				</span>
 			</div>
@@ -40,7 +40,7 @@ export function GroupPostCard({ post }: { post: GroupPost }) {
 			{/* Linked record */}
 			{post.releaseId && (
 				<div className="flex flex-col gap-1">
-					<span className="font-mono text-[10px] text-on-surface-variant">
+					<span className="font-mono text-xs text-on-surface-variant">
 						&#9492; LINKED:{" "}
 						<span className="text-on-surface">
 							{post.releaseArtist} - {post.releaseTitle}
@@ -56,7 +56,7 @@ export function GroupPostCard({ post }: { post: GroupPost }) {
 						</span>
 					</span>
 					{post.releaseRarityScore !== null && (
-						<span className="font-mono text-[10px] text-on-surface-variant">
+						<span className="font-mono text-xs text-on-surface-variant">
 							RARITY: {post.releaseRarityScore.toFixed(1)}
 						</span>
 					)}

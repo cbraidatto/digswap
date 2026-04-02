@@ -38,7 +38,7 @@ export function InviteAcceptButton({
 			type="button"
 			onClick={handleAccept}
 			disabled={isPending}
-			className="font-mono text-[10px] bg-primary text-primary-foreground px-6 py-2 rounded hover:bg-primary/90 transition-colors disabled:opacity-50"
+			className="font-mono text-xs bg-primary text-primary-foreground px-6 py-2 rounded hover:bg-primary/90 transition-colors disabled:opacity-50"
 		>
 			{isPending ? "Joining..." : "[Join Group]"}
 		</button>

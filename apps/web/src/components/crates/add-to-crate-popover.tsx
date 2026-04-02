@@ -121,14 +121,14 @@ export function AddToCratePopover({
       </PopoverTrigger>
       <PopoverContent className="w-72 p-4 bg-surface-container border-outline-variant/20">
         <div>
-          <p className="font-mono text-[10px] text-primary tracking-[0.15em] mb-3">
+          <p className="font-mono text-xs text-primary tracking-[0.15em] mb-3">
             [ADD_TO_CRATE]
           </p>
 
           {isLoading && (
             <div className="flex items-center gap-2 py-2">
               <span className="w-3 h-3 border border-primary border-t-transparent rounded-full animate-spin" />
-              <span className="font-mono text-[10px] text-on-surface-variant">
+              <span className="font-mono text-xs text-on-surface-variant">
                 Loading crates...
               </span>
             </div>
@@ -144,14 +144,14 @@ export function AddToCratePopover({
                   disabled={isAdding !== null}
                   className="w-full flex items-center justify-between py-2 px-2 rounded hover:bg-surface-container-high transition-colors disabled:opacity-50"
                 >
-                  <span className="font-mono text-[11px] text-on-surface truncate">
+                  <span className="font-mono text-xs text-on-surface truncate">
                     {crate.name}
                   </span>
                   <span className="flex items-center gap-1.5 flex-shrink-0">
                     {isAdding === crate.id && (
                       <span className="w-3 h-3 border border-primary border-t-transparent rounded-full animate-spin" />
                     )}
-                    <span className="font-mono text-[10px] text-on-surface-variant">
+                    <span className="font-mono text-xs text-on-surface-variant">
                       {crate.itemCount}
                     </span>
                   </span>
@@ -161,7 +161,7 @@ export function AddToCratePopover({
           )}
 
           {!isLoading && crates.length === 0 && !showInlineCreate && (
-            <p className="font-mono text-[10px] text-on-surface-variant/70 py-2">
+            <p className="font-mono text-xs text-on-surface-variant/70 py-2">
               No crates yet. Create one below.
             </p>
           )}
@@ -173,7 +173,7 @@ export function AddToCratePopover({
                 value={newCrateName}
                 onChange={(e) => setNewCrateName(e.target.value)}
                 placeholder="Crate name..."
-                className="font-mono text-[11px] bg-surface-container-low border border-outline-variant/20 rounded h-8 w-full px-2 focus:outline-none focus:border-primary/40 text-on-surface"
+                className="font-mono text-xs bg-surface-container-low border border-outline-variant/20 rounded h-8 w-full px-2 focus:outline-none focus:border-primary/40 text-on-surface"
                 onKeyDown={(e) => {
                   if (e.key === "Enter") handleCreateAndAdd();
                 }}
@@ -182,7 +182,7 @@ export function AddToCratePopover({
                 type="button"
                 onClick={handleCreateAndAdd}
                 disabled={!newCrateName.trim() || isAdding !== null}
-                className="font-mono text-[10px] bg-primary-container text-on-primary-container h-7 w-full rounded disabled:opacity-50 transition-opacity"
+                className="font-mono text-xs bg-primary-container text-on-primary-container h-7 w-full rounded disabled:opacity-50 transition-opacity"
               >
                 {isAdding === "creating" ? (
                   <span className="flex items-center justify-center gap-1.5">
@@ -197,9 +197,9 @@ export function AddToCratePopover({
                 <button
                   type="button"
                   onClick={() => setShowInlineCreate(false)}
-                  className="w-full font-mono text-[10px] text-on-surface-variant hover:text-on-surface transition-colors text-center"
+                  className="w-full font-mono text-xs text-on-surface-variant hover:text-on-surface transition-colors text-center"
                 >
-                  [CANCEL]
+                  Cancel
                 </button>
               )}
             </div>
@@ -209,7 +209,7 @@ export function AddToCratePopover({
             <button
               type="button"
               onClick={() => setShowInlineCreate(true)}
-              className="w-full font-mono text-[10px] text-primary hover:underline mt-2 text-left"
+              className="w-full font-mono text-xs text-primary hover:underline mt-2 text-left"
             >
               [ + New crate ]
             </button>

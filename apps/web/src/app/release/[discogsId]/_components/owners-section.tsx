@@ -15,14 +15,14 @@ export async function OwnersSection({ releaseId }: OwnersSectionProps) {
 	return (
 		<section className="space-y-3">
 			<div className="flex items-center gap-2">
-				<span className="font-mono text-[10px] text-primary tracking-[0.2em]">OWNERS</span>
-				<span className="font-mono text-[10px] text-on-surface-variant bg-surface-container-high rounded-full px-2 py-0.5">
+				<span className="font-mono text-xs text-primary tracking-[0.2em]">OWNERS</span>
+				<span className="font-mono text-xs text-on-surface-variant bg-surface-container-high rounded-full px-2 py-0.5">
 					{ownerCount}
 				</span>
 			</div>
 
 			{owners.length === 0 ? (
-				<p className="font-mono text-[11px] text-on-surface-variant">
+				<p className="font-mono text-xs text-on-surface-variant">
 					No diggers on DigSwap own this release yet.
 				</p>
 			) : (
@@ -54,19 +54,19 @@ export async function OwnersSection({ releaseId }: OwnersSectionProps) {
 										{owner.username ? (
 											<Link
 												href={`/perfil/${owner.username}`}
-												className="font-mono text-[11px] text-on-surface hover:text-primary transition-colors block truncate"
+												className="font-mono text-xs text-on-surface hover:text-primary transition-colors block truncate"
 											>
 												{owner.username}
 											</Link>
 										) : (
-											<span className="font-mono text-[11px] text-on-surface-variant block truncate">
+											<span className="font-mono text-xs text-on-surface-variant block truncate">
 												Anonymous
 											</span>
 										)}
 
 										{/* Display name if different */}
 										{owner.displayName && owner.displayName !== owner.username && (
-											<span className="text-[10px] text-on-surface-variant block truncate">
+											<span className="text-xs text-on-surface-variant block truncate">
 												{owner.displayName}
 											</span>
 										)}
@@ -91,7 +91,7 @@ export async function OwnersSection({ releaseId }: OwnersSectionProps) {
 					{/* "Ver todos" link when more than 12 owners */}
 					{ownerCount > 12 && (
 						<div className="text-center pt-2">
-							<span className="font-mono text-[10px] text-primary hover:underline cursor-pointer">
+							<span className="font-mono text-xs text-primary hover:underline cursor-pointer">
 								VER_TODOS ({ownerCount})
 							</span>
 						</div>

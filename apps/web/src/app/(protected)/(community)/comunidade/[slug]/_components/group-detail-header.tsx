@@ -33,10 +33,10 @@ export function GroupDetailHeader({
 		<div className="mb-6 pb-6 border-b border-outline-variant/10">
 			<div className="flex items-start justify-between gap-4">
 				<div className="flex-1 min-w-0">
-					<span className="font-mono text-[10px] uppercase tracking-[0.2em] text-outline">
+					<span className="font-mono text-xs uppercase tracking-[0.2em] text-outline">
 						{group.name}
 					</span>
-					<p className="font-mono text-[10px] text-on-surface-variant mt-1">
+					<p className="font-mono text-xs text-on-surface-variant mt-1">
 						// {group.category ?? "general"} &middot; {groupType} &middot;{" "}
 						{group.memberCount}{" "}
 						{group.memberCount === 1 ? "member" : "members"}

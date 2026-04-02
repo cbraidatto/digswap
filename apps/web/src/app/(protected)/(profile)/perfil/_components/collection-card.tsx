@@ -40,7 +40,7 @@ export function CollectionCard({ item, isOwner, actionSlot }: CollectionCardProp
 				{/* Rarity badge */}
 				{tier && (
 					<div className="absolute bottom-2 left-2">
-						<Badge variant={getRarityBadgeVariant(tier)} className="text-[10px]">
+						<Badge variant={getRarityBadgeVariant(tier)} className="text-xs">
 							{tier}
 						</Badge>
 					</div>
@@ -56,9 +56,9 @@ export function CollectionCard({ item, isOwner, actionSlot }: CollectionCardProp
 				{item.discogsId && (
 					<Link
 						href={`/release/${item.discogsId}`}
-						className="font-mono text-[10px] text-on-surface-variant hover:text-primary transition-colors inline-flex items-center gap-0.5 mb-1"
+						className="font-mono text-xs text-on-surface-variant hover:text-primary transition-colors inline-flex items-center gap-0.5 mb-1"
 					>
-						VIEW_RELEASE
+						View release
 						<span className="material-symbols-outlined text-[12px]">arrow_forward</span>
 					</Link>
 				)}

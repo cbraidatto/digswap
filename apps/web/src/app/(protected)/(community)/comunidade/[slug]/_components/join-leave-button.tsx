@@ -36,7 +36,7 @@ export function JoinLeaveButton({
 	// Private group + not a member: show invite-only label
 	if (visibility === "private" && !isMemberLocal) {
 		return (
-			<span className="font-mono text-[10px] text-on-surface-variant whitespace-nowrap">
+			<span className="font-mono text-xs text-on-surface-variant whitespace-nowrap">
 				[INVITE_ONLY]
 			</span>
 		);
@@ -85,21 +85,21 @@ export function JoinLeaveButton({
 	if (showLeaveConfirm) {
 		return (
 			<div className="flex items-center gap-2 whitespace-nowrap">
-				<span className="font-mono text-[10px] text-on-surface-variant">
+				<span className="font-mono text-xs text-on-surface-variant">
 					Leave {groupName}?
 				</span>
 				<button
 					type="button"
 					onClick={handleLeaveConfirm}
 					disabled={isPending}
-					className="font-mono text-[10px] text-destructive border border-destructive px-2 py-0.5 rounded hover:bg-destructive/10 transition-colors disabled:opacity-50"
+					className="font-mono text-xs text-destructive border border-destructive px-2 py-0.5 rounded hover:bg-destructive/10 transition-colors disabled:opacity-50"
 				>
 					[Confirm]
 				</button>
 				<button
 					type="button"
 					onClick={() => setShowLeaveConfirm(false)}
-					className="font-mono text-[10px] text-on-surface-variant border border-outline-variant/20 px-2 py-0.5 rounded hover:text-on-surface transition-colors"
+					className="font-mono text-xs text-on-surface-variant border border-outline-variant/20 px-2 py-0.5 rounded hover:text-on-surface transition-colors"
 				>
 					[Cancel]
 				</button>
@@ -115,9 +115,9 @@ export function JoinLeaveButton({
 				onClick={handleJoin}
 				disabled={isPending}
 				aria-label={`Join ${groupName}`}
-				className="font-mono text-[10px] border border-primary text-primary px-3 py-1 rounded hover:bg-primary/10 transition-colors whitespace-nowrap disabled:opacity-50"
+				className="font-mono text-xs border border-primary text-primary px-3 py-1 rounded hover:bg-primary/10 transition-colors whitespace-nowrap disabled:opacity-50"
 			>
-				[JOIN_GROUP]
+				Join group
 			</button>
 		);
 	}
@@ -132,11 +132,11 @@ export function JoinLeaveButton({
 			disabled={isPending}
 			className={
 				isHovered
-					? "font-mono text-[10px] text-destructive border border-destructive px-3 py-1 rounded hover:bg-destructive/10 transition-colors whitespace-nowrap disabled:opacity-50"
-					: "font-mono text-[10px] text-primary px-3 py-1 whitespace-nowrap"
+					? "font-mono text-xs text-destructive border border-destructive px-3 py-1 rounded hover:bg-destructive/10 transition-colors whitespace-nowrap disabled:opacity-50"
+					: "font-mono text-xs text-primary px-3 py-1 whitespace-nowrap"
 			}
 		>
-			{isHovered ? "[LEAVE_GROUP]" : "[JOINED]"}
+			{isHovered ? "Leave group" : "Joined"}
 		</button>
 	);
 }

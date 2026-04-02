@@ -66,7 +66,7 @@ export function BrowseGrid({ genre, decade }: BrowseGridProps) {
 	if (hasQueried && results.length === 0) {
 		return (
 			<div className="text-center py-8">
-				<div className="font-mono text-[10px] text-on-surface-variant">
+				<div className="font-mono text-xs text-on-surface-variant">
 					[NO_RECORDS_FOUND]
 				</div>
 				<div className="font-mono text-sm text-on-surface-variant mt-2">
@@ -107,7 +107,7 @@ export function BrowseGrid({ genre, decade }: BrowseGridProps) {
 							</span>
 							{rarityTier && (
 								<span
-									className={`text-[10px] font-mono px-1.5 py-0.5 rounded border ${getRarityColors(rarityTier)}`}
+									className={`text-xs font-mono px-1.5 py-0.5 rounded border ${getRarityColors(rarityTier)}`}
 								>
 									[{rarityTier.toUpperCase()}]
 								</span>
@@ -115,12 +115,12 @@ export function BrowseGrid({ genre, decade }: BrowseGridProps) {
 						</div>
 
 						{/* Artist */}
-						<div className="font-mono text-[10px] text-on-surface-variant truncate">
+						<div className="font-mono text-xs text-on-surface-variant truncate">
 							{record.artist}
 						</div>
 
 						{/* Owner Count */}
-						<div className="font-mono text-[10px] text-on-surface-variant mt-2">
+						<div className="font-mono text-xs text-on-surface-variant mt-2">
 							{record.ownerCount}{" "}
 							{record.ownerCount === 1 ? "owner" : "owners"}
 						</div>

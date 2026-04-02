@@ -101,34 +101,34 @@ export function RecordSearchInline({
 			<DialogTrigger render={<span />}>{children}</DialogTrigger>
 			<DialogContent className="sm:max-w-md">
 				<DialogHeader>
-					<DialogTitle className="font-mono text-[10px] uppercase tracking-[0.2em] text-outline">
+					<DialogTitle className="font-mono text-xs uppercase tracking-[0.2em] text-outline">
 						LINK_RECORD
 					</DialogTitle>
 				</DialogHeader>
 
 				{/* Search input with terminal prompt */}
 				<div className="flex items-center gap-2 border-l-2 border-primary pl-2">
-					<span className="font-mono text-[10px] text-primary">&gt;</span>
+					<span className="font-mono text-xs text-primary">&gt;</span>
 					<input
 						type="text"
 						value={term}
 						onChange={(e) => handleSearch(e.target.value)}
 						placeholder="Search records..."
 						autoFocus
-						className="flex-1 font-mono text-[10px] bg-transparent text-on-surface placeholder:text-on-surface-variant/50 outline-none"
+						className="flex-1 font-mono text-xs bg-transparent text-on-surface placeholder:text-on-surface-variant/50 outline-none"
 					/>
 				</div>
 
 				{/* Results */}
 				<div className="max-h-60 overflow-y-auto mt-2">
 					{isSearching && (
-						<div className="font-mono text-[10px] text-on-surface-variant py-2">
+						<div className="font-mono text-xs text-on-surface-variant py-2">
 							Searching...
 						</div>
 					)}
 
 					{!isSearching && results.length === 0 && term.length >= 2 && (
-						<div className="font-mono text-[10px] text-on-surface-variant py-2">
+						<div className="font-mono text-xs text-on-surface-variant py-2">
 							No records found.
 						</div>
 					)}
@@ -140,7 +140,7 @@ export function RecordSearchInline({
 							onClick={() => handleSelect(result)}
 							className="w-full text-left px-2 py-1.5 hover:bg-surface-container-low rounded transition-colors"
 						>
-							<span className="font-mono text-[10px] text-on-surface">
+							<span className="font-mono text-xs text-on-surface">
 								{result.title} - {result.artist}
 								{result.year ? ` \u00b7 ${result.year}` : ""}
 							</span>

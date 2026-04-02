@@ -116,7 +116,7 @@ export function GroupComposer({
 		<div className="mb-6">
 			{/* Review mode label */}
 			{isReviewMode && (
-				<div className="font-mono text-[10px] text-on-surface-variant mb-2">
+				<div className="font-mono text-xs text-on-surface-variant mb-2">
 					&middot; review mode &middot;
 				</div>
 			)}
@@ -144,7 +144,7 @@ export function GroupComposer({
 						))}
 					</div>
 					{errors.rating && (
-						<span className="font-mono text-[10px] text-destructive mt-1 block">
+						<span className="font-mono text-xs text-destructive mt-1 block">
 							{errors.rating}
 						</span>
 					)}
@@ -166,7 +166,7 @@ export function GroupComposer({
 				className="bg-surface-container-low border border-outline-variant/20 rounded p-3 w-full resize-none min-h-[80px] text-sm text-on-surface placeholder:text-on-surface-variant/50 outline-none focus:border-primary transition-colors"
 			/>
 			{errors.content && (
-				<span className="font-mono text-[10px] text-destructive mt-1 block">
+				<span className="font-mono text-xs text-destructive mt-1 block">
 					{errors.content}
 				</span>
 			)}
@@ -174,7 +174,7 @@ export function GroupComposer({
 			{/* Linked record display */}
 			{linkedRecord && (
 				<div className="flex items-center gap-2 mt-2">
-					<span className="font-mono text-[10px] text-on-surface-variant">
+					<span className="font-mono text-xs text-on-surface-variant">
 						&#9492; {linkedRecord.artist} - {linkedRecord.title}
 						{linkedRecord.label || linkedRecord.year
 							? ` [${[linkedRecord.label, linkedRecord.year].filter(Boolean).join(", ")}]`
@@ -190,14 +190,14 @@ export function GroupComposer({
 								return next;
 							});
 						}}
-						className="text-[10px] text-on-surface-variant hover:text-destructive transition-colors"
+						className="text-xs text-on-surface-variant hover:text-destructive transition-colors"
 					>
 						[x]
 					</button>
 				</div>
 			)}
 			{isReviewMode && errors.record && (
-				<span className="font-mono text-[10px] text-destructive mt-1 block">
+				<span className="font-mono text-xs text-destructive mt-1 block">
 					{errors.record}
 				</span>
 			)}
@@ -208,7 +208,7 @@ export function GroupComposer({
 					<RecordSearchInline onSelect={setLinkedRecord}>
 						<button
 							type="button"
-							className="font-mono text-[10px] text-on-surface-variant border border-outline-variant/20 px-2 py-1 rounded hover:text-primary hover:border-primary transition-colors"
+							className="font-mono text-xs text-on-surface-variant border border-outline-variant/20 px-2 py-1 rounded hover:text-primary hover:border-primary transition-colors"
 						>
 							[+ link record]
 						</button>
@@ -223,7 +223,7 @@ export function GroupComposer({
 							}
 							setErrors({});
 						}}
-						className={`font-mono text-[10px] border px-2 py-1 rounded transition-colors ${
+						className={`font-mono text-xs border px-2 py-1 rounded transition-colors ${
 							isReviewMode
 								? "text-primary border-primary bg-primary/10"
 								: "text-on-surface-variant border-outline-variant/20 hover:text-primary hover:border-primary"
@@ -237,7 +237,7 @@ export function GroupComposer({
 					type="button"
 					onClick={handleSubmit}
 					disabled={!content.trim() || isSubmitting}
-					className="font-mono text-[10px] bg-primary text-primary-foreground px-4 py-1 rounded hover:bg-primary/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+					className="font-mono text-xs bg-primary text-primary-foreground px-4 py-1 rounded hover:bg-primary/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
 				>
 					{isSubmitting
 						? "posting..."

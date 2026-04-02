@@ -61,7 +61,7 @@ function TradeCard({ thread }: { thread: TradeThreadListItem }) {
 
 				<div className="flex items-center gap-2 flex-shrink-0">
 					{thread.unreadCount > 0 && (
-						<span className="bg-primary text-primary-foreground text-[10px] font-bold px-1.5 py-0.5 rounded-full">
+						<span className="bg-primary text-primary-foreground text-xs font-bold px-1.5 py-0.5 rounded-full">
 							{thread.unreadCount}
 						</span>
 					)}
@@ -77,7 +77,7 @@ function TradeCard({ thread }: { thread: TradeThreadListItem }) {
 						? thread.lastMessage.body
 						: "No messages yet"}
 				</p>
-				<span className="text-muted-foreground/60 text-[10px] flex-shrink-0">
+				<span className="text-muted-foreground/60 text-xs flex-shrink-0">
 					{formatRelativeTime(timestamp)}
 				</span>
 			</div>

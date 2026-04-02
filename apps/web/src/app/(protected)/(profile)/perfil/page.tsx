@@ -187,9 +187,9 @@ export default async function PerfilPage({ searchParams }: PerfilPageProps) {
 									</span>
 								</div>
 								{profile?.username && (
-									<p className="font-mono text-[11px] text-primary/60 mb-0.5">@{profile.username}</p>
+									<p className="font-mono text-xs text-primary/60 mb-0.5">@{profile.username}</p>
 								)}
-								<p className="text-on-surface-variant font-mono text-[10px]">
+								<p className="text-on-surface-variant font-mono text-xs">
 									Member since {memberYear}
 								</p>
 							</div>
@@ -222,7 +222,7 @@ export default async function PerfilPage({ searchParams }: PerfilPageProps) {
 
 						{/* Follow counts + Edit */}
 						<div className="flex items-center justify-between mb-3">
-							<div className="flex items-center gap-3 font-mono text-[10px]">
+							<div className="flex items-center gap-3 font-mono text-xs">
 								<FollowList userId={user.id} type="following" count={followCounts.followingCount} />
 								<span className="text-outline">&middot;</span>
 								<FollowList userId={user.id} type="followers" count={followCounts.followerCount} />
@@ -256,7 +256,7 @@ export default async function PerfilPage({ searchParams }: PerfilPageProps) {
 						{/* Bio */}
 						{profile?.bio && (
 							<div className="mt-3 rounded border border-outline/15 bg-black/40 px-3 py-2.5 max-h-[180px] overflow-y-auto overflow-x-hidden" style={{ scrollbarWidth: "thin", scrollbarColor: "rgba(255,255,255,0.15) transparent" }}>
-								<p className="font-mono text-[11px] text-on-surface-variant leading-relaxed break-words whitespace-pre-wrap">
+								<p className="font-mono text-xs text-on-surface-variant leading-relaxed break-words whitespace-pre-wrap">
 									{profile.bio}
 								</p>
 							</div>
@@ -274,7 +274,7 @@ export default async function PerfilPage({ searchParams }: PerfilPageProps) {
 
 				{/* Digging Activity */}
 				<div className="md:col-span-8 bg-surface-container-low p-6 rounded-lg flex flex-col gap-5">
-					<h3 className="text-[10px] font-mono uppercase tracking-[0.2em] text-tertiary">
+					<h3 className="text-xs font-mono uppercase tracking-[0.2em] text-tertiary">
 						Digging Activity
 					</h3>
 
@@ -319,13 +319,13 @@ export default async function PerfilPage({ searchParams }: PerfilPageProps) {
 									{topGenres.map((g, i) => (
 										<li key={g.genre} className="flex items-center gap-2 min-w-0">
 											<span className="font-mono text-[9px] text-outline w-2.5 flex-shrink-0">{i + 1}</span>
-											<span className="font-mono text-[11px] text-on-surface truncate flex-1">{g.genre}</span>
-											<span className="font-mono text-[10px] text-secondary flex-shrink-0">{g.count}</span>
+											<span className="font-mono text-xs text-on-surface truncate flex-1">{g.genre}</span>
+											<span className="font-mono text-xs text-secondary flex-shrink-0">{g.count}</span>
 										</li>
 									))}
 								</ol>
 							) : (
-								<p className="font-mono text-[10px] text-outline/60 italic">no data yet</p>
+								<p className="font-mono text-xs text-outline/60 italic">no data yet</p>
 							)}
 						</div>
 					</div>
@@ -356,7 +356,7 @@ export default async function PerfilPage({ searchParams }: PerfilPageProps) {
 							<span className={`material-symbols-outlined text-sm ${stat.color}`}>
 								{stat.icon}
 							</span>
-							<span className="text-[10px] font-mono text-on-surface-variant uppercase tracking-widest">
+							<span className="text-xs font-mono text-on-surface-variant uppercase tracking-widest">
 								{stat.label}
 							</span>
 						</div>
@@ -369,7 +369,7 @@ export default async function PerfilPage({ searchParams }: PerfilPageProps) {
 			<div className="mt-4 flex justify-end">
 				<Link
 					href="/crates"
-					className="font-mono text-[10px] text-primary hover:underline tracking-[0.15em]"
+					className="font-mono text-xs text-primary hover:underline tracking-[0.15em]"
 				>
 					[MY_CRATES →]
 				</Link>
@@ -392,7 +392,7 @@ export default async function PerfilPage({ searchParams }: PerfilPageProps) {
 				{/* Share + Rarity Controls */}
 				<div className="bg-surface-container-low p-4 rounded-lg border border-outline-variant/10 flex flex-col gap-4">
 					<div>
-						<div className="font-mono text-[10px] text-on-surface-variant tracking-[0.15em] mb-2">
+						<div className="font-mono text-xs text-on-surface-variant tracking-[0.15em] mb-2">
 							[SHARE_BOUNTY_LINK]
 						</div>
 						<ShareSurface
@@ -401,7 +401,7 @@ export default async function PerfilPage({ searchParams }: PerfilPageProps) {
 						/>
 					</div>
 					<div className="border-t border-outline-variant/10 pt-4">
-						<div className="font-mono text-[10px] text-on-surface-variant tracking-[0.15em] mb-2">
+						<div className="font-mono text-xs text-on-surface-variant tracking-[0.15em] mb-2">
 							[RARITY_CARD]
 						</div>
 						<RarityCardModal
@@ -416,10 +416,10 @@ export default async function PerfilPage({ searchParams }: PerfilPageProps) {
 
 				{/* Quick Stats Recap */}
 				<div className="bg-surface-container-low p-4 rounded-lg border border-outline-variant/10 flex flex-col justify-center gap-2">
-					<div className="font-mono text-[10px] text-on-surface-variant tracking-[0.15em]">
+					<div className="font-mono text-xs text-on-surface-variant tracking-[0.15em]">
 						[PUBLIC_IDENTITY]
 					</div>
-					<p className="font-mono text-[10px] text-on-surface-variant leading-relaxed">
+					<p className="font-mono text-xs text-on-surface-variant leading-relaxed">
 						Share your Bounty Link to let other diggers know what records you are hunting.
 						Generate your Rarity Card to show off your collection stats on social media.
 					</p>
@@ -430,7 +430,7 @@ export default async function PerfilPage({ searchParams }: PerfilPageProps) {
 			<section className="mt-12">
 				<div className="flex items-center justify-between mb-6">
 					<div>
-						<span className="text-[10px] font-mono text-secondary tracking-[0.2em] uppercase">
+						<span className="text-xs font-mono text-secondary tracking-[0.2em] uppercase">
 							Wantlist
 						</span>
 						<h2 className="text-2xl font-bold font-heading text-on-surface mt-1">
@@ -443,7 +443,7 @@ export default async function PerfilPage({ searchParams }: PerfilPageProps) {
 				<WantlistGrid items={wantlistData} isOwner={true} />
 
 				{wantlistTotal > WANTLIST_PAGE_SIZE && (
-					<p className="mt-4 text-center font-mono text-[10px] text-outline">
+					<p className="mt-4 text-center font-mono text-xs text-outline">
 						Showing {Math.min(WANTLIST_PAGE_SIZE, wantlistTotal)} of {wantlistTotal} items
 					</p>
 				)}
@@ -453,7 +453,7 @@ export default async function PerfilPage({ searchParams }: PerfilPageProps) {
 			<section className="mt-12">
 				<div className="flex items-center justify-between mb-6">
 					<div>
-						<span className="text-[10px] font-mono text-primary tracking-[0.2em] uppercase">
+						<span className="text-xs font-mono text-primary tracking-[0.2em] uppercase">
 							Repository
 						</span>
 						<h2 className="text-2xl font-bold font-heading text-on-surface mt-1">

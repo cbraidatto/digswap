@@ -74,12 +74,12 @@ export function WantlistCard({ item, isOwner }: WantlistCardProps) {
 				<div className="absolute bottom-2 left-2">
 					{isFound ? (
 						<span className="inline-flex items-center gap-1 bg-primary/20 border border-primary/40 text-primary font-mono text-[9px] uppercase tracking-widest px-1.5 py-0.5 rounded">
-							<span className="material-symbols-outlined text-[10px]">task_alt</span>
+							<span className="material-symbols-outlined text-xs">task_alt</span>
 							Found
 						</span>
 					) : (
 						<span className="inline-flex items-center gap-1 bg-secondary/10 border border-secondary/30 text-secondary font-mono text-[9px] uppercase tracking-widest px-1.5 py-0.5 rounded">
-							<span className="material-symbols-outlined text-[10px]">manage_search</span>
+							<span className="material-symbols-outlined text-xs">manage_search</span>
 							Hunting
 						</span>
 					)}
@@ -136,7 +136,7 @@ export function WantlistCard({ item, isOwner }: WantlistCardProps) {
 					{item.artist ?? "Unknown Artist"}
 				</p>
 				{item.notes && (
-					<p className="mt-1.5 text-[10px] font-mono text-on-surface-variant/60 line-clamp-2 leading-relaxed">
+					<p className="mt-1.5 text-xs font-mono text-on-surface-variant/60 line-clamp-2 leading-relaxed">
 						{item.notes}
 					</p>
 				)}

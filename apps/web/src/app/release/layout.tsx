@@ -34,10 +34,10 @@ export default async function ReleaseLayout({ children }: { children: React.Reac
 	return (
 		<div className="min-h-screen bg-background">
 			<div className="border-b border-outline-variant/20 px-4 py-2 flex items-center justify-between">
-				<span className="font-mono text-[10px] text-primary tracking-[0.2em]">DIGSWAP_v1.0.0</span>
+				<span className="font-mono text-xs text-primary tracking-[0.2em]">DIGSWAP_v1.0.0</span>
 				<div className="flex gap-4">
-					<Link href="/signin" className="font-mono text-[10px] text-on-surface-variant hover:text-primary transition-colors">SIGN_IN</Link>
-					<Link href="/signup" className="font-mono text-[10px] text-primary">START_DIGGING &rarr;</Link>
+					<Link href="/signin" className="font-mono text-xs text-on-surface-variant hover:text-primary transition-colors">Sign in</Link>
+					<Link href="/signup" className="font-mono text-xs text-primary">Start digging &rarr;</Link>
 				</div>
 			</div>
 			{children}

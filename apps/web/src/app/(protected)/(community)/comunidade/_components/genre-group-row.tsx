@@ -19,14 +19,14 @@ export function GenreGroupRow({ name, slug, memberCount }: GenreGroupRowProps) {
 			href={`/comunidade/${slug}`}
 			className="flex items-baseline gap-2 group py-1"
 		>
-			<span className="font-mono text-[10px] text-on-surface group-hover:text-primary transition-colors whitespace-nowrap">
+			<span className="font-mono text-xs text-on-surface group-hover:text-primary transition-colors whitespace-nowrap">
 				{name}
 			</span>
 			<span
 				className="flex-1 border-b border-dotted border-outline-variant/30 min-w-[20px] translate-y-[-3px]"
 				aria-hidden="true"
 			/>
-			<span className="font-mono text-[10px] text-on-surface-variant whitespace-nowrap">
+			<span className="font-mono text-xs text-on-surface-variant whitespace-nowrap">
 				{formatCount(memberCount)} members
 			</span>
 		</Link>

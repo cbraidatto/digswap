@@ -14,7 +14,7 @@ export function BadgeRow({ badges }: BadgeRowProps) {
 			{badges.map((badge) => (
 				<span
 					key={badge.slug}
-					className="font-mono text-[10px] text-primary/80 bg-primary/8 border border-primary/15 px-2 py-1 rounded"
+					className="font-mono text-xs text-primary/80 bg-primary/8 border border-primary/15 px-2 py-1 rounded"
 					title={badge.description ?? undefined}
 				>
 					[{badge.name}]

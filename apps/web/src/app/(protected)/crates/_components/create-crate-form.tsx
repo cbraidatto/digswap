@@ -85,7 +85,7 @@ export function CreateCrateForm({ onSuccess, onCancel }: CreateCrateFormProps) {
       onSubmit={handleSubmit(onSubmit)}
       className="bg-surface-container rounded-lg border border-outline-variant/20 p-4 space-y-4"
     >
-      <div className="font-mono text-[10px] text-primary tracking-[0.15em] mb-1">
+      <div className="font-mono text-xs text-primary tracking-[0.15em] mb-1">
         [NEW_CRATE]
       </div>
 
@@ -97,7 +97,7 @@ export function CreateCrateForm({ onSuccess, onCancel }: CreateCrateFormProps) {
           className="w-full bg-surface-container-high rounded border border-outline-variant/20 px-3 py-2 font-mono text-sm text-on-surface placeholder:text-on-surface-variant/40 focus:outline-none focus:border-primary/40"
         />
         {errors.name && (
-          <p className="font-mono text-[10px] text-destructive mt-1">
+          <p className="font-mono text-xs text-destructive mt-1">
             {errors.name.message}
           </p>
         )}
@@ -111,7 +111,7 @@ export function CreateCrateForm({ onSuccess, onCancel }: CreateCrateFormProps) {
           className="bg-surface-container-high rounded border border-outline-variant/20 px-3 py-2 font-mono text-sm text-on-surface focus:outline-none focus:border-primary/40"
         />
         {errors.date && (
-          <p className="font-mono text-[10px] text-destructive mt-1">
+          <p className="font-mono text-xs text-destructive mt-1">
             {errors.date.message}
           </p>
         )}
@@ -124,7 +124,7 @@ export function CreateCrateForm({ onSuccess, onCancel }: CreateCrateFormProps) {
             key={opt.value}
             type="button"
             onClick={() => setValue("sessionType", opt.value)}
-            className={`font-mono text-[10px] px-2 py-1 rounded border transition-colors ${
+            className={`font-mono text-xs px-2 py-1 rounded border transition-colors ${
               sessionType === opt.value ? opt.activeClass : opt.inactiveClass
             }`}
           >
@@ -138,7 +138,7 @@ export function CreateCrateForm({ onSuccess, onCancel }: CreateCrateFormProps) {
         <button
           type="submit"
           disabled={isSubmitting}
-          className="font-mono text-[10px] px-3 py-1.5 rounded border border-primary/40 text-primary hover:bg-primary/10 transition-colors disabled:opacity-50"
+          className="font-mono text-xs px-3 py-1.5 rounded border border-primary/40 text-primary hover:bg-primary/10 transition-colors disabled:opacity-50"
         >
           {isSubmitting ? "[SAVING...]" : "[CREATE]"}
         </button>
@@ -146,9 +146,9 @@ export function CreateCrateForm({ onSuccess, onCancel }: CreateCrateFormProps) {
           <button
             type="button"
             onClick={onCancel}
-            className="font-mono text-[10px] px-3 py-1.5 rounded border border-outline-variant/20 text-on-surface-variant hover:bg-surface-container-high transition-colors"
+            className="font-mono text-xs px-3 py-1.5 rounded border border-outline-variant/20 text-on-surface-variant hover:bg-surface-container-high transition-colors"
           >
-            [CANCEL]
+            Cancel
           </button>
         )}
       </div>

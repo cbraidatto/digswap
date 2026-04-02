@@ -24,11 +24,11 @@ export async function RadarSection({ userId }: RadarSectionProps) {
   if (matches.length === 0) {
     return (
       <div className="mb-6 p-4 bg-surface-container-low border border-outline-variant/20 rounded">
-        <div className="font-mono text-[10px] text-on-surface-variant tracking-[0.15em]">
+        <div className="font-mono text-xs text-on-surface-variant tracking-[0.15em]">
           THE_RADAR{" "}
           <span className="text-primary">// status: scanning</span>
         </div>
-        <p className="font-mono text-[11px] text-on-surface-variant mt-1">
+        <p className="font-mono text-xs text-on-surface-variant mt-1">
           No matches yet. The Radar fires when someone in the network has a
           record from your wantlist.
         </p>
@@ -41,7 +41,7 @@ export async function RadarSection({ userId }: RadarSectionProps) {
       {/* Section header */}
       <div className="flex items-center justify-between mb-3">
         <div>
-          <span className="font-mono text-[10px] text-primary tracking-[0.2em] uppercase">
+          <span className="font-mono text-xs text-primary tracking-[0.2em] uppercase">
             THE_RADAR
           </span>
           <h2 className="font-heading text-xl font-bold text-on-surface mt-0.5">
@@ -51,7 +51,7 @@ export async function RadarSection({ userId }: RadarSectionProps) {
         </div>
         <Link
           href="/radar"
-          className="font-mono text-[10px] text-primary hover:underline flex items-center gap-1"
+          className="font-mono text-xs text-primary hover:underline flex items-center gap-1"
         >
           VIEW_ALL_MATCHES →
         </Link>
@@ -75,7 +75,7 @@ export async function RadarSection({ userId }: RadarSectionProps) {
                     className="w-full h-full object-cover rounded"
                   />
                 ) : (
-                  <span className="font-mono text-[11px] font-bold text-primary">
+                  <span className="font-mono text-xs font-bold text-primary">
                     {(match.matchUsername ?? "?").charAt(0).toUpperCase()}
                   </span>
                 )}
@@ -86,13 +86,13 @@ export async function RadarSection({ userId }: RadarSectionProps) {
                 <div className="flex items-center gap-2 mb-0.5">
                   <Link
                     href={`/perfil/${match.matchUsername}`}
-                    className="font-mono text-[11px] text-on-surface hover:text-primary transition-colors"
+                    className="font-mono text-xs text-on-surface hover:text-primary transition-colors"
                   >
                     {match.matchUsername}
                   </Link>
                   <ContextTooltip type="user" id={match.matchUserId} />
                 </div>
-                <div className="font-mono text-[10px] text-on-surface-variant truncate">
+                <div className="font-mono text-xs text-on-surface-variant truncate">
                   has{" "}
                   <span className="text-on-surface">{match.releaseTitle}</span>
                   {match.releaseArtist && (
@@ -126,7 +126,7 @@ export async function RadarSection({ userId }: RadarSectionProps) {
                 {match.discogsId && (
                   <Link
                     href={`/release/${match.discogsId}`}
-                    className="font-mono text-[10px] text-on-surface-variant hover:text-primary transition-colors"
+                    className="font-mono text-xs text-on-surface-variant hover:text-primary transition-colors"
                     title="View release page"
                   >
                     <span className="material-symbols-outlined text-[16px]">album</span>
@@ -134,7 +134,7 @@ export async function RadarSection({ userId }: RadarSectionProps) {
                 )}
                 <Link
                   href={`/perfil/${match.matchUsername}`}
-                  className="font-mono text-[10px] text-on-surface-variant hover:text-primary transition-colors px-2 py-1 rounded hover:bg-surface-container-high"
+                  className="font-mono text-xs text-on-surface-variant hover:text-primary transition-colors px-2 py-1 rounded hover:bg-surface-container-high"
                 >
                   VIEW →
                 </Link>

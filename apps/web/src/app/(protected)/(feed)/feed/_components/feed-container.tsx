@@ -96,8 +96,8 @@ export function FeedContainer({
 						onClick={() => handleModeSwitch("global")}
 						className={
 							mode === "global"
-								? "bg-primary text-on-primary text-[10px] font-bold rounded px-3 py-1.5 font-mono"
-								: "text-on-surface-variant hover:text-on-surface text-[10px] font-bold px-3 py-1.5 font-mono"
+								? "bg-primary text-on-primary text-xs font-bold rounded px-3 py-1.5 font-mono"
+								: "text-on-surface-variant hover:text-on-surface text-xs font-bold px-3 py-1.5 font-mono"
 						}
 					>
 						Global
@@ -109,8 +109,8 @@ export function FeedContainer({
 						onClick={() => handleModeSwitch("personal")}
 						className={
 							mode === "personal"
-								? "bg-primary text-on-primary text-[10px] font-bold rounded px-3 py-1.5 font-mono"
-								: "text-on-surface-variant hover:text-on-surface text-[10px] font-bold px-3 py-1.5 font-mono"
+								? "bg-primary text-on-primary text-xs font-bold rounded px-3 py-1.5 font-mono"
+								: "text-on-surface-variant hover:text-on-surface text-xs font-bold px-3 py-1.5 font-mono"
 						}
 					>
 						Following
@@ -148,7 +148,7 @@ export function FeedContainer({
 								<br />
 								new finds will surface here as they dig.
 							</div>
-							<div className="font-mono text-[10px] text-outline border border-outline-variant/20 px-4 py-2 rounded">
+							<div className="font-mono text-xs text-outline border border-outline-variant/20 px-4 py-2 rounded">
 								[AWAITING_SIGNAL]
 							</div>
 						</>
@@ -162,7 +162,7 @@ export function FeedContainer({
 								<br />
 								the feed goes live once you connect.
 							</div>
-							<div className="font-mono text-[10px] text-outline border border-outline-variant/20 px-4 py-2 rounded">
+							<div className="font-mono text-xs text-outline border border-outline-variant/20 px-4 py-2 rounded">
 								[AWAITING_CONNECTION]
 							</div>
 						</>
@@ -184,7 +184,7 @@ export function FeedContainer({
 
 			{/* End of feed */}
 			{!hasMore && items.length > 0 && (
-				<div className="font-mono text-[10px] text-outline text-center py-8">
+				<div className="font-mono text-xs text-outline text-center py-8">
 					[END_OF_FEED]
 				</div>
 			)}

@@ -100,7 +100,7 @@ export function EditProfileModal({ initial }: EditProfileModalProps) {
 					<div className="w-full max-w-md bg-surface-container-low border border-outline/20 rounded-lg overflow-hidden">
 						{/* Header */}
 						<div className="flex items-center justify-between px-6 py-4 border-b border-outline/10">
-							<span className="font-mono text-[10px] uppercase tracking-[0.2em] text-on-surface-variant">
+							<span className="font-mono text-xs uppercase tracking-[0.2em] text-on-surface-variant">
 								edit_profile
 							</span>
 							<button
@@ -147,14 +147,14 @@ export function EditProfileModal({ initial }: EditProfileModalProps) {
 									/>
 								</div>
 								<div>
-									<p className="font-mono text-[10px] uppercase tracking-[0.2em] text-on-surface-variant">Avatar</p>
+									<p className="font-mono text-xs uppercase tracking-[0.2em] text-on-surface-variant">Avatar</p>
 									<p className="font-mono text-[9px] text-outline mt-0.5">Max 2MB · JPG, PNG, WebP</p>
 								</div>
 							</div>
 
 							{/* Display Name */}
 							<div>
-								<label className="block font-mono text-[10px] uppercase tracking-[0.2em] text-on-surface-variant mb-2">
+								<label className="block font-mono text-xs uppercase tracking-[0.2em] text-on-surface-variant mb-2">
 									Display Name
 								</label>
 								<input
@@ -169,7 +169,7 @@ export function EditProfileModal({ initial }: EditProfileModalProps) {
 
 							{/* Username */}
 							<div>
-								<label className="block font-mono text-[10px] uppercase tracking-[0.2em] text-on-surface-variant mb-2">
+								<label className="block font-mono text-xs uppercase tracking-[0.2em] text-on-surface-variant mb-2">
 									Username
 								</label>
 								<div className="relative">
@@ -188,7 +188,7 @@ export function EditProfileModal({ initial }: EditProfileModalProps) {
 
 							{/* Location */}
 							<div>
-								<label className="block font-mono text-[10px] uppercase tracking-[0.2em] text-on-surface-variant mb-2">
+								<label className="block font-mono text-xs uppercase tracking-[0.2em] text-on-surface-variant mb-2">
 									Location
 								</label>
 								<input
@@ -203,7 +203,7 @@ export function EditProfileModal({ initial }: EditProfileModalProps) {
 
 							{/* Bio */}
 							<div>
-								<label className="block font-mono text-[10px] uppercase tracking-[0.2em] text-on-surface-variant mb-2">
+								<label className="block font-mono text-xs uppercase tracking-[0.2em] text-on-surface-variant mb-2">
 									Bio
 								</label>
 								<textarea
@@ -219,7 +219,7 @@ export function EditProfileModal({ initial }: EditProfileModalProps) {
 
 							{/* Social Links */}
 							<div className="pt-2 border-t border-outline/10">
-								<p className="font-mono text-[10px] uppercase tracking-[0.2em] text-on-surface-variant mb-4">
+								<p className="font-mono text-xs uppercase tracking-[0.2em] text-on-surface-variant mb-4">
 									Social Links
 								</p>
 								<div className="space-y-3">
@@ -231,7 +231,7 @@ export function EditProfileModal({ initial }: EditProfileModalProps) {
 										{ label: "Beatport",   value: beatportUrl,   set: setBeatportUrl,   placeholder: "https://www.beatport.com/artist/..." },
 									] as const).map(({ label, value, set, placeholder }) => (
 										<div key={label} className="flex items-center gap-3">
-											<span className="font-mono text-[10px] text-on-surface-variant w-20 flex-shrink-0">{label}</span>
+											<span className="font-mono text-xs text-on-surface-variant w-20 flex-shrink-0">{label}</span>
 											<input
 												type="url"
 												value={value}
@@ -245,7 +245,7 @@ export function EditProfileModal({ initial }: EditProfileModalProps) {
 							</div>
 
 						{error && (
-								<p className="font-mono text-[10px] text-red-400">{error}</p>
+								<p className="font-mono text-xs text-red-400">{error}</p>
 							)}
 						</div>
 
@@ -255,7 +255,7 @@ export function EditProfileModal({ initial }: EditProfileModalProps) {
 								type="button"
 								onClick={() => setOpen(false)}
 								disabled={isPending}
-								className="font-mono text-[10px] uppercase tracking-[0.15em] px-4 py-2 border border-outline/30 text-on-surface-variant hover:text-on-surface transition-colors rounded"
+								className="font-mono text-xs uppercase tracking-[0.15em] px-4 py-2 border border-outline/30 text-on-surface-variant hover:text-on-surface transition-colors rounded"
 							>
 								Cancel
 							</button>
@@ -263,7 +263,7 @@ export function EditProfileModal({ initial }: EditProfileModalProps) {
 								type="button"
 								onClick={handleSave}
 								disabled={isPending}
-								className="font-mono text-[10px] uppercase tracking-[0.15em] px-4 py-2 bg-primary text-on-primary rounded hover:bg-primary/90 transition-colors disabled:opacity-50"
+								className="font-mono text-xs uppercase tracking-[0.15em] px-4 py-2 bg-primary text-on-primary rounded hover:bg-primary/90 transition-colors disabled:opacity-50"
 							>
 								{isPending ? "Saving..." : "Save"}
 							</button>

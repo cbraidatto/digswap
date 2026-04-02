@@ -54,14 +54,14 @@ function SortableTrackRow({ id, position, title, artist }: SortableTrackRowProps
       >
         <GripVertical size={14} />
       </button>
-      <span className="font-mono text-[10px] text-on-surface-variant w-5 flex-shrink-0">
+      <span className="font-mono text-xs text-on-surface-variant w-5 flex-shrink-0">
         {position}
       </span>
       <span className="font-heading text-xs text-on-surface truncate flex-1 min-w-0">
         {title ?? "Unknown"}
       </span>
       {artist && (
-        <span className="font-mono text-[10px] text-on-surface-variant flex-shrink-0 truncate max-w-[120px] min-w-0">
+        <span className="font-mono text-xs text-on-surface-variant flex-shrink-0 truncate max-w-[120px] min-w-0">
           {artist}
         </span>
       )}
@@ -150,7 +150,7 @@ export function SetBuilderPanel({ crateId, items, onClose }: SetBuilderPanelProp
     <div className="bg-surface-container rounded-lg border border-outline-variant/20 p-4 space-y-4">
       {/* Header */}
       <div className="flex items-center justify-between">
-        <span className="font-mono text-[10px] text-primary tracking-[0.15em]">
+        <span className="font-mono text-xs text-primary tracking-[0.15em]">
           [SET_BUILDER]
         </span>
         <button
@@ -165,7 +165,7 @@ export function SetBuilderPanel({ crateId, items, onClose }: SetBuilderPanelProp
       {/* Event metadata */}
       <div className="flex gap-3">
         <div className="flex-1">
-          <label className="block font-mono text-[10px] text-on-surface-variant mb-1">
+          <label className="block font-mono text-xs text-on-surface-variant mb-1">
             DATE
           </label>
           <input
@@ -176,7 +176,7 @@ export function SetBuilderPanel({ crateId, items, onClose }: SetBuilderPanelProp
           />
         </div>
         <div className="flex-1">
-          <label className="block font-mono text-[10px] text-on-surface-variant mb-1">
+          <label className="block font-mono text-xs text-on-surface-variant mb-1">
             VENUE
           </label>
           <input
@@ -191,12 +191,12 @@ export function SetBuilderPanel({ crateId, items, onClose }: SetBuilderPanelProp
 
       {/* Track picker */}
       {items.length === 0 ? (
-        <p className="font-mono text-[10px] text-on-surface-variant/60">
+        <p className="font-mono text-xs text-on-surface-variant/60">
           No items in this crate yet.
         </p>
       ) : (
         <div>
-          <div className="font-mono text-[10px] text-on-surface-variant mb-2">
+          <div className="font-mono text-xs text-on-surface-variant mb-2">
             SELECT TRACKS
           </div>
           <div className="space-y-1 max-h-52 overflow-y-auto pr-1">
@@ -222,7 +222,7 @@ export function SetBuilderPanel({ crateId, items, onClose }: SetBuilderPanelProp
                   {item.title ?? "Unknown"}
                 </span>
                 {item.artist && (
-                  <span className="font-mono text-[10px] text-on-surface-variant flex-shrink-0 max-w-[100px] truncate min-w-0">
+                  <span className="font-mono text-xs text-on-surface-variant flex-shrink-0 max-w-[100px] truncate min-w-0">
                     {item.artist}
                   </span>
                 )}
@@ -235,7 +235,7 @@ export function SetBuilderPanel({ crateId, items, onClose }: SetBuilderPanelProp
       {/* Ordered track list with drag-to-reorder */}
       {selectedItemIds.size > 0 && (
         <div>
-          <div className="font-mono text-[10px] text-on-surface-variant mb-2">
+          <div className="font-mono text-xs text-on-surface-variant mb-2">
             TRACK ORDER
           </div>
           <DndContext collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
@@ -266,11 +266,11 @@ export function SetBuilderPanel({ crateId, items, onClose }: SetBuilderPanelProp
           type="button"
           onClick={handleSave}
           disabled={selectedItemIds.size === 0 || isSaving}
-          className="font-mono text-[10px] px-3 py-1.5 rounded border border-primary/40 text-primary hover:bg-primary/10 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+          className="font-mono text-xs px-3 py-1.5 rounded border border-primary/40 text-primary hover:bg-primary/10 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
         >
           {isSaving ? "[SAVING...]" : "[SAVE_SET]"}
         </button>
-        <span className="font-mono text-[10px] text-on-surface-variant">
+        <span className="font-mono text-xs text-on-surface-variant">
           {selectedItemIds.size} track{selectedItemIds.size !== 1 ? "s" : ""} selected
         </span>
       </div>

@@ -90,7 +90,7 @@ function ShowcaseCard({
 			{/* Info */}
 			<div className="px-3 py-2.5 flex flex-col gap-0.5">
 				<div className="flex items-center gap-1">
-					<span className={`material-symbols-outlined text-[11px] leading-none ${meta.color}`}>
+					<span className={`material-symbols-outlined text-xs leading-none ${meta.color}`}>
 						{meta.icon}
 					</span>
 					<span className={`font-mono text-[9px] uppercase tracking-[0.15em] ${meta.color}`}>
@@ -102,12 +102,12 @@ function ShowcaseCard({
 						<p className="font-heading font-bold text-[13px] text-on-surface truncate leading-tight">
 							{release.title}
 						</p>
-						<p className="font-mono text-[10px] text-on-surface-variant truncate">
+						<p className="font-mono text-xs text-on-surface-variant truncate">
 							{release.artist}{release.year ? ` · ${release.year}` : ""}
 						</p>
 					</>
 				) : (
-					<p className="font-mono text-[11px] text-outline/50 italic">not set yet</p>
+					<p className="font-mono text-xs text-outline/50 italic">not set yet</p>
 				)}
 			</div>
 		</div>
@@ -151,7 +151,7 @@ function ShowcasePicker({
 				<div className="flex items-center justify-between px-5 py-4 border-b border-outline/10">
 					<div className="flex items-center gap-2">
 						<span className={`material-symbols-outlined text-sm ${meta.color}`}>{meta.icon}</span>
-						<span className="font-mono text-[11px] uppercase tracking-widest text-on-surface-variant">
+						<span className="font-mono text-xs uppercase tracking-widest text-on-surface-variant">
 							{meta.label}
 						</span>
 					</div>
@@ -179,15 +179,15 @@ function ShowcasePicker({
 				{/* Results */}
 				<div className="px-5 pb-4 max-h-64 overflow-y-auto">
 					{isPending && (
-						<p className="font-mono text-[10px] text-outline py-6 text-center tracking-widest">
+						<p className="font-mono text-xs text-outline py-6 text-center tracking-widest">
 							SEARCHING...
 						</p>
 					)}
 					{!isPending && query && results.length === 0 && (
-						<p className="font-mono text-[10px] text-outline py-6 text-center">no results</p>
+						<p className="font-mono text-xs text-outline py-6 text-center">no results</p>
 					)}
 					{!isPending && !query && (
-						<p className="font-mono text-[10px] text-outline/50 py-4 text-center">
+						<p className="font-mono text-xs text-outline/50 py-4 text-center">
 							type to search your collection
 						</p>
 					)}
@@ -212,7 +212,7 @@ function ShowcasePicker({
 								)}
 								<div className="flex-1 min-w-0">
 									<p className="font-heading font-bold text-sm text-on-surface truncate">{r.title}</p>
-									<p className="font-mono text-[10px] text-on-surface-variant truncate">
+									<p className="font-mono text-xs text-on-surface-variant truncate">
 										{r.artist}{r.year ? ` · ${r.year}` : ""}
 									</p>
 								</div>
@@ -226,14 +226,14 @@ function ShowcasePicker({
 					<button
 						type="button"
 						onClick={() => onSelect(null)}
-						className="font-mono text-[10px] uppercase tracking-widest text-outline hover:text-on-surface-variant transition-colors"
+						className="font-mono text-xs uppercase tracking-widest text-outline hover:text-on-surface-variant transition-colors"
 					>
 						clear slot
 					</button>
 					<button
 						type="button"
 						onClick={onClose}
-						className="font-mono text-[10px] uppercase tracking-widest text-on-surface-variant hover:text-on-surface transition-colors"
+						className="font-mono text-xs uppercase tracking-widest text-on-surface-variant hover:text-on-surface transition-colors"
 					>
 						cancel
 					</button>

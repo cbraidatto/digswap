@@ -87,7 +87,7 @@ export function GroupDiscoveryHub({
 
 			{/* Genre Groups Section */}
 			<section>
-				<h2 className="font-mono text-[10px] uppercase tracking-[0.2em] text-outline mb-4">
+				<h2 className="font-mono text-xs uppercase tracking-[0.2em] text-outline mb-4">
 					GENRE_GROUPS
 				</h2>
 				<div className="space-y-1">
@@ -104,7 +104,7 @@ export function GroupDiscoveryHub({
 					<button
 						type="button"
 						onClick={() => setShowAllGenres(true)}
-						className="font-mono text-[10px] text-primary hover:text-primary/80 mt-3 transition-colors"
+						className="font-mono text-xs text-primary hover:text-primary/80 mt-3 transition-colors"
 					>
 						[show all genre groups]
 					</button>
@@ -113,16 +113,16 @@ export function GroupDiscoveryHub({
 
 			{/* Member Groups Section */}
 			<section>
-				<h2 className="font-mono text-[10px] uppercase tracking-[0.2em] text-outline mb-4">
+				<h2 className="font-mono text-xs uppercase tracking-[0.2em] text-outline mb-4">
 					MEMBER_GROUPS
 				</h2>
 
 				{memberGroups.length === 0 ? (
 					<div className="bg-surface-container-low border border-outline-variant/10 rounded p-8 text-center">
-						<div className="font-mono text-[10px] text-outline mb-2">
+						<div className="font-mono text-xs text-outline mb-2">
 							[NO_GROUPS_YET]
 						</div>
-						<p className="font-mono text-[10px] text-on-surface-variant">
+						<p className="font-mono text-xs text-on-surface-variant">
 							No community groups yet. Be the first to create one.
 						</p>
 					</div>
@@ -148,7 +148,7 @@ export function GroupDiscoveryHub({
 							type="button"
 							onClick={handleLoadMore}
 							disabled={isPending}
-							className="font-mono text-[10px] text-primary hover:text-primary/80 transition-colors disabled:opacity-50"
+							className="font-mono text-xs text-primary hover:text-primary/80 transition-colors disabled:opacity-50"
 						>
 							{isPending ? "[loading...]" : "[load more]"}
 						</button>

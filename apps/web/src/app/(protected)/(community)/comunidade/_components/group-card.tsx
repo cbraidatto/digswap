@@ -27,14 +27,14 @@ export function GroupCard({
 					{name}
 				</h3>
 				{visibility === "private" && (
-					<span className="font-mono text-[10px] font-semibold bg-surface-container-high text-on-surface-variant border border-outline-variant/20 px-2 py-0.5 rounded shrink-0">
+					<span className="font-mono text-xs font-semibold bg-surface-container-high text-on-surface-variant border border-outline-variant/20 px-2 py-0.5 rounded shrink-0">
 						[PRIVATE]
 					</span>
 				)}
 			</div>
 
 			<div className="flex items-center gap-2 mt-2">
-				<span className="font-mono text-[10px] text-on-surface-variant">
+				<span className="font-mono text-xs text-on-surface-variant">
 					{memberCount.toLocaleString()} members
 				</span>
 				{category && (
@@ -42,7 +42,7 @@ export function GroupCard({
 						<span className="text-outline-variant/30" aria-hidden="true">
 							/
 						</span>
-						<span className="font-mono text-[10px] text-on-surface-variant">
+						<span className="font-mono text-xs text-on-surface-variant">
 							{category}
 						</span>
 					</>
@@ -50,7 +50,7 @@ export function GroupCard({
 			</div>
 
 			{creatorUsername && (
-				<div className="mt-2 font-mono text-[10px] text-on-surface-variant">
+				<div className="mt-2 font-mono text-xs text-on-surface-variant">
 					Created by{" "}
 					<span
 						className="hover:text-primary transition-colors"

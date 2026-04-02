@@ -52,7 +52,7 @@ export default async function RadarPage({ searchParams }: RadarPageProps) {
           <div className="flex items-center gap-4 mb-3">
             <BackButton />
           </div>
-          <span className="font-mono text-[10px] text-primary tracking-[0.2em] uppercase">
+          <span className="font-mono text-xs text-primary tracking-[0.2em] uppercase">
             THE_RADAR
           </span>
           <h1 className="font-heading text-3xl font-extrabold text-on-surface mt-1 uppercase tracking-tight">
@@ -66,7 +66,7 @@ export default async function RadarPage({ searchParams }: RadarPageProps) {
             <Link
               key={tier.value}
               href={tier.value ? `/radar?rarity=${tier.value}` : "/radar"}
-              className={`font-mono text-[10px] px-3 py-1.5 rounded border transition-colors ${
+              className={`font-mono text-xs px-3 py-1.5 rounded border transition-colors ${
                 rarityTier === tier.value
                   ? "border-primary text-primary bg-primary/10"
                   : "border-outline-variant/20 text-on-surface-variant hover:border-outline-variant/40"
@@ -79,7 +79,7 @@ export default async function RadarPage({ searchParams }: RadarPageProps) {
 
         {/* Match list */}
         {matches.length === 0 ? (
-          <div className="font-mono text-[11px] text-on-surface-variant py-12 text-center">
+          <div className="font-mono text-xs text-on-surface-variant py-12 text-center">
             [NO_MATCHES] // No wantlist matches found
             {rarityTier
               ? ` in [${rarityTier.toUpperCase()}] tier`
@@ -103,7 +103,7 @@ export default async function RadarPage({ searchParams }: RadarPageProps) {
                         className="w-full h-full object-cover rounded"
                       />
                     ) : (
-                      <span className="font-mono text-[11px] font-bold text-primary">
+                      <span className="font-mono text-xs font-bold text-primary">
                         {(match.matchUsername ?? "?").charAt(0).toUpperCase()}
                       </span>
                     )}
@@ -112,13 +112,13 @@ export default async function RadarPage({ searchParams }: RadarPageProps) {
                     <div className="flex items-center gap-2 mb-0.5">
                       <Link
                         href={`/perfil/${match.matchUsername}`}
-                        className="font-mono text-[11px] text-on-surface hover:text-primary transition-colors"
+                        className="font-mono text-xs text-on-surface hover:text-primary transition-colors"
                       >
                         {match.matchUsername}
                       </Link>
                       <ContextTooltip type="user" id={match.matchUserId} />
                     </div>
-                    <div className="font-mono text-[10px] text-on-surface-variant truncate">
+                    <div className="font-mono text-xs text-on-surface-variant truncate">
                       has{" "}
                       <span className="text-on-surface">
                         {match.releaseTitle}
@@ -151,7 +151,7 @@ export default async function RadarPage({ searchParams }: RadarPageProps) {
                     <LeadAction type="user" id={match.matchUserId} />
                     <Link
                       href={`/perfil/${match.matchUsername}`}
-                      className="font-mono text-[10px] text-on-surface-variant hover:text-primary px-2 py-1 rounded hover:bg-surface-container-high"
+                      className="font-mono text-xs text-on-surface-variant hover:text-primary px-2 py-1 rounded hover:bg-surface-container-high"
                     >
                       VIEW →
                     </Link>
@@ -163,7 +163,7 @@ export default async function RadarPage({ searchParams }: RadarPageProps) {
         )}
 
         {/* Simple page navigation */}
-        <div className="flex items-center gap-4 mt-8 font-mono text-[10px]">
+        <div className="flex items-center gap-4 mt-8 font-mono text-xs">
           {page > 1 && (
             <Link
               href={`/radar?${rarityTier ? `rarity=${rarityTier}&` : ""}page=${page - 1}`}

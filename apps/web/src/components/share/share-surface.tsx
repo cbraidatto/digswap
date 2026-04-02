@@ -29,7 +29,7 @@ export function ShareSurface({ url, label = "COPY_LINK" }: ShareSurfaceProps) {
       <button
         type="button"
         onClick={handleCopy}
-        className="font-mono text-[10px] text-primary hover:underline flex items-center gap-1"
+        className="font-mono text-xs text-primary hover:underline flex items-center gap-1"
       >
         <span className="material-symbols-outlined text-[12px]">
           {copied ? "check" : "content_copy"}
@@ -40,7 +40,7 @@ export function ShareSurface({ url, label = "COPY_LINK" }: ShareSurfaceProps) {
         <button
           type="button"
           onClick={handleShare}
-          className="font-mono text-[10px] text-on-surface-variant hover:text-primary flex items-center gap-1"
+          className="font-mono text-xs text-on-surface-variant hover:text-primary flex items-center gap-1"
         >
           <span className="material-symbols-outlined text-[12px]">share</span>
           SHARE

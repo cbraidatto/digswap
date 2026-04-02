@@ -22,25 +22,25 @@ export function AppHeader({ xp = 0, userId }: AppHeaderProps) {
 			<nav className="hidden md:flex absolute left-1/2 -translate-x-1/2 gap-8 items-center">
 				<Link
 					href="/feed"
-					className="font-mono text-[10px] uppercase tracking-[0.2em] text-on-surface-variant hover:text-on-surface transition-colors"
+					className="font-mono text-xs uppercase tracking-[0.2em] text-on-surface-variant hover:text-on-surface transition-colors"
 				>
 					Feed
 				</Link>
 				<Link
 					href="/comunidade"
-					className="font-mono text-[10px] uppercase tracking-[0.2em] text-on-surface-variant hover:text-on-surface transition-colors"
+					className="font-mono text-xs uppercase tracking-[0.2em] text-on-surface-variant hover:text-on-surface transition-colors"
 				>
 					Community
 				</Link>
 				<Link
 					href="/explorar"
-					className="font-mono text-[10px] uppercase tracking-[0.2em] text-on-surface-variant hover:text-on-surface transition-colors"
+					className="font-mono text-xs uppercase tracking-[0.2em] text-on-surface-variant hover:text-on-surface transition-colors"
 				>
-					Explorar
+					Explore
 				</Link>
 				<Link
 					href="/perfil"
-					className="font-mono text-[10px] uppercase tracking-[0.2em] text-on-surface-variant hover:text-on-surface transition-colors"
+					className="font-mono text-xs uppercase tracking-[0.2em] text-on-surface-variant hover:text-on-surface transition-colors"
 				>
 					Profile
 				</Link>

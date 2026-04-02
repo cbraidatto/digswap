@@ -55,7 +55,7 @@ describe("AppHeader", () => {
 		await waitFor(() => {
 			expect(screen.getByText("Feed")).toHaveAttribute("href", "/feed");
 			expect(screen.getByText("Community")).toHaveAttribute("href", "/comunidade");
-			expect(screen.getByText("Explorar")).toHaveAttribute("href", "/explorar");
+			expect(screen.getByText("Explore")).toHaveAttribute("href", "/explorar");
 			expect(screen.getByText("Profile")).toHaveAttribute("href", "/perfil");
 		});
 	});

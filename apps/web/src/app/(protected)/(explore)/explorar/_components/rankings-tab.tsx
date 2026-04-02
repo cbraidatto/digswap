@@ -73,7 +73,7 @@ export function RankingsTab({ currentUserId }: RankingsTabProps) {
 			/>
 
 			{/* Section Header */}
-			<div className="font-mono text-[10px] uppercase tracking-wider text-tertiary mt-6 mb-4">
+			<div className="font-mono text-xs uppercase tracking-wider text-tertiary mt-6 mb-4">
 				{sectionLabel}
 			</div>
 
@@ -105,10 +105,10 @@ export function RankingsTab({ currentUserId }: RankingsTabProps) {
 			{/* Empty State */}
 			{!loading && entries.length === 0 && (
 				<div className="text-center py-12">
-					<p className="font-mono text-[10px] text-on-surface-variant uppercase tracking-wider">
+					<p className="font-mono text-xs text-on-surface-variant uppercase tracking-wider">
 						NO_RANKINGS_YET
 					</p>
-					<p className="font-mono text-[10px] text-outline mt-2">
+					<p className="font-mono text-xs text-outline mt-2">
 						Rankings are computed every 15 minutes. Import your collection and
 						start digging to appear on the leaderboard.
 					</p>
@@ -121,7 +121,7 @@ export function RankingsTab({ currentUserId }: RankingsTabProps) {
 					type="button"
 					onClick={handleLoadMore}
 					disabled={loadingMore}
-					className="w-full py-3 font-mono text-[10px] uppercase tracking-wider text-on-surface-variant hover:text-on-surface transition-colors disabled:opacity-50"
+					className="w-full py-3 font-mono text-xs uppercase tracking-wider text-on-surface-variant hover:text-on-surface transition-colors disabled:opacity-50"
 				>
 					{loadingMore ? "LOADING..." : "LOAD_MORE"}
 				</button>

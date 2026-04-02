@@ -18,7 +18,7 @@ export function RankCard({
 					military_tech
 				</span>
 				<div>
-					<div className="text-[10px] text-secondary font-mono uppercase tracking-widest">
+					<div className="text-xs text-secondary font-mono uppercase tracking-widest">
 						Class Status
 					</div>
 					<div className="text-sm font-bold font-heading">{title}</div>
@@ -30,10 +30,10 @@ export function RankCard({
 					<div className="text-2xl font-bold font-heading text-secondary">
 						{globalRank ? `#${globalRank}` : "#--"}
 					</div>
-					<div className="font-mono text-[10px] text-outline uppercase">
+					<div className="font-mono text-xs text-outline uppercase">
 						GLOBAL_RANK
 					</div>
-					<div className="font-mono text-[10px] text-outline uppercase">
+					<div className="font-mono text-xs text-outline uppercase">
 						Score_pts
 					</div>
 				</div>
@@ -41,10 +41,10 @@ export function RankCard({
 					<div className="text-2xl font-bold font-heading text-primary">
 						{rarityScore.toFixed(1)}
 					</div>
-					<div className="font-mono text-[10px] text-outline uppercase">
+					<div className="font-mono text-xs text-outline uppercase">
 						RARITY
 					</div>
-					<div className="font-mono text-[10px] text-outline uppercase">
+					<div className="font-mono text-xs text-outline uppercase">
 						Score_pts
 					</div>
 				</div>
@@ -52,10 +52,10 @@ export function RankCard({
 					<div className="text-2xl font-bold font-heading text-tertiary">
 						{contributionScore.toFixed(1)}
 					</div>
-					<div className="font-mono text-[10px] text-outline uppercase">
+					<div className="font-mono text-xs text-outline uppercase">
 						CONTRIBUTION
 					</div>
-					<div className="font-mono text-[10px] text-outline uppercase">
+					<div className="font-mono text-xs text-outline uppercase">
 						Score_pts
 					</div>
 				</div>

@@ -27,7 +27,7 @@ export function TradeQuotaBanner({ isPremium, tradesUsed, tradesLimit, percentUs
 				</div>
 				<Link
 					href="/pricing"
-					className="flex-shrink-0 bg-[#c8914a] text-[#0d0d0d] font-mono text-[10px] font-bold px-2.5 py-1 rounded hover:brightness-110 transition-all"
+					className="flex-shrink-0 bg-[#c8914a] text-[#0d0d0d] font-mono text-xs font-bold px-2.5 py-1 rounded hover:brightness-110 transition-all"
 				>
 					UPGRADE
 				</Link>
@@ -39,10 +39,10 @@ export function TradeQuotaBanner({ isPremium, tradesUsed, tradesLimit, percentUs
 		<div className="bg-[#111008] border border-[#2a2218] rounded p-3 flex items-center gap-3 mb-4">
 			<div className="flex-1 min-w-0">
 				<div className="flex items-center justify-between mb-1">
-					<span className="text-[#4a4035] font-mono text-[10px] uppercase tracking-widest">
+					<span className="text-[#4a4035] font-mono text-xs uppercase tracking-widest">
 						Trades this month
 					</span>
-					<span className="text-[#7a6e5f] font-mono text-[10px]">
+					<span className="text-[#7a6e5f] font-mono text-xs">
 						{tradesUsed} / {tradesLimit}
 					</span>
 				</div>
@@ -55,7 +55,7 @@ export function TradeQuotaBanner({ isPremium, tradesUsed, tradesLimit, percentUs
 			</div>
 			<Link
 				href="/pricing"
-				className="flex-shrink-0 text-[#4a4035] hover:text-[#c8914a] font-mono text-[10px] transition-colors"
+				className="flex-shrink-0 text-[#4a4035] hover:text-[#c8914a] font-mono text-xs transition-colors"
 			>
 				Upgrade
 			</Link>

@@ -204,7 +204,7 @@ export function AddRecordDialog({ open, onOpenChange }: AddRecordDialogProps) {
 													progress_activity
 												</span>
 											) : (
-												<div className="text-[10px] font-mono text-on-surface-variant">
+												<div className="text-xs font-mono text-on-surface-variant">
 													{result.year && <div>{result.year}</div>}
 													{result.format && (
 														<div className="text-on-surface-variant/60">

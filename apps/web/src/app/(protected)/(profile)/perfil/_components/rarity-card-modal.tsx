@@ -32,14 +32,14 @@ export function RarityCardModal({ username, appUrl, displayName, totalRecords = 
       <DialogTrigger>
         <button
           type="button"
-          className="font-mono text-[10px] text-on-surface-variant hover:text-primary transition-colors"
+          className="font-mono text-xs text-on-surface-variant hover:text-primary transition-colors"
         >
           GENERATE_RARITY_CARD
         </button>
       </DialogTrigger>
       <DialogContent className="bg-surface-container border-outline-variant/20 sm:max-w-2xl">
         <DialogHeader>
-          <DialogTitle className="font-mono text-[10px] text-primary tracking-[0.15em]">
+          <DialogTitle className="font-mono text-xs text-primary tracking-[0.15em]">
             [RARITY_SCORE_CARD]
           </DialogTitle>
         </DialogHeader>

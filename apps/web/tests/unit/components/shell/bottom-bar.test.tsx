@@ -20,9 +20,9 @@ describe("BottomBar", () => {
 	it("renders 4 tab links with correct labels", () => {
 		render(<BottomBar />);
 		expect(screen.getByText("Feed")).toBeInTheDocument();
-		expect(screen.getByText("Perfil")).toBeInTheDocument();
-		expect(screen.getByText("Explorar")).toBeInTheDocument();
-		expect(screen.getByText("Comunidade")).toBeInTheDocument();
+		expect(screen.getByText("Profile")).toBeInTheDocument();
+		expect(screen.getByText("Explore")).toBeInTheDocument();
+		expect(screen.getByText("Community")).toBeInTheDocument();
 	});
 
 	it("renders tab links with correct hrefs", () => {
@@ -41,14 +41,14 @@ describe("BottomBar", () => {
 		const feedLink = screen.getByText("Feed").closest("a");
 		expect(feedLink).toHaveAttribute("aria-current", "page");
 
-		const explorarLink = screen.getByText("Explorar").closest("a");
+		const explorarLink = screen.getByText("Explore").closest("a");
 		expect(explorarLink).not.toHaveAttribute("aria-current");
 	});
 
 	it("applies active styling to current tab", () => {
 		mockPathname.mockReturnValue("/explorar");
 		render(<BottomBar />);
-		const explorarLink = screen.getByText("Explorar").closest("a");
+		const explorarLink = screen.getByText("Explore").closest("a");
 		expect(explorarLink?.className).toContain("text-primary");
 
 		const feedLink = screen.getByText("Feed").closest("a");
