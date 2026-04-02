@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { redirect } from "next/navigation";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
@@ -57,7 +58,20 @@ function StatBlock({ value, label }: { value: string; label: string }) {
 	);
 }
 
-export default function Home() {
+export default async function Home({
+	searchParams,
+}: {
+	searchParams: Promise<{ error?: string; error_code?: string; error_description?: string }>;
+}) {
+	const params = await searchParams;
+
+	// OAuth errors (e.g. bad_oauth_state) redirect to / with error params.
+	// Send the user to signin with a clear message.
+	if (params.error_code || params.error) {
+		const message = params.error_description?.replace(/\+/g, " ") ?? params.error ?? "auth_error";
+		redirect(`/signin?error=${encodeURIComponent(message)}`);
+	}
+
 	return (
 		<div className="min-h-screen relative overflow-hidden">
 			{/* Subtle background texture */}
