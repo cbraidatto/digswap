@@ -159,21 +159,34 @@ export async function searchRecords(
  * Only returns records that exist in at least one user's collection.
  *
  * Per DISC2-02: Genre/decade browse returns cross-user records filtered by genre array and year range.
+ * Extended in S03: also supports multi-genre, country, format, minRarity filters.
  */
 export async function browseRecords(
 	genre: string | null,
 	decade: string | null,
 	limit = 20,
 	offset = 0,
+	genres: string[] = [],
+	country: string | null = null,
+	format: string | null = null,
+	minRarity = 0,
 ): Promise<BrowseResult[]> {
 	// Build WHERE conditions
 	const conditions = [];
 
+	// Legacy single-genre filter (kept for backward compat)
 	if (genre) {
-		// PostgreSQL array contains operator: genre column @> ARRAY[genre]
 		conditions.push(
 			sql`${releases.genre} @> ARRAY[${genre}]::text[]`,
 		);
+	}
+
+	// Multi-genre filter (any of): combine with OR
+	if (genres.length > 0) {
+		const genreConditions = genres.map(
+			(g) => sql`${releases.genre} @> ARRAY[${g}]::text[]`,
+		);
+		conditions.push(or(...genreConditions)!);
 	}
 
 	if (decade) {
@@ -186,6 +199,21 @@ export async function browseRecords(
 				)!,
 			);
 		}
+	}
+
+	if (country) {
+		conditions.push(ilike(releases.country, `%${country}%`));
+	}
+
+	if (format) {
+		conditions.push(ilike(releases.format, `%${format}%`));
+	}
+
+	if (minRarity > 0) {
+		// rarityScore is stored 0-1 range or 0-100 depending on compute — treat as 0-1, scale input
+		conditions.push(
+			sql`COALESCE(${releases.rarityScore}, 0) >= ${minRarity / 100}`,
+		);
 	}
 
 	// Inner join with collection_items to only show records in at least one collection

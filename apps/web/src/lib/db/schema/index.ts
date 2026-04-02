@@ -15,3 +15,4 @@ export * from "./import-jobs";
 export * from "./leads";
 export * from "./crates";
 export * from "./engagement";
+export * from "./search-signals";

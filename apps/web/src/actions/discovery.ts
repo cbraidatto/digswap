@@ -8,6 +8,7 @@ import {
 	getSuggestedRecords,
 } from "@/lib/discovery/queries";
 import { searchRecordsSchema, browseRecordsSchema } from "@/lib/validations/discovery";
+import { logSearchSignal } from "@/actions/search-signals";
 
 const PAGE_SIZE = 20;
 
@@ -38,6 +39,9 @@ export async function searchRecordsAction(term: string) {
 			return [];
 		}
 
+		// Fire-and-forget signal logging — don't await to keep latency low
+		void logSearchSignal([parsed.data.term], []);
+
 		return searchRecords(parsed.data.term);
 	} catch (err) {
 		console.error("[searchRecordsAction] error:", err);
@@ -49,15 +53,19 @@ export async function searchRecordsAction(term: string) {
  * Browse records filtered by genre and/or decade with pagination.
  * Requires authenticated user.
  *
- * Per DISC2-02.
+ * Per DISC2-02. Extended in S03: multi-genre, country, format, minRarity.
  */
 export async function browseRecordsAction(
 	genre: string | null,
 	decade: string | null,
 	page = 1,
+	genres: string[] = [],
+	country: string | null = null,
+	format: string | null = null,
+	minRarity = 0,
 ) {
 	try {
-		const parsed = browseRecordsSchema.safeParse({ genre, decade, page });
+		const parsed = browseRecordsSchema.safeParse({ genre, decade, page, genres, country, format, minRarity });
 		if (!parsed.success) {
 			return [];
 		}
@@ -77,7 +85,26 @@ export async function browseRecordsAction(
 		}
 
 		const offset = (parsed.data.page - 1) * PAGE_SIZE;
-		return browseRecords(parsed.data.genre, parsed.data.decade, PAGE_SIZE, offset);
+
+		// Log search signals when genre filters are active
+		const allGenres = [
+			...(parsed.data.genre ? [parsed.data.genre] : []),
+			...parsed.data.genres,
+		];
+		if (allGenres.length > 0) {
+			void logSearchSignal([], allGenres);
+		}
+
+		return browseRecords(
+			parsed.data.genre,
+			parsed.data.decade,
+			PAGE_SIZE,
+			offset,
+			parsed.data.genres,
+			parsed.data.country,
+			parsed.data.format,
+			parsed.data.minRarity,
+		);
 	} catch (err) {
 		console.error("[browseRecordsAction] error:", err);
 		return [];

@@ -1,16 +1,20 @@
 "use client";
 
 import { useState, useEffect, useTransition } from "react";
+import { useRouter } from "next/navigation";
 import { useInView } from "react-intersection-observer";
 import type { FeedItem } from "@/actions/social";
-import { loadMoreFeed } from "@/actions/social";
+import { loadMoreFeed, loadExploreFeed } from "@/actions/social";
 import { FeedCard } from "./feed-card";
 import { FollowEventCard } from "./follow-event-card";
 import { GroupFeedCard } from "./group-feed-card";
+import type { ContextReason } from "@/components/feed/context-label";
+
+type FeedMode = "personal" | "global" | "explore";
 
 interface FeedContainerProps {
 	initialItems: FeedItem[];
-	initialMode: "personal" | "global";
+	initialMode: FeedMode;
 	followingCount: number;
 }
 
@@ -19,6 +23,13 @@ export function FeedContainer({
 	initialMode,
 	followingCount,
 }: FeedContainerProps) {
+	const router = useRouter();
+
+	// "Feed" tab covers personal + global; "Explore" is a separate tab
+	const initialTopTab: "feed" | "explore" =
+		initialMode === "explore" ? "explore" : "feed";
+
+	const [topTab, setTopTab] = useState<"feed" | "explore">(initialTopTab);
 	const [items, setItems] = useState<FeedItem[]>(initialItems);
 	const [cursor, setCursor] = useState<string | null>(
 		initialItems.length > 0
@@ -26,65 +37,151 @@ export function FeedContainer({
 			: null,
 	);
 	const [hasMore, setHasMore] = useState(initialItems.length >= 20);
-	const [mode, setMode] = useState<"personal" | "global">(initialMode);
+
+	// Feed sub-mode (personal vs global) — only relevant when topTab === "feed"
+	const initialSubMode: "personal" | "global" =
+		initialMode === "personal" || initialMode === "global"
+			? initialMode
+			: followCounts(followingCount);
+	const [subMode, setSubMode] = useState<"personal" | "global">(
+		initialSubMode,
+	);
+
 	const [isPending, startTransition] = useTransition();
 	const { ref: sentinelRef, inView } = useInView({ threshold: 0 });
 
-	// Infinite scroll: load more when sentinel is in view
+	// Helpers
+	function followCounts(count: number): "personal" | "global" {
+		return count > 0 ? "personal" : "global";
+	}
+
+	const currentMode: FeedMode =
+		topTab === "explore" ? "explore" : subMode;
+
+	// Infinite scroll
 	useEffect(() => {
 		if (inView && hasMore && !isPending) {
 			startTransition(async () => {
-				const newItems = await loadMoreFeed(cursor, mode);
+				let newItems: FeedItem[];
+				if (currentMode === "explore") {
+					newItems = await loadExploreFeed(cursor);
+				} else {
+					newItems = await loadMoreFeed(cursor, currentMode);
+				}
 				if (newItems.length === 0) {
 					setHasMore(false);
 					return;
 				}
 				setItems((prev) => {
 					const existingIds = new Set(prev.map((item) => item.id));
-					const deduplicated = newItems.filter(
-						(item) => !existingIds.has(item.id),
-					);
-					return [...prev, ...deduplicated];
+					return [
+						...prev,
+						...newItems.filter((item) => !existingIds.has(item.id)),
+					];
 				});
 				setCursor(newItems[newItems.length - 1].createdAt);
+				if (newItems.length < 20) setHasMore(false);
 			});
 		}
-	}, [inView, hasMore, isPending, cursor, mode]);
+	}, [inView, hasMore, isPending, cursor, currentMode]);
 
-	function handleModeSwitch(newMode: "personal" | "global") {
-		if (newMode === mode) return;
-		setMode(newMode);
+	function switchTopTab(next: "feed" | "explore") {
+		if (next === topTab) return;
+		setTopTab(next);
+		setItems([]);
+		setCursor(null);
+		setHasMore(true);
+
+		// Update URL without full navigation (preserves state on back)
+		const url = next === "explore" ? "?tab=explore" : "?";
+		router.replace(url);
+
+		// Immediately load content for the new tab
+		startTransition(async () => {
+			let newItems: FeedItem[];
+			if (next === "explore") {
+				newItems = await loadExploreFeed(null);
+			} else {
+				newItems = await loadMoreFeed(null, subMode);
+			}
+			setItems(newItems);
+			setCursor(
+				newItems.length > 0
+					? newItems[newItems.length - 1].createdAt
+					: null,
+			);
+			setHasMore(newItems.length >= 20);
+		});
+	}
+
+	function handleSubModeSwitch(newMode: "personal" | "global") {
+		if (newMode === subMode) return;
+		setSubMode(newMode);
 		setItems([]);
 		setCursor(null);
 		setHasMore(true);
 		startTransition(async () => {
 			const newItems = await loadMoreFeed(null, newMode);
-			if (newItems.length === 0) {
-				setHasMore(false);
-				return;
-			}
 			setItems(newItems);
-			setCursor(newItems[newItems.length - 1].createdAt);
-			if (newItems.length < 20) {
-				setHasMore(false);
-			}
+			setCursor(
+				newItems.length > 0
+					? newItems[newItems.length - 1].createdAt
+					: null,
+			);
+			setHasMore(newItems.length >= 20);
 		});
 	}
 
 	const subtitle =
-		mode === "global"
-			? "// ranked by rarity signal"
-			: "// signals from diggers you follow";
+		topTab === "explore"
+			? "// discover beyond your network"
+			: subMode === "global"
+				? "// ranked by rarity signal"
+				: "// signals from diggers you follow";
 
 	return (
 		<div>
+			{/* Top-level tab switcher: Feed | Explore */}
+			<div
+				role="tablist"
+				aria-label="Content tabs"
+				className="bg-surface-container-low p-1 rounded-lg flex items-center gap-1 mb-4"
+			>
+				<button
+					type="button"
+					role="tab"
+					aria-selected={topTab === "feed"}
+					onClick={() => switchTopTab("feed")}
+					className={
+						topTab === "feed"
+							? "bg-primary text-on-primary text-xs font-bold rounded px-3 py-1.5 font-mono"
+							: "text-on-surface-variant hover:text-on-surface text-xs font-bold px-3 py-1.5 font-mono"
+					}
+				>
+					Feed
+				</button>
+				<button
+					type="button"
+					role="tab"
+					aria-selected={topTab === "explore"}
+					onClick={() => switchTopTab("explore")}
+					className={
+						topTab === "explore"
+							? "bg-primary text-on-primary text-xs font-bold rounded px-3 py-1.5 font-mono"
+							: "text-on-surface-variant hover:text-on-surface text-xs font-bold px-3 py-1.5 font-mono"
+					}
+				>
+					Explore
+				</button>
+			</div>
+
 			{/* Subtitle */}
 			<p className="font-mono text-sm text-on-surface-variant mb-6">
 				{subtitle}
 			</p>
 
-			{/* Mode toggle - only show if user follows someone */}
-			{followingCount > 0 && (
+			{/* Feed sub-mode toggle — only visible on Feed tab when user follows someone */}
+			{topTab === "feed" && followingCount > 0 && (
 				<div
 					role="tablist"
 					className="bg-surface-container-low p-1 rounded-lg flex items-center gap-1 mb-6"
@@ -92,10 +189,10 @@ export function FeedContainer({
 					<button
 						type="button"
 						role="tab"
-						aria-selected={mode === "global"}
-						onClick={() => handleModeSwitch("global")}
+						aria-selected={subMode === "global"}
+						onClick={() => handleSubModeSwitch("global")}
 						className={
-							mode === "global"
+							subMode === "global"
 								? "bg-primary text-on-primary text-xs font-bold rounded px-3 py-1.5 font-mono"
 								: "text-on-surface-variant hover:text-on-surface text-xs font-bold px-3 py-1.5 font-mono"
 						}
@@ -105,10 +202,10 @@ export function FeedContainer({
 					<button
 						type="button"
 						role="tab"
-						aria-selected={mode === "personal"}
-						onClick={() => handleModeSwitch("personal")}
+						aria-selected={subMode === "personal"}
+						onClick={() => handleSubModeSwitch("personal")}
 						className={
-							mode === "personal"
+							subMode === "personal"
 								? "bg-primary text-on-primary text-xs font-bold rounded px-3 py-1.5 font-mono"
 								: "text-on-surface-variant hover:text-on-surface text-xs font-bold px-3 py-1.5 font-mono"
 						}
@@ -122,7 +219,15 @@ export function FeedContainer({
 			<div aria-live="polite" className="space-y-4">
 				{items.map((item) =>
 					item.actionType === "added_record" ? (
-						<FeedCard key={item.id} item={item} />
+						<FeedCard
+							key={item.id}
+							item={item}
+							contextReason={
+								topTab === "explore"
+									? ((item.contextReason as ContextReason | undefined) ?? null)
+									: undefined
+							}
+						/>
 					) : item.actionType === "followed_user" ? (
 						<FollowEventCard key={item.id} item={item} />
 					) : item.actionType === "group_post" ||
@@ -138,7 +243,21 @@ export function FeedContainer({
 					<span className="material-symbols-outlined text-primary text-5xl mb-6 opacity-60">
 						sensors_off
 					</span>
-					{mode === "personal" ? (
+					{topTab === "explore" ? (
+						<>
+							<div className="font-mono text-sm text-primary mb-2">
+								&gt; explore_empty
+							</div>
+							<div className="font-mono text-xs text-on-surface-variant mb-6 max-w-sm leading-relaxed">
+								no new finds outside your network yet.
+								<br />
+								check back as more diggers log their records.
+							</div>
+							<div className="font-mono text-xs text-outline border border-outline-variant/20 px-4 py-2 rounded">
+								[SCANNING_BEYOND_NETWORK]
+							</div>
+						</>
+					) : subMode === "personal" ? (
 						<>
 							<div className="font-mono text-sm text-primary mb-2">
 								&gt; feed_empty

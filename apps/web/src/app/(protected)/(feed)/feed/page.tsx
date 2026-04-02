@@ -12,13 +12,18 @@ import {
 	getGlobalFeed,
 	getPersonalFeed,
 } from "@/lib/social/queries";
+import { getExploreFeed } from "@/lib/social/explore-queries";
 import { ProgressBanner } from "./_components/progress-banner";
 import { FeedContainer } from "./_components/feed-container";
 import { RadarSection } from "./_components/radar-section";
 import { RadarEmptyState } from "./_components/radar-empty-state";
 import { BackButton } from "@/components/shell/back-button";
 
-export default async function FeedPage() {
+export default async function FeedPage({
+	searchParams,
+}: {
+	searchParams: Promise<{ tab?: string }>;
+}) {
 	const supabase = await createClient();
 	const {
 		data: { user },
@@ -28,18 +33,31 @@ export default async function FeedPage() {
 		redirect("/login");
 	}
 
+	const { tab } = await searchParams;
+	const isExplore = tab === "explore";
+
 	const [progressState, followCounts] = await Promise.all([
 		getProgressBarState(user.id),
 		getFollowCounts(user.id),
 	]);
 
-	const initialMode =
-		followCounts.followingCount > 0 ? "personal" : "global";
+	let initialItems;
+	if (isExplore) {
+		initialItems = await getExploreFeed(user.id, null, 20);
+	} else {
+		const initialMode =
+			followCounts.followingCount > 0 ? "personal" : "global";
+		initialItems =
+			initialMode === "personal"
+				? await getPersonalFeed(user.id, null, 20)
+				: await getGlobalFeed(null, 20);
+	}
 
-	const initialFeed =
-		initialMode === "personal"
-			? await getPersonalFeed(user.id, null, 20)
-			: await getGlobalFeed(null, 20);
+	const initialMode = isExplore
+		? "explore"
+		: followCounts.followingCount > 0
+			? "personal"
+			: "global";
 
 	return (
 		<div className="flex min-h-[calc(100vh-56px)]">
@@ -64,7 +82,7 @@ export default async function FeedPage() {
 				/>
 
 				<FeedContainer
-					initialItems={initialFeed}
+					initialItems={initialItems}
 					initialMode={initialMode}
 					followingCount={followCounts.followingCount}
 				/>

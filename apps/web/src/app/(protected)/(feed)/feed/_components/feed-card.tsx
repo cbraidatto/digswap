@@ -7,6 +7,7 @@ import { CoverArt } from "@/components/ui/cover-art";
 import { DigButton } from "@/components/engagement/dig-button";
 import { PlayButton } from "@/components/player/play-button";
 import { getRarityTier, type RarityTier } from "@/lib/collection/rarity";
+import { ContextLabel, type ContextReason } from "@/components/feed/context-label";
 
 function formatRelativeTime(dateStr: string): string {
 	const diff = Date.now() - new Date(dateStr).getTime();
@@ -45,7 +46,15 @@ function getRarityTextColor(tier: RarityTier): string {
 	}
 }
 
-export function FeedCard({ item, digState }: { item: FeedItem; digState?: { dug: boolean; digCount: number } }) {
+export function FeedCard({
+	item,
+	digState,
+	contextReason,
+}: {
+	item: FeedItem;
+	digState?: { dug: boolean; digCount: number };
+	contextReason?: ContextReason;
+}) {
 	const tier = getRarityTier(item.releaseRarityScore);
 	const accentColor = getAccentStripColor(tier);
 	const rarityTextColor = getRarityTextColor(tier);
@@ -135,6 +144,9 @@ export function FeedCard({ item, digState }: { item: FeedItem; digState?: { dug:
 					</div>
 				</div>
 			</div>
+
+			{/* Context label (explore mode) */}
+			<ContextLabel reason={contextReason ?? null} />
 		</article>
 	);
 }

@@ -1,27 +1,65 @@
 "use client";
 
-import { useState } from "react";
+import { useCallback } from "react";
+import { useRouter, useSearchParams, usePathname } from "next/navigation";
 import { RecordSearch } from "./record-search";
 import { BrowseFilters } from "./browse-filters";
+import { AdvancedSearchFilters } from "./advanced-search-filters";
 import { BrowseGrid } from "./browse-grid";
 import { SuggestedSection } from "./suggested-section";
 
 export function RecordsTab() {
-	const [selectedGenre, setSelectedGenre] = useState<string | null>(null);
-	const [selectedDecade, setSelectedDecade] = useState<string | null>(null);
+	const router = useRouter();
+	const pathname = usePathname();
+	const searchParams = useSearchParams();
+
+	// URL-driven filter values
+	const urlGenres = searchParams.getAll("genre");
+	const urlCountry = searchParams.get("country") ?? null;
+	const urlFormat = searchParams.get("format") ?? null;
+	const urlMinRarity = Number(searchParams.get("minRarity") ?? "0");
+	// Legacy single-genre and decade (kept for BrowseFilters)
+	const legacyGenre = searchParams.get("lgGenre") ?? null;
+	const legacyDecade = searchParams.get("decade") ?? null;
+
+	const updateParam = useCallback(
+		(key: string, value: string | null) => {
+			const params = new URLSearchParams(searchParams.toString());
+			if (value) {
+				params.set(key, value);
+			} else {
+				params.delete(key);
+			}
+			const qs = params.toString();
+			router.push(`${pathname}${qs ? `?${qs}` : ""}`);
+		},
+		[router, pathname, searchParams],
+	);
 
 	return (
 		<div className="w-full p-8 md:p-12">
 			<div className="max-w-4xl mx-auto space-y-8">
 				<RecordSearch />
 				<div className="space-y-4">
+					{/* Advanced stackable filters (URL-driven: genre chips, country, format, rarity) */}
+					<AdvancedSearchFilters />
+
+					{/* Legacy decade filter */}
 					<BrowseFilters
-						selectedGenre={selectedGenre}
-						selectedDecade={selectedDecade}
-						onGenreChange={setSelectedGenre}
-						onDecadeChange={setSelectedDecade}
+						selectedGenre={legacyGenre}
+						selectedDecade={legacyDecade}
+						onGenreChange={(g) => updateParam("lgGenre", g)}
+						onDecadeChange={(d) => updateParam("decade", d)}
 					/>
-					<BrowseGrid genre={selectedGenre} decade={selectedDecade} />
+
+					<BrowseGrid
+						genre={legacyGenre}
+						decade={legacyDecade}
+						genres={urlGenres}
+						country={urlCountry}
+						format={urlFormat}
+						minRarity={urlMinRarity}
+					/>
 				</div>
 				<SuggestedSection />
 			</div>

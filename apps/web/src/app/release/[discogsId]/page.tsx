@@ -7,6 +7,7 @@ import { ReleaseHero } from "./_components/release-hero";
 import { ReleaseActions } from "./_components/release-actions";
 import { YouTubeEmbed } from "./_components/youtube-embed";
 import { OwnersSection } from "./_components/owners-section";
+import { WhoHasItSection } from "./_components/who-has-it-section";
 import { ReviewsSection } from "./_components/reviews-section";
 
 interface ReleasePageProps {
@@ -93,6 +94,10 @@ export default async function ReleasePage({ params }: ReleasePageProps) {
 			/>
 
 			<OwnersSection releaseId={release.id} />
+
+			{release.discogsId && (
+				<WhoHasItSection discogsId={release.discogsId} />
+			)}
 
 			<ReviewsSection
 				releaseId={release.id}

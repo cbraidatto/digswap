@@ -14,6 +14,7 @@ import {
 	getFollowing,
 	type FollowUser,
 } from "@/lib/social/queries";
+import { getExploreFeed } from "@/lib/social/explore-queries";
 import {
 	logActivitySchema,
 	followUserSchema,
@@ -40,6 +41,7 @@ export interface FeedItem {
 	releaseCoverUrl: string | null;
 	releaseRarityScore: number | null;
 	releaseYoutubeVideoId: string | null;
+	contextReason?: "dna_match" | "network" | "trending" | null;
 }
 
 export interface SearchResult {
@@ -166,20 +168,24 @@ export async function unfollowUser(
 
 export async function loadMoreFeed(
 	cursor: string | null,
-	mode: "personal" | "global",
+	mode: "personal" | "global" | "explore",
 ): Promise<FeedItem[]> {
 	try {
-		const parsed = loadMoreFeedSchema.safeParse({ cursor, mode });
-		if (!parsed.success) {
-			return [];
-		}
-
 		const supabase = await createClient();
 		const {
 			data: { user },
 		} = await supabase.auth.getUser();
 
 		if (!user) {
+			return [];
+		}
+
+		if (mode === "explore") {
+			return getExploreFeed(user.id, cursor);
+		}
+
+		const parsed = loadMoreFeedSchema.safeParse({ cursor, mode });
+		if (!parsed.success) {
 			return [];
 		}
 
@@ -190,6 +196,26 @@ export async function loadMoreFeed(
 		return getGlobalFeed(parsed.data.cursor);
 	} catch (err) {
 		console.error("[loadMoreFeed] error:", err);
+		return [];
+	}
+}
+
+export async function loadExploreFeed(
+	cursor: string | null,
+): Promise<FeedItem[]> {
+	try {
+		const supabase = await createClient();
+		const {
+			data: { user },
+		} = await supabase.auth.getUser();
+
+		if (!user) {
+			return [];
+		}
+
+		return getExploreFeed(user.id, cursor);
+	} catch (err) {
+		console.error("[loadExploreFeed] error:", err);
 		return [];
 	}
 }

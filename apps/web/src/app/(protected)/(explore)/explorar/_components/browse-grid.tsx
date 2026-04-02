@@ -22,30 +22,44 @@ function getRarityColors(tier: string | null): string {
 interface BrowseGridProps {
 	genre: string | null;
 	decade: string | null;
+	genres?: string[];
+	country?: string | null;
+	format?: string | null;
+	minRarity?: number;
 }
 
-export function BrowseGrid({ genre, decade }: BrowseGridProps) {
+export function BrowseGrid({
+	genre,
+	decade,
+	genres = [],
+	country = null,
+	format = null,
+	minRarity = 0,
+}: BrowseGridProps) {
 	const [results, setResults] = useState<BrowseResult[]>([]);
 	const [hasQueried, setHasQueried] = useState(false);
 	const [isPending, startTransition] = useTransition();
 
+	const hasAnyFilter =
+		!!genre || !!decade || genres.length > 0 || !!country || !!format || minRarity > 0;
+
 	useEffect(() => {
 		// Don't query if no filters selected
-		if (!genre && !decade) {
+		if (!hasAnyFilter) {
 			setResults([]);
 			setHasQueried(false);
 			return;
 		}
 
 		startTransition(async () => {
-			const data = await browseRecordsAction(genre, decade);
+			const data = await browseRecordsAction(genre, decade, 1, genres, country, format, minRarity);
 			setResults(data);
 			setHasQueried(true);
 		});
-	}, [genre, decade]);
+	}, [genre, decade, genres, country, format, minRarity, hasAnyFilter]);
 
 	// No filters selected: render nothing
-	if (!genre && !decade) {
+	if (!hasAnyFilter) {
 		return null;
 	}
 
