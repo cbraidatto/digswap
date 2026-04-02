@@ -2,6 +2,7 @@
 
 import { useRef, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 import { updateProfile, uploadAvatar } from "@/actions/profile";
 
 interface EditProfileModalProps {
@@ -119,7 +120,7 @@ export function EditProfileModal({ initial }: EditProfileModalProps) {
 								<div className="relative group flex-shrink-0">
 									<div className="w-16 h-16 rounded border-2 border-primary/20 overflow-hidden bg-surface-container-high flex items-center justify-center">
 										{avatarUrl ? (
-											<img src={avatarUrl} alt="Avatar" className="w-full h-full object-cover" />
+											<Image src={avatarUrl} alt="Avatar" width={64} height={64} unoptimized className="w-full h-full object-cover" />
 										) : (
 											<span className="text-2xl font-mono font-bold text-primary">
 												{(displayName || "D").charAt(0).toUpperCase()}

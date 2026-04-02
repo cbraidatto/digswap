@@ -1,4 +1,5 @@
 import { redirect } from "next/navigation";
+import Image from "next/image";
 import { createClient } from "@/lib/supabase/server";
 import { getRadarMatchesPaginated } from "@/lib/wantlist/radar-queries";
 import { LeadAction } from "@/components/digger-memory/lead-action";
@@ -95,11 +96,14 @@ export default async function RadarPage({ searchParams }: RadarPageProps) {
                   key={`${match.matchUserId}-${match.releaseId}`}
                   className="flex items-center gap-3 p-3 bg-surface-container-low border border-outline-variant/10 rounded hover:border-outline-variant/30 transition-colors"
                 >
-                  <div className="w-8 h-8 rounded bg-surface-container-high flex items-center justify-center flex-shrink-0">
+                  <div className="w-8 h-8 rounded bg-surface-container-high flex items-center justify-center flex-shrink-0 overflow-hidden">
                     {match.matchAvatarUrl ? (
-                      <img
+                      <Image
                         src={match.matchAvatarUrl}
                         alt={match.matchUsername ?? ""}
+                        width={32}
+                        height={32}
+                        unoptimized
                         className="w-full h-full object-cover rounded"
                       />
                     ) : (

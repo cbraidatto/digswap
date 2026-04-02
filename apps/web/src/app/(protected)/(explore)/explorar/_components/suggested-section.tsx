@@ -4,6 +4,7 @@ import { useEffect, useState, useTransition } from "react";
 import { getSuggestionsAction } from "@/actions/discovery";
 import type { SuggestionResult } from "@/lib/discovery/queries";
 import { getRarityTier } from "@/lib/collection/rarity";
+import { CoverArt } from "@/components/ui/cover-art";
 
 function getRarityColors(tier: string | null): string {
 	switch (tier) {
@@ -80,19 +81,12 @@ export function SuggestedSection() {
 								className="bg-surface-container-low rounded-lg p-4 hover:bg-surface-container transition-colors cursor-pointer group"
 							>
 								{/* Album Art */}
-								<div className="w-12 h-12 bg-surface-container-high rounded flex-shrink-0 flex items-center justify-center mb-3">
-									{record.coverImageUrl ? (
-										<img
-											src={record.coverImageUrl}
-											alt={record.title}
-											className="w-full h-full object-cover rounded"
-										/>
-									) : (
-										<span className="material-symbols-outlined text-on-surface-variant/40 text-xl">
-											album
-										</span>
-									)}
-								</div>
+								<CoverArt
+									src={record.coverImageUrl}
+									alt={record.title}
+									size="md"
+									containerClassName="mb-3"
+								/>
 
 								{/* Title + Rarity */}
 								<div className="flex flex-wrap items-center gap-2 mb-1">

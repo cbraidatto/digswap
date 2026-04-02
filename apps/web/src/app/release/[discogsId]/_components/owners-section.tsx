@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import { getOwnersByReleaseId, getOwnerCountByReleaseId } from "@/lib/release/queries";
 import { TrustStrip } from "@/components/trust/trust-strip";
@@ -36,9 +37,12 @@ export async function OwnersSection({ releaseId }: OwnersSectionProps) {
 								<div className="flex items-start gap-2">
 									{/* Avatar */}
 									{owner.avatarUrl ? (
-										<img
+										<Image
 											src={owner.avatarUrl}
 											alt={owner.username ?? "User"}
+											width={40}
+											height={40}
+											unoptimized
 											className="w-10 h-10 rounded object-cover shrink-0"
 										/>
 									) : (

@@ -1,7 +1,11 @@
 "use client";
 
+import dynamic from "next/dynamic";
 import { useState } from "react";
-import { AddToWantlistDialog } from "./add-to-wantlist-dialog";
+
+const AddToWantlistDialog = dynamic(() => import("./add-to-wantlist-dialog").then(m => m.AddToWantlistDialog), {
+	ssr: false,
+});
 
 export function WantlistAddButton() {
 	const [open, setOpen] = useState(false);
@@ -16,7 +20,7 @@ export function WantlistAddButton() {
 				<span className="material-symbols-outlined text-sm">add</span>
 				Add Record
 			</button>
-			<AddToWantlistDialog open={open} onOpenChange={setOpen} />
+			{open && <AddToWantlistDialog open={open} onOpenChange={setOpen} />}
 		</>
 	);
 }

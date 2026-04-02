@@ -2,6 +2,7 @@
 
 import { useRef, useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 import { uploadCoverImage, saveCoverPosition } from "@/actions/profile";
 
 interface CoverBannerProps {
@@ -133,9 +134,11 @@ export function CoverBanner({
 			{/* Main banner */}
 			<div className="relative w-full h-[280px] bg-surface-container-low overflow-hidden group">
 				{coverUrl ? (
-					<img
+					<Image
 						src={coverUrl}
 						alt="Profile cover"
+						fill
+						unoptimized
 						className="w-full h-full object-cover"
 						style={{ objectPosition: `center ${positionY}%` }}
 					/>
@@ -216,6 +219,7 @@ export function CoverBanner({
 							onTouchMove={onTouchMove}
 							onTouchEnd={onTouchEnd}
 						>
+							{/* eslint-disable-next-line @next/next/no-img-element */}
 							<img
 								ref={imgRef}
 								src={pendingPreview}

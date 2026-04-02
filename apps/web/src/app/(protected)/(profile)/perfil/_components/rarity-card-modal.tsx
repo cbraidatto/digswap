@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 import {
   Dialog,
   DialogContent,
@@ -45,9 +46,12 @@ export function RarityCardModal({ username, appUrl, displayName, totalRecords = 
         </DialogHeader>
         <div className="space-y-4">
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
+          <Image
             src={cardUrl}
             alt="Rarity Score Card"
+            width={1200}
+            height={630}
+            unoptimized
             className="w-full rounded"
             style={{ aspectRatio: "1200/630" }}
           />

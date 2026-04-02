@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 import Link from "next/link";
 import { getMoreReviews } from "@/actions/release";
 
@@ -97,9 +98,12 @@ export function ReviewsSection({ releaseId, initialReviews, initialCount }: Revi
 							{/* Header row */}
 							<div className="flex items-center gap-2">
 								{review.avatarUrl ? (
-									<img
+									<Image
 										src={review.avatarUrl}
 										alt={review.username ?? "User"}
+										width={32}
+										height={32}
+										unoptimized
 										className="w-8 h-8 rounded object-cover shrink-0"
 									/>
 								) : (

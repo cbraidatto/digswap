@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import type { UserRanking, UserBadge } from "@/lib/gamification/queries";
 import { TrustStrip } from "@/components/trust/trust-strip";
 import { FollowButton } from "./follow-button";
@@ -36,9 +37,12 @@ export function ProfileHeader({
 				{/* Avatar */}
 				<div className="w-20 h-20 bg-surface-container-high rounded border-2 border-primary/20 flex items-center justify-center flex-shrink-0">
 					{profile.avatarUrl ? (
-						<img
+						<Image
 							src={profile.avatarUrl}
 							alt={displayName}
+							width={80}
+							height={80}
+							unoptimized
 							className="w-full h-full object-cover rounded"
 						/>
 					) : (

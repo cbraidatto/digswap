@@ -6,6 +6,7 @@ import type { SearchResult } from "@/lib/discovery/queries";
 import { getRarityTier } from "@/lib/collection/rarity";
 import { getReviewCountAction } from "@/actions/community";
 import { AddToCrateButton } from "@/components/crates/add-to-crate-button";
+import { CoverArt } from "@/components/ui/cover-art";
 import { OwnersList } from "./owners-list";
 import { ReviewsPanel } from "./reviews-panel";
 
@@ -39,19 +40,11 @@ export function RecordSearchCard({ release }: RecordSearchCardProps) {
 		<div>
 			<div className="bg-surface-container-low rounded-lg p-4 flex gap-4 hover:bg-surface-container transition-colors cursor-pointer group">
 				{/* Album Art */}
-				<div className="w-12 h-12 bg-surface-container-high rounded flex-shrink-0 flex items-center justify-center">
-					{release.coverImageUrl ? (
-						<img
-							src={release.coverImageUrl}
-							alt={release.title}
-							className="w-full h-full object-cover rounded"
-						/>
-					) : (
-						<span className="material-symbols-outlined text-on-surface-variant/40 text-xl">
-							album
-						</span>
-					)}
-				</div>
+				<CoverArt
+					src={release.coverImageUrl}
+					alt={release.title}
+					size="md"
+				/>
 
 				{/* Info */}
 				<div className="flex-1 min-w-0">

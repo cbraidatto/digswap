@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { CoverArt } from "@/components/ui/cover-art";
 import type { WantlistIntersection } from "@/lib/wantlist/intersection-queries";
 
 function getRarityLabel(score: number | null): {
@@ -70,21 +71,14 @@ export function WantlistMatchSection({
 						const rarity = getRarityLabel(item.rarityScore);
 						return (
 							<div key={item.releaseId} className="flex-shrink-0 w-24 space-y-1">
-								<div className="w-24 h-24 rounded bg-surface-container-high overflow-hidden">
-									{item.coverArt ? (
-										<img
-											src={item.coverArt}
-											alt={item.releaseTitle}
-											className="w-full h-full object-cover"
-										/>
-									) : (
-										<div className="w-full h-full flex items-center justify-center">
-											<span className="material-symbols-outlined text-on-surface-variant text-2xl">
-												album
-											</span>
-										</div>
-									)}
-								</div>
+								<CoverArt
+									src={item.coverArt}
+									alt={item.releaseTitle}
+									size="full"
+									fill
+									containerClassName="w-24 h-24"
+									rounded="rounded"
+								/>
 								<div className="font-mono text-[9px] text-on-surface leading-tight truncate">
 									{item.releaseTitle}
 								</div>

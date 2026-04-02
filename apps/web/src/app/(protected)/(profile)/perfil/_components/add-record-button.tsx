@@ -1,7 +1,11 @@
 "use client";
 
+import dynamic from "next/dynamic";
 import { useState } from "react";
-import { AddRecordDialog } from "./add-record-dialog";
+
+const AddRecordDialog = dynamic(() => import("./add-record-dialog").then(m => m.AddRecordDialog), {
+	ssr: false,
+});
 
 export function AddRecordButton() {
 	const [open, setOpen] = useState(false);
@@ -16,7 +20,7 @@ export function AddRecordButton() {
 				<span className="material-symbols-outlined text-sm">add</span>
 				Add Record
 			</button>
-			<AddRecordDialog open={open} onOpenChange={setOpen} />
+			{open && <AddRecordDialog open={open} onOpenChange={setOpen} />}
 		</>
 	);
 }

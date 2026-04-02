@@ -1,4 +1,5 @@
 import { redirect } from "next/navigation";
+import Image from "next/image";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { listTradeThreads, type TradeThreadListItem } from "@/lib/trades/messages";
@@ -42,9 +43,12 @@ function TradeCard({ thread }: { thread: TradeThreadListItem }) {
 			<div className="flex items-start justify-between gap-3 mb-2">
 				<div className="flex items-center gap-2 min-w-0">
 					{thread.counterpartyAvatarUrl ? (
-						<img
+						<Image
 							src={thread.counterpartyAvatarUrl}
 							alt=""
+							width={28}
+							height={28}
+							unoptimized
 							className="w-7 h-7 rounded-full flex-shrink-0 border border-outline-variant"
 						/>
 					) : (

@@ -1,3 +1,4 @@
+import Image from "next/image";
 import type { TradeThreadDetail } from "@/lib/trades/messages";
 
 const TERMINAL_STATUSES = new Set(["completed", "declined", "cancelled", "expired"]);
@@ -35,9 +36,12 @@ export function TradeDetailHeader({ thread }: Props) {
 			{/* Counterparty card */}
 			<div className="flex items-center gap-3 mb-5">
 				{thread.counterpartyAvatarUrl ? (
-					<img
+					<Image
 						src={thread.counterpartyAvatarUrl}
 						alt=""
+						width={40}
+						height={40}
+						unoptimized
 						className="w-10 h-10 rounded-full border border-outline-variant"
 					/>
 				) : (

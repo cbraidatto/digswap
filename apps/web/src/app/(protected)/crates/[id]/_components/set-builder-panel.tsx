@@ -18,6 +18,7 @@ import {
 import { CSS } from "@dnd-kit/utilities";
 import type { CrateItemRow } from "@/lib/crates/types";
 import { createSet } from "@/actions/crates";
+import { CoverArt } from "@/components/ui/cover-art";
 
 // ---------------------------------------------------------------------------
 // Sortable track row
@@ -212,10 +213,11 @@ export function SetBuilderPanel({ crateId, items, onClose }: SetBuilderPanelProp
                   className="accent-primary"
                 />
                 {item.coverImageUrl && (
-                  <img
+                  <CoverArt
                     src={item.coverImageUrl}
                     alt={item.title ?? ""}
-                    className="w-6 h-6 rounded object-cover flex-shrink-0"
+                    size="xs"
+                    containerClassName="w-6 h-6"
                   />
                 )}
                 <span className="font-heading text-xs text-on-surface truncate flex-1 min-w-0">

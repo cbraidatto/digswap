@@ -3,6 +3,7 @@
 import Link from "next/link";
 import type { FeedItem } from "@/actions/social";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { CoverArt } from "@/components/ui/cover-art";
 import { getRarityTier, type RarityTier } from "@/lib/collection/rarity";
 
 function formatRelativeTime(dateStr: string): string {
@@ -48,7 +49,7 @@ export function FeedCard({ item }: { item: FeedItem }) {
 	const rarityTextColor = getRarityTextColor(tier);
 
 	return (
-		<article className="bg-surface-container-low rounded-lg overflow-hidden border border-outline-variant/10">
+		<article className="bg-surface-container-low rounded-lg overflow-hidden border border-outline-variant/10 transition-all hover:border-outline-variant/20 hover:shadow-md hover:shadow-black/5">
 			{/* Accent strip */}
 			<div className={`h-1 w-full ${accentColor}`} />
 
@@ -84,19 +85,11 @@ export function FeedCard({ item }: { item: FeedItem }) {
 			{/* Content grid */}
 			<div className="px-4 pb-4 flex gap-4">
 				{/* Cover art */}
-				<div className="w-[120px] h-[120px] max-sm:w-[80px] max-sm:h-[80px] bg-surface-container-high rounded flex items-center justify-center flex-shrink-0">
-					{item.releaseCoverUrl ? (
-						<img
-							src={item.releaseCoverUrl}
-							alt={`${item.releaseArtist} - ${item.releaseTitle}`}
-							className="w-full h-full object-cover rounded"
-						/>
-					) : (
-						<span className="material-symbols-outlined text-3xl text-on-surface-variant/30">
-							album
-						</span>
-					)}
-				</div>
+				<CoverArt
+					src={item.releaseCoverUrl}
+					alt={`${item.releaseArtist} - ${item.releaseTitle}`}
+					size="xl"
+				/>
 
 				{/* Metadata */}
 				<div className="flex flex-col gap-1 min-w-0">

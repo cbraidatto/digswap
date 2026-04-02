@@ -14,9 +14,16 @@ export function SkeletonDisc({ size = "md" }: { size?: "sm" | "md" | "lg" }) {
 	}[size];
 
 	return (
-		<div
-			className={`${sizeClass} rounded-full bg-surface-container-high animate-pulse`}
-		/>
+		<div className={`${sizeClass} relative rounded-full bg-surface-container-high overflow-hidden`}>
+			{/* Vinyl grooves effect */}
+			<div className="absolute inset-0 rounded-full animate-[spin_3s_linear_infinite] opacity-20">
+				<div className="absolute inset-[15%] rounded-full border border-on-surface-variant/20" />
+				<div className="absolute inset-[30%] rounded-full border border-on-surface-variant/15" />
+				<div className="absolute inset-[45%] rounded-full border border-on-surface-variant/10" />
+			</div>
+			{/* Center label */}
+			<div className="absolute inset-[40%] rounded-full bg-surface-container animate-pulse" />
+		</div>
 	);
 }
 

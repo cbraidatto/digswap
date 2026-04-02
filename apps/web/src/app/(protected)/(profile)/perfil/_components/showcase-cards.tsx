@@ -2,6 +2,7 @@
 
 import { useCallback, useRef, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
+import { CoverArt } from "@/components/ui/cover-art";
 import {
 	searchCollectionForShowcase,
 	updateShowcase,
@@ -48,23 +49,22 @@ function ShowcaseCard({
 		<div className="group relative flex flex-col rounded-lg overflow-hidden border border-outline/[0.08] bg-surface-container-high">
 			{/* Cover — fixed height */}
 			<div className="relative h-36 w-full overflow-hidden bg-surface-container flex-shrink-0">
-				{release?.coverImageUrl ? (
-					<img
-						src={release.coverImageUrl}
-						alt={release.title}
-						className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
-					/>
-				) : (
-					<div className="w-full h-full flex flex-col items-center justify-center gap-2">
-						<span className={`material-symbols-outlined text-3xl ${meta.color} opacity-20`}>
-							{meta.icon}
-						</span>
-						{isOwner && (
-							<span className="font-mono text-[9px] uppercase tracking-widest text-outline/40">
-								click to set
-							</span>
-						)}
-					</div>
+				<CoverArt
+					src={release?.coverImageUrl ?? null}
+					alt={release?.title ?? meta.label}
+					size="full"
+					fill
+					className={release?.coverImageUrl ? "transition-transform duration-300 group-hover:scale-105" : ""}
+					containerClassName="h-full"
+					rounded="rounded-none"
+					fallbackIcon={meta.icon}
+				/>
+
+				{/* "click to set" hint when empty */}
+				{!release?.coverImageUrl && isOwner && (
+					<span className="absolute inset-0 flex items-end justify-center pb-3 font-mono text-[9px] uppercase tracking-widest text-outline/40 pointer-events-none">
+						click to set
+					</span>
 				)}
 
 				{/* Gradient overlay at bottom */}
@@ -199,17 +199,11 @@ function ShowcasePicker({
 								onClick={() => onSelect(r.id)}
 								className="w-full flex items-center gap-3 p-2 rounded-lg hover:bg-surface-container-high transition-colors text-left"
 							>
-								{r.coverImageUrl ? (
-									<img
-										src={r.coverImageUrl}
-										alt={r.title}
-										className="w-10 h-10 object-cover rounded flex-shrink-0"
-									/>
-								) : (
-									<div className="w-10 h-10 bg-surface-container rounded flex-shrink-0 flex items-center justify-center">
-										<span className="material-symbols-outlined text-sm text-outline">album</span>
-									</div>
-								)}
+								<CoverArt
+									src={r.coverImageUrl}
+									alt={r.title}
+									size="sm"
+								/>
 								<div className="flex-1 min-w-0">
 									<p className="font-heading font-bold text-sm text-on-surface truncate">{r.title}</p>
 									<p className="font-mono text-xs text-on-surface-variant truncate">

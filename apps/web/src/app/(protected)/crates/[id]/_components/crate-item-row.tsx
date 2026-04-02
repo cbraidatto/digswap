@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import type { CrateItemRow as CrateItemRowType } from "@/lib/crates/types";
 import { moveToWantlist, moveToCollection } from "@/actions/crates";
+import { CoverArt } from "@/components/ui/cover-art";
 
 interface CrateItemRowProps {
   item: CrateItemRowType;
@@ -51,19 +52,11 @@ export function CrateItemRow({ item }: CrateItemRowProps) {
       }`}
     >
       {/* Cover image */}
-      <div className="w-10 h-10 flex-shrink-0 rounded overflow-hidden bg-surface-container-high flex items-center justify-center">
-        {item.coverImageUrl ? (
-          <img
-            src={item.coverImageUrl}
-            alt={item.title ?? "Record cover"}
-            className="w-full h-full object-cover"
-          />
-        ) : (
-          <span className="material-symbols-outlined text-base text-on-surface-variant">
-            album
-          </span>
-        )}
-      </div>
+      <CoverArt
+        src={item.coverImageUrl}
+        alt={item.title ?? "Record cover"}
+        size="sm"
+      />
 
       {/* Title + artist */}
       <div className="flex-1 min-w-0">

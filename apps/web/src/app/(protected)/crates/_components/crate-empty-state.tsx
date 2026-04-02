@@ -8,10 +8,13 @@ export function CrateEmptyState() {
 
   return (
     <div className="flex flex-col items-center justify-center py-16 gap-4">
-      <div className="font-mono text-xs text-on-surface-variant tracking-[0.15em]">
-        [NO_CRATES_YET]
-      </div>
-      <p className="font-mono text-sm text-on-surface-variant text-center max-w-xs">
+      <span className="material-symbols-outlined text-4xl text-primary/40">
+        inventory_2
+      </span>
+      <h3 className="font-heading text-base font-semibold text-on-surface">
+        No crates yet
+      </h3>
+      <p className="text-sm text-on-surface-variant text-center max-w-xs">
         Create a crate to organize your next digging session.
       </p>
       {isCreating ? (
@@ -24,9 +27,10 @@ export function CrateEmptyState() {
       ) : (
         <button
           onClick={() => setIsCreating(true)}
-          className="font-mono text-xs px-3 py-1.5 rounded border border-primary/40 text-primary hover:bg-primary/10 transition-colors"
+          type="button"
+          className="text-sm px-4 py-2 rounded-lg border border-primary/40 text-primary hover:bg-primary/10 transition-colors font-medium"
         >
-          [+ NEW_CRATE]
+          Create a crate
         </button>
       )}
     </div>

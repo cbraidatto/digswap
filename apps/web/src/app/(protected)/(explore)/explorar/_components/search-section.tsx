@@ -2,6 +2,7 @@
 
 import { useState, useRef, useCallback, useTransition } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { searchUsers, type SearchResult } from "@/actions/social";
 import { FollowButton } from "@/app/(protected)/(profile)/perfil/[username]/_components/follow-button";
 
@@ -74,12 +75,15 @@ export function SearchSection() {
 								className="bg-surface-container-low rounded-lg p-4 flex items-center gap-4 hover:bg-surface-container transition-colors"
 							>
 								{/* Avatar 40px */}
-								<div className="w-10 h-10 bg-surface-container-high rounded flex items-center justify-center flex-shrink-0">
+								<div className="w-10 h-10 bg-surface-container-high rounded flex items-center justify-center flex-shrink-0 overflow-hidden">
 									{result.avatarUrl ? (
-										<img
+										<Image
 											src={result.avatarUrl}
 											alt={result.username || "user"}
-											className="w-full h-full object-cover rounded"
+											width={40}
+											height={40}
+											className="object-cover rounded"
+											unoptimized
 										/>
 									) : (
 										<span className="text-sm font-mono font-bold text-primary">

@@ -6,6 +6,7 @@ import { releases } from "@/lib/db/schema/releases";
 import { tradeRequests } from "@/lib/db/schema/trades";
 import { wantlistItems } from "@/lib/db/schema/wantlist";
 import { profiles } from "@/lib/db/schema/users";
+import Image from "next/image";
 import { createClient } from "@/lib/supabase/server";
 import { collectionFilterSchema } from "@/lib/collection/filters";
 import {
@@ -166,9 +167,12 @@ export default async function PerfilPage({ searchParams }: PerfilPageProps) {
 						<div className="flex items-start gap-4 mb-4">
 							<div className="w-16 h-16 flex-shrink-0 bg-surface-container-high rounded border-2 border-primary/20 flex items-center justify-center">
 								{profile?.avatarUrl ? (
-									<img
+									<Image
 										src={profile.avatarUrl}
 										alt={displayName}
+										width={64}
+										height={64}
+										unoptimized
 										className="w-full h-full object-cover rounded"
 									/>
 								) : (

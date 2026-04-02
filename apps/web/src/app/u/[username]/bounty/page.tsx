@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 import { eq, inArray } from "drizzle-orm";
+import Image from "next/image";
 import Link from "next/link";
 import { db } from "@/lib/db";
 import { profiles } from "@/lib/db/schema/users";
@@ -7,6 +8,7 @@ import { wantlistItems } from "@/lib/db/schema/wantlist";
 import { releases } from "@/lib/db/schema/releases";
 import { createClient } from "@/lib/supabase/server";
 import { ShareSurface } from "@/components/share/share-surface";
+import { CoverArt } from "@/components/ui/cover-art";
 
 interface BountyPageProps {
   params: Promise<{ username: string }>;
@@ -93,10 +95,12 @@ export default async function BountyPage({ params }: BountyPageProps) {
           </div>
           <div className="flex items-center justify-center gap-3 mb-4">
             {targetProfile.avatarUrl ? (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img
+              <Image
                 src={targetProfile.avatarUrl}
                 alt={targetProfile.displayName ?? username}
+                width={48}
+                height={48}
+                unoptimized
                 className="w-12 h-12 rounded-full"
               />
             ) : (
@@ -135,20 +139,14 @@ export default async function BountyPage({ params }: BountyPageProps) {
                   <div className="h-0.5 bg-primary" />
                   <div className="p-4 flex items-start gap-4">
                     {/* Cover art or placeholder */}
-                    <div className="w-16 h-16 rounded bg-surface-container-high flex items-center justify-center flex-shrink-0">
-                      {item.coverImageUrl ? (
-                        // eslint-disable-next-line @next/next/no-img-element
-                        <img
-                          src={item.coverImageUrl}
-                          alt={item.releaseTitle ?? ""}
-                          className="w-full h-full object-cover rounded"
-                        />
-                      ) : (
-                        <span className="material-symbols-outlined text-on-surface-variant text-2xl">
-                          album
-                        </span>
-                      )}
-                    </div>
+                    <CoverArt
+                      src={item.coverImageUrl}
+                      alt={item.releaseTitle ?? ""}
+                      size="lg"
+                      width={64}
+                      height={64}
+                      containerClassName="w-16 h-16"
+                    />
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 mb-1">
                         <span className="font-mono text-[9px] text-tertiary">

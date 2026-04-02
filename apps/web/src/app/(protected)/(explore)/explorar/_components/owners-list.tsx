@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import type { RecordOwner } from "@/lib/discovery/queries";
 
 interface OwnersListProps {
@@ -30,12 +31,15 @@ export function OwnersList({ owners }: OwnersListProps) {
 					className="flex items-center gap-2 h-8"
 				>
 					{/* Avatar */}
-					<div className="w-6 h-6 rounded bg-surface-container-high flex items-center justify-center flex-shrink-0">
+					<div className="w-6 h-6 rounded bg-surface-container-high flex items-center justify-center flex-shrink-0 overflow-hidden">
 						{owner.avatarUrl ? (
-							<img
+							<Image
 								src={owner.avatarUrl}
 								alt={owner.username || "user"}
-								className="w-full h-full object-cover rounded"
+								width={24}
+								height={24}
+								className="object-cover rounded"
+								unoptimized
 							/>
 						) : (
 							<span className="text-xs font-mono font-bold text-primary">

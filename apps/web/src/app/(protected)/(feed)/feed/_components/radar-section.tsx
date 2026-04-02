@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import { getRadarMatches } from "@/lib/wantlist/radar-queries";
 import { LeadAction } from "@/components/digger-memory/lead-action";
 import { ContextTooltip } from "@/components/digger-memory/context-tooltip";
@@ -67,12 +68,15 @@ export async function RadarSection({ userId }: RadarSectionProps) {
               className="flex items-center gap-3 p-3 bg-surface-container-low border border-outline-variant/10 rounded hover:border-outline-variant/30 transition-colors"
             >
               {/* Avatar */}
-              <div className="w-8 h-8 rounded bg-surface-container-high flex items-center justify-center flex-shrink-0">
+              <div className="w-8 h-8 rounded bg-surface-container-high flex items-center justify-center flex-shrink-0 overflow-hidden">
                 {match.matchAvatarUrl ? (
-                  <img
+                  <Image
                     src={match.matchAvatarUrl}
                     alt={match.matchUsername ?? "user"}
+                    width={32}
+                    height={32}
                     className="w-full h-full object-cover rounded"
+                    unoptimized
                   />
                 ) : (
                   <span className="font-mono text-xs font-bold text-primary">

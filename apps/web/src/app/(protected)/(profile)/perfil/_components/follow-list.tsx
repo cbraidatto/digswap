@@ -2,6 +2,7 @@
 
 import { useState, useTransition } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { fetchFollowersList, fetchFollowingList } from "@/actions/social";
 import type { FollowUser } from "@/lib/social/queries";
 
@@ -72,9 +73,12 @@ export function FollowList({ userId, type, count }: FollowListProps) {
 								{/* Avatar 24px */}
 								<div className="w-6 h-6 bg-surface-container-high rounded flex items-center justify-center flex-shrink-0">
 									{user.avatarUrl ? (
-										<img
+										<Image
 											src={user.avatarUrl}
 											alt={user.username || "user"}
+											width={24}
+											height={24}
+											unoptimized
 											className="w-full h-full object-cover rounded"
 										/>
 									) : (
