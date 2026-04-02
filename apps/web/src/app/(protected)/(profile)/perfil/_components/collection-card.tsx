@@ -7,6 +7,7 @@ import type { ReactNode } from "react";
 import type { CollectionItem } from "@/lib/collection/queries";
 import { getRarityTier, getRarityBadgeVariant } from "@/lib/collection/rarity";
 import { ConditionEditor } from "./condition-editor";
+import { PlayButton } from "@/components/player/play-button";
 
 interface CollectionCardProps {
 	item: CollectionItem;
@@ -19,8 +20,8 @@ export function CollectionCard({ item, isOwner, actionSlot }: CollectionCardProp
 
 	return (
 		<div className="group bg-surface-container-low rounded-lg overflow-hidden border border-outline-variant/10 transition-all hover:border-primary/20 hover:shadow-lg hover:shadow-primary/5">
-			{/* Cover Art */}
-			<div className="relative aspect-square bg-surface-container-high">
+		{/* Aspect-ratio cover container — PlayButton overlays on hover */}
+		<div className="relative aspect-square bg-surface-container-high group/cover">
 				{item.coverImageUrl ? (
 					<Image
 						src={item.coverImageUrl}
@@ -43,6 +44,19 @@ export function CollectionCard({ item, isOwner, actionSlot }: CollectionCardProp
 						<Badge variant={getRarityBadgeVariant(tier)} className="text-xs">
 							{tier}
 						</Badge>
+					</div>
+				)}
+
+				{/* Play button — appears on hover */}
+				{item.youtubeVideoId && (
+					<div className="absolute bottom-2 right-2 opacity-0 group-hover/cover:opacity-100 transition-opacity">
+						<PlayButton
+							videoId={item.youtubeVideoId}
+							title={item.title}
+							artist={item.artist}
+							coverUrl={item.coverImageUrl}
+							size="sm"
+						/>
 					</div>
 				)}
 			</div>

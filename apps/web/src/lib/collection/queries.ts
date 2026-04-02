@@ -23,6 +23,7 @@ export interface CollectionItem {
 	format: string | null;
 	coverImageUrl: string | null;
 	rarityScore: number | null;
+	youtubeVideoId: string | null;
 }
 
 /**
@@ -93,6 +94,7 @@ export async function getCollectionPage(
 			format: releases.format,
 			coverImageUrl: releases.coverImageUrl,
 			rarityScore: releases.rarityScore,
+			youtubeVideoId: releases.youtubeVideoId,
 		})
 		.from(collectionItems)
 		.innerJoin(releases, eq(collectionItems.releaseId, releases.id))

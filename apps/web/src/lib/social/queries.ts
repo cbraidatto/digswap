@@ -35,6 +35,7 @@ export async function getGlobalFeed(
 			releaseLabel: releases.label,
 			releaseCoverUrl: releases.coverImageUrl,
 			releaseRarityScore: releases.rarityScore,
+			releaseYoutubeVideoId: releases.youtubeVideoId,
 		})
 		.from(activityFeed)
 		.leftJoin(profiles, eq(activityFeed.userId, profiles.id))
@@ -95,6 +96,7 @@ export async function getPersonalFeed(
 			releaseLabel: releases.label,
 			releaseCoverUrl: releases.coverImageUrl,
 			releaseRarityScore: releases.rarityScore,
+			releaseYoutubeVideoId: releases.youtubeVideoId,
 		})
 		.from(activityFeed)
 		.leftJoin(profiles, eq(activityFeed.userId, profiles.id))

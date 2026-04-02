@@ -39,6 +39,7 @@ export interface FeedItem {
 	releaseLabel: string | null;
 	releaseCoverUrl: string | null;
 	releaseRarityScore: number | null;
+	releaseYoutubeVideoId: string | null;
 }
 
 export interface SearchResult {

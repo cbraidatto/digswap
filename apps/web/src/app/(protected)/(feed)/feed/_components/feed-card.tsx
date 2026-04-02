@@ -5,6 +5,7 @@ import type { FeedItem } from "@/actions/social";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { CoverArt } from "@/components/ui/cover-art";
 import { DigButton } from "@/components/engagement/dig-button";
+import { PlayButton } from "@/components/player/play-button";
 import { getRarityTier, type RarityTier } from "@/lib/collection/rarity";
 
 function formatRelativeTime(dateStr: string): string {
@@ -112,11 +113,24 @@ export function FeedCard({ item, digState }: { item: FeedItem; digState?: { dug:
 					</div>
 
 					{/* Dig button */}
-					<div className="mt-2">
+					<div className="mt-2 flex items-center gap-2">
 						<DigButton
 							feedItemId={item.id}
 							initialDug={digState?.dug ?? false}
 							initialCount={digState?.digCount ?? 0}
+							track={item.releaseYoutubeVideoId ? {
+								videoId: item.releaseYoutubeVideoId,
+								title: item.releaseTitle ?? "Unknown",
+								artist: item.releaseArtist ?? "Unknown",
+								coverUrl: item.releaseCoverUrl ?? null,
+							} : undefined}
+						/>
+						<PlayButton
+							videoId={item.releaseYoutubeVideoId}
+							title={item.releaseTitle ?? "Unknown"}
+							artist={item.releaseArtist ?? "Unknown"}
+							coverUrl={item.releaseCoverUrl}
+							size="sm"
 						/>
 					</div>
 				</div>

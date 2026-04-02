@@ -2,19 +2,23 @@
 
 import { useState, useOptimistic, useTransition } from "react";
 import { toggleDig } from "@/actions/engagement";
+import { usePlayerStore, type PlayerTrack } from "@/lib/player/store";
 import { cn } from "@/lib/utils";
 
 interface DigButtonProps {
 	feedItemId: string;
 	initialDug: boolean;
 	initialCount: number;
+	/** If provided, Dig! also adds the track to the player queue */
+	track?: PlayerTrack;
 }
 
-export function DigButton({ feedItemId, initialDug, initialCount }: DigButtonProps) {
+export function DigButton({ feedItemId, initialDug, initialCount, track }: DigButtonProps) {
 	const [dug, setDug] = useState(initialDug);
 	const [digCount, setDigCount] = useState(initialCount);
 	const [isPending, startTransition] = useTransition();
 	const [optimisticDug, setOptimisticDug] = useOptimistic(dug);
+	const addToQueue = usePlayerStore((s) => s.addToQueue);
 
 	function handleToggle() {
 		setOptimisticDug(!optimisticDug);
@@ -24,8 +28,11 @@ export function DigButton({ feedItemId, initialDug, initialCount }: DigButtonPro
 			if (!result.error) {
 				setDug(result.dug);
 				setDigCount(result.digCount);
+				// Add to queue when digging (not un-digging) and track has a videoId
+				if (result.dug && track?.videoId) {
+					addToQueue(track);
+				}
 			} else {
-				// Revert optimistic
 				setOptimisticDug(dug);
 			}
 		});

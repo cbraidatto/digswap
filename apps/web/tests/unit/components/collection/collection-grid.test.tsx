@@ -32,6 +32,7 @@ function makeItem(overrides: Partial<CollectionItem> = {}): CollectionItem {
 		format: "LP",
 		coverImageUrl: null,
 		rarityScore: 1.5,
+		youtubeVideoId: null,
 		...overrides,
 	};
 }
