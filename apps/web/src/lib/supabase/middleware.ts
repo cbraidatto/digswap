@@ -2,6 +2,21 @@ import { createServerClient } from "@supabase/ssr";
 import { type NextRequest, NextResponse } from "next/server";
 
 /**
+ * Extract the Supabase session ID (sub claim `session_id`) from a JWT access token.
+ * The JWT payload is base64url-encoded in the second segment.
+ */
+function extractSessionId(accessToken: string): string | null {
+	try {
+		const payload = accessToken.split(".")[1];
+		if (!payload) return null;
+		const decoded = JSON.parse(Buffer.from(payload, "base64url").toString());
+		return decoded.session_id ?? null;
+	} catch {
+		return null;
+	}
+}
+
+/**
  * Updates the auth session, refreshing the JWT token if expired.
  * Handles cookie synchronization between request and response.
  *
@@ -44,6 +59,49 @@ export async function updateSession(request: NextRequest) {
 	const { data: { user } } = await supabase.auth.getUser();
 
 	const { pathname } = request.nextUrl;
+
+	// Session allowlist check: verify the user's Supabase session is still tracked
+	// in our user_sessions table. If it was revoked via "terminate session", the
+	// JWT may still be valid but our allowlist won't contain it.
+	if (user) {
+		const isProtectedPath = !pathname.startsWith("/signin") &&
+			!pathname.startsWith("/signup") &&
+			!pathname.startsWith("/forgot-password") &&
+			!pathname.startsWith("/reset-password") &&
+			!pathname.startsWith("/api/");
+
+		if (isProtectedPath) {
+			try {
+				// Get current Supabase session ID from the session data
+				const { data: { session } } = await supabase.auth.getSession();
+				const supabaseSessionId = session?.access_token
+					? extractSessionId(session.access_token)
+					: null;
+
+				if (supabaseSessionId) {
+					// Check if this session exists in our allowlist
+					// Uses Supabase client (respects RLS — user can only see own sessions)
+					const { data: tracked } = await supabase
+						.from("user_sessions")
+						.select("id")
+						.eq("session_id", supabaseSessionId)
+						.eq("user_id", user.id)
+						.limit(1);
+
+					if (tracked && tracked.length === 0) {
+						// Session was revoked — sign out and redirect
+						await supabase.auth.signOut();
+						const url = request.nextUrl.clone();
+						url.pathname = "/signin";
+						return NextResponse.redirect(url);
+					}
+				}
+			} catch {
+				// Non-blocking: if allowlist check fails, let the request through
+				// (fail-open for availability, the session is still JWT-valid)
+			}
+		}
+	}
 
 	// Protected routes: redirect unauthenticated users to /signin
 	const protectedPaths = [

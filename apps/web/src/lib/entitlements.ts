@@ -13,6 +13,7 @@ export type TradeEntitlementReason = "no_limit" | "under_limit" | "limit_reached
 
 export interface UserSubscriptionSnapshot {
 	plan: SubscriptionPlan;
+	status: string;
 	tradesMonthReset: Date | null;
 	tradesThisMonth: number;
 }
@@ -41,14 +42,22 @@ function isResetExpired(tradesMonthReset: Date | null, now: Date) {
 	return now > resetCutoff;
 }
 
-export function isPremium(plan: SubscriptionPlan): boolean {
-	return plan === "premium_monthly" || plan === "premium_annual";
+/** Statuses that grant premium access */
+const PREMIUM_ACTIVE_STATUSES = new Set(["active", "trialing"]);
+
+export function isPremium(plan: SubscriptionPlan, status?: string): boolean {
+	const isPremiumPlan = plan === "premium_monthly" || plan === "premium_annual";
+	if (!isPremiumPlan) return false;
+	// If status is provided, it must be in the allowed set
+	if (status !== undefined) return PREMIUM_ACTIVE_STATUSES.has(status);
+	return true; // Backwards compat: no status = trust the plan
 }
 
 async function readSubscriptionRow(userId: string) {
 	const rows = await db
 		.select({
 			plan: subscriptions.plan,
+			status: subscriptions.status,
 			tradesMonthReset: subscriptions.tradesMonthReset,
 			tradesThisMonth: subscriptions.tradesThisMonth,
 			userId: subscriptions.userId,
@@ -80,6 +89,7 @@ export async function getUserSubscription(
 	}
 
 	const plan = (row.plan ?? "free") as SubscriptionPlan;
+	const status = row.status ?? "active";
 	const now = new Date();
 	const tradesMonthReset =
 		row.tradesMonthReset instanceof Date
@@ -92,6 +102,7 @@ export async function getUserSubscription(
 		await resetTradeWindow(userId, now);
 		return {
 			plan,
+			status,
 			tradesMonthReset: now,
 			tradesThisMonth: 0,
 		};
@@ -99,6 +110,7 @@ export async function getUserSubscription(
 
 	return {
 		plan,
+		status,
 		tradesMonthReset,
 		tradesThisMonth: row.tradesThisMonth ?? 0,
 	};
@@ -107,9 +119,10 @@ export async function getUserSubscription(
 export async function canInitiateTrade(userId: string): Promise<TradeEntitlementResult> {
 	const subscription = await getUserSubscription(userId);
 	const plan = subscription?.plan ?? "free";
+	const status = subscription?.status ?? "active";
 	const tradesUsed = subscription?.tradesThisMonth ?? 0;
 
-	if (isPremium(plan)) {
+	if (isPremium(plan, status)) {
 		return {
 			allowed: true,
 			reason: "no_limit",
@@ -138,8 +151,9 @@ export async function canInitiateTrade(userId: string): Promise<TradeEntitlement
 export async function incrementTradeCount(userId: string): Promise<void> {
 	const subscription = await getUserSubscription(userId);
 	const plan = subscription?.plan ?? "free";
+	const status = subscription?.status ?? "active";
 
-	if (isPremium(plan)) {
+	if (isPremium(plan, status)) {
 		return;
 	}
 
@@ -158,7 +172,8 @@ export async function incrementTradeCount(userId: string): Promise<void> {
 export async function getQuotaStatus(userId: string): Promise<QuotaStatus> {
 	const subscription = await getUserSubscription(userId);
 	const plan = subscription?.plan ?? "free";
-	const premium = isPremium(plan);
+	const status = subscription?.status ?? "active";
+	const premium = isPremium(plan, status);
 	const tradesUsed = subscription?.tradesThisMonth ?? 0;
 	const tradesLimit = premium ? null : FREE_TRADE_LIMIT;
 

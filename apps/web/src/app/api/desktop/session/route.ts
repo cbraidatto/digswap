@@ -1,36 +1,56 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { apiRateLimit } from "@/lib/rate-limit";
+import { randomBytes } from "node:crypto";
+import { handoffStore } from "@/lib/desktop/handoff-store";
 
 /**
- * GET /api/desktop/session
+ * POST /api/desktop/session
  *
- * Returns the current session tokens for the Electron desktop shell to sync
- * into its safeStorage vault via window.desktopShell.syncSession().
+ * Generates a single-use handoff code that the desktop app can exchange
+ * for a session via /api/desktop/session/exchange.
  *
- * Uses the server-side Supabase client which can read HttpOnly auth cookies —
- * the browser-side client cannot access those cookies directly.
+ * The handoff code:
+ * - Is 32 bytes of cryptographic randomness (URL-safe base64)
+ * - Expires after 30 seconds
+ * - Can only be used once
+ * - Never contains actual session tokens
  *
- * Returns null when no authenticated session exists.
+ * This replaces the previous GET endpoint that returned raw tokens to the browser.
  */
-export async function GET() {
+export async function POST() {
 	const supabase = await createClient();
 	const {
-		data: { session },
-	} = await supabase.auth.getSession();
+		data: { user },
+	} = await supabase.auth.getUser();
 
-	if (!session?.access_token || !session.refresh_token) {
-		return NextResponse.json(null);
+	if (!user) {
+		return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
 	}
 
-	// SEC-04: rate limit by user ID (30 req/60s — same as general API)
-	const { success } = await apiRateLimit.limit(session.user.id);
+	const { success } = await apiRateLimit.limit(user.id);
 	if (!success) {
 		return NextResponse.json({ error: "Too many requests" }, { status: 429 });
 	}
 
-	return NextResponse.json({
-		accessToken: session.access_token,
-		refreshToken: session.refresh_token,
-	});
+	// Generate single-use handoff code
+	const code = randomBytes(32).toString("base64url");
+	const expiresAt = Date.now() + 30_000; // 30 seconds
+
+	handoffStore.set(code, { userId: user.id, expiresAt });
+
+	return NextResponse.json({ code, expiresIn: 30 });
+}
+
+/**
+ * Exchange a handoff code for session tokens.
+ * This should ONLY be called server-side by the desktop app, never from the browser.
+ *
+ * @deprecated GET method removed — was returning raw tokens to browser JS.
+ */
+export async function GET() {
+	return NextResponse.json(
+		{ error: "This endpoint no longer returns session tokens. Use POST to generate a handoff code." },
+		{ status: 410 },
+	);
 }

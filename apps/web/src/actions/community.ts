@@ -158,17 +158,9 @@ export async function joinGroupAction(
 			return { error: "Already a member of this group." };
 		}
 
-		// For private groups, verify invite exists
+		// For private groups, block direct join — must use acceptInviteAction with a valid token
 		if (group.visibility === "private") {
-			const invite = await db
-				.select({ id: groupInvites.id })
-				.from(groupInvites)
-				.where(eq(groupInvites.groupId, groupId))
-				.limit(1);
-
-			if (invite.length === 0) {
-				return { error: "This is a private group. An invite is required." };
-			}
+			return { error: "This is a private group. You need an invite link to join." };
 		}
 
 		// Insert member
@@ -679,7 +671,32 @@ export async function loadGroupPostsAction(
 	cursor?: string,
 ): Promise<GroupPost[]> {
 	try {
-		await requireUser();
+		const user = await requireUser();
+
+		// Verify membership for private groups
+		const [group] = await db
+			.select({ visibility: groups.visibility })
+			.from(groups)
+			.where(eq(groups.id, groupId))
+			.limit(1);
+
+		if (group?.visibility === "private") {
+			const [membership] = await db
+				.select({ id: groupMembers.id })
+				.from(groupMembers)
+				.where(
+					and(
+						eq(groupMembers.groupId, groupId),
+						eq(groupMembers.userId, user.id),
+					),
+				)
+				.limit(1);
+
+			if (!membership) {
+				return []; // Not a member of this private group
+			}
+		}
+
 		return getGroupPosts(groupId, cursor);
 	} catch (err) {
 		console.error("[loadGroupPostsAction] error:", err);
