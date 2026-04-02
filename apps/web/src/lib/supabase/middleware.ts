@@ -32,7 +32,7 @@ export async function updateSession(request: NextRequest) {
 
 	const supabase = createServerClient(
 		process.env.NEXT_PUBLIC_SUPABASE_URL!,
-		process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY!,
+		process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY! || process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY!,
 		{
 			cookies: {
 				getAll() {
@@ -60,13 +60,12 @@ export async function updateSession(request: NextRequest) {
 
 	const { pathname } = request.nextUrl;
 
-	// Session allowlist check: verify the user's Supabase session is still tracked
-	// in our user_sessions table. If it was revoked via "terminate session", the
-	// JWT may still be valid but our allowlist won't contain it.
+	// Session allowlist check — validates revoked sessions without calling getSession()
+	// (getSession() in middleware interferes with OAuth PKCE cookie flow)
 	//
-	// IMPORTANT: Only block when the user HAS tracked sessions but the current
-	// one isn't among them. If the user has zero tracked sessions (new OAuth
-	// login, onboarding), let them through — it's not a revoked session.
+	// Approach: extract session_id from the JWT that getUser() already validated,
+	// then check if it exists in our user_sessions tracking table.
+	// Only block when user HAS tracked sessions but current isn't among them.
 	if (user) {
 		const isProtectedPath = !pathname.startsWith("/signin") &&
 			!pathname.startsWith("/signup") &&
@@ -77,27 +76,42 @@ export async function updateSession(request: NextRequest) {
 
 		if (isProtectedPath) {
 			try {
-				const { data: { session } } = await supabase.auth.getSession();
-				const supabaseSessionId = session?.access_token
-					? extractSessionId(session.access_token)
+				// Read the access token directly from cookies instead of calling getSession()
+				const projectRef = process.env.NEXT_PUBLIC_SUPABASE_URL?.match(/\/\/([^.]+)\./)?.[1];
+				const accessTokenCookie = projectRef
+					? request.cookies.get(`sb-${projectRef}-auth-token`)?.value
 					: null;
 
+				// The cookie stores a JSON array: [access_token, refresh_token, ...]
+				// or in newer versions it may be a single token
+				let accessToken: string | null = null;
+				if (accessTokenCookie) {
+					try {
+						const parsed = JSON.parse(
+							accessTokenCookie.startsWith("base64-")
+								? Buffer.from(accessTokenCookie.slice(7), "base64").toString()
+								: accessTokenCookie,
+						);
+						accessToken = Array.isArray(parsed) ? parsed[0] : parsed;
+					} catch {
+						accessToken = accessTokenCookie;
+					}
+				}
+
+				const supabaseSessionId = accessToken ? extractSessionId(accessToken) : null;
+
 				if (supabaseSessionId) {
-					// Get ALL tracked sessions for this user
 					const { data: allSessions } = await supabase
 						.from("user_sessions")
 						.select("session_id")
 						.eq("user_id", user.id);
 
-					// Only enforce allowlist if user has tracked sessions
-					// (zero sessions = new login not yet registered, not a revocation)
 					if (allSessions && allSessions.length > 0) {
 						const isTracked = allSessions.some(
 							(s: { session_id: string }) => s.session_id === supabaseSessionId,
 						);
 
 						if (!isTracked) {
-							// Session was revoked — sign out and redirect
 							await supabase.auth.signOut();
 							const url = request.nextUrl.clone();
 							url.pathname = "/signin";
@@ -106,7 +120,7 @@ export async function updateSession(request: NextRequest) {
 					}
 				}
 			} catch {
-				// Non-blocking: if allowlist check fails, let the request through
+				// Non-blocking: fail-open if check fails
 			}
 		}
 	}
