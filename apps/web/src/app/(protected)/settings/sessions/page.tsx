@@ -1,6 +1,12 @@
+import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { SessionList } from "@/components/settings/session-list";
+
+export const metadata: Metadata = {
+	title: "Active sessions — DigSwap",
+	description: "View and manage your active login sessions.",
+};
 
 /**
  * Active Sessions settings page.

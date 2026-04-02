@@ -1,5 +1,11 @@
+import type { Metadata } from "next";
 import { and, count, eq, gte, inArray, isNotNull, or } from "drizzle-orm";
 import { redirect } from "next/navigation";
+
+export const metadata: Metadata = {
+	title: "My collection — DigSwap",
+	description: "View and manage your vinyl record collection.",
+};
 import { db } from "@/lib/db";
 import { collectionItems } from "@/lib/db/schema/collections";
 import { releases } from "@/lib/db/schema/releases";

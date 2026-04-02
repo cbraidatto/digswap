@@ -1,9 +1,15 @@
+import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { DiscogsSettings } from "@/components/discogs/discogs-settings";
 import { NotificationPreferences } from "./_components/notification-preferences";
+
+export const metadata: Metadata = {
+	title: "Settings — DigSwap",
+	description: "Manage your account settings and integrations.",
+};
 
 /**
  * Settings page with Discogs integration section.

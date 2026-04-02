@@ -1,7 +1,13 @@
+import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { ImportProgress } from "@/components/discogs/import-progress";
+
+export const metadata: Metadata = {
+	title: "Import progress — DigSwap",
+	description: "Track the progress of your Discogs collection import.",
+};
 
 export default async function ImportProgressPage() {
 	const supabase = await createClient();

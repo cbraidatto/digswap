@@ -1,7 +1,13 @@
+import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
+
+export const metadata: Metadata = {
+	title: "Trades — DigSwap",
+	description: "Manage your vinyl trade requests and active swaps.",
+};
 import { listTradeThreads, type TradeThreadListItem } from "@/lib/trades/messages";
 import { getQuotaStatus } from "@/lib/entitlements";
 import { TradeQuotaBanner } from "@/components/trades/TradeQuotaBanner";

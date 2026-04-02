@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { eq } from "drizzle-orm";
 import { notFound, redirect } from "next/navigation";
 import Link from "next/link";
@@ -21,6 +22,16 @@ import { ProfileCollectionSection } from "./_components/profile-collection-secti
 interface PublicProfileProps {
 	params: Promise<{ username: string }>;
 	searchParams: Promise<Record<string, string | string[] | undefined>>;
+}
+
+export async function generateMetadata({
+	params,
+}: PublicProfileProps): Promise<Metadata> {
+	const { username } = await params;
+	return {
+		title: `${username} — DigSwap`,
+		description: `Check out ${username}'s vinyl collection on DigSwap.`,
+	};
 }
 
 export default async function PublicProfilePage({

@@ -1,6 +1,12 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { loadGenreGroupsAction, loadMemberGroupsAction } from "@/actions/community";
 import { GroupDiscoveryHub } from "./_components/group-discovery-hub";
+
+export const metadata: Metadata = {
+	title: "Community — DigSwap",
+	description: "Discover and join vinyl collector groups.",
+};
 
 export default async function ComunidadePage() {
 	const [genreGroups, memberGroups] = await Promise.all([

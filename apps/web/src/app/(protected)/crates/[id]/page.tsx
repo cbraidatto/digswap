@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { notFound, redirect } from "next/navigation";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
@@ -5,6 +6,11 @@ import { getCrateById, getCrateItems, getSetsForCrate } from "@/lib/crates/queri
 import { CrateItemRow } from "./_components/crate-item-row";
 import { NewSetSection } from "./_components/new-set-section";
 import { SetsSection } from "./_components/sets-section";
+
+export const metadata: Metadata = {
+	title: "Crate — DigSwap",
+	description: "View and organize records in your crate for your next digging session.",
+};
 
 const SESSION_TYPE_CHIP: Record<string, { label: string; className: string }> = {
   digging_trip: {

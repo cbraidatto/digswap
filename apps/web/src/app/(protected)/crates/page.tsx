@@ -1,6 +1,12 @@
+import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { getCrates } from "@/lib/crates/queries";
+
+export const metadata: Metadata = {
+	title: "Crates — DigSwap",
+	description: "Organize your vinyl finds into custom crates.",
+};
 import { CrateCard } from "./_components/crate-card";
 import { CrateEmptyState } from "./_components/crate-empty-state";
 import { CratesHeader } from "./_components/crates-header";

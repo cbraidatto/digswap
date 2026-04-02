@@ -1,4 +1,10 @@
+import type { Metadata } from "next";
 import { GroupCreateForm } from "./_components/group-create-form";
+
+export const metadata: Metadata = {
+	title: "Create group — DigSwap",
+	description: "Start a new vinyl collector community group.",
+};
 
 export default function NewGroupPage() {
 	return (

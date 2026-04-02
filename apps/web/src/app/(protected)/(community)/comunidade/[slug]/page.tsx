@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
@@ -8,6 +9,11 @@ import {
 } from "@/lib/community/queries";
 import { GroupDetailHeader } from "./_components/group-detail-header";
 import { InviteControls } from "./_components/invite-controls";
+
+export const metadata: Metadata = {
+	title: "Group — DigSwap",
+	description: "A community group on DigSwap where vinyl diggers share finds and discuss records.",
+};
 import { GroupContentSection } from "./_components/group-content-section";
 
 export default async function GroupDetailPage({

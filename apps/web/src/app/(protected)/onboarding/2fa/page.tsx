@@ -1,6 +1,12 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { AuthCard } from "@/components/auth/auth-card";
 import { TotpSetup } from "@/components/auth/totp-setup";
+
+export const metadata: Metadata = {
+	title: "Set up 2FA — DigSwap",
+	description: "Enable two-factor authentication to secure your account.",
+};
 
 /**
  * 2FA setup page during onboarding.

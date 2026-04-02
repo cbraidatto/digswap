@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { eq } from "drizzle-orm";
 import { notFound, redirect } from "next/navigation";
@@ -10,6 +11,11 @@ import {
 	type ComparisonItem,
 } from "@/lib/social/comparison";
 import { getRarityTier } from "@/lib/collection/rarity";
+
+export const metadata: Metadata = {
+	title: "Compare collections — DigSwap",
+	description: "See the overlap and unique records between two vinyl collections.",
+};
 
 interface ComparePageProps {
 	params: Promise<{ username: string }>;

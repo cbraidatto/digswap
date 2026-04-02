@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
@@ -6,6 +7,11 @@ import {
 	getGroupMembershipState,
 } from "@/lib/community/queries";
 import { InviteAcceptButton } from "./invite-accept-button";
+
+export const metadata: Metadata = {
+	title: "Join group — DigSwap",
+	description: "Accept an invitation to join a DigSwap community group.",
+};
 
 export default async function JoinByTokenPage({
 	params,

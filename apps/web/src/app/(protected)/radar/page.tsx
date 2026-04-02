@@ -1,6 +1,12 @@
+import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import Image from "next/image";
 import { createClient } from "@/lib/supabase/server";
+
+export const metadata: Metadata = {
+	title: "Wantlist Radar — DigSwap",
+	description: "Find diggers who have the records on your wantlist.",
+};
 import { getRadarMatchesPaginated } from "@/lib/wantlist/radar-queries";
 import { LeadAction } from "@/components/digger-memory/lead-action";
 import { ContextTooltip } from "@/components/digger-memory/context-tooltip";

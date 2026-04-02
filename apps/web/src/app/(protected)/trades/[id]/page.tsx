@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { notFound, redirect } from "next/navigation";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
@@ -8,6 +9,11 @@ import { TradeDetailHeader } from "./_components/TradeDetailHeader";
 import { TradeMessageThread } from "./_components/TradeMessageThread";
 import { TradeMessageComposer } from "./_components/TradeMessageComposer";
 import { TradePresenceIndicator } from "./_components/TradePresenceIndicator";
+
+export const metadata: Metadata = {
+	title: "Trade — DigSwap",
+	description: "View trade details and messages with another digger.",
+};
 
 interface Props {
 	params: Promise<{ id: string }>;

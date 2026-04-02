@@ -1,5 +1,11 @@
+import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
+
+export const metadata: Metadata = {
+	title: "Feed — DigSwap",
+	description: "See the latest activity from the digger community.",
+};
 import {
 	getProgressBarState,
 	getFollowCounts,
