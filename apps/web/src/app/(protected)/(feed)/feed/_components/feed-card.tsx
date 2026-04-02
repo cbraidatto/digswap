@@ -4,6 +4,7 @@ import Link from "next/link";
 import type { FeedItem } from "@/actions/social";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { CoverArt } from "@/components/ui/cover-art";
+import { DigButton } from "@/components/engagement/dig-button";
 import { getRarityTier, type RarityTier } from "@/lib/collection/rarity";
 
 function formatRelativeTime(dateStr: string): string {
@@ -43,7 +44,7 @@ function getRarityTextColor(tier: RarityTier): string {
 	}
 }
 
-export function FeedCard({ item }: { item: FeedItem }) {
+export function FeedCard({ item, digState }: { item: FeedItem; digState?: { dug: boolean; digCount: number } }) {
 	const tier = getRarityTier(item.releaseRarityScore);
 	const accentColor = getAccentStripColor(tier);
 	const rarityTextColor = getRarityTextColor(tier);
@@ -77,8 +78,8 @@ export function FeedCard({ item }: { item: FeedItem }) {
 					{formatRelativeTime(item.createdAt)}
 				</span>
 
-				<span className="font-mono text-xs text-primary bg-primary/10 px-1.5 py-0.5 rounded border border-primary/20 ml-auto">
-					[NEW_FIND]
+				<span className="text-xs text-primary bg-primary/10 px-1.5 py-0.5 rounded border border-primary/20 ml-auto">
+					New find
 				</span>
 			</div>
 
@@ -93,31 +94,30 @@ export function FeedCard({ item }: { item: FeedItem }) {
 
 				{/* Metadata */}
 				<div className="flex flex-col gap-1 min-w-0">
-					<div className="font-mono text-xs">
-						<span className="text-on-surface-variant">ARTIST:</span>{" "}
-						<span className="text-on-surface">{item.releaseArtist ?? "Unknown"}</span>
-					</div>
-					<div className="font-mono text-xs">
-						<span className="text-on-surface-variant">TITLE:</span>{" "}
-						<span className="text-on-surface">{item.releaseTitle ?? "Unknown"}</span>
-					</div>
-					<div className="font-mono text-xs">
-						<span className="text-on-surface-variant">GENRE:</span>{" "}
-						<span className="text-on-surface">
-							{item.releaseGenre?.[0] ?? "Unknown"}
-						</span>
-					</div>
-					<div className="font-mono text-xs">
-						<span className="text-on-surface-variant">LABEL:</span>{" "}
-						<span className="text-on-surface">{item.releaseLabel ?? "Unknown"}</span>
-					</div>
+					<h3 className="font-heading text-sm font-bold text-on-surface truncate">
+						{item.releaseTitle ?? "Unknown"}
+					</h3>
+					<p className="text-xs text-on-surface-variant truncate">
+						{item.releaseArtist ?? "Unknown"}
+					</p>
+					<p className="text-xs text-on-surface-variant/70 truncate">
+						{item.releaseGenre?.[0] ?? "Unknown"} · {item.releaseLabel ?? "Unknown"}
+					</p>
 
 					{/* Rarity badge */}
-					<div className={`font-mono text-xs font-bold mt-2 ${rarityTextColor}`}>
-						RARITY:{" "}
-						{item.releaseRarityScore !== null
+					<div className={`text-xs font-semibold mt-1.5 ${rarityTextColor}`}>
+						{tier} · {item.releaseRarityScore !== null
 							? item.releaseRarityScore.toFixed(1)
 							: "--"}
+					</div>
+
+					{/* Dig button */}
+					<div className="mt-2">
+						<DigButton
+							feedItemId={item.id}
+							initialDug={digState?.dug ?? false}
+							initialCount={digState?.digCount ?? 0}
+						/>
 					</div>
 				</div>
 			</div>
