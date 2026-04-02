@@ -144,7 +144,7 @@ export function CoverBanner({
 						<div
 							className="absolute inset-0 opacity-[0.04]"
 							style={{
-								backgroundImage: "radial-gradient(#6fdd78 1px, transparent 1px)",
+								backgroundImage: "radial-gradient(var(--primary) 1px, transparent 1px)",
 								backgroundSize: "24px 24px",
 							}}
 						/>

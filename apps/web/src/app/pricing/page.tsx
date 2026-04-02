@@ -36,17 +36,17 @@ export default async function PricingPage() {
 	const annualPriceId = process.env.NEXT_PUBLIC_STRIPE_PRICE_ANNUAL ?? "";
 
 	return (
-		<div className="min-h-screen bg-[#0d0d0d] px-4 py-16">
+		<div className="min-h-screen bg-surface-container-lowest px-4 py-16">
 			<div className="max-w-2xl mx-auto">
 				{/* Header */}
 				<div className="text-center mb-12">
-					<div className="text-[10px] font-mono text-[#4a4035] uppercase tracking-widest mb-3">
+					<div className="text-[10px] font-mono text-muted-foreground uppercase tracking-widest mb-3">
 						Pricing
 					</div>
-					<h1 className="text-[#e8dcc8] font-heading text-3xl font-bold mb-3">
+					<h1 className="text-foreground font-heading text-3xl font-bold mb-3">
 						Choose your dig level
 					</h1>
-					<p className="text-[#7a6e5f] font-mono text-sm max-w-sm mx-auto leading-relaxed">
+					<p className="text-muted-foreground font-mono text-sm max-w-sm mx-auto leading-relaxed">
 						Free forever for casual diggers. Go Premium for unlimited trades and deeper tools.
 					</p>
 				</div>
@@ -58,7 +58,7 @@ export default async function PricingPage() {
 				/>
 
 				{/* Footer note */}
-				<p className="text-center text-[#2a2218] font-mono text-[10px] mt-10">
+				<p className="text-center text-outline-variant font-mono text-[10px] mt-10">
 					Cancel anytime. No hidden fees. Prices in USD.
 				</p>
 			</div>

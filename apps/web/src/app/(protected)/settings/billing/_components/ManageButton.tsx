@@ -22,7 +22,7 @@ export function ManageButton() {
 		<button
 			onClick={handleManage}
 			disabled={isPending}
-			className="w-full bg-[#1a1610] border border-[#2a2218] text-[#7a6e5f] font-mono text-xs py-3 rounded hover:border-[#3a3228] transition-colors disabled:opacity-50"
+			className="w-full bg-surface-container-low border border-outline-variant text-muted-foreground font-mono text-xs py-3 rounded hover:border-outline transition-colors disabled:opacity-50"
 		>
 			{isPending ? "..." : "MANAGE_SUBSCRIPTION"}
 		</button>

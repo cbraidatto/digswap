@@ -40,7 +40,7 @@ export default async function TradeDetailPage({ params }: Props) {
 			{/* Back nav */}
 			<Link
 				href="/trades"
-				className="inline-flex items-center gap-1.5 text-[#4a4035] hover:text-[#7a6e5f] font-mono text-xs mb-6 transition-colors"
+				className="inline-flex items-center gap-1.5 text-muted-foreground hover:text-muted-foreground font-mono text-xs mb-6 transition-colors"
 			>
 				<span className="material-symbols-outlined text-sm">arrow_back</span>
 				Trades

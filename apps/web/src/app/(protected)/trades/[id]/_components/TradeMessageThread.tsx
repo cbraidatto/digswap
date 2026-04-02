@@ -22,7 +22,7 @@ function formatDate(iso: string) {
 function SystemMessage({ message }: { message: TradeThreadMessage }) {
 	return (
 		<div className="flex justify-center my-3">
-			<span className="text-[#4a4035] font-mono text-[10px] italic px-3 py-1 rounded border border-[#2a2218] bg-[#0a0a0a]">
+			<span className="text-muted-foreground font-mono text-[10px] italic px-3 py-1 rounded border border-outline-variant bg-background">
 				{message.body}
 			</span>
 		</div>
@@ -38,20 +38,20 @@ function MessageBubble({ message, showSender }: MessageBubbleProps) {
 	return (
 		<div className={`flex flex-col gap-1 ${message.isOwn ? "items-end" : "items-start"}`}>
 			{showSender && !message.isOwn && (
-				<span className="text-[#4a4035] font-mono text-[10px] px-1">
+				<span className="text-muted-foreground font-mono text-[10px] px-1">
 					{message.senderUsername ?? "Unknown digger"}
 				</span>
 			)}
 			<div
 				className={`max-w-[75%] px-3 py-2 rounded text-sm font-mono leading-relaxed ${
 					message.isOwn
-						? "bg-[#1a1208] border border-[#c8914a]/20 text-[#e8dcc8]"
-						: "bg-[#111008] border border-[#2a2218] text-[#c8c0b0]"
+						? "bg-surface-dim border border-primary/20 text-foreground"
+						: "bg-surface-container border border-outline-variant text-on-surface-variant"
 				}`}
 			>
 				{message.body}
 			</div>
-			<span className="text-[#2a2218] font-mono text-[9px] px-1">
+			<span className="text-outline-variant font-mono text-[9px] px-1">
 				{formatTime(message.createdAt)}
 			</span>
 		</div>
@@ -131,7 +131,7 @@ export function TradeMessageThread({
 	if (messages.length === 0) {
 		return (
 			<div className="flex-1 flex items-center justify-center py-12">
-				<p className="text-[#4a4035] font-mono text-xs">
+				<p className="text-muted-foreground font-mono text-xs">
 					No messages yet. Start the conversation.
 				</p>
 			</div>
@@ -156,9 +156,9 @@ export function TradeMessageThread({
 				<div key={group.date}>
 					{/* Date separator */}
 					<div className="flex items-center gap-3 my-4">
-						<div className="flex-1 h-px bg-[#2a2218]" />
-						<span className="text-[#4a4035] font-mono text-[10px]">{group.date}</span>
-						<div className="flex-1 h-px bg-[#2a2218]" />
+						<div className="flex-1 h-px bg-outline-variant" />
+						<span className="text-muted-foreground font-mono text-[10px]">{group.date}</span>
+						<div className="flex-1 h-px bg-outline-variant" />
 					</div>
 
 					<div className="flex flex-col gap-2">

@@ -42,18 +42,18 @@ export default async function SettingsPage({
 
 			<Link
 				href="/settings/billing"
-				className="flex items-center justify-between bg-[#111008] border border-[#2a2218] rounded p-4 hover:border-[#3a3228] transition-colors group"
+				className="flex items-center justify-between bg-surface-container border border-outline-variant rounded p-4 hover:border-outline transition-colors group"
 			>
 				<div className="flex items-center gap-3">
-					<span className="material-symbols-outlined text-[#4a4035] group-hover:text-[#c8914a] transition-colors text-sm">
+					<span className="material-symbols-outlined text-muted-foreground group-hover:text-primary transition-colors text-sm">
 						credit_card
 					</span>
 					<div>
-						<div className="text-[#e8dcc8] font-mono text-sm">Billing</div>
-						<div className="text-[#4a4035] font-mono text-xs">Manage your subscription and trade quota</div>
+						<div className="text-foreground font-mono text-sm">Billing</div>
+						<div className="text-muted-foreground font-mono text-xs">Manage your subscription and trade quota</div>
 					</div>
 				</div>
-				<span className="material-symbols-outlined text-[#2a2218] text-sm">chevron_right</span>
+				<span className="material-symbols-outlined text-outline-variant text-sm">chevron_right</span>
 			</Link>
 
 			{oauthError && <OAuthErrorBanner error={oauthError} />}

@@ -8,15 +8,15 @@ import { TradeQuotaBanner } from "@/components/trades/TradeQuotaBanner";
 const TERMINAL_STATUSES = new Set(["completed", "declined", "cancelled", "expired"]);
 
 const STATUS_LABEL: Record<string, { label: string; className: string }> = {
-	pending:     { label: "PENDING",     className: "text-[#4a4035] border-[#2a2218]" },
-	lobby:       { label: "LOBBY",       className: "text-[#c8914a] border-[#c8914a]/30" },
-	previewing:  { label: "PREVIEWING",  className: "text-[#c8914a] border-[#c8914a]/30" },
-	accepted:    { label: "ACCEPTED",    className: "text-[#c8914a] border-[#c8914a]/30" },
-	transferring:{ label: "TRANSFERRING",className: "text-[#7aa2c8] border-[#7aa2c8]/30" },
-	completed:   { label: "COMPLETE",    className: "text-[#7ac87a] border-[#7ac87a]/30" },
-	declined:    { label: "DECLINED",    className: "text-[#4a4035] border-[#2a2218]" },
-	cancelled:   { label: "CANCELLED",   className: "text-[#4a4035] border-[#2a2218]" },
-	expired:     { label: "EXPIRED",     className: "text-[#4a4035] border-[#2a2218]" },
+	pending:     { label: "Pending",      className: "text-muted-foreground border-outline-variant" },
+	lobby:       { label: "Lobby",        className: "text-primary border-primary/30" },
+	previewing:  { label: "Previewing",   className: "text-primary border-primary/30" },
+	accepted:    { label: "Accepted",     className: "text-primary border-primary/30" },
+	transferring:{ label: "Transferring", className: "text-secondary border-secondary/30" },
+	completed:   { label: "Complete",     className: "text-tertiary border-tertiary/30" },
+	declined:    { label: "Declined",     className: "text-muted-foreground border-outline-variant" },
+	cancelled:   { label: "Cancelled",    className: "text-muted-foreground border-outline-variant" },
+	expired:     { label: "Expired",      className: "text-muted-foreground border-outline-variant" },
 };
 
 function formatRelativeTime(iso: string) {
@@ -37,7 +37,7 @@ function TradeCard({ thread }: { thread: TradeThreadListItem }) {
 	return (
 		<Link
 			href={`/trades/${thread.tradeId}`}
-			className={`block bg-[#0d0d0d] border border-[#2a2218] rounded p-4 hover:border-[#3a3228] transition-colors ${isTerminal ? "opacity-60" : ""}`}
+			className={`block bg-surface-container-lowest border border-outline-variant rounded p-4 hover:border-outline transition-colors ${isTerminal ? "opacity-60" : ""}`}
 		>
 			<div className="flex items-start justify-between gap-3 mb-2">
 				<div className="flex items-center gap-2 min-w-0">
@@ -45,39 +45,39 @@ function TradeCard({ thread }: { thread: TradeThreadListItem }) {
 						<img
 							src={thread.counterpartyAvatarUrl}
 							alt=""
-							className="w-7 h-7 rounded-full flex-shrink-0 border border-[#2a2218]"
+							className="w-7 h-7 rounded-full flex-shrink-0 border border-outline-variant"
 						/>
 					) : (
-						<div className="w-7 h-7 rounded-full bg-[#1a1610] border border-[#2a2218] flex-shrink-0 flex items-center justify-center">
-							<span className="text-[#4a4035] text-xs font-mono">
+						<div className="w-7 h-7 rounded-full bg-surface-container-low border border-outline-variant flex-shrink-0 flex items-center justify-center">
+							<span className="text-muted-foreground text-xs">
 								{(thread.counterpartyUsername[0] ?? "?").toUpperCase()}
 							</span>
 						</div>
 					)}
-					<span className="text-[#e8dcc8] text-sm font-mono truncate">
+					<span className="text-foreground text-sm truncate">
 						{thread.counterpartyUsername}
 					</span>
 				</div>
 
 				<div className="flex items-center gap-2 flex-shrink-0">
 					{thread.unreadCount > 0 && (
-						<span className="bg-[#c8914a] text-[#0d0d0d] text-[10px] font-mono font-bold px-1.5 py-0.5 rounded-full">
+						<span className="bg-primary text-primary-foreground text-[10px] font-bold px-1.5 py-0.5 rounded-full">
 							{thread.unreadCount}
 						</span>
 					)}
-					<span className={`text-[10px] font-mono px-1.5 py-0.5 rounded border ${status.className}`}>
+					<span className={`text-xs px-1.5 py-0.5 rounded border ${status.className}`}>
 						{status.label}
 					</span>
 				</div>
 			</div>
 
 			<div className="flex items-end justify-between gap-2">
-				<p className="text-[#7a6e5f] text-xs font-mono truncate flex-1">
+				<p className="text-muted-foreground text-xs truncate flex-1">
 					{thread.lastMessage
 						? thread.lastMessage.body
 						: "No messages yet"}
 				</p>
-				<span className="text-[#4a4035] text-[10px] font-mono flex-shrink-0">
+				<span className="text-muted-foreground/60 text-[10px] flex-shrink-0">
 					{formatRelativeTime(timestamp)}
 				</span>
 			</div>
@@ -107,20 +107,20 @@ export default async function TradesPage() {
 				percentUsed={quota.percentUsed}
 			/>
 			<div className="mb-6">
-				<h1 className="text-[#e8dcc8] font-heading text-xl font-bold tracking-tight">
+				<h1 className="text-foreground font-heading text-xl font-bold tracking-tight">
 					Trades
 				</h1>
-				<p className="text-[#4a4035] text-xs font-mono mt-1">
+				<p className="text-muted-foreground text-xs mt-1">
 					{threads.length} active trade{threads.length !== 1 ? "s" : ""}
 				</p>
 			</div>
 
 			{threads.length === 0 ? (
-				<div className="text-center py-16 border border-dashed border-[#2a2218] rounded">
-					<p className="text-[#4a4035] font-mono text-sm">No active trades</p>
-					<p className="text-[#2a2218] font-mono text-xs mt-2">
+				<div className="text-center py-16 border border-dashed border-outline-variant rounded">
+					<p className="text-muted-foreground text-sm">No active trades</p>
+					<p className="text-muted-foreground/50 text-xs mt-2">
 						Discover records to trade on{" "}
-						<Link href="/radar" className="text-[#c8914a] hover:underline">
+						<Link href="/radar" className="text-primary hover:underline">
 							The Radar
 						</Link>
 					</p>

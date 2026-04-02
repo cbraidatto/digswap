@@ -7,7 +7,7 @@ export default function Home() {
 			<div
 				className="fixed inset-0 opacity-[0.03] pointer-events-none"
 				style={{
-					backgroundImage: "radial-gradient(#6fdd78 1px, transparent 1px)",
+					backgroundImage: "radial-gradient(var(--primary) 1px, transparent 1px)",
 					backgroundSize: "32px 32px",
 				}}
 			/>

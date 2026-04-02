@@ -8,10 +8,10 @@ const STATE_CONFIG: Record<
 	TradePresenceState,
 	{ label: string; dotClass: string; textClass: string }
 > = {
-	both_online:       { label: "Both online",         dotClass: "bg-[#7ac87a]",  textClass: "text-[#7ac87a]" },
-	me_only:           { label: "Desktop active",       dotClass: "bg-[#c8914a]",  textClass: "text-[#c8914a]" },
-	counterparty_only: { label: "Counterparty online",  dotClass: "bg-[#7aa2c8]",  textClass: "text-[#7aa2c8]" },
-	neither:           { label: "Offline",              dotClass: "bg-[#4a4035]",  textClass: "text-[#4a4035]" },
+	both_online:       { label: "Both online",         dotClass: "bg-tertiary",  textClass: "text-tertiary" },
+	me_only:           { label: "Desktop active",       dotClass: "bg-primary",  textClass: "text-primary" },
+	counterparty_only: { label: "Counterparty online",  dotClass: "bg-secondary",  textClass: "text-secondary" },
+	neither:           { label: "Offline",              dotClass: "bg-muted-foreground",  textClass: "text-muted-foreground" },
 };
 
 interface PresenceRow {

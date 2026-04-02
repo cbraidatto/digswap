@@ -266,7 +266,7 @@ export default async function PerfilPage({ searchParams }: PerfilPageProps) {
 					<div
 						className="absolute inset-0 opacity-5 pointer-events-none"
 						style={{
-							backgroundImage: "radial-gradient(#6fdd78 1px, transparent 1px)",
+							backgroundImage: "radial-gradient(var(--primary) 1px, transparent 1px)",
 							backgroundSize: "20px 20px",
 						}}
 					/>

@@ -49,8 +49,8 @@ export function TradeMessageComposer({ tradeId, status }: Props) {
 
 	if (isTerminal) {
 		return (
-			<div className="border-t border-[#2a2218] pt-4 mt-4">
-				<p className="text-[#4a4035] font-mono text-xs text-center">
+			<div className="border-t border-outline-variant pt-4 mt-4">
+				<p className="text-muted-foreground font-mono text-xs text-center">
 					This trade is {status} — messaging is closed
 				</p>
 			</div>
@@ -60,7 +60,7 @@ export function TradeMessageComposer({ tradeId, status }: Props) {
 	return (
 		<form
 			onSubmit={handleSubmit}
-			className="border-t border-[#2a2218] pt-4 mt-4"
+			className="border-t border-outline-variant pt-4 mt-4"
 		>
 			<div className="relative">
 				<textarea
@@ -72,12 +72,12 @@ export function TradeMessageComposer({ tradeId, status }: Props) {
 					maxLength={MAX_LENGTH}
 					rows={3}
 					placeholder="Send a message… (Enter to send, Shift+Enter for newline)"
-					className="w-full bg-[#0a0a0a] border border-[#2a2218] rounded px-3 py-2.5 text-sm font-mono text-[#e8dcc8] placeholder-[#4a4035] resize-none focus:outline-none focus:border-[#c8914a]/40 disabled:opacity-50 disabled:cursor-not-allowed"
+					className="w-full bg-background border border-outline-variant rounded px-3 py-2.5 text-sm font-mono text-foreground placeholder-muted-foreground resize-none focus:outline-none focus:border-primary/40 disabled:opacity-50 disabled:cursor-not-allowed"
 				/>
 				{nearLimit && (
 					<span
 						className={`absolute bottom-2.5 right-3 font-mono text-[10px] ${
-							charsLeft < 100 ? "text-[#c87a7a]" : "text-[#4a4035]"
+							charsLeft < 100 ? "text-destructive" : "text-muted-foreground"
 						}`}
 					>
 						{charsLeft}
@@ -86,14 +86,14 @@ export function TradeMessageComposer({ tradeId, status }: Props) {
 			</div>
 
 			{error && (
-				<p className="text-[#c87a7a] font-mono text-xs mt-1.5">{error}</p>
+				<p className="text-destructive font-mono text-xs mt-1.5">{error}</p>
 			)}
 
 			<div className="flex justify-end mt-2">
 				<button
 					type="submit"
 					disabled={isDisabled || !body.trim()}
-					className="bg-[#c8914a] hover:bg-[#e8a85a] disabled:bg-[#2a2218] disabled:text-[#4a4035] text-[#0d0d0d] font-mono text-xs font-bold px-4 py-2 rounded transition-colors"
+					className="bg-primary hover:bg-primary disabled:bg-outline-variant disabled:text-muted-foreground text-background font-mono text-xs font-bold px-4 py-2 rounded transition-colors"
 				>
 					{isPending ? "Sending…" : "Send"}
 				</button>

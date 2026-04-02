@@ -54,12 +54,12 @@ export default async function BillingPage({
 		<div className="mx-auto w-full max-w-[640px] px-4 py-6 space-y-6">
 			{/* Header */}
 			<div className="flex items-center gap-3">
-				<h1 className="font-heading text-xl font-semibold text-[#e8dcc8]">Billing</h1>
+				<h1 className="font-heading text-xl font-semibold text-foreground">Billing</h1>
 				<span
-					className={`text-[10px] font-mono uppercase tracking-widest px-2 py-0.5 rounded border ${
+					className={`text-xs uppercase tracking-widest px-2 py-0.5 rounded border ${
 						isPremium
-							? "bg-[#c8914a]/10 border-[#c8914a]/30 text-[#c8914a]"
-							: "bg-[#111008] border-[#2a2218] text-[#4a4035]"
+							? "bg-primary/10 border-primary/30 text-primary"
+							: "bg-surface-container border-outline-variant text-muted-foreground"
 					}`}
 				>
 					{planLabel}
@@ -68,15 +68,15 @@ export default async function BillingPage({
 
 			{/* Success banner */}
 			{showSuccess && (
-				<div className="bg-[#0a1a0a] border border-[#7ac87a]/20 rounded p-4 flex items-start gap-3">
-					<span className="material-symbols-outlined text-[#7ac87a] text-sm flex-shrink-0 mt-0.5">
+				<div className="bg-tertiary/5 border border-tertiary/20 rounded p-4 flex items-start gap-3">
+					<span className="material-symbols-outlined text-tertiary text-sm flex-shrink-0 mt-0.5">
 						check_circle
 					</span>
 					<div>
-						<div className="text-[#7ac87a] font-mono text-xs font-bold">
+						<div className="text-tertiary text-xs font-bold">
 							Subscription activated
 						</div>
-						<div className="text-[#4a7a4a] font-mono text-xs mt-0.5">
+						<div className="text-tertiary/60 text-xs mt-0.5">
 							Welcome to Premium — unlimited trades unlocked.
 						</div>
 					</div>
@@ -84,51 +84,51 @@ export default async function BillingPage({
 			)}
 
 			{/* Subscription card */}
-			<div className="bg-[#111008] border border-[#2a2218] rounded p-5 space-y-4">
-				<div className="text-[10px] font-mono text-[#4a4035] uppercase tracking-widest">
+			<div className="bg-surface-container border border-outline-variant rounded p-5 space-y-4">
+				<div className="text-xs text-muted-foreground uppercase tracking-widest">
 					Current plan
 				</div>
 
 				{isPremium ? (
 					<div className="space-y-3">
 						<div className="flex items-center justify-between">
-							<span className="text-[#e8dcc8] font-mono text-sm">Premium</span>
-							<span className="text-[#c8914a] font-mono text-xs">Active</span>
+							<span className="text-foreground text-sm">Premium</span>
+							<span className="text-primary text-xs">Active</span>
 						</div>
-						<div className="flex items-center justify-between text-xs font-mono">
-							<span className="text-[#4a4035]">Next renewal</span>
-							<span className="text-[#7a6e5f]">
+						<div className="flex items-center justify-between text-xs">
+							<span className="text-muted-foreground">Next renewal</span>
+							<span className="text-on-surface-variant">
 								{formatDate(currentPeriodEnd)}
 							</span>
 						</div>
-						<div className="flex items-center justify-between text-xs font-mono">
-							<span className="text-[#4a4035]">Trades this month</span>
-							<span className="text-[#7a6e5f]">Unlimited</span>
+						<div className="flex items-center justify-between text-xs">
+							<span className="text-muted-foreground">Trades this month</span>
+							<span className="text-on-surface-variant">Unlimited</span>
 						</div>
 					</div>
 				) : (
 					<div className="space-y-4">
 						<div className="flex items-center justify-between">
-							<span className="text-[#e8dcc8] font-mono text-sm">Free</span>
-							<span className="text-[#4a4035] font-mono text-xs">Active</span>
+							<span className="text-foreground text-sm">Free</span>
+							<span className="text-muted-foreground text-xs">Active</span>
 						</div>
 
 						{/* Quota bar */}
 						<div className="space-y-1.5">
-							<div className="flex items-center justify-between text-xs font-mono">
-								<span className="text-[#4a4035]">Trades this month</span>
-								<span className="text-[#7a6e5f]">
+							<div className="flex items-center justify-between text-xs">
+								<span className="text-muted-foreground">Trades this month</span>
+								<span className="text-on-surface-variant">
 									{quota.tradesUsed} / {quota.tradesLimit}
 								</span>
 							</div>
-							<div className="h-1.5 bg-[#1a1610] rounded-full overflow-hidden">
+							<div className="h-1.5 bg-surface-container-low rounded-full overflow-hidden">
 								<div
-									className="h-full bg-[#c8914a] rounded-full transition-all"
+									className="h-full bg-primary rounded-full transition-all"
 									style={{ width: `${Math.min(quota.percentUsed ?? 0, 100)}%` }}
 								/>
 							</div>
 							{quota.tradesUsed >= (quota.tradesLimit ?? 5) && (
-								<p className="text-[10px] font-mono text-[#c8914a]">
+								<p className="text-xs text-primary">
 									Monthly limit reached — resets on the 1st of next month
 								</p>
 							)}
@@ -145,21 +145,21 @@ export default async function BillingPage({
 					<div className="space-y-3">
 						<Link
 							href="/pricing"
-							className="block w-full text-center bg-[#c8914a] text-[#0d0d0d] font-mono text-xs font-bold py-3 rounded hover:brightness-110 transition-all"
+							className="block w-full text-center bg-primary text-primary-foreground text-xs font-bold py-3 rounded hover:brightness-110 transition-all"
 						>
-							UPGRADE_TO_PREMIUM
+							Upgrade to Premium
 						</Link>
-						<p className="text-center text-[10px] font-mono text-[#2a2218]">
+						<p className="text-center text-xs text-muted-foreground/50">
 							Unlimited trades from $8.25/month
 						</p>
 					</div>
 				)}
 			</div>
 
-			<div className="border-t border-[#1a1610] pt-4">
+			<div className="border-t border-outline-variant pt-4">
 				<Link
 					href="/settings"
-					className="text-[#4a4035] hover:text-[#7a6e5f] font-mono text-xs transition-colors"
+					className="text-muted-foreground hover:text-on-surface-variant text-xs transition-colors"
 				>
 					← Back to Settings
 				</Link>
@@ -167,4 +167,3 @@ export default async function BillingPage({
 		</div>
 	);
 }
-
