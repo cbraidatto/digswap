@@ -8,6 +8,7 @@ import type { CollectionItem } from "@/lib/collection/queries";
 import { getRarityTier, getRarityBadgeVariant } from "@/lib/collection/rarity";
 import { ConditionEditor } from "./condition-editor";
 import { PlayButton } from "@/components/player/play-button";
+import { SpinningLogButton } from "@/components/engagement/spinning-log-button";
 
 interface CollectionCardProps {
 	item: CollectionItem;
@@ -81,6 +82,13 @@ export function CollectionCard({ item, isOwner, actionSlot }: CollectionCardProp
 					<ConditionEditor
 						collectionItemId={item.id}
 						currentGrade={item.conditionGrade ?? null}
+					/>
+				)}
+				{/* Spinning Log — only visible to owner */}
+				{isOwner && item.releaseId && (
+					<SpinningLogButton
+						releaseId={item.releaseId}
+						releaseTitle={item.title}
 					/>
 				)}
 				{actionSlot}

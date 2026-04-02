@@ -7,10 +7,11 @@ import {
   integer,
   date,
   check,
+  boolean,
 } from "drizzle-orm/pg-core";
 import { pgPolicy } from "drizzle-orm/pg-core";
 import { sql } from "drizzle-orm";
-import { authenticatedRole, authUid } from "drizzle-orm/supabase";
+import { authenticatedRole, authUid, anonRole } from "drizzle-orm/supabase";
 import { releases } from "./releases";
 
 // ---------------------------------------------------------------------------
@@ -26,6 +27,7 @@ export const crates = pgTable(
     sessionType: varchar("session_type", { length: 20 })
       .notNull()
       .default("digging_trip"),
+    isPublic: boolean("is_public").notNull().default(false),
     createdAt: timestamp("created_at", { withTimezone: true })
       .defaultNow()
       .notNull(),
@@ -38,10 +40,17 @@ export const crates = pgTable(
       "crates_session_type_check",
       sql`${table.sessionType} IN ('digging_trip','event_prep','wish_list','other')`,
     ),
-    pgPolicy("crates_select_own", {
+    // Authenticated users can see their own crates OR public crates
+    pgPolicy("crates_select_own_or_public", {
       for: "select",
       to: authenticatedRole,
-      using: sql`${table.userId} = ${authUid}`,
+      using: sql`${table.userId} = ${authUid} OR ${table.isPublic} = true`,
+    }),
+    // Anon users can see public crates
+    pgPolicy("crates_select_public_anon", {
+      for: "select",
+      to: anonRole,
+      using: sql`${table.isPublic} = true`,
     }),
     pgPolicy("crates_insert_own", {
       for: "insert",

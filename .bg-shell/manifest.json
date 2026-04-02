@@ -1,16 +1,16 @@
 [
   {
-    "id": "0d96d404",
+    "id": "37652456",
     "label": "next-dev",
     "command": "cd apps/web && npx next dev --turbopack -p 3000",
     "cwd": "C:\\Users\\INTEL\\Desktop\\Get Shit DOne",
     "ownerSessionFile": "C:\\Users\\INTEL\\.gsd\\sessions\\--C--Users-INTEL-Desktop-Get Shit DOne--\\2026-04-02T04-05-24-488Z_03360d1f-2b9c-428b-a113-2656b7b9dcba.jsonl",
     "persistAcrossSessions": false,
-    "startedAt": 1775140679400,
+    "startedAt": 1775152413360,
     "processType": "server",
     "group": null,
     "readyPattern": null,
     "readyPort": 3000,
-    "pid": 26264
+    "pid": 24012
   }
 ]

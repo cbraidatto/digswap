@@ -92,9 +92,16 @@ export function FeedContainer({
 		setCursor(null);
 		setHasMore(true);
 
-		// Update URL without full navigation (preserves state on back)
+		// Update URL without full navigation
 		const url = next === "explore" ? "?tab=explore" : "?";
 		router.replace(url);
+
+		// Log signal when switching to Explore (non-blocking)
+		if (next === "explore") {
+			import("@/actions/search-signals").then(({ logSearchSignal }) => {
+				void logSearchSignal([], []);
+			});
+		}
 
 		// Immediately load content for the new tab
 		startTransition(async () => {

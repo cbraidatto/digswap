@@ -25,6 +25,7 @@ import {
 } from "@/lib/collection/queries";
 import { getFollowCounts } from "@/lib/social/queries";
 import { CollectionGridWithCrates } from "./_components/collection-grid-with-crates";
+import { CollectionSectionClient } from "./_components/collection-section-client";
 import { CollectionSkeleton } from "./_components/collection-skeleton";
 import { FilterBar } from "./_components/filter-bar";
 import { FollowList } from "./_components/follow-list";
@@ -376,7 +377,13 @@ export default async function PerfilPage({ searchParams }: PerfilPageProps) {
 			</section>
 
 			{/* My Crates shortcut */}
-			<div className="mt-4 flex justify-end">
+			<div className="mt-4 flex justify-end gap-4">
+				<Link
+					href="/perfil/stats"
+					className="font-mono text-xs text-secondary hover:underline tracking-[0.15em]"
+				>
+					[VIEW_STATS →]
+				</Link>
 				<Link
 					href="/crates"
 					className="font-mono text-xs text-primary hover:underline tracking-[0.15em]"
@@ -481,8 +488,8 @@ export default async function PerfilPage({ searchParams }: PerfilPageProps) {
 					basePath="/perfil"
 				/>
 
-				{/* Collection Grid */}
-				<CollectionGridWithCrates items={items} />
+				{/* Collection Grid with view toggle */}
+				<CollectionSectionClient items={items} />
 
 				{/* Pagination */}
 				{totalPages > 1 && (

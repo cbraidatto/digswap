@@ -1,6 +1,7 @@
-import { eq, and, desc, asc, sql, count, inArray } from "drizzle-orm";
+import { eq, and, desc, asc, sql, count, inArray, isNull } from "drizzle-orm";
 import { db } from "@/lib/db";
 import { crates, crateItems, sets, setTracks } from "@/lib/db/schema/crates";
+import { profiles } from "@/lib/db/schema/users";
 import type { CrateRow, CrateItemRow, SetWithTracks } from "./types";
 
 /**
@@ -17,6 +18,7 @@ export async function getCrates(
       name: crates.name,
       date: crates.date,
       sessionType: crates.sessionType,
+      isPublic: crates.isPublic,
       createdAt: crates.createdAt,
       updatedAt: crates.updatedAt,
       itemCount: count(crateItems.id),
@@ -144,4 +146,80 @@ export async function getSetsForCrate(
 
     return { ...set, tracks };
   });
+}
+
+// ---------------------------------------------------------------------------
+// Public crates (for discovery page)
+// ---------------------------------------------------------------------------
+
+export type PublicCrate = {
+  id: string;
+  name: string;
+  userId: string;
+  sessionType: string;
+  createdAt: Date;
+  itemCount: number;
+  ownerUsername: string | null;
+  ownerDisplayName: string | null;
+  previewCovers: (string | null)[];
+};
+
+/**
+ * Returns the most recent public crates with owner info and up to 4 cover images.
+ */
+export async function getPublicCrates(limit = 20): Promise<PublicCrate[]> {
+  // 1. Fetch public crates with owner profile and item count
+  const rows = await db
+    .select({
+      id: crates.id,
+      name: crates.name,
+      userId: crates.userId,
+      sessionType: crates.sessionType,
+      createdAt: crates.createdAt,
+      itemCount: count(crateItems.id),
+      ownerUsername: profiles.username,
+      ownerDisplayName: profiles.displayName,
+    })
+    .from(crates)
+    .leftJoin(crateItems, eq(crateItems.crateId, crates.id))
+    .leftJoin(profiles, eq(profiles.id, crates.userId))
+    .where(eq(crates.isPublic, true))
+    .groupBy(crates.id, profiles.username, profiles.displayName)
+    .orderBy(desc(crates.createdAt))
+    .limit(limit);
+
+  if (rows.length === 0) return [];
+
+  // 2. Fetch up to 4 cover images per crate in one query
+  const crateIds = rows.map((r) => r.id);
+  const coverRows = await db
+    .select({
+      crateId: crateItems.crateId,
+      coverImageUrl: crateItems.coverImageUrl,
+    })
+    .from(crateItems)
+    .where(
+      and(
+        inArray(crateItems.crateId, crateIds),
+        // only items that actually have a cover
+        sql`${crateItems.coverImageUrl} IS NOT NULL`,
+      ),
+    )
+    .orderBy(asc(crateItems.createdAt));
+
+  // Group covers by crateId, take first 4
+  const coversByCrate = new Map<string, (string | null)[]>();
+  for (const row of coverRows) {
+    const existing = coversByCrate.get(row.crateId) ?? [];
+    if (existing.length < 4) {
+      existing.push(row.coverImageUrl);
+      coversByCrate.set(row.crateId, existing);
+    }
+  }
+
+  return rows.map((r) => ({
+    ...r,
+    itemCount: Number(r.itemCount),
+    previewCovers: coversByCrate.get(r.id) ?? [],
+  }));
 }

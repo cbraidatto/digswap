@@ -6,6 +6,7 @@ import { getCrateById, getCrateItems, getSetsForCrate } from "@/lib/crates/queri
 import { CrateItemRow } from "./_components/crate-item-row";
 import { NewSetSection } from "./_components/new-set-section";
 import { SetsSection } from "./_components/sets-section";
+import { CrateHeaderActions } from "./_components/crate-header-actions";
 
 export const metadata: Metadata = {
 	title: "Crate — DigSwap",
@@ -97,6 +98,11 @@ export default async function CrateDetailPage({ params }: CrateDetailPageProps) 
             )}
           </div>
         </div>
+        <CrateHeaderActions
+          crateId={id}
+          crateTitle={crate.name}
+          initialIsPublic={crate.isPublic}
+        />
       </div>
 
       {/* Items list */}

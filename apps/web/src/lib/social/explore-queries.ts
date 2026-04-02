@@ -4,6 +4,7 @@ import { follows, activityFeed } from "@/lib/db/schema/social";
 import { profiles } from "@/lib/db/schema/users";
 import { releases } from "@/lib/db/schema/releases";
 import { diggerDna } from "@/lib/db/schema/engagement";
+import { searchSignals } from "@/lib/db/schema/search-signals";
 import type { FeedItem } from "@/actions/social";
 
 export async function getExploreFeed(
@@ -11,15 +12,29 @@ export async function getExploreFeed(
 	cursor: string | null,
 	limit = 20,
 ): Promise<FeedItem[]> {
-	// 1. Fetch digger DNA top genres for this user
+	// 1. Fetch digger DNA top genres
 	const dnaRows = await db
 		.select({ topGenres: diggerDna.topGenres })
 		.from(diggerDna)
 		.where(eq(diggerDna.userId, userId))
 		.limit(1);
 
-	const topGenres: string[] =
-		dnaRows[0]?.topGenres?.map((g) => g.name) ?? [];
+	const dnaGenres: string[] = dnaRows[0]?.topGenres?.map((g) => g.name) ?? [];
+
+	// 2. Fetch active search signals (last 7 days, not decayed)
+	const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
+	const signalRows = await db
+		.select({ genres: searchSignals.genres, strength: searchSignals.strength })
+		.from(searchSignals)
+		.where(
+			sql`${searchSignals.userId} = ${userId} AND ${searchSignals.lastReinforcedAt} > ${sevenDaysAgo}`,
+		)
+		.limit(1);
+
+	// Merge DNA genres + signal genres, deduplicated. Signal genres get a boost
+	// by appearing first (affects ordering via contextReason matching).
+	const signalGenres = signalRows[0]?.genres ?? [];
+	const topGenres = [...new Set([...signalGenres, ...dnaGenres])];
 
 	// 2. Build exclusion list: user themselves + who they follow
 	const followingRows = await db
@@ -98,10 +113,12 @@ export async function getExploreFeed(
 
 	return rows.map((row) => {
 		const rowGenres: string[] = row.releaseGenre ?? [];
+		const hasSignalMatch =
+			signalGenres.length > 0 && rowGenres.some((g) => signalGenres.includes(g));
 		const hasDnaMatch =
-			topGenres.length > 0 && rowGenres.some((g) => topGenres.includes(g));
+			dnaGenres.length > 0 && rowGenres.some((g) => dnaGenres.includes(g));
 
-		const contextReason: "dna_match" | "trending" = hasDnaMatch
+		const contextReason: "dna_match" | "trending" = hasSignalMatch || hasDnaMatch
 			? "dna_match"
 			: "trending";
 

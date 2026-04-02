@@ -96,6 +96,29 @@ export async function updateCrate(
   }
 }
 
+export async function toggleCrateVisibility(
+  crateId: string,
+  isPublic: boolean,
+): Promise<{ success: boolean; error?: string }> {
+  try {
+    const user = await getAuthUser();
+    if (!user) return { success: false, error: "Not authenticated" };
+
+    await db
+      .update(crates)
+      .set({ isPublic, updatedAt: new Date() })
+      .where(and(eq(crates.id, crateId), eq(crates.userId, user.id)));
+
+    revalidatePath("/crates");
+    revalidatePath(`/crates/${crateId}`);
+    revalidatePath("/explorar/crates");
+    return { success: true };
+  } catch (err) {
+    console.error("[toggleCrateVisibility] error:", err);
+    return { success: false, error: "Failed to update visibility. Please try again." };
+  }
+}
+
 export async function deleteCrate(
   crateId: string,
 ): Promise<{ success: boolean; error?: string }> {

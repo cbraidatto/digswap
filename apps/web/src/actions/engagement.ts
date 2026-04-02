@@ -3,6 +3,8 @@
 import { createClient } from "@/lib/supabase/server";
 import { db } from "@/lib/db";
 import { digs, diggerDna } from "@/lib/db/schema/engagement";
+import { listeningLogs } from "@/lib/db/schema/listening-logs";
+import { activityFeed } from "@/lib/db/schema/social";
 import { collectionItems } from "@/lib/db/schema/collections";
 import { releases } from "@/lib/db/schema/releases";
 import { eq, and, sql, count } from "drizzle-orm";
@@ -12,6 +14,12 @@ import { z } from "zod";
 // ── Validation schemas ─────────────────────────────────────
 const feedItemIdSchema = z.object({
 	feedItemId: z.string().uuid(),
+});
+
+const logListeningSchema = z.object({
+	releaseId: z.string().uuid(),
+	caption: z.string().max(280).optional(),
+	rating: z.number().int().min(1).max(5).optional(),
 });
 
 // ── Helpers ────────────────────────────────────────────────
@@ -284,5 +292,53 @@ export async function getDiggerDna(userId: string) {
 	} catch (err) {
 		console.error("[getDiggerDna] error:", err);
 		return null;
+	}
+}
+
+// ── Log a listen (Spinning Log) ───────────────────────────
+export async function logListening(
+	releaseId: string,
+	caption?: string,
+	rating?: number,
+): Promise<{ success: boolean; error?: string }> {
+	try {
+		const user = await requireUser();
+
+		const { success: rlSuccess } = await apiRateLimit.limit(user.id);
+		if (!rlSuccess) {
+			return { success: false, error: "Too many requests" };
+		}
+
+		const parsed = logListeningSchema.safeParse({ releaseId, caption, rating });
+		if (!parsed.success) {
+			return { success: false, error: parsed.error.issues[0]?.message ?? "Invalid input" };
+		}
+
+		const { releaseId: validReleaseId, caption: validCaption, rating: validRating } = parsed.data;
+
+		// Insert listening log
+		await db.insert(listeningLogs).values({
+			userId: user.id,
+			releaseId: validReleaseId,
+			caption: validCaption ?? null,
+			rating: validRating ?? null,
+		});
+
+		// Insert activity feed entry
+		await db.insert(activityFeed).values({
+			userId: user.id,
+			actionType: "spinning_now",
+			targetType: "release",
+			targetId: validReleaseId,
+			metadata: {
+				caption: validCaption ?? null,
+				rating: validRating ?? null,
+			},
+		});
+
+		return { success: true };
+	} catch (err) {
+		console.error("[logListening] error:", err);
+		return { success: false, error: "Could not log listening" };
 	}
 }
