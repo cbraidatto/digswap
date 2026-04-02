@@ -37,6 +37,10 @@ export function InviteControls({ groupId, groupSlug }: InviteControlsProps) {
 	function handleCopyInviteLink() {
 		startTransition(async () => {
 			const result = await generateInviteAction(groupId);
+			if ("error" in result) {
+				toast(result.error);
+				return;
+			}
 			const link = `${window.location.origin}/join/${result.token}`;
 			try {
 				await navigator.clipboard.writeText(link);

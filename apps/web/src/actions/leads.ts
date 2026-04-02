@@ -12,81 +12,96 @@ export async function saveLead(
   note: string | null,
   status: LeadStatus,
 ) {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) return { error: "Not authenticated" };
+  try {
+    const supabase = await createClient();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+    if (!user) return { error: "Not authenticated" };
 
-  const { success: rlSuccess } = await apiRateLimit.limit(user.id);
-  if (!rlSuccess) {
-    return { error: "Too many requests. Please wait a moment." };
+    const { success: rlSuccess } = await apiRateLimit.limit(user.id);
+    if (!rlSuccess) {
+      return { error: "Too many requests. Please wait a moment." };
+    }
+
+    await db
+      .insert(leads)
+      .values({
+        userId: user.id,
+        targetType,
+        targetId,
+        note,
+        status,
+        updatedAt: new Date(),
+      })
+      .onConflictDoUpdate({
+        target: [leads.userId, leads.targetType, leads.targetId],
+        set: { note, status, updatedAt: new Date() },
+      });
+
+    return { success: true };
+  } catch (err) {
+    console.error("[saveLead] error:", err);
+    return { error: "Failed to save lead. Please try again." };
   }
-
-  await db
-    .insert(leads)
-    .values({
-      userId: user.id,
-      targetType,
-      targetId,
-      note,
-      status,
-      updatedAt: new Date(),
-    })
-    .onConflictDoUpdate({
-      target: [leads.userId, leads.targetType, leads.targetId],
-      set: { note, status, updatedAt: new Date() },
-    });
-
-  return { success: true };
 }
 
 export async function getLead(targetType: LeadTargetType, targetId: string) {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) return null;
+  try {
+    const supabase = await createClient();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+    if (!user) return null;
 
-  const { success: rlSuccess } = await apiRateLimit.limit(user.id);
-  if (!rlSuccess) return null;
+    const { success: rlSuccess } = await apiRateLimit.limit(user.id);
+    if (!rlSuccess) return null;
 
-  const [lead] = await db
-    .select()
-    .from(leads)
-    .where(
-      and(
-        eq(leads.userId, user.id),
-        eq(leads.targetType, targetType),
-        eq(leads.targetId, targetId),
-      ),
-    )
-    .limit(1);
+    const [lead] = await db
+      .select()
+      .from(leads)
+      .where(
+        and(
+          eq(leads.userId, user.id),
+          eq(leads.targetType, targetType),
+          eq(leads.targetId, targetId),
+        ),
+      )
+      .limit(1);
 
-  return lead ?? null;
+    return lead ?? null;
+  } catch (err) {
+    console.error("[getLead] error:", err);
+    return null;
+  }
 }
 
 export async function getLeads(filters?: {
   status?: LeadStatus;
   targetType?: LeadTargetType;
 }) {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) return [];
+  try {
+    const supabase = await createClient();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+    if (!user) return [];
 
-  const { success: rlSuccess } = await apiRateLimit.limit(user.id);
-  if (!rlSuccess) return [];
+    const { success: rlSuccess } = await apiRateLimit.limit(user.id);
+    if (!rlSuccess) return [];
 
-  const conditions = [eq(leads.userId, user.id)];
-  if (filters?.status) conditions.push(eq(leads.status, filters.status));
-  if (filters?.targetType)
-    conditions.push(eq(leads.targetType, filters.targetType));
+    const conditions = [eq(leads.userId, user.id)];
+    if (filters?.status) conditions.push(eq(leads.status, filters.status));
+    if (filters?.targetType)
+      conditions.push(eq(leads.targetType, filters.targetType));
 
-  return db
-    .select()
-    .from(leads)
-    .where(and(...conditions))
-    .orderBy(leads.updatedAt);
+    return db
+      .select()
+      .from(leads)
+      .where(and(...conditions))
+      .orderBy(leads.updatedAt);
+  } catch (err) {
+    console.error("[getLeads] error:", err);
+    return [];
+  }
 }

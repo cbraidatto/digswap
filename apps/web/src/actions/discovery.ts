@@ -17,26 +17,31 @@ const PAGE_SIZE = 20;
  * Per DISC2-01.
  */
 export async function searchRecordsAction(term: string) {
-	const supabase = await createClient();
-	const {
-		data: { user },
-	} = await supabase.auth.getUser();
+	try {
+		const supabase = await createClient();
+		const {
+			data: { user },
+		} = await supabase.auth.getUser();
 
-	if (!user) {
-		throw new Error("Not authenticated");
-	}
+		if (!user) {
+			return [];
+		}
 
-	const { success: rlSuccess } = await apiRateLimit.limit(user.id);
-	if (!rlSuccess) {
+		const { success: rlSuccess } = await apiRateLimit.limit(user.id);
+		if (!rlSuccess) {
+			return [];
+		}
+
+		const trimmed = (term ?? "").trim();
+		if (trimmed.length < 2) {
+			return [];
+		}
+
+		return searchRecords(trimmed);
+	} catch (err) {
+		console.error("[searchRecordsAction] error:", err);
 		return [];
 	}
-
-	const trimmed = (term ?? "").trim();
-	if (trimmed.length < 2) {
-		return [];
-	}
-
-	return searchRecords(trimmed);
 }
 
 /**
@@ -50,22 +55,27 @@ export async function browseRecordsAction(
 	decade: string | null,
 	page = 1,
 ) {
-	const supabase = await createClient();
-	const {
-		data: { user },
-	} = await supabase.auth.getUser();
+	try {
+		const supabase = await createClient();
+		const {
+			data: { user },
+		} = await supabase.auth.getUser();
 
-	if (!user) {
-		throw new Error("Not authenticated");
-	}
+		if (!user) {
+			return [];
+		}
 
-	const { success: rlSuccess } = await apiRateLimit.limit(user.id);
-	if (!rlSuccess) {
+		const { success: rlSuccess } = await apiRateLimit.limit(user.id);
+		if (!rlSuccess) {
+			return [];
+		}
+
+		const offset = (Math.max(1, page) - 1) * PAGE_SIZE;
+		return browseRecords(genre, decade, PAGE_SIZE, offset);
+	} catch (err) {
+		console.error("[browseRecordsAction] error:", err);
 		return [];
 	}
-
-	const offset = (Math.max(1, page) - 1) * PAGE_SIZE;
-	return browseRecords(genre, decade, PAGE_SIZE, offset);
 }
 
 /**
@@ -75,19 +85,24 @@ export async function browseRecordsAction(
  * Per DISC2-04.
  */
 export async function getSuggestionsAction() {
-	const supabase = await createClient();
-	const {
-		data: { user },
-	} = await supabase.auth.getUser();
+	try {
+		const supabase = await createClient();
+		const {
+			data: { user },
+		} = await supabase.auth.getUser();
 
-	if (!user) {
-		throw new Error("Not authenticated");
-	}
+		if (!user) {
+			return [];
+		}
 
-	const { success: rlSuccess } = await apiRateLimit.limit(user.id);
-	if (!rlSuccess) {
+		const { success: rlSuccess } = await apiRateLimit.limit(user.id);
+		if (!rlSuccess) {
+			return [];
+		}
+
+		return getSuggestedRecords(user.id);
+	} catch (err) {
+		console.error("[getSuggestionsAction] error:", err);
 		return [];
 	}
-
-	return getSuggestedRecords(user.id);
 }

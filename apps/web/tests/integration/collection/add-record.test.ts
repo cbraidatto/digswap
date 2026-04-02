@@ -140,13 +140,13 @@ describe("addRecordToCollection", () => {
 		expect(result).toEqual({ error: "Record already in your collection" });
 	});
 
-	test("throws for unauthenticated user", async () => {
+	test("returns error for unauthenticated user", async () => {
 		mockGetUser.mockResolvedValue({
 			data: { user: null },
 		});
 
-		await expect(addRecordToCollection(12345)).rejects.toThrow(
-			"Not authenticated",
-		);
+		const result = await addRecordToCollection(12345);
+		expect(result).toHaveProperty("error");
+		expect(result.error).toMatch(/not authenticated/i);
 	});
 });

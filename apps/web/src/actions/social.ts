@@ -51,37 +51,42 @@ export async function logActivity(
 	targetId: string | null,
 	metadata: Record<string, unknown> | null,
 ): Promise<void> {
-	await db.insert(activityFeed).values({
-		userId,
-		actionType,
-		targetType,
-		targetId,
-		metadata,
-	});
+	try {
+		await db.insert(activityFeed).values({
+			userId,
+			actionType,
+			targetType,
+			targetId,
+			metadata,
+		});
+	} catch (err) {
+		console.error("[logActivity] error:", err);
+		// Non-blocking: activity logging failure should not crash the caller
+	}
 }
 
 export async function followUser(
 	targetUserId: string,
 ): Promise<{ success?: boolean; error?: string }> {
-	const supabase = await createClient();
-	const {
-		data: { user },
-	} = await supabase.auth.getUser();
-
-	if (!user) {
-		return { error: "Not authenticated" };
-	}
-
-	const { success: rlSuccess } = await apiRateLimit.limit(user.id);
-	if (!rlSuccess) {
-		return { error: "Too many requests. Please wait a moment." };
-	}
-
-	if (targetUserId === user.id) {
-		return { error: "Cannot follow yourself" };
-	}
-
 	try {
+		const supabase = await createClient();
+		const {
+			data: { user },
+		} = await supabase.auth.getUser();
+
+		if (!user) {
+			return { error: "Not authenticated" };
+		}
+
+		const { success: rlSuccess } = await apiRateLimit.limit(user.id);
+		if (!rlSuccess) {
+			return { error: "Too many requests. Please wait a moment." };
+		}
+
+		if (targetUserId === user.id) {
+			return { error: "Cannot follow yourself" };
+		}
+
 		await db.insert(follows).values({
 			followerId: user.id,
 			followingId: targetUserId,
@@ -106,21 +111,21 @@ export async function followUser(
 export async function unfollowUser(
 	targetUserId: string,
 ): Promise<{ success?: boolean; error?: string }> {
-	const supabase = await createClient();
-	const {
-		data: { user },
-	} = await supabase.auth.getUser();
-
-	if (!user) {
-		return { error: "Not authenticated" };
-	}
-
-	const { success: rlSuccess } = await apiRateLimit.limit(user.id);
-	if (!rlSuccess) {
-		return { error: "Too many requests. Please wait a moment." };
-	}
-
 	try {
+		const supabase = await createClient();
+		const {
+			data: { user },
+		} = await supabase.auth.getUser();
+
+		if (!user) {
+			return { error: "Not authenticated" };
+		}
+
+		const { success: rlSuccess } = await apiRateLimit.limit(user.id);
+		if (!rlSuccess) {
+			return { error: "Too many requests. Please wait a moment." };
+		}
+
 		await db
 			.delete(follows)
 			.where(
@@ -140,103 +145,123 @@ export async function loadMoreFeed(
 	cursor: string | null,
 	mode: "personal" | "global",
 ): Promise<FeedItem[]> {
-	const supabase = await createClient();
-	const {
-		data: { user },
-	} = await supabase.auth.getUser();
+	try {
+		const supabase = await createClient();
+		const {
+			data: { user },
+		} = await supabase.auth.getUser();
 
-	if (!user) {
+		if (!user) {
+			return [];
+		}
+
+		if (mode === "personal") {
+			return getPersonalFeed(user.id, cursor);
+		}
+
+		return getGlobalFeed(cursor);
+	} catch (err) {
+		console.error("[loadMoreFeed] error:", err);
 		return [];
 	}
-
-	if (mode === "personal") {
-		return getPersonalFeed(user.id, cursor);
-	}
-
-	return getGlobalFeed(cursor);
 }
 
 export async function fetchFollowersList(
 	userId: string,
 ): Promise<FollowUser[]> {
-	return getFollowers(userId);
+	try {
+		return await getFollowers(userId);
+	} catch (err) {
+		console.error("[fetchFollowersList] error:", err);
+		return [];
+	}
 }
 
 export async function fetchFollowingList(
 	userId: string,
 ): Promise<FollowUser[]> {
-	return getFollowing(userId);
+	try {
+		return await getFollowing(userId);
+	} catch (err) {
+		console.error("[fetchFollowingList] error:", err);
+		return [];
+	}
 }
 
 export async function searchUsers(
 	query: string,
 ): Promise<SearchResult[]> {
-	const supabase = await createClient();
-	const {
-		data: { user },
-	} = await supabase.auth.getUser();
+	try {
+		const supabase = await createClient();
+		const {
+			data: { user },
+		} = await supabase.auth.getUser();
 
-	if (!user) {
+		if (!user) {
+			return [];
+		}
+
+		const { success: rlSuccess } = await apiRateLimit.limit(user.id);
+		if (!rlSuccess) {
+			return [];
+		}
+
+		const trimmed = query.trim();
+		if (trimmed.length < 2) {
+			return [];
+		}
+
+		// Sanitize query to prevent SQL injection through ilike patterns
+		const sanitized = trimmed.replace(/[%_\\]/g, "\\$&");
+
+		const matchingProfiles = await db
+			.select({
+				id: profiles.id,
+				username: profiles.username,
+				displayName: profiles.displayName,
+				avatarUrl: profiles.avatarUrl,
+			})
+			.from(profiles)
+			.where(ilike(profiles.username, `%${sanitized}%`))
+			.limit(20);
+
+		// Enrich each profile with counts
+		const results: SearchResult[] = [];
+		for (const profile of matchingProfiles) {
+			const recordCountResult = await db
+				.select({ count: sql<number>`count(*)` })
+				.from(collectionItems)
+				.where(eq(collectionItems.userId, profile.id));
+
+			const followerCountResult = await db
+				.select({ count: sql<number>`count(*)` })
+				.from(follows)
+				.where(eq(follows.followingId, profile.id));
+
+			const isFollowingResult = await db
+				.select({ id: follows.id })
+				.from(follows)
+				.where(
+					and(
+						eq(follows.followerId, user.id),
+						eq(follows.followingId, profile.id),
+					),
+				);
+
+			results.push({
+				id: profile.id,
+				username: profile.username,
+				displayName: profile.displayName,
+				avatarUrl: profile.avatarUrl,
+				recordCount: Number(recordCountResult[0]?.count ?? 0),
+				followerCount: Number(followerCountResult[0]?.count ?? 0),
+				isFollowing: isFollowingResult.length > 0,
+			});
+		}
+
+		return results;
+	} catch (err) {
+		console.error("[searchUsers] error:", err);
 		return [];
 	}
-
-	const { success: rlSuccess } = await apiRateLimit.limit(user.id);
-	if (!rlSuccess) {
-		return [];
-	}
-
-	const trimmed = query.trim();
-	if (trimmed.length < 2) {
-		return [];
-	}
-
-	// Sanitize query to prevent SQL injection through ilike patterns
-	const sanitized = trimmed.replace(/[%_\\]/g, "\\$&");
-
-	const matchingProfiles = await db
-		.select({
-			id: profiles.id,
-			username: profiles.username,
-			displayName: profiles.displayName,
-			avatarUrl: profiles.avatarUrl,
-		})
-		.from(profiles)
-		.where(ilike(profiles.username, `%${sanitized}%`))
-		.limit(20);
-
-	// Enrich each profile with counts
-	const results: SearchResult[] = [];
-	for (const profile of matchingProfiles) {
-		const recordCountResult = await db
-			.select({ count: sql<number>`count(*)` })
-			.from(collectionItems)
-			.where(eq(collectionItems.userId, profile.id));
-
-		const followerCountResult = await db
-			.select({ count: sql<number>`count(*)` })
-			.from(follows)
-			.where(eq(follows.followingId, profile.id));
-
-		const isFollowingResult = await db
-			.select({ id: follows.id })
-			.from(follows)
-			.where(
-				and(
-					eq(follows.followerId, user.id),
-					eq(follows.followingId, profile.id),
-				),
-			);
-
-		results.push({
-			id: profile.id,
-			username: profile.username,
-			displayName: profile.displayName,
-			avatarUrl: profile.avatarUrl,
-			recordCount: Number(recordCountResult[0]?.count ?? 0),
-			followerCount: Number(followerCountResult[0]?.count ?? 0),
-			isFollowing: isFollowingResult.length > 0,
-		});
-	}
-
-	return results;
 }

@@ -264,15 +264,13 @@ describe("Auth Bypass Prevention", () => {
 
 	describe("community.ts auth guard", () => {
 		it("should require authentication for createGroupAction", async () => {
-			await expect(
-				createGroupAction({ name: "Test", visibility: "public" }),
-			).rejects.toThrow(/not authenticated/i);
+			const result = await createGroupAction({ name: "Test", visibility: "public" });
+			expect(result).toHaveProperty("error");
 		});
 
 		it("should require authentication for joinGroupAction", async () => {
-			await expect(
-				joinGroupAction("group-id"),
-			).rejects.toThrow(/not authenticated/i);
+			const result = await joinGroupAction("group-id");
+			expect(result).toHaveProperty("error");
 		});
 	});
 
@@ -291,7 +289,8 @@ describe("Auth Bypass Prevention", () => {
 
 	describe("discovery.ts auth guard", () => {
 		it("should require authentication for searchRecordsAction", async () => {
-			await expect(searchRecordsAction("test")).rejects.toThrow(/not authenticated/i);
+			const result = await searchRecordsAction("test");
+			expect(result).toEqual([]);
 		});
 	});
 
@@ -313,17 +312,20 @@ describe("Auth Bypass Prevention", () => {
 
 	describe("collection.ts auth guard", () => {
 		it("should require authentication for searchDiscogs", async () => {
-			await expect(searchDiscogs("test query")).rejects.toThrow(/not authenticated/i);
+			const result = await searchDiscogs("test query");
+			expect(result).toEqual([]);
 		});
 	});
 
 	describe("discogs.ts auth guard", () => {
 		it("should require authentication for connectDiscogs", async () => {
-			await expect(connectDiscogs()).rejects.toThrow(/not authenticated/i);
+			const result = await connectDiscogs();
+			expect(result).toHaveProperty("error");
 		});
 
 		it("should require authentication for triggerSync", async () => {
-			await expect(triggerSync()).rejects.toThrow(/not authenticated/i);
+			const result = await triggerSync();
+			expect(result).toHaveProperty("error");
 		});
 	});
 
@@ -342,23 +344,29 @@ describe("Auth Bypass Prevention", () => {
 
 	describe("wantlist.ts auth guard", () => {
 		it("should require authentication for addToWantlist", async () => {
-			await expect(addToWantlist(12345)).rejects.toThrow(/not authenticated/i);
+			const result = await addToWantlist(12345);
+			expect(result).toHaveProperty("error");
+			expect(result.error).toMatch(/not authenticated/i);
 		});
 	});
 
 	describe("notifications.ts auth guard", () => {
 		it("should require authentication for getNotificationsAction", async () => {
-			await expect(getNotificationsAction()).rejects.toThrow(/not authenticated/i);
+			const result = await getNotificationsAction();
+			expect(result.items).toEqual([]);
 		});
 
 		it("should require authentication for markNotificationRead", async () => {
-			await expect(markNotificationRead("notif-id")).rejects.toThrow(/not authenticated/i);
+			const result = await markNotificationRead("notif-id");
+			expect(result).toHaveProperty("error");
+			expect(result.error).toMatch(/not authenticated/i);
 		});
 	});
 
 	describe("gamification.ts auth guard", () => {
 		it("should require authentication for loadGlobalLeaderboard", async () => {
-			await expect(loadGlobalLeaderboard()).rejects.toThrow(/not authenticated/i);
+			const result = await loadGlobalLeaderboard();
+			expect(result).toEqual([]);
 		});
 	});
 

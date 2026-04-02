@@ -34,50 +34,70 @@ async function requireUser() {
 export async function loadGlobalLeaderboard(
 	page?: number,
 ): Promise<LeaderboardEntry[]> {
-	const user = await requireUser();
+	try {
+		const user = await requireUser();
 
-	const { success: rlSuccess } = await apiRateLimit.limit(user.id);
-	if (!rlSuccess) {
+		const { success: rlSuccess } = await apiRateLimit.limit(user.id);
+		if (!rlSuccess) {
+			return [];
+		}
+
+		return getGlobalLeaderboard(page);
+	} catch (err) {
+		console.error("[loadGlobalLeaderboard] error:", err);
 		return [];
 	}
-
-	return getGlobalLeaderboard(page);
 }
 
 export async function loadGenreLeaderboard(
 	genre: string,
 	page?: number,
 ): Promise<LeaderboardEntry[]> {
-	const user = await requireUser();
+	try {
+		const user = await requireUser();
 
-	const { success: rlSuccess } = await apiRateLimit.limit(user.id);
-	if (!rlSuccess) {
+		const { success: rlSuccess } = await apiRateLimit.limit(user.id);
+		if (!rlSuccess) {
+			return [];
+		}
+
+		return getGenreLeaderboard(genre, page);
+	} catch (err) {
+		console.error("[loadGenreLeaderboard] error:", err);
 		return [];
 	}
-
-	return getGenreLeaderboard(genre, page);
 }
 
 export async function loadLeaderboardCount(): Promise<number> {
-	const user = await requireUser();
+	try {
+		const user = await requireUser();
 
-	const { success: rlSuccess } = await apiRateLimit.limit(user.id);
-	if (!rlSuccess) {
+		const { success: rlSuccess } = await apiRateLimit.limit(user.id);
+		if (!rlSuccess) {
+			return 0;
+		}
+
+		return getLeaderboardCount();
+	} catch (err) {
+		console.error("[loadLeaderboardCount] error:", err);
 		return 0;
 	}
-
-	return getLeaderboardCount();
 }
 
 export async function loadGenreLeaderboardCount(
 	genre: string,
 ): Promise<number> {
-	const user = await requireUser();
+	try {
+		const user = await requireUser();
 
-	const { success: rlSuccess } = await apiRateLimit.limit(user.id);
-	if (!rlSuccess) {
+		const { success: rlSuccess } = await apiRateLimit.limit(user.id);
+		if (!rlSuccess) {
+			return 0;
+		}
+
+		return getGenreLeaderboardCount(genre);
+	} catch (err) {
+		console.error("[loadGenreLeaderboardCount] error:", err);
 		return 0;
 	}
-
-	return getGenreLeaderboardCount(genre);
 }

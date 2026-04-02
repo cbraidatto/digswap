@@ -17,13 +17,20 @@ async function requireUser() {
 	return user;
 }
 
-export async function getTradePresence(tradeId: string): Promise<TradePresenceSnapshot> {
-	const user = await requireUser();
-	const parsedTradeId = uuidSchema.safeParse(tradeId);
+export async function getTradePresence(
+	tradeId: string,
+): Promise<TradePresenceSnapshot | { error: string }> {
+	try {
+		const user = await requireUser();
+		const parsedTradeId = uuidSchema.safeParse(tradeId);
 
-	if (!parsedTradeId.success) {
-		throw new Error("Invalid trade.");
+		if (!parsedTradeId.success) {
+			return { error: "Invalid trade." };
+		}
+
+		return deriveTradePresence(parsedTradeId.data, user.id);
+	} catch (err) {
+		console.error("[getTradePresence] error:", err);
+		return { error: "Failed to get trade presence." };
 	}
-
-	return deriveTradePresence(parsedTradeId.data, user.id);
 }

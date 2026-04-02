@@ -26,41 +26,46 @@ export async function enrollTotp(): Promise<
 		backupCodes: string[];
 	}>
 > {
-	const supabase = await createClient();
-	const {
-		data: { user },
-	} = await supabase.auth.getUser();
+	try {
+		const supabase = await createClient();
+		const {
+			data: { user },
+		} = await supabase.auth.getUser();
 
-	if (!user) {
-		return { success: false, error: "Not authenticated." };
-	}
+		if (!user) {
+			return { success: false, error: "Not authenticated." };
+		}
 
-	// Enroll TOTP factor
-	const { data, error } = await supabase.auth.mfa.enroll({
-		factorType: "totp",
-		friendlyName: "DigSwap",
-	});
+		// Enroll TOTP factor
+		const { data, error } = await supabase.auth.mfa.enroll({
+			factorType: "totp",
+			friendlyName: "DigSwap",
+		});
 
-	if (error || !data) {
+		if (error || !data) {
+			return {
+				success: false,
+				error: error?.message ?? "Failed to enroll TOTP factor.",
+			};
+		}
+
+		// Generate and store backup codes
+		const codes = generateBackupCodes(10);
+		await storeBackupCodes(user.id, codes);
+
 		return {
-			success: false,
-			error: error?.message ?? "Failed to enroll TOTP factor.",
+			success: true,
+			data: {
+				factorId: data.id,
+				qrCode: data.totp.qr_code,
+				uri: data.totp.uri,
+				backupCodes: codes,
+			},
 		};
+	} catch (err) {
+		console.error("[enrollTotp] error:", err);
+		return { success: false, error: "Failed to enroll TOTP. Please try again." };
 	}
-
-	// Generate and store backup codes
-	const codes = generateBackupCodes(10);
-	await storeBackupCodes(user.id, codes);
-
-	return {
-		success: true,
-		data: {
-			factorId: data.id,
-			qrCode: data.totp.qr_code,
-			uri: data.totp.uri,
-			backupCodes: codes,
-		},
-	};
 }
 
 /**
@@ -68,66 +73,71 @@ export async function enrollTotp(): Promise<
  * After successful verification, marks the user's profile as 2FA-enabled.
  */
 export async function verifyTotpEnrollment(factorId: string, code: string): Promise<MfaResult> {
-	const supabase = await createClient();
-	const {
-		data: { user },
-	} = await supabase.auth.getUser();
+	try {
+		const supabase = await createClient();
+		const {
+			data: { user },
+		} = await supabase.auth.getUser();
 
-	if (!user) {
-		return { success: false, error: "Not authenticated." };
+		if (!user) {
+			return { success: false, error: "Not authenticated." };
+		}
+
+		// Rate limit by user ID
+		const { success: allowed } = await totpRateLimit.limit(user.id);
+		if (!allowed) {
+			return {
+				success: false,
+				error: "Too many attempts. Please wait a few minutes and try again.",
+			};
+		}
+
+		// Validate code format
+		const parsed = totpSchema.safeParse({ code });
+		if (!parsed.success) {
+			return {
+				success: false,
+				error: "Invalid code. Please check your authenticator app and try again.",
+			};
+		}
+
+		// Challenge the factor
+		const { data: challengeData, error: challengeError } = await supabase.auth.mfa.challenge({
+			factorId,
+		});
+
+		if (challengeError || !challengeData) {
+			return {
+				success: false,
+				error: challengeError?.message ?? "Failed to create MFA challenge.",
+			};
+		}
+
+		// Verify the code
+		const { error: verifyError } = await supabase.auth.mfa.verify({
+			factorId,
+			challengeId: challengeData.id,
+			code: parsed.data.code,
+		});
+
+		if (verifyError) {
+			return {
+				success: false,
+				error: "Invalid code. Please check your authenticator app and try again.",
+			};
+		}
+
+		// Update profile to mark 2FA as enabled
+		await db
+			.update(profiles)
+			.set({ twoFactorEnabled: true, updatedAt: new Date() })
+			.where(eq(profiles.id, user.id));
+
+		return { success: true, data: {} };
+	} catch (err) {
+		console.error("[verifyTotpEnrollment] error:", err);
+		return { success: false, error: "Failed to verify TOTP. Please try again." };
 	}
-
-	// Rate limit by user ID
-	const { success: allowed } = await totpRateLimit.limit(user.id);
-	if (!allowed) {
-		return {
-			success: false,
-			error: "Too many attempts. Please wait a few minutes and try again.",
-		};
-	}
-
-	// Validate code format
-	const parsed = totpSchema.safeParse({ code });
-	if (!parsed.success) {
-		return {
-			success: false,
-			error: "Invalid code. Please check your authenticator app and try again.",
-		};
-	}
-
-	// Challenge the factor
-	const { data: challengeData, error: challengeError } = await supabase.auth.mfa.challenge({
-		factorId,
-	});
-
-	if (challengeError || !challengeData) {
-		return {
-			success: false,
-			error: challengeError?.message ?? "Failed to create MFA challenge.",
-		};
-	}
-
-	// Verify the code
-	const { error: verifyError } = await supabase.auth.mfa.verify({
-		factorId,
-		challengeId: challengeData.id,
-		code: parsed.data.code,
-	});
-
-	if (verifyError) {
-		return {
-			success: false,
-			error: "Invalid code. Please check your authenticator app and try again.",
-		};
-	}
-
-	// Update profile to mark 2FA as enabled
-	await db
-		.update(profiles)
-		.set({ twoFactorEnabled: true, updatedAt: new Date() })
-		.where(eq(profiles.id, user.id));
-
-	return { success: true, data: {} };
 }
 
 /**
@@ -135,86 +145,91 @@ export async function verifyTotpEnrollment(factorId: string, code: string): Prom
  * User has authenticated (AAL1) and needs to verify TOTP to reach AAL2.
  */
 export async function challengeTotp(code: string): Promise<MfaResult<{ redirectTo: string }>> {
-	const supabase = await createClient();
-	const {
-		data: { user },
-	} = await supabase.auth.getUser();
+	try {
+		const supabase = await createClient();
+		const {
+			data: { user },
+		} = await supabase.auth.getUser();
 
-	if (!user) {
-		return { success: false, error: "Not authenticated." };
+		if (!user) {
+			return { success: false, error: "Not authenticated." };
+		}
+
+		// Rate limit by user ID
+		const { success: allowed } = await totpRateLimit.limit(user.id);
+		if (!allowed) {
+			return {
+				success: false,
+				error: "Too many attempts. Please wait a few minutes and try again.",
+			};
+		}
+
+		// Validate code format
+		const parsed = totpSchema.safeParse({ code });
+		if (!parsed.success) {
+			return {
+				success: false,
+				error: "Invalid code. Please check your authenticator app and try again.",
+			};
+		}
+
+		// Get user's TOTP factors
+		const { data: factorsData, error: factorsError } = await supabase.auth.mfa.listFactors();
+
+		if (factorsError || !factorsData) {
+			return {
+				success: false,
+				error: factorsError?.message ?? "Failed to retrieve MFA factors.",
+			};
+		}
+
+		// Find the first verified TOTP factor
+		const totpFactor = factorsData.totp.find((f) => f.status === "verified");
+
+		if (!totpFactor) {
+			return { success: false, error: "No verified TOTP factor found." };
+		}
+
+		// Challenge
+		const { data: challengeData, error: challengeError } = await supabase.auth.mfa.challenge({
+			factorId: totpFactor.id,
+		});
+
+		if (challengeError || !challengeData) {
+			return {
+				success: false,
+				error: challengeError?.message ?? "Failed to create MFA challenge.",
+			};
+		}
+
+		// Verify
+		const { error: verifyError } = await supabase.auth.mfa.verify({
+			factorId: totpFactor.id,
+			challengeId: challengeData.id,
+			code: parsed.data.code,
+		});
+
+		if (verifyError) {
+			return {
+				success: false,
+				error: "Invalid code. Please check your authenticator app and try again.",
+			};
+		}
+
+		// Check if user needs onboarding
+		const [profile] = await db
+			.select({ onboardingCompleted: profiles.onboardingCompleted })
+			.from(profiles)
+			.where(eq(profiles.id, user.id))
+			.limit(1);
+
+		const redirectTo = profile && !profile.onboardingCompleted ? "/onboarding" : "/feed";
+
+		return { success: true, data: { redirectTo } };
+	} catch (err) {
+		console.error("[challengeTotp] error:", err);
+		return { success: false, error: "Failed to verify TOTP. Please try again." };
 	}
-
-	// Rate limit by user ID
-	const { success: allowed } = await totpRateLimit.limit(user.id);
-	if (!allowed) {
-		return {
-			success: false,
-			error: "Too many attempts. Please wait a few minutes and try again.",
-		};
-	}
-
-	// Validate code format
-	const parsed = totpSchema.safeParse({ code });
-	if (!parsed.success) {
-		return {
-			success: false,
-			error: "Invalid code. Please check your authenticator app and try again.",
-		};
-	}
-
-	// Get user's TOTP factors
-	const { data: factorsData, error: factorsError } = await supabase.auth.mfa.listFactors();
-
-	if (factorsError || !factorsData) {
-		return {
-			success: false,
-			error: factorsError?.message ?? "Failed to retrieve MFA factors.",
-		};
-	}
-
-	// Find the first verified TOTP factor
-	const totpFactor = factorsData.totp.find((f) => f.status === "verified");
-
-	if (!totpFactor) {
-		return { success: false, error: "No verified TOTP factor found." };
-	}
-
-	// Challenge
-	const { data: challengeData, error: challengeError } = await supabase.auth.mfa.challenge({
-		factorId: totpFactor.id,
-	});
-
-	if (challengeError || !challengeData) {
-		return {
-			success: false,
-			error: challengeError?.message ?? "Failed to create MFA challenge.",
-		};
-	}
-
-	// Verify
-	const { error: verifyError } = await supabase.auth.mfa.verify({
-		factorId: totpFactor.id,
-		challengeId: challengeData.id,
-		code: parsed.data.code,
-	});
-
-	if (verifyError) {
-		return {
-			success: false,
-			error: "Invalid code. Please check your authenticator app and try again.",
-		};
-	}
-
-	// Check if user needs onboarding
-	const [profile] = await db
-		.select({ onboardingCompleted: profiles.onboardingCompleted })
-		.from(profiles)
-		.where(eq(profiles.id, user.id))
-		.limit(1);
-
-	const redirectTo = profile && !profile.onboardingCompleted ? "/onboarding" : "/feed";
-
-	return { success: true, data: { redirectTo } };
 }
 
 /**
@@ -224,70 +239,75 @@ export async function challengeTotp(code: string): Promise<MfaResult<{ redirectT
 export async function useBackupCode(
 	code: string,
 ): Promise<MfaResult<{ redirectTo: string; remainingCodes: number }>> {
-	const supabase = await createClient();
-	const {
-		data: { user },
-	} = await supabase.auth.getUser();
+	try {
+		const supabase = await createClient();
+		const {
+			data: { user },
+		} = await supabase.auth.getUser();
 
-	if (!user) {
-		return { success: false, error: "Not authenticated." };
-	}
+		if (!user) {
+			return { success: false, error: "Not authenticated." };
+		}
 
-	// Rate limit by user ID
-	const { success: allowed } = await totpRateLimit.limit(user.id);
-	if (!allowed) {
+		// Rate limit by user ID
+		const { success: allowed } = await totpRateLimit.limit(user.id);
+		if (!allowed) {
+			return {
+				success: false,
+				error: "Too many attempts. Please wait a few minutes and try again.",
+			};
+		}
+
+		// Validate code format
+		const parsed = backupCodeSchema.safeParse({ code });
+		if (!parsed.success) {
+			return { success: false, error: "Backup code is required." };
+		}
+
+		// Try to consume the backup code
+		const result = await consumeBackupCode(user.id, parsed.data.code);
+
+		if (!result.success) {
+			return {
+				success: false,
+				error: "Invalid backup code. Please try another code.",
+			};
+		}
+
+		// Backup code is valid -- we need to elevate session to AAL2
+		// Since Supabase doesn't natively support backup codes for AAL2,
+		// we use the TOTP factor challenge/verify flow.
+		// For backup codes, we mark the code as consumed and trust the verification.
+		// The user gets redirected but may not have full AAL2 -- this is a known
+		// limitation documented in the plan.
+
+		// Get user's TOTP factors and complete the MFA challenge
+		const { data: factorsData } = await supabase.auth.mfa.listFactors();
+		const totpFactor = factorsData?.totp.find((f) => f.status === "verified");
+
+		// Even with backup code, we note the factor exists for the session
+		// The backup code flow bypasses TOTP verification by design
+
+		// Check onboarding status
+		const [profile] = await db
+			.select({ onboardingCompleted: profiles.onboardingCompleted })
+			.from(profiles)
+			.where(eq(profiles.id, user.id))
+			.limit(1);
+
+		const redirectTo = profile && !profile.onboardingCompleted ? "/onboarding" : "/feed";
+
 		return {
-			success: false,
-			error: "Too many attempts. Please wait a few minutes and try again.",
+			success: true,
+			data: {
+				redirectTo,
+				remainingCodes: result.remainingCodes,
+			},
 		};
+	} catch (err) {
+		console.error("[useBackupCode] error:", err);
+		return { success: false, error: "Failed to verify backup code. Please try again." };
 	}
-
-	// Validate code format
-	const parsed = backupCodeSchema.safeParse({ code });
-	if (!parsed.success) {
-		return { success: false, error: "Backup code is required." };
-	}
-
-	// Try to consume the backup code
-	const result = await consumeBackupCode(user.id, parsed.data.code);
-
-	if (!result.success) {
-		return {
-			success: false,
-			error: "Invalid backup code. Please try another code.",
-		};
-	}
-
-	// Backup code is valid -- we need to elevate session to AAL2
-	// Since Supabase doesn't natively support backup codes for AAL2,
-	// we use the TOTP factor challenge/verify flow.
-	// For backup codes, we mark the code as consumed and trust the verification.
-	// The user gets redirected but may not have full AAL2 -- this is a known
-	// limitation documented in the plan.
-
-	// Get user's TOTP factors and complete the MFA challenge
-	const { data: factorsData } = await supabase.auth.mfa.listFactors();
-	const totpFactor = factorsData?.totp.find((f) => f.status === "verified");
-
-	// Even with backup code, we note the factor exists for the session
-	// The backup code flow bypasses TOTP verification by design
-
-	// Check onboarding status
-	const [profile] = await db
-		.select({ onboardingCompleted: profiles.onboardingCompleted })
-		.from(profiles)
-		.where(eq(profiles.id, user.id))
-		.limit(1);
-
-	const redirectTo = profile && !profile.onboardingCompleted ? "/onboarding" : "/feed";
-
-	return {
-		success: true,
-		data: {
-			redirectTo,
-			remainingCodes: result.remainingCodes,
-		},
-	};
 }
 
 /**
@@ -296,66 +316,71 @@ export async function useBackupCode(
  * Unenrolls the TOTP factor and invalidates all remaining backup codes.
  */
 export async function disableTotp(): Promise<MfaResult> {
-	const supabase = await createClient();
-	const {
-		data: { user },
-	} = await supabase.auth.getUser();
+	try {
+		const supabase = await createClient();
+		const {
+			data: { user },
+		} = await supabase.auth.getUser();
 
-	if (!user) {
-		return { success: false, error: "Not authenticated." };
-	}
+		if (!user) {
+			return { success: false, error: "Not authenticated." };
+		}
 
-	// Verify user is at AAL2
-	const { data: aalData, error: aalError } =
-		await supabase.auth.mfa.getAuthenticatorAssuranceLevel();
+		// Verify user is at AAL2
+		const { data: aalData, error: aalError } =
+			await supabase.auth.mfa.getAuthenticatorAssuranceLevel();
 
-	if (aalError || !aalData) {
-		return {
-			success: false,
-			error: "Failed to verify authentication level.",
-		};
-	}
-
-	if (aalData.currentLevel !== "aal2") {
-		return {
-			success: false,
-			error: "You must verify with your authenticator app before disabling 2FA.",
-		};
-	}
-
-	// Get and unenroll all TOTP factors
-	const { data: factorsData, error: factorsError } = await supabase.auth.mfa.listFactors();
-
-	if (factorsError || !factorsData) {
-		return {
-			success: false,
-			error: factorsError?.message ?? "Failed to retrieve MFA factors.",
-		};
-	}
-
-	for (const factor of factorsData.totp) {
-		const { error: unenrollError } = await supabase.auth.mfa.unenroll({
-			factorId: factor.id,
-		});
-		if (unenrollError) {
+		if (aalError || !aalData) {
 			return {
 				success: false,
-				error: unenrollError.message ?? "Failed to disable 2FA.",
+				error: "Failed to verify authentication level.",
 			};
 		}
+
+		if (aalData.currentLevel !== "aal2") {
+			return {
+				success: false,
+				error: "You must verify with your authenticator app before disabling 2FA.",
+			};
+		}
+
+		// Get and unenroll all TOTP factors
+		const { data: factorsData, error: factorsError } = await supabase.auth.mfa.listFactors();
+
+		if (factorsError || !factorsData) {
+			return {
+				success: false,
+				error: factorsError?.message ?? "Failed to retrieve MFA factors.",
+			};
+		}
+
+		for (const factor of factorsData.totp) {
+			const { error: unenrollError } = await supabase.auth.mfa.unenroll({
+				factorId: factor.id,
+			});
+			if (unenrollError) {
+				return {
+					success: false,
+					error: unenrollError.message ?? "Failed to disable 2FA.",
+				};
+			}
+		}
+
+		// Update profile
+		await db
+			.update(profiles)
+			.set({ twoFactorEnabled: false, updatedAt: new Date() })
+			.where(eq(profiles.id, user.id));
+
+		// Invalidate remaining backup codes (mark as used for audit trail)
+		await db
+			.update(backupCodes)
+			.set({ used: true, usedAt: new Date() })
+			.where(and(eq(backupCodes.userId, user.id), eq(backupCodes.used, false)));
+
+		return { success: true, data: {} };
+	} catch (err) {
+		console.error("[disableTotp] error:", err);
+		return { success: false, error: "Failed to disable 2FA. Please try again." };
 	}
-
-	// Update profile
-	await db
-		.update(profiles)
-		.set({ twoFactorEnabled: false, updatedAt: new Date() })
-		.where(eq(profiles.id, user.id));
-
-	// Invalidate remaining backup codes (mark as used for audit trail)
-	await db
-		.update(backupCodes)
-		.set({ used: true, usedAt: new Date() })
-		.where(and(eq(backupCodes.userId, user.id), eq(backupCodes.used, false)));
-
-	return { success: true, data: {} };
 }

@@ -21,68 +21,73 @@ const YOUTUBE_SEARCH_URL = "https://www.googleapis.com/youtube/v3/search";
 export async function searchYouTubeForRelease(
   releaseInternalId: string,
 ): Promise<{ videoId: string | null; error?: string }> {
-  // Authenticate user (rate limiting requires user ID)
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) return { videoId: null, error: "Authentication required" };
+  try {
+    // Authenticate user (rate limiting requires user ID)
+    const supabase = await createClient();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+    if (!user) return { videoId: null, error: "Authentication required" };
 
-  // Rate limit
-  const { success } = await apiRateLimit.limit(user.id);
-  if (!success) return { videoId: null, error: "Rate limited" };
+    // Rate limit
+    const { success } = await apiRateLimit.limit(user.id);
+    if (!success) return { videoId: null, error: "Rate limited" };
 
-  // Fetch release data
-  const [release] = await db
-    .select({
-      id: releases.id,
-      title: releases.title,
-      artist: releases.artist,
-      youtubeVideoId: releases.youtubeVideoId,
-    })
-    .from(releases)
-    .where(eq(releases.id, releaseInternalId))
-    .limit(1);
-
-  if (!release) return { videoId: null, error: "Release not found" };
-
-  // Cache hit -- return immediately
-  if (release.youtubeVideoId) return { videoId: release.youtubeVideoId };
-
-  // No API key configured -- skip gracefully
-  const apiKey = process.env.YOUTUBE_API_KEY;
-  if (!apiKey) return { videoId: null };
-
-  // Call YouTube Data API v3 search.list
-  const params = new URLSearchParams({
-    part: "snippet",
-    q: `${release.artist} ${release.title}`,
-    type: "video",
-    videoCategoryId: "10", // Music
-    maxResults: "1",
-    key: apiKey,
-  });
-
-  const response = await fetch(`${YOUTUBE_SEARCH_URL}?${params}`);
-  if (!response.ok) return { videoId: null }; // Quota exceeded or API error -- fail gracefully
-
-  const data = await response.json();
-  const videoId: string | null = data.items?.[0]?.id?.videoId ?? null;
-
-  // Cache result in DB via admin client (only when video found)
-  // Do NOT store null results -- leave column null so future searches can retry
-  if (videoId) {
-    const admin = createAdminClient();
-    await admin
-      .from("releases")
-      .update({
-        youtube_video_id: videoId,
-        updated_at: new Date().toISOString(),
+    // Fetch release data
+    const [release] = await db
+      .select({
+        id: releases.id,
+        title: releases.title,
+        artist: releases.artist,
+        youtubeVideoId: releases.youtubeVideoId,
       })
-      .eq("id", release.id);
-  }
+      .from(releases)
+      .where(eq(releases.id, releaseInternalId))
+      .limit(1);
 
-  return { videoId };
+    if (!release) return { videoId: null, error: "Release not found" };
+
+    // Cache hit -- return immediately
+    if (release.youtubeVideoId) return { videoId: release.youtubeVideoId };
+
+    // No API key configured -- skip gracefully
+    const apiKey = process.env.YOUTUBE_API_KEY;
+    if (!apiKey) return { videoId: null };
+
+    // Call YouTube Data API v3 search.list
+    const params = new URLSearchParams({
+      part: "snippet",
+      q: `${release.artist} ${release.title}`,
+      type: "video",
+      videoCategoryId: "10", // Music
+      maxResults: "1",
+      key: apiKey,
+    });
+
+    const response = await fetch(`${YOUTUBE_SEARCH_URL}?${params}`);
+    if (!response.ok) return { videoId: null }; // Quota exceeded or API error -- fail gracefully
+
+    const data = await response.json();
+    const videoId: string | null = data.items?.[0]?.id?.videoId ?? null;
+
+    // Cache result in DB via admin client (only when video found)
+    // Do NOT store null results -- leave column null so future searches can retry
+    if (videoId) {
+      const admin = createAdminClient();
+      await admin
+        .from("releases")
+        .update({
+          youtube_video_id: videoId,
+          updated_at: new Date().toISOString(),
+        })
+        .eq("id", release.id);
+    }
+
+    return { videoId };
+  } catch (err) {
+    console.error("[searchYouTubeForRelease] error:", err);
+    return { videoId: null, error: "Failed to search YouTube. Please try again." };
+  }
 }
 
 /**
@@ -90,5 +95,10 @@ export async function searchYouTubeForRelease(
  * Wraps getReviewsForRelease for client component consumption.
  */
 export async function getMoreReviews(releaseId: string, cursor: string, limit = 10) {
-  return getReviewsForRelease(releaseId, cursor, limit);
+  try {
+    return await getReviewsForRelease(releaseId, cursor, limit);
+  } catch (err) {
+    console.error("[getMoreReviews] error:", err);
+    return [];
+  }
 }

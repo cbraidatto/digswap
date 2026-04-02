@@ -252,9 +252,11 @@ describe("group visibility", () => {
 
 		const result = await generateInviteAction("group-1");
 
-		expect(result.token).toBeDefined();
-		expect(typeof result.token).toBe("string");
-		expect(result.token.length).toBeGreaterThan(0);
+		expect("token" in result).toBe(true);
+		if ("token" in result) {
+			expect(typeof result.token).toBe("string");
+			expect(result.token.length).toBeGreaterThan(0);
+		}
 	});
 
 	test("generateInviteAction requires admin role", async () => {
@@ -263,9 +265,8 @@ describe("group visibility", () => {
 			[{ role: "member" }],
 		];
 
-		await expect(generateInviteAction("group-1")).rejects.toThrow(
-			"Only group admins can generate invite links.",
-		);
+		const result = await generateInviteAction("group-1");
+		expect(result).toHaveProperty("error", "Only group admins can generate invite links.");
 	});
 
 	test("acceptInviteAction adds member to group", async () => {

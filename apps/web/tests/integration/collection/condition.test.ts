@@ -103,14 +103,14 @@ describe("updateConditionGrade", () => {
 		expect(result).toEqual({ error: "Could not update condition grade." });
 	});
 
-	test("throws for unauthenticated user", async () => {
+	test("returns error for unauthenticated user", async () => {
 		mockGetUser.mockResolvedValue({
 			data: { user: null },
 		});
 
-		await expect(
-			updateConditionGrade("item-1", "VG+"),
-		).rejects.toThrow("Not authenticated");
+		const result = await updateConditionGrade("item-1", "VG+");
+		expect(result).toHaveProperty("error");
+		expect(result.error).toMatch(/not authenticated/i);
 	});
 
 	test("accepts all valid CONDITION_GRADES", async () => {

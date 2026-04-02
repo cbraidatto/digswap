@@ -32,41 +32,41 @@ import { createHandoffToken } from "@/lib/desktop/handoff-token";
 export async function generateHandoffToken(
   tradeId: string,
 ): Promise<{ token: string } | { error: string }> {
-  const supabase = await createClient();
-  const {
-    data: { user },
-    error: authError,
-  } = await supabase.auth.getUser();
-
-  if (authError || !user) {
-    return { error: "Not authenticated" };
-  }
-
-  const userId = user.id;
-
-  // Verify caller is a participant in the trade (IDOR protection)
-  const trades = await db
-    .select({ id: tradeRequests.id })
-    .from(tradeRequests)
-    .where(
-      and(
-        eq(tradeRequests.id, tradeId),
-        or(
-          eq(tradeRequests.requesterId, userId),
-          eq(tradeRequests.providerId, userId),
-        ),
-      ),
-    );
-
-  if (trades.length === 0) {
-    return { error: "Trade not found or you are not a participant" };
-  }
-
   try {
+    const supabase = await createClient();
+    const {
+      data: { user },
+      error: authError,
+    } = await supabase.auth.getUser();
+
+    if (authError || !user) {
+      return { error: "Not authenticated" };
+    }
+
+    const userId = user.id;
+
+    // Verify caller is a participant in the trade (IDOR protection)
+    const trades = await db
+      .select({ id: tradeRequests.id })
+      .from(tradeRequests)
+      .where(
+        and(
+          eq(tradeRequests.id, tradeId),
+          or(
+            eq(tradeRequests.requesterId, userId),
+            eq(tradeRequests.providerId, userId),
+          ),
+        ),
+      );
+
+    if (trades.length === 0) {
+      return { error: "Trade not found or you are not a participant" };
+    }
+
     const token = await createHandoffToken(tradeId, userId);
     return { token };
   } catch (err) {
-    console.error("[generateHandoffToken] failed to create token:", err);
+    console.error("[generateHandoffToken] failed:", err);
     return { error: "Failed to generate handoff token" };
   }
 }
@@ -80,8 +80,12 @@ export async function generateHandoffToken(
  * No auth required — this is safe to call from the public /desktop/open page.
  */
 export async function checkDesktopVersion(): Promise<{ minVersion: number }> {
-  const raw = process.env.NEXT_PUBLIC_MIN_DESKTOP_VERSION;
-  const minVersion = raw ? parseInt(raw, 10) : 1;
-  return { minVersion: isNaN(minVersion) ? 1 : minVersion };
+  try {
+    const raw = process.env.NEXT_PUBLIC_MIN_DESKTOP_VERSION;
+    const minVersion = raw ? parseInt(raw, 10) : 1;
+    return { minVersion: isNaN(minVersion) ? 1 : minVersion };
+  } catch (err) {
+    console.error("[checkDesktopVersion] error:", err);
+    return { minVersion: 1 };
+  }
 }
-

@@ -20,8 +20,12 @@ export function DiscogsConnect() {
 	const handleConnect = () => {
 		startTransition(async () => {
 			try {
-				const { url } = await connectDiscogs();
-				window.location.href = url;
+				const result = await connectDiscogs();
+				if ("error" in result) {
+					toast.error(result.error);
+					return;
+				}
+				window.location.href = result.url;
 			} catch {
 				toast.error("Could not connect to Discogs. Please try again.");
 			}

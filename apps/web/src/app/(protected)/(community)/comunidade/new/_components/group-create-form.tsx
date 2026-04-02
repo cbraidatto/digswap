@@ -52,6 +52,10 @@ export function GroupCreateForm() {
 				category: data.category || undefined,
 				visibility: data.visibility,
 			});
+			if ("error" in result) {
+				toast.error(result.error);
+				return;
+			}
 			toast("Group created.");
 			router.push(`/comunidade/${result.slug}`);
 		} catch (err) {

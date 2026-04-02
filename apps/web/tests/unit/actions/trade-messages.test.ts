@@ -92,27 +92,30 @@ describe("sendTradeMessage", () => {
 	it("rejects unauthenticated caller", async () => {
 		mockUser = null;
 
-		await expect(sendTradeMessage(TRADE_ID, "Need that rip")).rejects.toThrow("Not authenticated");
+		const result = await sendTradeMessage(TRADE_ID, "Need that rip");
+		expect(result.success).toBe(false);
 		expect(getTradeParticipantContextMock).not.toHaveBeenCalled();
 	});
 
 	it("rejects non-participant", async () => {
 		getTradeParticipantContextMock.mockResolvedValue(null);
 
-		await expect(sendTradeMessage(TRADE_ID, "Need that rip")).rejects.toThrow(
-			"Trade not found or forbidden.",
-		);
+		const result = await sendTradeMessage(TRADE_ID, "Need that rip");
+		expect(result.success).toBe(false);
+		if (!result.success) expect(result.error).toBe("Trade not found or forbidden.");
 	});
 
 	it("rejects empty body", async () => {
-		await expect(sendTradeMessage(TRADE_ID, "   ")).rejects.toThrow("Message cannot be empty.");
+		const result = await sendTradeMessage(TRADE_ID, "   ");
+		expect(result.success).toBe(false);
+		if (!result.success) expect(result.error).toBe("Message cannot be empty.");
 		expect(getTradeParticipantContextMock).not.toHaveBeenCalled();
 	});
 
 	it("rejects body longer than 2000 chars", async () => {
-		await expect(sendTradeMessage(TRADE_ID, "a".repeat(2001))).rejects.toThrow(
-			"Message is too long.",
-		);
+		const result = await sendTradeMessage(TRADE_ID, "a".repeat(2001));
+		expect(result.success).toBe(false);
+		if (!result.success) expect(result.error).toBe("Message is too long.");
 		expect(getTradeParticipantContextMock).not.toHaveBeenCalled();
 	});
 
@@ -123,9 +126,9 @@ describe("sendTradeMessage", () => {
 		});
 		selectResults = [[{ count: 10 }]];
 
-		await expect(sendTradeMessage(TRADE_ID, "Still there?")).rejects.toThrow(
-			"Too many messages in a short period. Please wait a moment.",
-		);
+		const result = await sendTradeMessage(TRADE_ID, "Still there?");
+		expect(result.success).toBe(false);
+		if (!result.success) expect(result.error).toBe("Too many messages in a short period. Please wait a moment.");
 		expect(insertValuesMock).not.toHaveBeenCalled();
 	});
 

@@ -15,48 +15,63 @@ import {
  * Get a page of notifications for the current user.
  */
 export async function getNotificationsAction(page = 1) {
-	const supabase = await createClient();
-	const {
-		data: { user },
-	} = await supabase.auth.getUser();
+	try {
+		const supabase = await createClient();
+		const {
+			data: { user },
+		} = await supabase.auth.getUser();
 
-	if (!user) {
-		throw new Error("Not authenticated");
+		if (!user) {
+			return { items: [], total: 0, page: 1, pageSize: 20 };
+		}
+
+		return getNotificationPage(user.id, page);
+	} catch (err) {
+		console.error("[getNotificationsAction] error:", err);
+		return { items: [], total: 0, page: 1, pageSize: 20 };
 	}
-
-	return getNotificationPage(user.id, page);
 }
 
 /**
  * Get recent notifications for the current user (for dropdown display).
  */
 export async function getRecentNotificationsAction(limit = 5) {
-	const supabase = await createClient();
-	const {
-		data: { user },
-	} = await supabase.auth.getUser();
+	try {
+		const supabase = await createClient();
+		const {
+			data: { user },
+		} = await supabase.auth.getUser();
 
-	if (!user) {
-		throw new Error("Not authenticated");
+		if (!user) {
+			return [];
+		}
+
+		return getRecentNotifications(user.id, limit);
+	} catch (err) {
+		console.error("[getRecentNotificationsAction] error:", err);
+		return [];
 	}
-
-	return getRecentNotifications(user.id, limit);
 }
 
 /**
  * Get the unread notification count for the current user.
  */
 export async function getUnreadCountAction(): Promise<number> {
-	const supabase = await createClient();
-	const {
-		data: { user },
-	} = await supabase.auth.getUser();
+	try {
+		const supabase = await createClient();
+		const {
+			data: { user },
+		} = await supabase.auth.getUser();
 
-	if (!user) {
-		throw new Error("Not authenticated");
+		if (!user) {
+			return 0;
+		}
+
+		return getUnreadCount(user.id);
+	} catch (err) {
+		console.error("[getUnreadCountAction] error:", err);
+		return 0;
 	}
-
-	return getUnreadCount(user.id);
 }
 
 /**
@@ -66,39 +81,44 @@ export async function getUnreadCountAction(): Promise<number> {
 export async function markNotificationRead(
 	notificationId: string,
 ): Promise<{ success?: boolean; error?: string }> {
-	const supabase = await createClient();
-	const {
-		data: { user },
-	} = await supabase.auth.getUser();
+	try {
+		const supabase = await createClient();
+		const {
+			data: { user },
+		} = await supabase.auth.getUser();
 
-	if (!user) {
-		throw new Error("Not authenticated");
+		if (!user) {
+			return { error: "Not authenticated" };
+		}
+
+		const { success: rlSuccess } = await apiRateLimit.limit(user.id);
+		if (!rlSuccess) {
+			return { error: "Too many requests. Please wait a moment." };
+		}
+
+		const admin = createAdminClient();
+
+		const { data, error } = await admin
+			.from("notifications")
+			.update({ read: true })
+			.eq("id", notificationId)
+			.eq("user_id", user.id) // Ownership check
+			.select("id")
+			.maybeSingle();
+
+		if (error) {
+			return { error: "Could not mark notification as read." };
+		}
+
+		if (!data) {
+			return { error: "Notification not found." };
+		}
+
+		return { success: true };
+	} catch (err) {
+		console.error("[markNotificationRead] error:", err);
+		return { error: "Failed to mark notification as read." };
 	}
-
-	const { success: rlSuccess } = await apiRateLimit.limit(user.id);
-	if (!rlSuccess) {
-		return { error: "Too many requests. Please wait a moment." };
-	}
-
-	const admin = createAdminClient();
-
-	const { data, error } = await admin
-		.from("notifications")
-		.update({ read: true })
-		.eq("id", notificationId)
-		.eq("user_id", user.id) // Ownership check
-		.select("id")
-		.maybeSingle();
-
-	if (error) {
-		return { error: "Could not mark notification as read." };
-	}
-
-	if (!data) {
-		return { error: "Notification not found." };
-	}
-
-	return { success: true };
 }
 
 /**
@@ -108,33 +128,38 @@ export async function markAllRead(): Promise<{
 	success?: boolean;
 	error?: string;
 }> {
-	const supabase = await createClient();
-	const {
-		data: { user },
-	} = await supabase.auth.getUser();
+	try {
+		const supabase = await createClient();
+		const {
+			data: { user },
+		} = await supabase.auth.getUser();
 
-	if (!user) {
-		throw new Error("Not authenticated");
+		if (!user) {
+			return { error: "Not authenticated" };
+		}
+
+		const { success: rlSuccess } = await apiRateLimit.limit(user.id);
+		if (!rlSuccess) {
+			return { error: "Too many requests. Please wait a moment." };
+		}
+
+		const admin = createAdminClient();
+
+		const { error } = await admin
+			.from("notifications")
+			.update({ read: true })
+			.eq("user_id", user.id)
+			.eq("read", false);
+
+		if (error) {
+			return { error: "Could not mark notifications as read." };
+		}
+
+		return { success: true };
+	} catch (err) {
+		console.error("[markAllRead] error:", err);
+		return { error: "Failed to mark notifications as read." };
 	}
-
-	const { success: rlSuccess } = await apiRateLimit.limit(user.id);
-	if (!rlSuccess) {
-		return { error: "Too many requests. Please wait a moment." };
-	}
-
-	const admin = createAdminClient();
-
-	const { error } = await admin
-		.from("notifications")
-		.update({ read: true })
-		.eq("user_id", user.id)
-		.eq("read", false);
-
-	if (error) {
-		return { error: "Could not mark notifications as read." };
-	}
-
-	return { success: true };
 }
 
 /**
@@ -142,35 +167,41 @@ export async function markAllRead(): Promise<{
  * Lazy-creates default preferences row if none exists (per D-18).
  */
 export async function getPreferencesAction() {
-	const supabase = await createClient();
-	const {
-		data: { user },
-	} = await supabase.auth.getUser();
+	try {
+		const supabase = await createClient();
+		const {
+			data: { user },
+		} = await supabase.auth.getUser();
 
-	if (!user) {
-		throw new Error("Not authenticated");
+		if (!user) {
+			return null;
+		}
+
+		const existing = await getPreferences(user.id);
+		if (existing) {
+			return existing;
+		}
+
+		// Lazy-create defaults
+		const admin = createAdminClient();
+		const { data: created, error } = await admin
+			.from("notification_preferences")
+			.insert({
+				user_id: user.id,
+			})
+			.select()
+			.single();
+
+		if (error) {
+			console.error("[getPreferencesAction] create defaults error:", error);
+			return null;
+		}
+
+		return created;
+	} catch (err) {
+		console.error("[getPreferencesAction] error:", err);
+		return null;
 	}
-
-	const existing = await getPreferences(user.id);
-	if (existing) {
-		return existing;
-	}
-
-	// Lazy-create defaults
-	const admin = createAdminClient();
-	const { data: created, error } = await admin
-		.from("notification_preferences")
-		.insert({
-			user_id: user.id,
-		})
-		.select()
-		.single();
-
-	if (error) {
-		throw new Error("Could not create notification preferences.");
-	}
-
-	return created;
 }
 
 /**
@@ -185,20 +216,26 @@ export async function updatePreferencesAction(prefs: {
 	rankingChangeInapp?: boolean;
 	newBadgeInapp?: boolean;
 	pushEnabled?: boolean;
-}) {
-	const supabase = await createClient();
-	const {
-		data: { user },
-	} = await supabase.auth.getUser();
+}): Promise<{ success?: boolean; error?: string }> {
+	try {
+		const supabase = await createClient();
+		const {
+			data: { user },
+		} = await supabase.auth.getUser();
 
-	if (!user) {
-		throw new Error("Not authenticated");
+		if (!user) {
+			return { error: "Not authenticated" };
+		}
+
+		const { success: rlSuccess } = await apiRateLimit.limit(user.id);
+		if (!rlSuccess) {
+			return { error: "Too many requests. Please wait a moment." };
+		}
+
+		await upsertPreferences(user.id, prefs);
+		return { success: true };
+	} catch (err) {
+		console.error("[updatePreferencesAction] error:", err);
+		return { error: "Failed to update preferences. Please try again." };
 	}
-
-	const { success: rlSuccess } = await apiRateLimit.limit(user.id);
-	if (!rlSuccess) {
-		throw new Error("Too many requests. Please wait a moment.");
-	}
-
-	return upsertPreferences(user.id, prefs);
 }

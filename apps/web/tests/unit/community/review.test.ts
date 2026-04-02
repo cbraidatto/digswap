@@ -229,25 +229,23 @@ describe("createReviewAction", () => {
 	});
 
 	test("rejects rating 0 (validation error)", async () => {
-		await expect(
-			createReviewAction({
-				groupId: TEST_GROUP_ID,
-				releaseId: TEST_RELEASE_ID,
-				rating: 0,
-				body: "Should fail",
-			}),
-		).rejects.toThrow(/Too small|between 1 and 5/i);
+		const result = await createReviewAction({
+			groupId: TEST_GROUP_ID,
+			releaseId: TEST_RELEASE_ID,
+			rating: 0,
+			body: "Should fail",
+		});
+		expect(result).toHaveProperty("error");
 	});
 
 	test("rejects rating 6 (validation error)", async () => {
-		await expect(
-			createReviewAction({
-				groupId: TEST_GROUP_ID,
-				releaseId: TEST_RELEASE_ID,
-				rating: 6,
-				body: "Should fail",
-			}),
-		).rejects.toThrow(/Too big|between 1 and 5/i);
+		const result = await createReviewAction({
+			groupId: TEST_GROUP_ID,
+			releaseId: TEST_RELEASE_ID,
+			rating: 6,
+			body: "Should fail",
+		});
+		expect(result).toHaveProperty("error");
 	});
 
 	test("creates group_post with reviewId", async () => {

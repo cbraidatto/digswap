@@ -43,16 +43,22 @@ export function PricingCards({ currentPlan, monthlyPriceId, annualPriceId }: Pro
 		startTransition(async () => {
 			const priceId = billing === "monthly" ? monthlyPriceId : annualPriceId;
 			const { createCheckoutSession } = await import("@/actions/stripe");
-			const { url } = await createCheckoutSession(priceId);
-			router.push(url);
+			const result = await createCheckoutSession(priceId);
+			if ("error" in result) {
+				return;
+			}
+			router.push(result.url);
 		});
 	}
 
 	async function handleManage() {
 		startTransition(async () => {
 			const { createPortalSession } = await import("@/actions/stripe");
-			const { url } = await createPortalSession();
-			router.push(url);
+			const result = await createPortalSession();
+			if ("error" in result) {
+				return;
+			}
+			router.push(result.url);
 		});
 	}
 

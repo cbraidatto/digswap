@@ -213,17 +213,15 @@ describe("createGroupAction", () => {
 	});
 
 	test("rejects empty name", async () => {
-		await expect(
-			createGroupAction({ name: "", visibility: "public" }),
-		).rejects.toThrow("Group name is required.");
+		const result = await createGroupAction({ name: "", visibility: "public" });
+		expect(result).toHaveProperty("error", "Group name is required.");
 	});
 
 	test("rejects name longer than 80 chars", async () => {
 		const longName = "A".repeat(81);
 
-		await expect(
-			createGroupAction({ name: longName, visibility: "public" }),
-		).rejects.toThrow("Group name must be 80 characters or fewer.");
+		const result = await createGroupAction({ name: longName, visibility: "public" });
+		expect(result).toHaveProperty("error", "Group name must be 80 characters or fewer.");
 	});
 
 	test("inserts creator as admin member", async () => {

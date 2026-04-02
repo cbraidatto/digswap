@@ -22,8 +22,12 @@ export function TradeLimitModal({ open, onClose, tradesUsed, tradesLimit = 5 }: 
 			const { createCheckoutSession } = await import("@/actions/stripe");
 			try {
 				const priceId = process.env.NEXT_PUBLIC_STRIPE_PRICE_MONTHLY ?? "";
-				const { url } = await createCheckoutSession(priceId);
-				router.push(url);
+				const result = await createCheckoutSession(priceId);
+				if ("error" in result) {
+					router.push("/pricing");
+					return;
+				}
+				router.push(result.url);
 			} catch {
 				// Fallback to pricing page if action fails
 				router.push("/pricing");

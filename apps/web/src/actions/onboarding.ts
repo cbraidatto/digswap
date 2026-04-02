@@ -119,6 +119,11 @@ export async function completeOnboarding(): Promise<{
  * Skip to next step -- a no-op server action that returns the next step number.
  * Used to track progress without requiring database writes for skipped steps.
  */
-export async function skipToStep(step: number): Promise<{ success: boolean; nextStep: number }> {
-	return { success: true, nextStep: step };
+export async function skipToStep(step: number): Promise<{ success: boolean; nextStep: number; error?: string }> {
+	try {
+		return { success: true, nextStep: step };
+	} catch (err) {
+		console.error("[skipToStep] error:", err);
+		return { success: false, nextStep: step, error: "Failed to skip step." };
+	}
 }

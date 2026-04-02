@@ -47,54 +47,59 @@ async function getClientIp(): Promise<string> {
 export async function signUp(
 	formData: FormData,
 ): Promise<{ success: boolean; error?: string; email?: string }> {
-	// Rate limit by IP
-	const ip = await getClientIp();
-	const { success: allowed } = await authRateLimit.limit(ip);
-	if (!allowed) {
-		return {
-			success: false,
-			error: "Too many attempts. Please wait a moment before trying again.",
+	try {
+		// Rate limit by IP
+		const ip = await getClientIp();
+		const { success: allowed } = await authRateLimit.limit(ip);
+		if (!allowed) {
+			return {
+				success: false,
+				error: "Too many attempts. Please wait a moment before trying again.",
+			};
+		}
+
+		// Validate input
+		const rawData = {
+			email: formData.get("email"),
+			password: formData.get("password"),
+			confirmPassword: formData.get("confirmPassword"),
 		};
+
+		const parsed = signUpSchema.safeParse(rawData);
+		if (!parsed.success) {
+			const firstError = parsed.error.issues[0]?.message || "Invalid input.";
+			return { success: false, error: firstError };
+		}
+
+		const { email, password } = parsed.data;
+
+		// Create user in Supabase
+		const supabase = await createClient();
+		const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
+
+		const { error } = await supabase.auth.signUp({
+			email,
+			password,
+			options: {
+				emailRedirectTo: `${siteUrl}/api/auth/callback`,
+			},
+		});
+
+		if (error) {
+			// OWASP: Never reveal if email already exists.
+			// Supabase may return "User already registered" -- mask it.
+			console.error("Signup error:", error.message);
+			return {
+				success: false,
+				error: GENERIC_AUTH_ERROR,
+			};
+		}
+
+		return { success: true, email };
+	} catch (err) {
+		console.error("[signUp] error:", err);
+		return { success: false, error: "Something went wrong. Please try again." };
 	}
-
-	// Validate input
-	const rawData = {
-		email: formData.get("email"),
-		password: formData.get("password"),
-		confirmPassword: formData.get("confirmPassword"),
-	};
-
-	const parsed = signUpSchema.safeParse(rawData);
-	if (!parsed.success) {
-		const firstError = parsed.error.issues[0]?.message || "Invalid input.";
-		return { success: false, error: firstError };
-	}
-
-	const { email, password } = parsed.data;
-
-	// Create user in Supabase
-	const supabase = await createClient();
-	const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
-
-	const { error } = await supabase.auth.signUp({
-		email,
-		password,
-		options: {
-			emailRedirectTo: `${siteUrl}/api/auth/callback`,
-		},
-	});
-
-	if (error) {
-		// OWASP: Never reveal if email already exists.
-		// Supabase may return "User already registered" -- mask it.
-		console.error("Signup error:", error.message);
-		return {
-			success: false,
-			error: GENERIC_AUTH_ERROR,
-		};
-	}
-
-	return { success: true, email };
 }
 
 /**
@@ -110,84 +115,89 @@ export async function signIn(formData: FormData): Promise<{
 	mfaRequired?: boolean;
 	redirectTo?: string;
 }> {
-	// Rate limit by IP
-	const ip = await getClientIp();
-	const { success: allowed } = await authRateLimit.limit(ip);
-	if (!allowed) {
-		return {
-			success: false,
-			error: "Too many attempts. Please wait a moment before trying again.",
-		};
-	}
-
-	// Validate input
-	const rawData = {
-		email: formData.get("email"),
-		password: formData.get("password"),
-	};
-
-	const parsed = signInSchema.safeParse(rawData);
-	if (!parsed.success) {
-		const firstError = parsed.error.issues[0]?.message || "Invalid input.";
-		return { success: false, error: firstError };
-	}
-
-	const { email, password } = parsed.data;
-
-	// Sign in with Supabase
-	const supabase = await createClient();
-	const { data, error } = await supabase.auth.signInWithPassword({
-		email,
-		password,
-	});
-
-	if (error) {
-		return { success: false, error: GENERIC_AUTH_ERROR };
-	}
-
-	// Check MFA level
-	const { data: mfaData, error: mfaError } =
-		await supabase.auth.mfa.getAuthenticatorAssuranceLevel();
-
-	if (!mfaError && mfaData.nextLevel === "aal2" && mfaData.currentLevel !== "aal2") {
-		return { success: true, mfaRequired: true };
-	}
-
-	// Record session in user_sessions table (D-13)
-	if (data.session && data.user) {
-		const headerStore = await headers();
-		const deviceInfo = headerStore.get("user-agent") || "unknown";
-
-		try {
-			const admin = createAdminClient();
-
-			// Insert new session record
-			await admin.from("user_sessions").insert({
-				user_id: data.user.id,
-				session_id: data.session.access_token.slice(-32), // Unique identifier from token
-				device_info: deviceInfo,
-				ip_address: ip,
-			});
-
-			// Enforce max sessions: if > MAX_SESSIONS, delete oldest
-			const { data: sessions } = await admin
-				.from("user_sessions")
-				.select("id, created_at")
-				.eq("user_id", data.user.id)
-				.order("created_at", { ascending: true });
-
-			if (sessions && sessions.length > MAX_SESSIONS) {
-				const sessionsToRemove = sessions.slice(0, sessions.length - MAX_SESSIONS);
-				const idsToRemove = sessionsToRemove.map((s) => s.id);
-				await admin.from("user_sessions").delete().in("id", idsToRemove);
-			}
-		} catch (sessionError) {
-			// Session tracking failure should not block login.
-			console.error("Session tracking error:", sessionError);
+	try {
+		// Rate limit by IP
+		const ip = await getClientIp();
+		const { success: allowed } = await authRateLimit.limit(ip);
+		if (!allowed) {
+			return {
+				success: false,
+				error: "Too many attempts. Please wait a moment before trying again.",
+			};
 		}
-	}
 
-	return { success: true, redirectTo: "/onboarding" };
+		// Validate input
+		const rawData = {
+			email: formData.get("email"),
+			password: formData.get("password"),
+		};
+
+		const parsed = signInSchema.safeParse(rawData);
+		if (!parsed.success) {
+			const firstError = parsed.error.issues[0]?.message || "Invalid input.";
+			return { success: false, error: firstError };
+		}
+
+		const { email, password } = parsed.data;
+
+		// Sign in with Supabase
+		const supabase = await createClient();
+		const { data, error } = await supabase.auth.signInWithPassword({
+			email,
+			password,
+		});
+
+		if (error) {
+			return { success: false, error: GENERIC_AUTH_ERROR };
+		}
+
+		// Check MFA level
+		const { data: mfaData, error: mfaError } =
+			await supabase.auth.mfa.getAuthenticatorAssuranceLevel();
+
+		if (!mfaError && mfaData.nextLevel === "aal2" && mfaData.currentLevel !== "aal2") {
+			return { success: true, mfaRequired: true };
+		}
+
+		// Record session in user_sessions table (D-13)
+		if (data.session && data.user) {
+			const headerStore = await headers();
+			const deviceInfo = headerStore.get("user-agent") || "unknown";
+
+			try {
+				const admin = createAdminClient();
+
+				// Insert new session record
+				await admin.from("user_sessions").insert({
+					user_id: data.user.id,
+					session_id: data.session.access_token.slice(-32), // Unique identifier from token
+					device_info: deviceInfo,
+					ip_address: ip,
+				});
+
+				// Enforce max sessions: if > MAX_SESSIONS, delete oldest
+				const { data: sessions } = await admin
+					.from("user_sessions")
+					.select("id, created_at")
+					.eq("user_id", data.user.id)
+					.order("created_at", { ascending: true });
+
+				if (sessions && sessions.length > MAX_SESSIONS) {
+					const sessionsToRemove = sessions.slice(0, sessions.length - MAX_SESSIONS);
+					const idsToRemove = sessionsToRemove.map((s) => s.id);
+					await admin.from("user_sessions").delete().in("id", idsToRemove);
+				}
+			} catch (sessionError) {
+				// Session tracking failure should not block login.
+				console.error("Session tracking error:", sessionError);
+			}
+		}
+
+		return { success: true, redirectTo: "/onboarding" };
+	} catch (err) {
+		console.error("[signIn] error:", err);
+		return { success: false, error: "Something went wrong. Please try again." };
+	}
 }
 
 /**
@@ -198,32 +208,37 @@ export async function signIn(formData: FormData): Promise<{
 export async function resendVerification(
 	email: string,
 ): Promise<{ success: boolean; error?: string }> {
-	if (!email || typeof email !== "string") {
-		return { success: false, error: "Email is required." };
+	try {
+		if (!email || typeof email !== "string") {
+			return { success: false, error: "Email is required." };
+		}
+
+		// Rate limit by email
+		const { success: allowed } = await authRateLimit.limit(`resend:${email}`);
+		if (!allowed) {
+			return {
+				success: false,
+				error: "Too many attempts. Please wait a moment before trying again.",
+			};
+		}
+
+		const supabase = await createClient();
+		const { error } = await supabase.auth.resend({
+			type: "signup",
+			email,
+		});
+
+		if (error) {
+			// Do not reveal whether the email exists
+			console.error("Resend verification error:", error.message);
+		}
+
+		// Always return success to prevent email enumeration
+		return { success: true };
+	} catch (err) {
+		console.error("[resendVerification] error:", err);
+		return { success: false, error: "Something went wrong. Please try again." };
 	}
-
-	// Rate limit by email
-	const { success: allowed } = await authRateLimit.limit(`resend:${email}`);
-	if (!allowed) {
-		return {
-			success: false,
-			error: "Too many attempts. Please wait a moment before trying again.",
-		};
-	}
-
-	const supabase = await createClient();
-	const { error } = await supabase.auth.resend({
-		type: "signup",
-		email,
-	});
-
-	if (error) {
-		// Do not reveal whether the email exists
-		console.error("Resend verification error:", error.message);
-	}
-
-	// Always return success to prevent email enumeration
-	return { success: true };
 }
 
 /**
@@ -237,44 +252,52 @@ export async function resendVerification(
 export async function forgotPassword(
 	formData: FormData,
 ): Promise<{ success: boolean; message: string; errors?: Record<string, string[]> }> {
-	const rawData = {
-		email: formData.get("email"),
-	};
+	try {
+		const rawData = {
+			email: formData.get("email"),
+		};
 
-	// Validate input
-	const parsed = forgotPasswordSchema.safeParse(rawData);
-	if (!parsed.success) {
+		// Validate input
+		const parsed = forgotPasswordSchema.safeParse(rawData);
+		if (!parsed.success) {
+			return {
+				success: false,
+				message: "Please enter a valid email address.",
+				errors: parsed.error.flatten().fieldErrors,
+			};
+		}
+
+		const { email } = parsed.data;
+
+		// Rate limit by email (3 per 15 min)
+		const { success: withinLimit } = await resetRateLimit.limit(email.toLowerCase());
+		if (!withinLimit) {
+			return {
+				success: false,
+				message: "Too many attempts. Please wait a moment before trying again.",
+			};
+		}
+
+		const supabase = await createClient();
+		const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
+
+		// Send reset email -- errors are intentionally swallowed (OWASP)
+		await supabase.auth.resetPasswordForEmail(email, {
+			redirectTo: `${siteUrl}/api/auth/callback?next=/reset-password`,
+		});
+
+		// ALWAYS return success to prevent email enumeration
+		return {
+			success: true,
+			message: `Check your inbox. We sent a reset link to ${email}.`,
+		};
+	} catch (err) {
+		console.error("[forgotPassword] error:", err);
 		return {
 			success: false,
-			message: "Please enter a valid email address.",
-			errors: parsed.error.flatten().fieldErrors,
+			message: "Something went wrong. Please try again.",
 		};
 	}
-
-	const { email } = parsed.data;
-
-	// Rate limit by email (3 per 15 min)
-	const { success: withinLimit } = await resetRateLimit.limit(email.toLowerCase());
-	if (!withinLimit) {
-		return {
-			success: false,
-			message: "Too many attempts. Please wait a moment before trying again.",
-		};
-	}
-
-	const supabase = await createClient();
-	const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
-
-	// Send reset email -- errors are intentionally swallowed (OWASP)
-	await supabase.auth.resetPasswordForEmail(email, {
-		redirectTo: `${siteUrl}/api/auth/callback?next=/reset-password`,
-	});
-
-	// ALWAYS return success to prevent email enumeration
-	return {
-		success: true,
-		message: `Check your inbox. We sent a reset link to ${email}.`,
-	};
 }
 
 /**
@@ -289,56 +312,64 @@ export async function forgotPassword(
 export async function resetPassword(
 	formData: FormData,
 ): Promise<{ success: boolean; message: string; errors?: Record<string, string[]> }> {
-	const rawData = {
-		password: formData.get("password"),
-		confirmPassword: formData.get("confirmPassword"),
-	};
-
-	// Validate input (same strength rules as signup per D-18)
-	const parsed = resetPasswordSchema.safeParse(rawData);
-	if (!parsed.success) {
-		return {
-			success: false,
-			message: "Please fix the errors below.",
-			errors: parsed.error.flatten().fieldErrors,
+	try {
+		const rawData = {
+			password: formData.get("password"),
+			confirmPassword: formData.get("confirmPassword"),
 		};
-	}
 
-	// Rate limit by IP
-	const ip = await getClientIp();
-	const { success: withinLimit } = await authRateLimit.limit(ip);
-	if (!withinLimit) {
-		return {
-			success: false,
-			message: "Too many attempts. Please wait a moment before trying again.",
-		};
-	}
-
-	const supabase = await createClient();
-
-	const { error } = await supabase.auth.updateUser({
-		password: parsed.data.password,
-	});
-
-	if (error) {
-		// Handle expired/invalid recovery link
-		if (error.message?.toLowerCase().includes("expired") || error.status === 403) {
+		// Validate input (same strength rules as signup per D-18)
+		const parsed = resetPasswordSchema.safeParse(rawData);
+		if (!parsed.success) {
 			return {
 				success: false,
-				message: "This reset link has expired. Request a new one.",
+				message: "Please fix the errors below.",
+				errors: parsed.error.flatten().fieldErrors,
 			};
 		}
 
+		// Rate limit by IP
+		const ip = await getClientIp();
+		const { success: withinLimit } = await authRateLimit.limit(ip);
+		if (!withinLimit) {
+			return {
+				success: false,
+				message: "Too many attempts. Please wait a moment before trying again.",
+			};
+		}
+
+		const supabase = await createClient();
+
+		const { error } = await supabase.auth.updateUser({
+			password: parsed.data.password,
+		});
+
+		if (error) {
+			// Handle expired/invalid recovery link
+			if (error.message?.toLowerCase().includes("expired") || error.status === 403) {
+				return {
+					success: false,
+					message: "This reset link has expired. Request a new one.",
+				};
+			}
+
+			return {
+				success: false,
+				message: "Something went wrong. Please try again.",
+			};
+		}
+
+		return {
+			success: true,
+			message: "Password updated. You can now sign in with your new password.",
+		};
+	} catch (err) {
+		console.error("[resetPassword] error:", err);
 		return {
 			success: false,
 			message: "Something went wrong. Please try again.",
 		};
 	}
-
-	return {
-		success: true,
-		message: "Password updated. You can now sign in with your new password.",
-	};
 }
 
 /**

@@ -21,44 +21,49 @@ import { discogsRateLimit } from "@/lib/rate-limit";
  * silently dropped, causing POST 200 with no navigation. The caller must
  * do window.location.href = url to perform a full browser navigation.
  */
-export async function connectDiscogs(): Promise<{ url: string }> {
-	const supabase = await createClient();
-	const {
-		data: { user },
-	} = await supabase.auth.getUser();
+export async function connectDiscogs(): Promise<{ url: string } | { error: string }> {
+	try {
+		const supabase = await createClient();
+		const {
+			data: { user },
+		} = await supabase.auth.getUser();
 
-	if (!user) {
-		throw new Error("Not authenticated");
+		if (!user) {
+			return { error: "Not authenticated" };
+		}
+
+		const { success: rlSuccess } = await discogsRateLimit.limit(user.id);
+		if (!rlSuccess) {
+			return { error: "Too many requests. Please wait a moment." };
+		}
+
+		const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
+		const callbackUrl = `${siteUrl}/api/discogs/callback`;
+
+		const { token, tokenSecret, authorizeUrl } =
+			await getRequestToken(callbackUrl);
+
+		// Store request token in httpOnly cookie for the callback.
+		// sameSite: "lax" allows the cookie to survive the redirect back from Discogs.
+		// maxAge: 600 (10 minutes) prevents stale tokens from lingering.
+		const cookieStore = await cookies();
+		cookieStore.set(
+			"discogs_oauth",
+			JSON.stringify({ token, tokenSecret }),
+			{
+				httpOnly: true,
+				secure: process.env.NODE_ENV === "production",
+				sameSite: "lax",
+				maxAge: 600,
+				path: "/",
+			},
+		);
+
+		return { url: authorizeUrl };
+	} catch (err) {
+		console.error("[connectDiscogs] error:", err);
+		return { error: "Failed to connect to Discogs. Please try again." };
 	}
-
-	const { success: rlSuccess } = await discogsRateLimit.limit(user.id);
-	if (!rlSuccess) {
-		throw new Error("Too many requests. Please wait a moment.");
-	}
-
-	const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
-	const callbackUrl = `${siteUrl}/api/discogs/callback`;
-
-	const { token, tokenSecret, authorizeUrl } =
-		await getRequestToken(callbackUrl);
-
-	// Store request token in httpOnly cookie for the callback.
-	// sameSite: "lax" allows the cookie to survive the redirect back from Discogs.
-	// maxAge: 600 (10 minutes) prevents stale tokens from lingering.
-	const cookieStore = await cookies();
-	cookieStore.set(
-		"discogs_oauth",
-		JSON.stringify({ token, tokenSecret }),
-		{
-			httpOnly: true,
-			secure: process.env.NODE_ENV === "production",
-			sameSite: "lax",
-			maxAge: 600,
-			path: "/",
-		},
-	);
-
-	return { url: authorizeUrl };
 }
 
 /**
@@ -73,66 +78,71 @@ export async function triggerSync(): Promise<{
 	success?: boolean;
 	error?: string;
 }> {
-	const supabase = await createClient();
-	const {
-		data: { user },
-	} = await supabase.auth.getUser();
+	try {
+		const supabase = await createClient();
+		const {
+			data: { user },
+		} = await supabase.auth.getUser();
 
-	if (!user) {
-		throw new Error("Not authenticated");
+		if (!user) {
+			return { error: "Not authenticated" };
+		}
+
+		const { success: rlSuccess } = await discogsRateLimit.limit(user.id);
+		if (!rlSuccess) {
+			return { error: "Too many requests. Please wait a moment." };
+		}
+
+		const admin = createAdminClient();
+
+		// Check for existing active import/sync job (prevent duplicates)
+		const { data: existingJobs } = await admin
+			.from("import_jobs")
+			.select("id")
+			.eq("user_id", user.id)
+			.in("status", ["pending", "processing"])
+			.limit(1);
+
+		if (existingJobs && existingJobs.length > 0) {
+			return { error: "An import is already in progress." };
+		}
+
+		// Create sync job
+		const { data: job, error } = await admin
+			.from("import_jobs")
+			.insert({
+				user_id: user.id,
+				type: "sync",
+				status: "pending",
+				total_items: 0,
+				processed_items: 0,
+				current_page: 1,
+				created_at: new Date().toISOString(),
+			})
+			.select("id")
+			.single();
+
+		if (error || !job) {
+			return { error: "Could not start sync." };
+		}
+
+		// Trigger import worker (fire-and-forget)
+		const siteUrl =
+			process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
+		fetch(`${siteUrl}/api/discogs/import`, {
+			method: "POST",
+			headers: {
+				"Content-Type": "application/json",
+				Authorization: `Bearer ${process.env.IMPORT_WORKER_SECRET}`,
+			},
+			body: JSON.stringify({ jobId: job.id }),
+		}).catch(() => {});
+
+		return { success: true };
+	} catch (err) {
+		console.error("[triggerSync] error:", err);
+		return { error: "Failed to start sync. Please try again." };
 	}
-
-	const { success: rlSuccess } = await discogsRateLimit.limit(user.id);
-	if (!rlSuccess) {
-		return { error: "Too many requests. Please wait a moment." };
-	}
-
-	const admin = createAdminClient();
-
-	// Check for existing active import/sync job (prevent duplicates)
-	const { data: existingJobs } = await admin
-		.from("import_jobs")
-		.select("id")
-		.eq("user_id", user.id)
-		.in("status", ["pending", "processing"])
-		.limit(1);
-
-	if (existingJobs && existingJobs.length > 0) {
-		return { error: "An import is already in progress." };
-	}
-
-	// Create sync job
-	const { data: job, error } = await admin
-		.from("import_jobs")
-		.insert({
-			user_id: user.id,
-			type: "sync",
-			status: "pending",
-			total_items: 0,
-			processed_items: 0,
-			current_page: 1,
-			created_at: new Date().toISOString(),
-		})
-		.select("id")
-		.single();
-
-	if (error || !job) {
-		return { error: "Could not start sync." };
-	}
-
-	// Trigger import worker (fire-and-forget)
-	const siteUrl =
-		process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
-	fetch(`${siteUrl}/api/discogs/import`, {
-		method: "POST",
-		headers: {
-			"Content-Type": "application/json",
-			Authorization: `Bearer ${process.env.IMPORT_WORKER_SECRET}`,
-		},
-		body: JSON.stringify({ jobId: job.id }),
-	}).catch(() => {});
-
-	return { success: true };
 }
 
 /**
@@ -152,23 +162,23 @@ export async function disconnectDiscogs(): Promise<{
 	success?: boolean;
 	error?: string;
 }> {
-	const supabase = await createClient();
-	const {
-		data: { user },
-	} = await supabase.auth.getUser();
-
-	if (!user) {
-		throw new Error("Not authenticated");
-	}
-
-	const { success: rlSuccess } = await discogsRateLimit.limit(user.id);
-	if (!rlSuccess) {
-		return { error: "Too many requests. Please wait a moment." };
-	}
-
-	const admin = createAdminClient();
-
 	try {
+		const supabase = await createClient();
+		const {
+			data: { user },
+		} = await supabase.auth.getUser();
+
+		if (!user) {
+			return { error: "Not authenticated" };
+		}
+
+		const { success: rlSuccess } = await discogsRateLimit.limit(user.id);
+		if (!rlSuccess) {
+			return { error: "Too many requests. Please wait a moment." };
+		}
+
+		const admin = createAdminClient();
+
 		// 1. Cancel any active import jobs
 		await admin
 			.from("import_jobs")
@@ -209,8 +219,8 @@ export async function disconnectDiscogs(): Promise<{
 		await deleteTokens(user.id);
 
 		return { success: true };
-	} catch (error) {
-		console.error("Disconnect error:", error);
+	} catch (err) {
+		console.error("[disconnectDiscogs] error:", err);
 		return { error: "Could not disconnect. Please try again." };
 	}
 }
@@ -231,74 +241,79 @@ export async function triggerReimport(): Promise<{
 	error?: string;
 	redirectTo?: string;
 }> {
-	const supabase = await createClient();
-	const {
-		data: { user },
-	} = await supabase.auth.getUser();
+	try {
+		const supabase = await createClient();
+		const {
+			data: { user },
+		} = await supabase.auth.getUser();
 
-	if (!user) {
-		throw new Error("Not authenticated");
+		if (!user) {
+			return { error: "Not authenticated" };
+		}
+
+		const { success: rlSuccess } = await discogsRateLimit.limit(user.id);
+		if (!rlSuccess) {
+			return { error: "Too many requests. Please wait a moment." };
+		}
+
+		const admin = createAdminClient();
+
+		// Check for existing active job
+		const { data: existingJobs } = await admin
+			.from("import_jobs")
+			.select("id")
+			.eq("user_id", user.id)
+			.in("status", ["pending", "processing"])
+			.limit(1);
+
+		if (existingJobs && existingJobs.length > 0) {
+			return { error: "An import is already in progress." };
+		}
+
+		// Delete existing Discogs-sourced items (clean slate)
+		await admin
+			.from("collection_items")
+			.delete()
+			.eq("user_id", user.id)
+			.eq("added_via", "discogs");
+
+		await admin
+			.from("wantlist_items")
+			.delete()
+			.eq("user_id", user.id)
+			.eq("added_via", "discogs");
+
+		// Create fresh collection import job
+		const { data: job } = await admin
+			.from("import_jobs")
+			.insert({
+				user_id: user.id,
+				type: "collection",
+				status: "pending",
+				total_items: 0,
+				processed_items: 0,
+				current_page: 1,
+				created_at: new Date().toISOString(),
+			})
+			.select("id")
+			.single();
+
+		if (job) {
+			const siteUrl =
+				process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
+			fetch(`${siteUrl}/api/discogs/import`, {
+				method: "POST",
+				headers: {
+					"Content-Type": "application/json",
+					Authorization: `Bearer ${process.env.IMPORT_WORKER_SECRET}`,
+				},
+				body: JSON.stringify({ jobId: job.id }),
+			}).catch(() => {});
+		}
+
+		return { success: true, redirectTo: "/import-progress" };
+	} catch (err) {
+		console.error("[triggerReimport] error:", err);
+		return { error: "Failed to start re-import. Please try again." };
 	}
-
-	const { success: rlSuccess } = await discogsRateLimit.limit(user.id);
-	if (!rlSuccess) {
-		return { error: "Too many requests. Please wait a moment." };
-	}
-
-	const admin = createAdminClient();
-
-	// Check for existing active job
-	const { data: existingJobs } = await admin
-		.from("import_jobs")
-		.select("id")
-		.eq("user_id", user.id)
-		.in("status", ["pending", "processing"])
-		.limit(1);
-
-	if (existingJobs && existingJobs.length > 0) {
-		return { error: "An import is already in progress." };
-	}
-
-	// Delete existing Discogs-sourced items (clean slate)
-	await admin
-		.from("collection_items")
-		.delete()
-		.eq("user_id", user.id)
-		.eq("added_via", "discogs");
-
-	await admin
-		.from("wantlist_items")
-		.delete()
-		.eq("user_id", user.id)
-		.eq("added_via", "discogs");
-
-	// Create fresh collection import job
-	const { data: job } = await admin
-		.from("import_jobs")
-		.insert({
-			user_id: user.id,
-			type: "collection",
-			status: "pending",
-			total_items: 0,
-			processed_items: 0,
-			current_page: 1,
-			created_at: new Date().toISOString(),
-		})
-		.select("id")
-		.single();
-
-	if (job) {
-		const siteUrl =
-			process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
-		fetch(`${siteUrl}/api/discogs/import`, {
-			method: "POST",
-			headers: {
-				"Content-Type": "application/json",
-				Authorization: `Bearer ${process.env.IMPORT_WORKER_SECRET}`,
-			},
-			body: JSON.stringify({ jobId: job.id }),
-		}).catch(() => {});
-	}
-
-	return { success: true, redirectTo: "/import-progress" };
 }

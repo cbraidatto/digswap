@@ -216,12 +216,11 @@ describe("createPostAction", () => {
 	});
 
 	test("rejects empty content", async () => {
-		await expect(
-			createPostAction({
-				groupId: TEST_GROUP_ID,
-				content: "",
-			}),
-		).rejects.toThrow("Post content is required");
+		const result = await createPostAction({
+			groupId: TEST_GROUP_ID,
+			content: "",
+		});
+		expect(result).toHaveProperty("error");
 	});
 
 	test("requires group membership (rejects non-member)", async () => {
@@ -230,12 +229,11 @@ describe("createPostAction", () => {
 			[],
 		];
 
-		await expect(
-			createPostAction({
-				groupId: TEST_GROUP_ID,
-				content: "I want to post here",
-			}),
-		).rejects.toThrow("You must be a member of this group to post.");
+		const result = await createPostAction({
+			groupId: TEST_GROUP_ID,
+			content: "I want to post here",
+		});
+		expect(result).toHaveProperty("error", "You must be a member of this group to post.");
 	});
 
 	test("calls logActivity with actionType group_post", async () => {

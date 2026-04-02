@@ -10,8 +10,11 @@ export function ManageButton() {
 	function handleManage() {
 		startTransition(async () => {
 			const { createPortalSession } = await import("@/actions/stripe");
-			const { url } = await createPortalSession();
-			router.push(url);
+			const result = await createPortalSession();
+			if ("error" in result) {
+				return;
+			}
+			router.push(result.url);
 		});
 	}
 
