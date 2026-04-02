@@ -63,42 +63,50 @@ export async function updateSession(request: NextRequest) {
 	// Session allowlist check: verify the user's Supabase session is still tracked
 	// in our user_sessions table. If it was revoked via "terminate session", the
 	// JWT may still be valid but our allowlist won't contain it.
+	//
+	// IMPORTANT: Only block when the user HAS tracked sessions but the current
+	// one isn't among them. If the user has zero tracked sessions (new OAuth
+	// login, onboarding), let them through — it's not a revoked session.
 	if (user) {
 		const isProtectedPath = !pathname.startsWith("/signin") &&
 			!pathname.startsWith("/signup") &&
 			!pathname.startsWith("/forgot-password") &&
 			!pathname.startsWith("/reset-password") &&
-			!pathname.startsWith("/api/");
+			!pathname.startsWith("/api/") &&
+			!pathname.startsWith("/onboarding");
 
 		if (isProtectedPath) {
 			try {
-				// Get current Supabase session ID from the session data
 				const { data: { session } } = await supabase.auth.getSession();
 				const supabaseSessionId = session?.access_token
 					? extractSessionId(session.access_token)
 					: null;
 
 				if (supabaseSessionId) {
-					// Check if this session exists in our allowlist
-					// Uses Supabase client (respects RLS — user can only see own sessions)
-					const { data: tracked } = await supabase
+					// Get ALL tracked sessions for this user
+					const { data: allSessions } = await supabase
 						.from("user_sessions")
-						.select("id")
-						.eq("session_id", supabaseSessionId)
-						.eq("user_id", user.id)
-						.limit(1);
+						.select("session_id")
+						.eq("user_id", user.id);
 
-					if (tracked && tracked.length === 0) {
-						// Session was revoked — sign out and redirect
-						await supabase.auth.signOut();
-						const url = request.nextUrl.clone();
-						url.pathname = "/signin";
-						return NextResponse.redirect(url);
+					// Only enforce allowlist if user has tracked sessions
+					// (zero sessions = new login not yet registered, not a revocation)
+					if (allSessions && allSessions.length > 0) {
+						const isTracked = allSessions.some(
+							(s: { session_id: string }) => s.session_id === supabaseSessionId,
+						);
+
+						if (!isTracked) {
+							// Session was revoked — sign out and redirect
+							await supabase.auth.signOut();
+							const url = request.nextUrl.clone();
+							url.pathname = "/signin";
+							return NextResponse.redirect(url);
+						}
 					}
 				}
 			} catch {
 				// Non-blocking: if allowlist check fails, let the request through
-				// (fail-open for availability, the session is still JWT-valid)
 			}
 		}
 	}
