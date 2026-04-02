@@ -7,6 +7,7 @@ import {
 	browseRecords,
 	getSuggestedRecords,
 } from "@/lib/discovery/queries";
+import { searchRecordsSchema, browseRecordsSchema } from "@/lib/validations/discovery";
 
 const PAGE_SIZE = 20;
 
@@ -18,6 +19,11 @@ const PAGE_SIZE = 20;
  */
 export async function searchRecordsAction(term: string) {
 	try {
+		const parsed = searchRecordsSchema.safeParse({ term });
+		if (!parsed.success) {
+			return [];
+		}
+
 		const supabase = await createClient();
 		const {
 			data: { user },
@@ -32,12 +38,7 @@ export async function searchRecordsAction(term: string) {
 			return [];
 		}
 
-		const trimmed = (term ?? "").trim();
-		if (trimmed.length < 2) {
-			return [];
-		}
-
-		return searchRecords(trimmed);
+		return searchRecords(parsed.data.term);
 	} catch (err) {
 		console.error("[searchRecordsAction] error:", err);
 		return [];
@@ -56,6 +57,11 @@ export async function browseRecordsAction(
 	page = 1,
 ) {
 	try {
+		const parsed = browseRecordsSchema.safeParse({ genre, decade, page });
+		if (!parsed.success) {
+			return [];
+		}
+
 		const supabase = await createClient();
 		const {
 			data: { user },
@@ -70,8 +76,8 @@ export async function browseRecordsAction(
 			return [];
 		}
 
-		const offset = (Math.max(1, page) - 1) * PAGE_SIZE;
-		return browseRecords(genre, decade, PAGE_SIZE, offset);
+		const offset = (parsed.data.page - 1) * PAGE_SIZE;
+		return browseRecords(parsed.data.genre, parsed.data.decade, PAGE_SIZE, offset);
 	} catch (err) {
 		console.error("[browseRecordsAction] error:", err);
 		return [];

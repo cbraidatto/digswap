@@ -17,6 +17,7 @@ import { createClient } from "@/lib/supabase/server";
 import { db } from "@/lib/db";
 import { tradeRequests } from "@/lib/db/schema/trades";
 import { createHandoffToken } from "@/lib/desktop/handoff-token";
+import { handoffTokenSchema } from "@/lib/validations/desktop";
 
 /**
  * Generate a handoff token for the given trade.
@@ -33,6 +34,11 @@ export async function generateHandoffToken(
   tradeId: string,
 ): Promise<{ token: string } | { error: string }> {
   try {
+    const parsed = handoffTokenSchema.safeParse({ tradeId });
+    if (!parsed.success) {
+      return { error: "Invalid trade ID" };
+    }
+
     const supabase = await createClient();
     const {
       data: { user },
@@ -51,7 +57,7 @@ export async function generateHandoffToken(
       .from(tradeRequests)
       .where(
         and(
-          eq(tradeRequests.id, tradeId),
+          eq(tradeRequests.id, parsed.data.tradeId),
           or(
             eq(tradeRequests.requesterId, userId),
             eq(tradeRequests.providerId, userId),
@@ -63,7 +69,7 @@ export async function generateHandoffToken(
       return { error: "Trade not found or you are not a participant" };
     }
 
-    const token = await createHandoffToken(tradeId, userId);
+    const token = await createHandoffToken(parsed.data.tradeId, userId);
     return { token };
   } catch (err) {
     console.error("[generateHandoffToken] failed:", err);

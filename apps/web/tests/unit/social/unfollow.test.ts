@@ -58,8 +58,8 @@ vi.mock("drizzle-orm", () => ({
 
 import { unfollowUser } from "@/actions/social";
 
-const USER_ID = "user-uuid-001";
-const TARGET_ID = "user-uuid-002";
+const USER_ID = "a0000000-0000-4000-a000-000000000001";
+const TARGET_ID = "a0000000-0000-4000-a000-000000000002";
 
 describe("unfollowUser (detailed)", () => {
 	beforeEach(() => {

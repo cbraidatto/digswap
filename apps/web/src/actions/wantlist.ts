@@ -5,12 +5,18 @@ import { createAdminClient } from "@/lib/supabase/admin";
 import { createDiscogsClient, computeRarityScore } from "@/lib/discogs/client";
 import { apiRateLimit } from "@/lib/rate-limit";
 import { searchYouTube } from "@/lib/youtube/client";
+import { addToWantlistSchema, wantlistItemIdSchema, addFromYouTubeSchema } from "@/lib/validations/wantlist";
 export { searchYouTube };
 
 export async function addToWantlist(
 	discogsId: number,
 ): Promise<{ success?: boolean; error?: string }> {
 	try {
+		const parsed = addToWantlistSchema.safeParse({ discogsId });
+		if (!parsed.success) {
+			return { error: parsed.error.issues[0]?.message ?? "Invalid Discogs ID" };
+		}
+
 		const supabase = await createClient();
 		const {
 			data: { user },
@@ -28,7 +34,7 @@ export async function addToWantlist(
 		const { data: existingRelease } = await admin
 			.from("releases")
 			.select("id")
-			.eq("discogs_id", discogsId)
+			.eq("discogs_id", parsed.data.discogsId)
 			.maybeSingle();
 
 		let releaseId: string;
@@ -37,7 +43,7 @@ export async function addToWantlist(
 			releaseId = existingRelease.id;
 		} else {
 			const client = await createDiscogsClient(user.id);
-			const { data: release } = await client.database().getRelease(discogsId);
+			const { data: release } = await client.database().getRelease(parsed.data.discogsId);
 			const have = release.community?.have ?? 0;
 			const want = release.community?.want ?? 0;
 
@@ -96,6 +102,11 @@ export async function removeFromWantlist(
 	wantlistItemId: string,
 ): Promise<{ success?: boolean; error?: string }> {
 	try {
+		const parsed = wantlistItemIdSchema.safeParse({ wantlistItemId });
+		if (!parsed.success) {
+			return { error: "Invalid wantlist item ID" };
+		}
+
 		const supabase = await createClient();
 		const {
 			data: { user },
@@ -112,7 +123,7 @@ export async function removeFromWantlist(
 		const { error } = await admin
 			.from("wantlist_items")
 			.delete()
-			.eq("id", wantlistItemId)
+			.eq("id", parsed.data.wantlistItemId)
 			.eq("user_id", user.id);
 
 		if (error) return { error: "Could not remove from wantlist." };
@@ -127,6 +138,11 @@ export async function markAsFound(
 	wantlistItemId: string,
 ): Promise<{ success?: boolean; error?: string }> {
 	try {
+		const parsed = wantlistItemIdSchema.safeParse({ wantlistItemId });
+		if (!parsed.success) {
+			return { error: "Invalid wantlist item ID" };
+		}
+
 		const supabase = await createClient();
 		const {
 			data: { user },
@@ -144,7 +160,7 @@ export async function markAsFound(
 		const { data: item, error: fetchError } = await admin
 			.from("wantlist_items")
 			.select("id, release_id")
-			.eq("id", wantlistItemId)
+			.eq("id", parsed.data.wantlistItemId)
 			.eq("user_id", user.id)
 			.maybeSingle();
 
@@ -154,7 +170,7 @@ export async function markAsFound(
 		const { error: updateError } = await admin
 			.from("wantlist_items")
 			.update({ found_at: new Date().toISOString() })
-			.eq("id", wantlistItemId)
+			.eq("id", parsed.data.wantlistItemId)
 			.eq("user_id", user.id);
 
 		if (updateError) return { error: "Could not mark as found." };
@@ -200,6 +216,11 @@ export async function addToWantlistFromYouTube(
 	thumbnail: string,
 ): Promise<{ success?: boolean; error?: string; existingOwners?: number }> {
 	try {
+		const parsed = addFromYouTubeSchema.safeParse({ videoId, title, channelTitle, thumbnail });
+		if (!parsed.success) {
+			return { error: parsed.error.issues[0]?.message ?? "Invalid input" };
+		}
+
 		const supabase = await createClient();
 		const {
 			data: { user },
@@ -217,7 +238,7 @@ export async function addToWantlistFromYouTube(
 		const { data: existingRelease } = await admin
 			.from("releases")
 			.select("id")
-			.eq("youtube_video_id", videoId)
+			.eq("youtube_video_id", parsed.data.videoId)
 			.maybeSingle();
 
 		let releaseId: string;
@@ -229,10 +250,10 @@ export async function addToWantlistFromYouTube(
 			const { data: inserted, error: insertError } = await admin
 				.from("releases")
 				.insert({
-					youtube_video_id: videoId,
-					title,
-					artist: channelTitle,
-					cover_image_url: thumbnail,
+					youtube_video_id: parsed.data.videoId,
+					title: parsed.data.title,
+					artist: parsed.data.channelTitle,
+					cover_image_url: parsed.data.thumbnail,
 					updated_at: new Date().toISOString(),
 				})
 				.select("id")

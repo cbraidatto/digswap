@@ -186,7 +186,7 @@ describe("IDOR Prevention", () => {
 				createQueryChain({ data: null, error: null }),
 			);
 
-			const result = await markNotificationRead("notif-owned-by-user-B");
+			const result = await markNotificationRead("a0000000-0000-4000-a000-00000000000b");
 
 			expect(result.error).toBe("Notification not found.");
 		});
@@ -199,7 +199,7 @@ describe("IDOR Prevention", () => {
 				createQueryChain({ data: null, error: null }),
 			);
 
-			const result = await removeFromWantlist("wantlist-item-1");
+			const result = await removeFromWantlist("a0000000-0000-4000-a000-000000000001");
 
 			// Should succeed (no error returned from the query)
 			expect(result.success).toBe(true);

@@ -14,6 +14,13 @@ import {
 	getFollowing,
 	type FollowUser,
 } from "@/lib/social/queries";
+import {
+	logActivitySchema,
+	followUserSchema,
+	loadMoreFeedSchema,
+	userIdSchema,
+	searchUsersSchema,
+} from "@/lib/validations/social";
 
 export interface FeedItem {
 	id: string;
@@ -52,12 +59,17 @@ export async function logActivity(
 	metadata: Record<string, unknown> | null,
 ): Promise<void> {
 	try {
+		const parsed = logActivitySchema.safeParse({ userId, actionType, targetType, targetId, metadata });
+		if (!parsed.success) {
+			return;
+		}
+
 		await db.insert(activityFeed).values({
-			userId,
-			actionType,
-			targetType,
-			targetId,
-			metadata,
+			userId: parsed.data.userId,
+			actionType: parsed.data.actionType,
+			targetType: parsed.data.targetType,
+			targetId: parsed.data.targetId,
+			metadata: parsed.data.metadata,
 		});
 	} catch (err) {
 		console.error("[logActivity] error:", err);
@@ -69,6 +81,11 @@ export async function followUser(
 	targetUserId: string,
 ): Promise<{ success?: boolean; error?: string }> {
 	try {
+		const parsed = followUserSchema.safeParse({ targetUserId });
+		if (!parsed.success) {
+			return { error: "Invalid user ID" };
+		}
+
 		const supabase = await createClient();
 		const {
 			data: { user },
@@ -83,22 +100,22 @@ export async function followUser(
 			return { error: "Too many requests. Please wait a moment." };
 		}
 
-		if (targetUserId === user.id) {
+		if (parsed.data.targetUserId === user.id) {
 			return { error: "Cannot follow yourself" };
 		}
 
 		await db.insert(follows).values({
 			followerId: user.id,
-			followingId: targetUserId,
+			followingId: parsed.data.targetUserId,
 		});
 
 		// Log activity
 		const targetProfile = await db
 			.select({ username: profiles.username })
 			.from(profiles)
-			.where(eq(profiles.id, targetUserId));
+			.where(eq(profiles.id, parsed.data.targetUserId));
 
-		await logActivity(user.id, "followed_user", "user", targetUserId, {
+		await logActivity(user.id, "followed_user", "user", parsed.data.targetUserId, {
 			username: targetProfile[0]?.username ?? null,
 		});
 
@@ -112,6 +129,11 @@ export async function unfollowUser(
 	targetUserId: string,
 ): Promise<{ success?: boolean; error?: string }> {
 	try {
+		const parsed = followUserSchema.safeParse({ targetUserId });
+		if (!parsed.success) {
+			return { error: "Invalid user ID" };
+		}
+
 		const supabase = await createClient();
 		const {
 			data: { user },
@@ -131,7 +153,7 @@ export async function unfollowUser(
 			.where(
 				and(
 					eq(follows.followerId, user.id),
-					eq(follows.followingId, targetUserId),
+					eq(follows.followingId, parsed.data.targetUserId),
 				),
 			);
 
@@ -146,6 +168,11 @@ export async function loadMoreFeed(
 	mode: "personal" | "global",
 ): Promise<FeedItem[]> {
 	try {
+		const parsed = loadMoreFeedSchema.safeParse({ cursor, mode });
+		if (!parsed.success) {
+			return [];
+		}
+
 		const supabase = await createClient();
 		const {
 			data: { user },
@@ -155,11 +182,11 @@ export async function loadMoreFeed(
 			return [];
 		}
 
-		if (mode === "personal") {
-			return getPersonalFeed(user.id, cursor);
+		if (parsed.data.mode === "personal") {
+			return getPersonalFeed(user.id, parsed.data.cursor);
 		}
 
-		return getGlobalFeed(cursor);
+		return getGlobalFeed(parsed.data.cursor);
 	} catch (err) {
 		console.error("[loadMoreFeed] error:", err);
 		return [];
@@ -170,7 +197,12 @@ export async function fetchFollowersList(
 	userId: string,
 ): Promise<FollowUser[]> {
 	try {
-		return await getFollowers(userId);
+		const parsed = userIdSchema.safeParse({ userId });
+		if (!parsed.success) {
+			return [];
+		}
+
+		return await getFollowers(parsed.data.userId);
 	} catch (err) {
 		console.error("[fetchFollowersList] error:", err);
 		return [];
@@ -181,7 +213,12 @@ export async function fetchFollowingList(
 	userId: string,
 ): Promise<FollowUser[]> {
 	try {
-		return await getFollowing(userId);
+		const parsed = userIdSchema.safeParse({ userId });
+		if (!parsed.success) {
+			return [];
+		}
+
+		return await getFollowing(parsed.data.userId);
 	} catch (err) {
 		console.error("[fetchFollowingList] error:", err);
 		return [];
@@ -192,6 +229,11 @@ export async function searchUsers(
 	query: string,
 ): Promise<SearchResult[]> {
 	try {
+		const parsed = searchUsersSchema.safeParse({ query });
+		if (!parsed.success) {
+			return [];
+		}
+
 		const supabase = await createClient();
 		const {
 			data: { user },
@@ -206,13 +248,8 @@ export async function searchUsers(
 			return [];
 		}
 
-		const trimmed = query.trim();
-		if (trimmed.length < 2) {
-			return [];
-		}
-
 		// Sanitize query to prevent SQL injection through ilike patterns
-		const sanitized = trimmed.replace(/[%_\\]/g, "\\$&");
+		const sanitized = parsed.data.query.replace(/[%_\\]/g, "\\$&");
 
 		const matchingProfiles = await db
 			.select({

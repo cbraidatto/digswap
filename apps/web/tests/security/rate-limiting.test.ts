@@ -244,7 +244,7 @@ describe("Server Action Rate Limiting", () => {
 		it("calls apiRateLimit.limit with user.id on followUser", async () => {
 			mockApiLimit.mockResolvedValue({ success: true });
 
-			await followUser("target-user-id");
+			await followUser("a0000000-0000-4000-a000-000000000099");
 
 			expect(mockApiLimit).toHaveBeenCalledWith("test-user-id");
 		});
@@ -252,7 +252,7 @@ describe("Server Action Rate Limiting", () => {
 		it("returns error when apiRateLimit denies on followUser", async () => {
 			mockApiLimit.mockResolvedValue({ success: false });
 
-			const result = await followUser("target-user-id");
+			const result = await followUser("a0000000-0000-4000-a000-000000000099");
 
 			expect(result.error).toContain("Too many requests");
 		});
@@ -300,10 +300,10 @@ describe("Server Action Rate Limiting", () => {
 		it("calls apiRateLimit.limit on markNotificationRead", async () => {
 			mockApiLimit.mockResolvedValue({ success: true });
 			mockFrom.mockReturnValue(
-				createQueryChain({ data: { id: "notif-1" }, error: null }),
+				createQueryChain({ data: { id: "a0000000-0000-4000-a000-000000000011" }, error: null }),
 			);
 
-			await markNotificationRead("notif-1");
+			await markNotificationRead("a0000000-0000-4000-a000-000000000011");
 
 			expect(mockApiLimit).toHaveBeenCalledWith("test-user-id");
 		});
@@ -311,7 +311,7 @@ describe("Server Action Rate Limiting", () => {
 		it("returns error when rate limited on markNotificationRead", async () => {
 			mockApiLimit.mockResolvedValue({ success: false });
 
-			const result = await markNotificationRead("notif-1");
+			const result = await markNotificationRead("a0000000-0000-4000-a000-000000000011");
 
 			expect(result.error).toContain("Too many requests");
 		});

@@ -110,7 +110,7 @@ function makeCrate(id: string, name: string, itemCount = 0) {
 }
 
 const DEFAULT_PROPS = {
-	releaseId: "00000000-0000-0000-0000-000000000099",
+	releaseId: "a0000000-0000-4000-a000-000000000099",
 	discogsId: 12345,
 	title: "Blue Train",
 	artist: "John Coltrane",

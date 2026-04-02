@@ -121,7 +121,7 @@ describe("searchYouTubeForRelease", () => {
 		queryResults = [
 			[
 				{
-					id: "rel-uuid-1",
+					id: "a0000000-0000-4000-a000-000000000001",
 					title: "Kind of Blue",
 					artist: "Miles Davis",
 					youtubeVideoId: "cached123",
@@ -129,7 +129,7 @@ describe("searchYouTubeForRelease", () => {
 			],
 		];
 
-		const result = await searchYouTubeForRelease("rel-uuid-1");
+		const result = await searchYouTubeForRelease("a0000000-0000-4000-a000-000000000001");
 
 		expect(result.videoId).toBe("cached123");
 		expect(mockFetch).not.toHaveBeenCalled();
@@ -139,7 +139,7 @@ describe("searchYouTubeForRelease", () => {
 		queryResults = [
 			[
 				{
-					id: "rel-uuid-1",
+					id: "a0000000-0000-4000-a000-000000000001",
 					title: "Kind of Blue",
 					artist: "Miles Davis",
 					youtubeVideoId: null,
@@ -154,7 +154,7 @@ describe("searchYouTubeForRelease", () => {
 			}),
 		});
 
-		const result = await searchYouTubeForRelease("rel-uuid-1");
+		const result = await searchYouTubeForRelease("a0000000-0000-4000-a000-000000000001");
 
 		expect(result.videoId).toBe("dQw4w9WgXcQ");
 		expect(mockFetch).toHaveBeenCalledTimes(1);
@@ -166,7 +166,7 @@ describe("searchYouTubeForRelease", () => {
 		queryResults = [
 			[
 				{
-					id: "rel-uuid-1",
+					id: "a0000000-0000-4000-a000-000000000001",
 					title: "Obscure Album",
 					artist: "Unknown Artist",
 					youtubeVideoId: null,
@@ -179,7 +179,7 @@ describe("searchYouTubeForRelease", () => {
 			json: async () => ({ items: [] }),
 		});
 
-		const result = await searchYouTubeForRelease("rel-uuid-1");
+		const result = await searchYouTubeForRelease("a0000000-0000-4000-a000-000000000001");
 
 		expect(result.videoId).toBeNull();
 	});
@@ -188,7 +188,7 @@ describe("searchYouTubeForRelease", () => {
 		queryResults = [
 			[
 				{
-					id: "rel-uuid-1",
+					id: "a0000000-0000-4000-a000-000000000001",
 					title: "Kind of Blue",
 					artist: "Miles Davis",
 					youtubeVideoId: null,
@@ -202,7 +202,7 @@ describe("searchYouTubeForRelease", () => {
 			json: async () => ({ error: { code: 403, message: "quotaExceeded" } }),
 		});
 
-		const result = await searchYouTubeForRelease("rel-uuid-1");
+		const result = await searchYouTubeForRelease("a0000000-0000-4000-a000-000000000001");
 
 		expect(result.videoId).toBeNull();
 		expect(result.error).toBeUndefined();
@@ -214,7 +214,7 @@ describe("searchYouTubeForRelease", () => {
 		queryResults = [
 			[
 				{
-					id: "rel-uuid-1",
+					id: "a0000000-0000-4000-a000-000000000001",
 					title: "Kind of Blue",
 					artist: "Miles Davis",
 					youtubeVideoId: null,
@@ -222,7 +222,7 @@ describe("searchYouTubeForRelease", () => {
 			],
 		];
 
-		const result = await searchYouTubeForRelease("rel-uuid-1");
+		const result = await searchYouTubeForRelease("a0000000-0000-4000-a000-000000000001");
 
 		expect(result.videoId).toBeNull();
 		expect(mockFetch).not.toHaveBeenCalled();
@@ -231,7 +231,7 @@ describe("searchYouTubeForRelease", () => {
 	test("returns error when user is not authenticated", async () => {
 		mockGetUser.mockResolvedValue({ data: { user: null } });
 
-		const result = await searchYouTubeForRelease("rel-uuid-1");
+		const result = await searchYouTubeForRelease("a0000000-0000-4000-a000-000000000001");
 
 		expect(result.videoId).toBeNull();
 		expect(result.error).toBe("Authentication required");
@@ -240,7 +240,7 @@ describe("searchYouTubeForRelease", () => {
 	test("returns error when rate limited", async () => {
 		mockRateLimitFn.mockResolvedValue({ success: false });
 
-		const result = await searchYouTubeForRelease("rel-uuid-1");
+		const result = await searchYouTubeForRelease("a0000000-0000-4000-a000-000000000001");
 
 		expect(result.videoId).toBeNull();
 		expect(result.error).toBe("Rate limited");

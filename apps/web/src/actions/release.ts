@@ -7,6 +7,7 @@ import { eq } from "drizzle-orm";
 import { apiRateLimit } from "@/lib/rate-limit";
 import { createClient } from "@/lib/supabase/server";
 import { getReviewsForRelease } from "@/lib/community/queries";
+import { releaseIdSchema, getMoreReviewsSchema } from "@/lib/validations/release";
 
 const YOUTUBE_SEARCH_URL = "https://www.googleapis.com/youtube/v3/search";
 
@@ -22,6 +23,11 @@ export async function searchYouTubeForRelease(
   releaseInternalId: string,
 ): Promise<{ videoId: string | null; error?: string }> {
   try {
+    const parsed = releaseIdSchema.safeParse({ releaseInternalId });
+    if (!parsed.success) {
+      return { videoId: null, error: "Invalid release ID" };
+    }
+
     // Authenticate user (rate limiting requires user ID)
     const supabase = await createClient();
     const {
@@ -42,7 +48,7 @@ export async function searchYouTubeForRelease(
         youtubeVideoId: releases.youtubeVideoId,
       })
       .from(releases)
-      .where(eq(releases.id, releaseInternalId))
+      .where(eq(releases.id, parsed.data.releaseInternalId))
       .limit(1);
 
     if (!release) return { videoId: null, error: "Release not found" };
@@ -96,7 +102,12 @@ export async function searchYouTubeForRelease(
  */
 export async function getMoreReviews(releaseId: string, cursor: string, limit = 10) {
   try {
-    return await getReviewsForRelease(releaseId, cursor, limit);
+    const parsed = getMoreReviewsSchema.safeParse({ releaseId, cursor, limit });
+    if (!parsed.success) {
+      return [];
+    }
+
+    return await getReviewsForRelease(parsed.data.releaseId, parsed.data.cursor, parsed.data.limit);
   } catch (err) {
     console.error("[getMoreReviews] error:", err);
     return [];

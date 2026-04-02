@@ -5,22 +5,7 @@ import { db } from "@/lib/db";
 import { profiles } from "@/lib/db/schema/users";
 import { apiRateLimit } from "@/lib/rate-limit";
 import { createClient } from "@/lib/supabase/server";
-
-/**
- * Validate display name: 3-50 chars, alphanumeric plus hyphens/underscores.
- */
-function validateDisplayName(name: string): string | null {
-	if (!name || name.trim().length < 3) {
-		return "Display name must be at least 3 characters.";
-	}
-	if (name.trim().length > 50) {
-		return "Display name must be 50 characters or less.";
-	}
-	if (!/^[a-zA-Z0-9_-]+$/.test(name.trim())) {
-		return "Display name can only contain letters, numbers, hyphens, and underscores.";
-	}
-	return null;
-}
+import { onboardingProfileSchema, skipToStepSchema } from "@/lib/validations/onboarding";
 
 /**
  * Update user profile during onboarding step 1.
@@ -48,18 +33,18 @@ export async function updateProfile(
 	const displayName = formData.get("display_name") as string;
 	const avatarUrl = formData.get("avatar_url") as string | null;
 
-	// Validate display name
-	const validationError = validateDisplayName(displayName);
-	if (validationError) {
-		return { success: false, error: validationError };
+	// Validate with Zod
+	const parsed = onboardingProfileSchema.safeParse({ display_name: displayName, avatar_url: avatarUrl });
+	if (!parsed.success) {
+		return { success: false, error: parsed.error.issues[0]?.message ?? "Invalid input" };
 	}
 
 	try {
 		await db
 			.update(profiles)
 			.set({
-				displayName: displayName.trim(),
-				...(avatarUrl && avatarUrl.trim() ? { avatarUrl: avatarUrl.trim() } : {}),
+				displayName: parsed.data.display_name.trim(),
+				...(parsed.data.avatar_url && parsed.data.avatar_url.trim() ? { avatarUrl: parsed.data.avatar_url.trim() } : {}),
 				updatedAt: new Date(),
 			})
 			.where(eq(profiles.id, user.id));
@@ -121,7 +106,12 @@ export async function completeOnboarding(): Promise<{
  */
 export async function skipToStep(step: number): Promise<{ success: boolean; nextStep: number; error?: string }> {
 	try {
-		return { success: true, nextStep: step };
+		const parsed = skipToStepSchema.safeParse({ step });
+		if (!parsed.success) {
+			return { success: false, nextStep: step, error: "Invalid step number" };
+		}
+
+		return { success: true, nextStep: parsed.data.step };
 	} catch (err) {
 		console.error("[skipToStep] error:", err);
 		return { success: false, nextStep: step, error: "Failed to skip step." };

@@ -229,9 +229,13 @@ vi.mock("@/lib/validations/community", () => ({
 vi.mock("@/lib/validations/profile", () => ({
 	updateProfileSchema: { safeParse: vi.fn().mockReturnValue({ success: true, data: {} }) },
 }));
-vi.mock("@/lib/validations/common", () => ({
-	sanitizeWildcards: vi.fn((v: string) => v),
-}));
+vi.mock("@/lib/validations/common", async (importOriginal) => {
+	const actual = await importOriginal<typeof import("@/lib/validations/common")>();
+	return {
+		...actual,
+		sanitizeWildcards: vi.fn((v: string) => v),
+	};
+});
 
 // ---------------------------------------------------------------------------
 // Import actions AFTER mocks
@@ -276,7 +280,7 @@ describe("Auth Bypass Prevention", () => {
 
 	describe("social.ts auth guard", () => {
 		it("should require authentication for followUser", async () => {
-			const result = await followUser("target-user-id");
+			const result = await followUser("a0000000-0000-4000-a000-000000000099");
 			expect(result).toHaveProperty("error");
 			expect(result.error).toMatch(/not authenticated/i);
 		});
@@ -296,7 +300,7 @@ describe("Auth Bypass Prevention", () => {
 
 	describe("profile.ts auth guard", () => {
 		it("should require authentication for updateShowcase", async () => {
-			const result = await updateShowcase("searching", "release-id");
+			const result = await updateShowcase("searching", "a0000000-0000-4000-a000-000000000022");
 			expect(result).toHaveProperty("error");
 			expect(result.error).toMatch(/unauthenticated/i);
 		});
@@ -357,7 +361,7 @@ describe("Auth Bypass Prevention", () => {
 		});
 
 		it("should require authentication for markNotificationRead", async () => {
-			const result = await markNotificationRead("notif-id");
+			const result = await markNotificationRead("a0000000-0000-4000-a000-000000000033");
 			expect(result).toHaveProperty("error");
 			expect(result.error).toMatch(/not authenticated/i);
 		});

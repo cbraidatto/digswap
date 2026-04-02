@@ -247,7 +247,7 @@ describe("RLS Policy Coverage", () => {
 				{ file: "community.ts",  patterns: ["createPostSchema", "createReviewSchema"] },
 				{ file: "mfa.ts",        patterns: ["totpSchema", "backupCodeSchema"] },
 				{ file: "profile.ts",    patterns: ["updateProfileSchema"] },
-				{ file: "onboarding.ts", patterns: ["validateDisplayName"] },
+				{ file: "onboarding.ts", patterns: ["validateDisplayName", "onboardingProfileSchema", "safeParse"] },
 			];
 
 			for (const { file, patterns } of filesWithUserInput) {

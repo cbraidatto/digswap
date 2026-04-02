@@ -5,6 +5,7 @@ import { db } from "@/lib/db";
 import { leads, type LeadStatus, type LeadTargetType } from "@/lib/db/schema/leads";
 import { apiRateLimit } from "@/lib/rate-limit";
 import { createClient } from "@/lib/supabase/server";
+import { saveLeadSchema, getLeadSchema, getLeadsFilterSchema } from "@/lib/validations/leads";
 
 export async function saveLead(
   targetType: LeadTargetType,
@@ -13,6 +14,11 @@ export async function saveLead(
   status: LeadStatus,
 ) {
   try {
+    const parsed = saveLeadSchema.safeParse({ targetType, targetId, note, status });
+    if (!parsed.success) {
+      return { error: parsed.error.issues[0]?.message ?? "Invalid input" };
+    }
+
     const supabase = await createClient();
     const {
       data: { user },
@@ -48,6 +54,11 @@ export async function saveLead(
 
 export async function getLead(targetType: LeadTargetType, targetId: string) {
   try {
+    const parsed = getLeadSchema.safeParse({ targetType, targetId });
+    if (!parsed.success) {
+      return null;
+    }
+
     const supabase = await createClient();
     const {
       data: { user },
@@ -81,6 +92,11 @@ export async function getLeads(filters?: {
   targetType?: LeadTargetType;
 }) {
   try {
+    const parsed = getLeadsFilterSchema.safeParse(filters);
+    if (!parsed.success) {
+      return [];
+    }
+
     const supabase = await createClient();
     const {
       data: { user },

@@ -7,6 +7,7 @@ import { createAdminClient } from "@/lib/supabase/admin";
 import { db } from "@/lib/db";
 import { userSessions } from "@/lib/db/schema/sessions";
 import { apiRateLimit } from "@/lib/rate-limit";
+import { sessionIdSchema, enforceSessionLimitSchema, recordSessionSchema } from "@/lib/validations/sessions";
 
 /**
  * Maximum concurrent sessions allowed per user (D-13).
@@ -115,7 +116,8 @@ export async function getSessions(): Promise<{
 export async function terminateSession(
 	sessionId: string,
 ): Promise<{ success: boolean; error?: string }> {
-	if (!sessionId || typeof sessionId !== "string") {
+	const parsed = sessionIdSchema.safeParse({ sessionId });
+	if (!parsed.success) {
 		return { success: false, error: "Invalid session ID" };
 	}
 
@@ -139,7 +141,7 @@ export async function terminateSession(
 			.select()
 			.from(userSessions)
 			.where(
-				and(eq(userSessions.id, sessionId), eq(userSessions.userId, userId)),
+				and(eq(userSessions.id, parsed.data.sessionId), eq(userSessions.userId, userId)),
 			)
 			.limit(1);
 
@@ -158,7 +160,7 @@ export async function terminateSession(
 			await admin
 				.from("user_sessions")
 				.delete()
-				.eq("id", sessionId)
+				.eq("id", parsed.data.sessionId)
 				.eq("user_id", userId);
 		} catch (adminError) {
 			console.error("Admin session invalidation error:", adminError);
@@ -168,7 +170,7 @@ export async function terminateSession(
 		await db
 			.delete(userSessions)
 			.where(
-				and(eq(userSessions.id, sessionId), eq(userSessions.userId, userId)),
+				and(eq(userSessions.id, parsed.data.sessionId), eq(userSessions.userId, userId)),
 			);
 
 		return { success: true };
@@ -192,11 +194,16 @@ export async function enforceSessionLimit(
 	newSessionId: string,
 ): Promise<void> {
 	try {
+		const parsed = enforceSessionLimitSchema.safeParse({ userId, newSessionId });
+		if (!parsed.success) {
+			return;
+		}
+
 		// Count active sessions
 		const sessions = await db
 			.select()
 			.from(userSessions)
-			.where(eq(userSessions.userId, userId))
+			.where(eq(userSessions.userId, parsed.data.userId))
 			.orderBy(asc(userSessions.createdAt));
 
 		if (sessions.length >= MAX_SESSIONS) {
@@ -246,6 +253,11 @@ export async function recordSession(
 	sessionId: string,
 ): Promise<void> {
 	try {
+		const parsed = recordSessionSchema.safeParse({ userId, sessionId });
+		if (!parsed.success) {
+			return;
+		}
+
 		const headerStore = await headers();
 		const deviceInfo = headerStore.get("user-agent") || "unknown";
 		const ipAddress =
@@ -255,14 +267,14 @@ export async function recordSession(
 
 		// Insert the new session
 		await db.insert(userSessions).values({
-			userId,
-			sessionId,
+			userId: parsed.data.userId,
+			sessionId: parsed.data.sessionId,
 			deviceInfo,
 			ipAddress,
 		});
 
 		// Enforce session limit after insertion
-		await enforceSessionLimit(userId, sessionId);
+		await enforceSessionLimit(parsed.data.userId, parsed.data.sessionId);
 	} catch (err) {
 		console.error("Failed to record session:", err);
 		// Session recording failure should not block login

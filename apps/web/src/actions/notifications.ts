@@ -10,12 +10,23 @@ import {
 	getPreferences,
 	upsertPreferences,
 } from "@/lib/notifications/queries";
+import {
+	notificationPageSchema,
+	recentNotificationsSchema,
+	notificationIdSchema,
+	updatePreferencesSchema,
+} from "@/lib/validations/notifications";
 
 /**
  * Get a page of notifications for the current user.
  */
 export async function getNotificationsAction(page = 1) {
 	try {
+		const parsed = notificationPageSchema.safeParse({ page });
+		if (!parsed.success) {
+			return { items: [], total: 0, page: 1, pageSize: 20 };
+		}
+
 		const supabase = await createClient();
 		const {
 			data: { user },
@@ -25,7 +36,7 @@ export async function getNotificationsAction(page = 1) {
 			return { items: [], total: 0, page: 1, pageSize: 20 };
 		}
 
-		return getNotificationPage(user.id, page);
+		return getNotificationPage(user.id, parsed.data.page);
 	} catch (err) {
 		console.error("[getNotificationsAction] error:", err);
 		return { items: [], total: 0, page: 1, pageSize: 20 };
@@ -37,6 +48,11 @@ export async function getNotificationsAction(page = 1) {
  */
 export async function getRecentNotificationsAction(limit = 5) {
 	try {
+		const parsed = recentNotificationsSchema.safeParse({ limit });
+		if (!parsed.success) {
+			return [];
+		}
+
 		const supabase = await createClient();
 		const {
 			data: { user },
@@ -46,7 +62,7 @@ export async function getRecentNotificationsAction(limit = 5) {
 			return [];
 		}
 
-		return getRecentNotifications(user.id, limit);
+		return getRecentNotifications(user.id, parsed.data.limit);
 	} catch (err) {
 		console.error("[getRecentNotificationsAction] error:", err);
 		return [];
@@ -82,6 +98,11 @@ export async function markNotificationRead(
 	notificationId: string,
 ): Promise<{ success?: boolean; error?: string }> {
 	try {
+		const parsed = notificationIdSchema.safeParse({ notificationId });
+		if (!parsed.success) {
+			return { error: "Invalid notification ID" };
+		}
+
 		const supabase = await createClient();
 		const {
 			data: { user },
@@ -101,7 +122,7 @@ export async function markNotificationRead(
 		const { data, error } = await admin
 			.from("notifications")
 			.update({ read: true })
-			.eq("id", notificationId)
+			.eq("id", parsed.data.notificationId)
 			.eq("user_id", user.id) // Ownership check
 			.select("id")
 			.maybeSingle();
@@ -218,6 +239,11 @@ export async function updatePreferencesAction(prefs: {
 	pushEnabled?: boolean;
 }): Promise<{ success?: boolean; error?: string }> {
 	try {
+		const parsed = updatePreferencesSchema.safeParse(prefs);
+		if (!parsed.success) {
+			return { error: "Invalid preferences data" };
+		}
+
 		const supabase = await createClient();
 		const {
 			data: { user },
