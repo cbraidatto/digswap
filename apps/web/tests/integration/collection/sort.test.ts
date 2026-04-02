@@ -11,8 +11,8 @@ const mockSqlCalls: unknown[][] = [];
 
 vi.mock("drizzle-orm", () => ({
 	eq: (...args: unknown[]) => mockEq(...args),
-	desc: (...args: unknown[]) => mockDesc(...args),
-	asc: (...args: unknown[]) => mockAsc(...args),
+	desc: (arg: unknown) => mockDesc(arg),
+	asc: (arg: unknown) => mockAsc(arg),
 	and: (...args: unknown[]) => mockAnd(...args),
 	gte: (...args: unknown[]) => mockGte(...args),
 	lt: (...args: unknown[]) => mockLt(...args),

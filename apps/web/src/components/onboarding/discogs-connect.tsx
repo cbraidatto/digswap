@@ -20,15 +20,10 @@ export function DiscogsConnect() {
 	const handleConnect = () => {
 		startTransition(async () => {
 			try {
-				await connectDiscogs();
-				// redirect happens inside the server action, this line won't be reached
-			} catch (error) {
-				// redirect() throws a special NEXT_REDIRECT error -- only show toast for real errors
-				const message =
-					error instanceof Error ? error.message : String(error);
-				if (!message.includes("NEXT_REDIRECT")) {
-					toast.error("Could not connect to Discogs. Please try again.");
-				}
+				const { url } = await connectDiscogs();
+				window.location.href = url;
+			} catch {
+				toast.error("Could not connect to Discogs. Please try again.");
 			}
 		});
 	};

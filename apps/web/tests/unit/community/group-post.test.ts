@@ -167,6 +167,9 @@ vi.mock("@/lib/community/queries", () => ({
 import { createPostAction } from "@/actions/community";
 import { logActivity } from "@/actions/social";
 
+const TEST_GROUP_ID = "11111111-1111-4111-8111-111111111111";
+const TEST_RELEASE_ID = "22222222-2222-4222-8222-222222222222";
+
 describe("createPostAction", () => {
 	beforeEach(() => {
 		vi.clearAllMocks();
@@ -187,7 +190,7 @@ describe("createPostAction", () => {
 		];
 
 		const result = await createPostAction({
-			groupId: "group-1",
+			groupId: TEST_GROUP_ID,
 			content: "Check out this rare pressing!",
 		});
 
@@ -203,9 +206,9 @@ describe("createPostAction", () => {
 		];
 
 		const result = await createPostAction({
-			groupId: "group-1",
+			groupId: TEST_GROUP_ID,
 			content: "My latest find",
-			releaseId: "release-1",
+			releaseId: TEST_RELEASE_ID,
 		});
 
 		expect(result).toEqual({ id: "post-2" });
@@ -215,10 +218,10 @@ describe("createPostAction", () => {
 	test("rejects empty content", async () => {
 		await expect(
 			createPostAction({
-				groupId: "group-1",
+				groupId: TEST_GROUP_ID,
 				content: "",
 			}),
-		).rejects.toThrow("Post content cannot be empty.");
+		).rejects.toThrow("Post content is required");
 	});
 
 	test("requires group membership (rejects non-member)", async () => {
@@ -229,7 +232,7 @@ describe("createPostAction", () => {
 
 		await expect(
 			createPostAction({
-				groupId: "group-1",
+				groupId: TEST_GROUP_ID,
 				content: "I want to post here",
 			}),
 		).rejects.toThrow("You must be a member of this group to post.");
@@ -244,7 +247,7 @@ describe("createPostAction", () => {
 		];
 
 		await createPostAction({
-			groupId: "group-1",
+			groupId: TEST_GROUP_ID,
 			content: "New post content",
 		});
 
@@ -254,7 +257,7 @@ describe("createPostAction", () => {
 			"group_post",
 			"post-1",
 			expect.objectContaining({
-				groupId: "group-1",
+				groupId: TEST_GROUP_ID,
 				groupName: "Jazz Group",
 				groupSlug: "jazz-group",
 			}),

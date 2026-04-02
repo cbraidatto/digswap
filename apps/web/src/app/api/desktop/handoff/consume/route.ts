@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { verifyAndConsumeHandoffToken } from "@/lib/desktop/handoff-token";
+import { tradeRateLimit } from "@/lib/rate-limit";
 
 export const runtime = "nodejs";
 
@@ -41,6 +42,12 @@ export async function POST(request: NextRequest) {
 
   if (userError || !user) {
     return NextResponse.json({ error: "Invalid desktop session" }, { status: 401 });
+  }
+
+  // SEC-04: rate limit by user ID — prevents brute force of handoff tokens
+  const { success: rlSuccess } = await tradeRateLimit.limit(user.id);
+  if (!rlSuccess) {
+    return NextResponse.json({ error: "Too many requests" }, { status: 429 });
   }
 
   const consumed = await verifyAndConsumeHandoffToken(token, tradeId, user.id);

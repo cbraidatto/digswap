@@ -17,6 +17,7 @@ import { sendWantlistMatchEmail } from "@/lib/notifications/email";
 describe("sendWantlistMatchEmail", () => {
 	beforeEach(() => {
 		vi.clearAllMocks();
+		process.env.RESEND_API_KEY = "test-resend-key";
 		mockSend.mockResolvedValue({ data: { id: "email-123" }, error: null });
 	});
 

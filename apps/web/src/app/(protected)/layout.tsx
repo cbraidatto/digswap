@@ -20,6 +20,7 @@ export default async function ProtectedLayout({ children }: { children: React.Re
 		.select({
 			displayName: profiles.displayName,
 			avatarUrl: profiles.avatarUrl,
+			subscriptionTier: profiles.subscriptionTier,
 		})
 		.from(profiles)
 		.where(eq(profiles.id, user.id))
@@ -31,6 +32,7 @@ export default async function ProtectedLayout({ children }: { children: React.Re
 				id: user.id,
 				displayName: profile?.displayName ?? null,
 				avatarUrl: profile?.avatarUrl ?? null,
+				subscriptionTier: profile?.subscriptionTier ?? "free",
 			}}
 			banner={<ImportBanner userId={user.id} />}
 		>

@@ -35,11 +35,11 @@ describe("Security Headers Configuration", () => {
 		securityHeaders = [];
 
 		// Check each required header exists in the config
+		// CSP is handled per-request in middleware (nonce-based), not in next.config.ts
 		const requiredHeaders = [
 			{ key: "X-Frame-Options", value: "DENY" },
 			{ key: "Strict-Transport-Security", value: "max-age=" },
 			{ key: "X-Content-Type-Options", value: "nosniff" },
-			{ key: "Content-Security-Policy", value: "default-src" },
 			{ key: "Referrer-Policy", value: "" },
 			{ key: "Permissions-Policy", value: "" },
 		];
@@ -79,15 +79,16 @@ describe("Security Headers Configuration", () => {
 		expect(content).toContain('"nosniff"');
 	});
 
-	it("includes Content-Security-Policy header", async () => {
+	it("CSP is handled by middleware (not static next.config headers)", async () => {
+		// CSP uses per-request nonces — it cannot be a static header in next.config.ts.
+		// Verify the middleware file has the CSP generator reference.
 		const fs = await import("node:fs");
 		const path = await import("node:path");
-		const configPath = path.resolve(process.cwd(), "next.config.ts");
-		const content = fs.readFileSync(configPath, "utf-8");
+		const middlewarePath = path.resolve(process.cwd(), "src/middleware.ts");
+		const content = fs.readFileSync(middlewarePath, "utf-8");
 
-		expect(content).toContain('"Content-Security-Policy"');
-		expect(content).toContain("default-src 'self'");
-		expect(content).toContain("frame-ancestors 'none'");
+		expect(content).toContain("Content-Security-Policy");
+		expect(content).toContain("generateCspHeader");
 	});
 
 	it("includes Referrer-Policy header", async () => {

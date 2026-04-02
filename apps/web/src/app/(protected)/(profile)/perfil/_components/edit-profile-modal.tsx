@@ -62,7 +62,7 @@ export function EditProfileModal({ initial }: EditProfileModalProps) {
 		const result = await uploadAvatar(fd);
 		setIsUploadingAvatar(false);
 		if ("error" in result) {
-			setError(result.error);
+			setError(result.error ?? "Failed to upload avatar.");
 		} else {
 			setAvatarUrl(result.url ?? null);
 		}
@@ -76,7 +76,7 @@ export function EditProfileModal({ initial }: EditProfileModalProps) {
 				youtubeUrl, instagramUrl, soundcloudUrl, discogsUrl, beatportUrl,
 			});
 			if ("error" in result) {
-				setError(result.error);
+				setError(result.error ?? "Failed to update profile.");
 				return;
 			}
 			router.refresh();

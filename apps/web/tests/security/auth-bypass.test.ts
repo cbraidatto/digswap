@@ -402,6 +402,9 @@ describe("Auth Bypass Prevention", () => {
 		it("should require authentication for enrollTotp", async () => {
 			const result = await enrollTotp();
 			expect(result.success).toBe(false);
+			if (result.success) {
+				throw new Error("Expected enrollTotp to fail for unauthenticated user.");
+			}
 			expect(result.error).toMatch(/not authenticated/i);
 		});
 	});

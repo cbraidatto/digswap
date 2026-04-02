@@ -1,12 +1,18 @@
 import { app, BrowserWindow } from "electron";
 import type { DesktopProtocolPayload } from "../shared/ipc-types";
-import { registerDesktopIpc } from "./ipc";
 import { resolveDesktopSupabaseConfig } from "./config";
+import { registerDesktopIpc } from "./ipc";
 import { extractProtocolUrlFromArgv, parseProtocolUrl, registerProtocolClient } from "./protocol";
 import { DesktopSessionStore } from "./session-store";
 import { DesktopSupabaseAuth } from "./supabase-auth";
 import { DesktopTradeRuntime } from "./trade-runtime";
-import { createMainWindow, getMainWindow } from "./window";
+import {
+  createMainWindow,
+  createTradeWindow,
+  focusMainWindow,
+  focusTradeWindow,
+  getMainWindow,
+} from "./window";
 
 const gotLock = app.requestSingleInstanceLock();
 
@@ -20,30 +26,28 @@ const queuedProtocolUrls: string[] = [];
 let sessionStore: DesktopSessionStore | null = null;
 let authRuntime: DesktopSupabaseAuth | null = null;
 let tradeRuntime: DesktopTradeRuntime | null = null;
+let desktopSiteUrl = "http://localhost:3000";
+let desktopSupabaseUrl: string | null = null;
 
-function focusMainWindow() {
-  const mainWindow = getMainWindow();
-  if (!mainWindow) {
-    return;
-  }
-
-  if (mainWindow.isMinimized()) {
-    mainWindow.restore();
-  }
-
-  mainWindow.show();
-  mainWindow.focus();
+function resolveDesktopSiteUrl() {
+  return (
+    process.env.DESKTOP_WEB_APP_URL ??
+    process.env.NEXT_PUBLIC_APP_URL ??
+    process.env.NEXT_PUBLIC_SITE_URL ??
+    "http://localhost:3000"
+  );
 }
 
-function publishProtocolPayload(payload: DesktopProtocolPayload) {
+async function publishProtocolPayload(payload: DesktopProtocolPayload) {
   sessionStore?.setLastProtocolPayload(payload);
 
-  const mainWindow = getMainWindow();
-  if (!mainWindow) {
+  if (payload.kind === "trade-handoff") {
+    const tradeWindow = await createTradeWindow();
+    tradeWindow.webContents.send("desktop:protocol-payload", payload);
+    focusTradeWindow();
     return;
   }
 
-  mainWindow.webContents.send("desktop:protocol-payload", payload);
   focusMainWindow();
 }
 
@@ -58,7 +62,7 @@ async function processProtocolUrl(rawUrl: string) {
     await authRuntime.handleAuthCallback(payload);
   }
 
-  publishProtocolPayload(payload);
+  await publishProtocolPayload(payload);
 }
 
 function enqueueProtocolUrl(rawUrl: string | null) {
@@ -75,8 +79,13 @@ function enqueueProtocolUrl(rawUrl: string | null) {
 }
 
 app.on("second-instance", (_event, argv) => {
-  enqueueProtocolUrl(extractProtocolUrlFromArgv(argv));
-  focusMainWindow();
+  const protocolUrl = extractProtocolUrlFromArgv(argv);
+  if (!protocolUrl) {
+    focusMainWindow();
+    return;
+  }
+
+  enqueueProtocolUrl(protocolUrl);
 });
 
 app.on("open-url", (event, rawUrl) => {
@@ -90,6 +99,9 @@ app.whenReady().then(async () => {
   sessionStore = new DesktopSessionStore();
 
   const { config, error } = resolveDesktopSupabaseConfig();
+  desktopSiteUrl = config?.siteUrl ?? resolveDesktopSiteUrl();
+  desktopSupabaseUrl = config?.url ?? null;
+
   authRuntime = new DesktopSupabaseAuth(config, error, sessionStore);
   tradeRuntime = new DesktopTradeRuntime(config, authRuntime, sessionStore);
   await tradeRuntime.initialize();
@@ -100,7 +112,10 @@ app.whenReady().then(async () => {
     tradeRuntime,
   });
 
-  await createMainWindow();
+  await createMainWindow({
+    siteUrl: desktopSiteUrl,
+    supabaseUrl: desktopSupabaseUrl,
+  });
 
   const startupProtocolUrl = extractProtocolUrlFromArgv(process.argv);
   if (startupProtocolUrl) {
@@ -108,16 +123,21 @@ app.whenReady().then(async () => {
   }
 
   for (const queuedProtocolUrl of queuedProtocolUrls.splice(0)) {
-    void processProtocolUrl(queuedProtocolUrl);
+    await processProtocolUrl(queuedProtocolUrl);
   }
 
   app.on("activate", async () => {
     if (BrowserWindow.getAllWindows().length === 0) {
-      await createMainWindow();
+      await createMainWindow({
+        siteUrl: desktopSiteUrl,
+        supabaseUrl: desktopSupabaseUrl,
+      });
       return;
     }
 
-    focusMainWindow();
+    if (getMainWindow()) {
+      focusMainWindow();
+    }
   });
 });
 

@@ -2,6 +2,7 @@ import Link from "next/link";
 import type { UserRanking, UserBadge } from "@/lib/gamification/queries";
 import { TrustStrip } from "@/components/trust/trust-strip";
 import { FollowButton } from "./follow-button";
+import { PremiumBadge } from "@/components/ui/PremiumBadge";
 
 interface ProfileHeaderProps {
 	profile: {
@@ -11,6 +12,7 @@ interface ProfileHeaderProps {
 		avatarUrl: string | null;
 		bio: string | null;
 		createdAt: Date;
+		subscriptionTier?: string;
 	};
 	followCounts: { followingCount: number; followerCount: number };
 	isFollowing: boolean;
@@ -30,6 +32,9 @@ export function ProfileHeader({
 	isAuthenticated = true,
 }: ProfileHeaderProps) {
 	const displayName = (profile.displayName || "DIGGER").toUpperCase();
+	const isPremium =
+		profile.subscriptionTier === "premium_monthly" ||
+		profile.subscriptionTier === "premium_annual";
 	const memberYear = new Date(profile.createdAt).getFullYear();
 
 	return (
@@ -52,9 +57,12 @@ export function ProfileHeader({
 
 				{/* Info Section */}
 				<div className="flex-1 min-w-0">
-					<h1 className="text-3xl font-bold tracking-tight font-heading text-on-surface">
-						{displayName}
-					</h1>
+					<div className="flex items-center gap-2 flex-wrap">
+						<h1 className="text-3xl font-bold tracking-tight font-heading text-on-surface">
+							{displayName}
+						</h1>
+						{isPremium && <PremiumBadge />}
+					</div>
 					{profile.username && (
 						<p className="text-sm font-mono text-on-surface-variant">
 							@{profile.username}

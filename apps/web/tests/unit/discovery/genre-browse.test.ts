@@ -85,11 +85,24 @@ vi.mock("@/lib/collection/filters", () => ({
 import { browseRecords } from "@/lib/discovery/queries";
 import { db } from "@/lib/db";
 
+type DbMock = {
+	select: ReturnType<typeof vi.fn>;
+	from: ReturnType<typeof vi.fn>;
+	where: ReturnType<typeof vi.fn>;
+	orderBy: ReturnType<typeof vi.fn>;
+	limit: ReturnType<typeof vi.fn>;
+	innerJoin: ReturnType<typeof vi.fn>;
+	leftJoin: ReturnType<typeof vi.fn>;
+	groupBy: ReturnType<typeof vi.fn>;
+	offset: ReturnType<typeof vi.fn>;
+};
+
 describe("browseRecords", () => {
 	beforeEach(() => {
 		vi.clearAllMocks();
 		queryCallCount = 0;
 		queryResults = [];
+		const dbMock = db as unknown as DbMock;
 		// Re-setup the chain returns after clearAllMocks
 		for (const method of [
 			"select",
@@ -101,10 +114,8 @@ describe("browseRecords", () => {
 			"leftJoin",
 			"groupBy",
 			"offset",
-		]) {
-			vi.mocked(
-				(db as Record<string, unknown>)[method] as () => unknown,
-			).mockImplementation(() => db);
+		] as const) {
+			dbMock[method].mockImplementation(() => db);
 		}
 	});
 
@@ -206,14 +217,11 @@ describe("browseRecords", () => {
 
 	test("applies pagination with limit and offset", async () => {
 		queryResults = [[]];
+		const dbMock = db as unknown as DbMock;
 
 		await browseRecords("Jazz", null, 10, 20);
 
-		expect(
-			vi.mocked(db.limit as (n: number) => unknown),
-		).toHaveBeenCalledWith(10);
-		expect(
-			vi.mocked(db.offset as (n: number) => unknown),
-		).toHaveBeenCalledWith(20);
+		expect(dbMock.limit).toHaveBeenCalledWith(10);
+		expect(dbMock.offset).toHaveBeenCalledWith(20);
 	});
 });

@@ -2,6 +2,8 @@ import { redirect } from "next/navigation";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { listTradeThreads, type TradeThreadListItem } from "@/lib/trades/messages";
+import { getQuotaStatus } from "@/lib/entitlements";
+import { TradeQuotaBanner } from "@/components/trades/TradeQuotaBanner";
 
 const TERMINAL_STATUSES = new Set(["completed", "declined", "cancelled", "expired"]);
 
@@ -90,10 +92,20 @@ export default async function TradesPage() {
 	} = await supabase.auth.getUser();
 	if (!user) redirect("/signin");
 
-	const threads = await listTradeThreads(user.id);
+	const [threads, quota] = await Promise.all([
+		listTradeThreads(user.id),
+		getQuotaStatus(user.id),
+	]);
 
 	return (
 		<div className="max-w-2xl mx-auto px-4 py-8">
+			<TradeQuotaBanner
+				plan={quota.plan}
+				isPremium={quota.isPremium}
+				tradesUsed={quota.tradesUsed}
+				tradesLimit={quota.tradesLimit}
+				percentUsed={quota.percentUsed}
+			/>
 			<div className="mb-6">
 				<h1 className="text-[#e8dcc8] font-heading text-xl font-bold tracking-tight">
 					Trades

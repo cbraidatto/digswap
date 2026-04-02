@@ -1,8 +1,12 @@
-import { type NextRequest } from "next/server";
-import { updateSession } from "@/lib/supabase/middleware";
+import { type NextRequest, NextResponse } from "next/server";
 import { generateCspHeader } from "@/lib/security/csp";
+import { updateSession } from "@/lib/supabase/middleware";
 
 export async function middleware(request: NextRequest) {
+	if (request.nextUrl.pathname === "/api/stripe/webhook") {
+		return NextResponse.next();
+	}
+
 	const nonce = Buffer.from(crypto.randomUUID()).toString("base64");
 	const isDev = process.env.NODE_ENV === "development";
 	const cspHeader = generateCspHeader(nonce, isDev);
@@ -18,6 +22,14 @@ export async function middleware(request: NextRequest) {
 	// Set CSP on the response
 	response.headers.set("Content-Security-Policy", cspHeader);
 	response.headers.set("x-nonce", nonce);
+
+	// SEC-02: additional security headers
+	response.headers.set("X-Content-Type-Options", "nosniff");
+	response.headers.set("Referrer-Policy", "strict-origin-when-cross-origin");
+	response.headers.set(
+		"Permissions-Policy",
+		"camera=(), microphone=(), geolocation=()",
+	);
 
 	return response;
 }

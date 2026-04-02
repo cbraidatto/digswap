@@ -1,8 +1,9 @@
 import type { Metadata, Viewport } from "next";
+import { Inter, JetBrains_Mono, Space_Grotesk } from "next/font/google";
 import { headers } from "next/headers";
-import { Inter, Space_Grotesk, JetBrains_Mono } from "next/font/google";
-import { Toaster } from "@/components/ui/sonner";
+import { DesktopSessionSync } from "@/components/desktop/desktop-session-sync";
 import { ThemeProvider } from "@/components/theme-provider";
+import { Toaster } from "@/components/ui/sonner";
 import "./globals.css";
 
 const inter = Inter({
@@ -28,7 +29,8 @@ const jetbrainsMono = JetBrains_Mono({
 
 export const metadata: Metadata = {
 	title: "DigSwap — Find who has the record you're hunting",
-	description: "The discovery layer serious diggers have been missing. Connect your Discogs library, find who owns your Holy Grails, and organize the hunt.",
+	description:
+		"The discovery layer serious diggers have been missing. Connect your Discogs library, find who owns your Holy Grails, and organize the hunt.",
 };
 
 export const viewport: Viewport = {
@@ -67,6 +69,7 @@ export default async function RootLayout({
 				/>
 			</head>
 			<body className="font-sans antialiased">
+				<DesktopSessionSync />
 				<ThemeProvider>
 					<div className="grain">{children}</div>
 				</ThemeProvider>

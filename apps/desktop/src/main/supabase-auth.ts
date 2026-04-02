@@ -1,6 +1,11 @@
 import { createClient, type Session } from "@supabase/supabase-js";
 import { shell } from "electron";
-import type { AuthCallbackPayload, AuthProvider, SupabaseSession } from "../shared/ipc-types";
+import type {
+  AuthCallbackPayload,
+  AuthProvider,
+  DesktopShellSessionPayload,
+  SupabaseSession,
+} from "../shared/ipc-types";
 import type { DesktopSupabaseConfig } from "./config";
 import type { DesktopSessionStore } from "./session-store";
 
@@ -111,6 +116,56 @@ export class DesktopSupabaseAuth {
     return data.session?.access_token ?? null;
   }
 
+  async importSession(tokens: DesktopShellSessionPayload) {
+    const client = this.getClientOrThrow();
+
+    if (!tokens.accessToken || !tokens.refreshToken) {
+      throw new Error("Desktop session sync requires both access and refresh tokens.");
+    }
+
+    const currentSession = await this.getSession();
+    if (
+      currentSession?.accessToken === tokens.accessToken &&
+      currentSession.refreshToken === tokens.refreshToken
+    ) {
+      return;
+    }
+
+    const { data, error } = await client.auth.setSession({
+      access_token: tokens.accessToken,
+      refresh_token: tokens.refreshToken,
+    });
+
+    if (error) {
+      throw error;
+    }
+
+    this.emitSession(mapSession(data.session));
+  }
+
+  async clearImportedSession() {
+    if (!this.client) {
+      await this.sessionStore.clearVault();
+      this.emitSession(null);
+      return;
+    }
+
+    const currentSession = await this.getSession();
+    if (!currentSession) {
+      await this.sessionStore.clearVault();
+      this.emitSession(null);
+      return;
+    }
+
+    const { error } = await this.client.auth.signOut();
+    if (error) {
+      throw error;
+    }
+
+    await this.sessionStore.clearVault();
+    this.emitSession(null);
+  }
+
   async startOAuthSignIn(provider: AuthProvider) {
     if (!this.client || !this.config) {
       throw new Error(this.configError ?? "Desktop auth is not configured.");
@@ -155,6 +210,34 @@ export class DesktopSupabaseAuth {
     });
   }
 
+  async startMagicLinkSignIn(email: string) {
+    if (!this.client || !this.config) {
+      throw new Error(this.configError ?? "Desktop auth is not configured.");
+    }
+
+    if (this.pendingOAuth) {
+      throw new Error("An auth flow is already in progress.");
+    }
+
+    const { error } = await this.client.auth.signInWithOtp({
+      email,
+      options: { emailRedirectTo: this.config.redirectTo },
+    });
+
+    if (error) {
+      throw error;
+    }
+
+    return new Promise<void>((resolve, reject) => {
+      const timeoutId = setTimeout(() => {
+        this.pendingOAuth = null;
+        reject(new Error("Timed out waiting for the magic link callback."));
+      }, 10 * 60 * 1000);
+
+      this.pendingOAuth = { reject, resolve, timeoutId };
+    });
+  }
+
   async handleAuthCallback(payload: AuthCallbackPayload) {
     if (!this.client) {
       return;
@@ -182,18 +265,7 @@ export class DesktopSupabaseAuth {
   }
 
   async signOut() {
-    if (!this.client) {
-      await this.sessionStore.clearVault();
-      return;
-    }
-
-    const { error } = await this.client.auth.signOut();
-    if (error) {
-      throw error;
-    }
-
-    await this.sessionStore.clearVault();
-    this.emitSession(null);
+    await this.clearImportedSession();
   }
 
   private rejectPendingOAuth(error: Error) {

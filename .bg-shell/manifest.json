@@ -1,0 +1,16 @@
+[
+  {
+    "id": "071204b4",
+    "label": "next-dev",
+    "command": "cd apps/web && npx next dev --port 3000",
+    "cwd": "C:\\Users\\INTEL\\Desktop\\Get Shit DOne",
+    "ownerSessionFile": "C:\\Users\\INTEL\\.gsd\\sessions\\--C--Users-INTEL-Desktop-Get Shit DOne--\\2026-04-02T02-18-29-281Z_c18e1283-8ace-4518-8953-d2c79357f4c8.jsonl",
+    "persistAcrossSessions": false,
+    "startedAt": 1775096751459,
+    "processType": "server",
+    "group": null,
+    "readyPattern": null,
+    "readyPort": 3000,
+    "pid": 25628
+  }
+]

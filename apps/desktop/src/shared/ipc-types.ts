@@ -75,6 +75,21 @@ export interface DesktopBootstrapState {
   lastProtocolPayload: DesktopProtocolPayload | null;
 }
 
+export interface DesktopShellSessionPayload {
+  accessToken: string;
+  refreshToken: string;
+}
+
+/**
+ * Minimal shell bridge exposed to the remote DigSwap web app.
+ * This must stay tiny because the main BrowserWindow loads remote content.
+ */
+export interface DesktopMainShellBridge {
+  isDesktop(): boolean;
+  getAppVersion(): Promise<string>;
+  syncSession(session: DesktopShellSessionPayload | null): Promise<void>;
+}
+
 /**
  * The IPC bridge exposed on window.desktopBridge by the Electron preload script.
  * Renderer calls these methods; the main process is the only place that touches
@@ -84,6 +99,7 @@ export interface DesktopBridge {
   getBootstrapState(): Promise<DesktopBootstrapState>;
   getSession(): Promise<SupabaseSession | null>;
   openOAuth(provider: AuthProvider): Promise<void>;
+  sendMagicLink(email: string): Promise<void>;
   signOut(): Promise<void>;
   getPendingTrades(): Promise<PendingTrade[]>;
   openTradeFromHandoff(handoffToken: string): Promise<void>;
@@ -157,6 +173,7 @@ export interface DesktopBridgeTradeRuntime {
 
 declare global {
   interface Window {
+    desktopShell?: DesktopMainShellBridge;
     // Augment: trade runtime methods merged at runtime by the preload script
     desktopBridge: DesktopBridge & DesktopBridgeTradeRuntime;
   }

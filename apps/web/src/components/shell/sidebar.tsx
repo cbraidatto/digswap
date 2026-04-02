@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { PremiumBadge } from "@/components/ui/PremiumBadge";
 
 const NAV_ITEMS = [
 	{ href: "/feed", label: "Feed", icon: "history" },
@@ -13,9 +14,10 @@ const NAV_ITEMS = [
 interface SidebarProps {
 	displayName: string | null;
 	rank?: string;
+	subscriptionTier?: string;
 }
 
-export function Sidebar({ displayName, rank = "Digger" }: SidebarProps) {
+export function Sidebar({ displayName, rank = "Digger", subscriptionTier }: SidebarProps) {
 	const pathname = usePathname();
 
 	return (
@@ -29,8 +31,13 @@ export function Sidebar({ displayName, rank = "Digger" }: SidebarProps) {
 						<div className="text-primary font-mono text-sm font-bold">
 							{displayName ?? "DIGGER"}
 						</div>
-						<div className="text-on-surface-variant text-[10px] font-mono uppercase tracking-widest">
-							{rank}
+						<div className="flex items-center gap-1.5">
+							<span className="text-on-surface-variant text-[10px] font-mono uppercase tracking-widest">
+								{rank}
+							</span>
+							{(subscriptionTier === "premium_monthly" || subscriptionTier === "premium_annual") && (
+								<PremiumBadge />
+							)}
 						</div>
 					</div>
 				</div>

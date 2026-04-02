@@ -91,7 +91,7 @@ vi.mock("drizzle-orm", () => ({
 // ---------------------------------------------------------------------------
 // Import after mocks
 // ---------------------------------------------------------------------------
-import { getUserRanking } from "@/lib/gamification/queries";
+import { getUserRanking, type UserRanking } from "@/lib/gamification/queries";
 import { computeGlobalScore } from "@/lib/gamification/constants";
 
 describe("getUserRanking", () => {
@@ -133,13 +133,18 @@ describe("getUserRanking", () => {
 
 describe("profile ranking display logic", () => {
 	test("displays fallback values when user is unranked", () => {
-		// When getUserRanking returns null, profile uses fallbacks
-		const ranking = null;
+		function getRankingDisplay(ranking: UserRanking | null) {
+			return {
+				title: ranking?.title ?? "Vinyl Rookie",
+				globalRank: ranking?.globalRank ?? null,
+				rarityScore: ranking?.rarityScore ?? 0,
+				contributionScore: ranking?.contributionScore ?? 0,
+			};
+		}
 
-		const title = ranking?.title ?? "Vinyl Rookie";
-		const globalRank = ranking?.globalRank ?? null;
-		const rarityScore = ranking?.rarityScore ?? 0;
-		const contributionScore = ranking?.contributionScore ?? 0;
+		// When getUserRanking returns null, profile uses fallbacks
+		const { title, globalRank, rarityScore, contributionScore } =
+			getRankingDisplay(null);
 
 		expect(title).toBe("Vinyl Rookie");
 		expect(globalRank).toBeNull();

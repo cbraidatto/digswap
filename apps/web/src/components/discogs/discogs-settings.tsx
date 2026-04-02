@@ -44,13 +44,10 @@ export function DiscogsSettings({
 	const handleConnect = () => {
 		startConnectTransition(async () => {
 			try {
-				await connectDiscogs();
-			} catch (error) {
-				const message =
-					error instanceof Error ? error.message : String(error);
-				if (!message.includes("NEXT_REDIRECT")) {
-					toast.error("Could not connect to Discogs. Please try again.");
-				}
+				const { url } = await connectDiscogs();
+				window.location.href = url;
+			} catch {
+				toast.error("Could not connect to Discogs. Please try again.");
 			}
 		});
 	};

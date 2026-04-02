@@ -11,7 +11,7 @@ import { test, expect } from "@playwright/test";
 test.describe("Authentication Pages", () => {
 	test("signup page loads and shows form", async ({ page }) => {
 		await page.goto("/signup");
-		await expect(page).toHaveTitle(/VinylDig/i);
+		await expect(page).toHaveTitle(/DigSwap/i);
 
 		// Verify form elements are visible
 		await expect(page.getByLabel(/email/i)).toBeVisible();
@@ -23,7 +23,7 @@ test.describe("Authentication Pages", () => {
 
 	test("signin page loads and shows form", async ({ page }) => {
 		await page.goto("/signin");
-		await expect(page).toHaveTitle(/VinylDig/i);
+		await expect(page).toHaveTitle(/DigSwap/i);
 
 		// Verify form elements are visible
 		await expect(page.getByLabel(/email/i)).toBeVisible();
@@ -35,7 +35,7 @@ test.describe("Authentication Pages", () => {
 
 	test("forgot-password page loads", async ({ page }) => {
 		await page.goto("/forgot-password");
-		await expect(page).toHaveTitle(/VinylDig/i);
+		await expect(page).toHaveTitle(/DigSwap/i);
 
 		// Verify email input for reset
 		await expect(page.getByLabel(/email/i)).toBeVisible();
@@ -55,9 +55,9 @@ test.describe("Authentication Pages", () => {
 	test("signin page has link to signup", async ({ page }) => {
 		await page.goto("/signin");
 
-		// Check for signup link
+		// Link text is "Create an account" — regex must include the word "an"
 		const signupLink = page.getByRole("link", {
-			name: /sign up|create account|register/i,
+			name: /sign up|create an? account|register/i,
 		});
 		await expect(signupLink).toBeVisible();
 	});

@@ -1,5 +1,4 @@
 import { DISCOGS_GENRES } from "@/lib/discogs/taxonomy";
-import type { Group } from "@/lib/community/queries";
 import { JoinLeaveButton } from "./join-leave-button";
 
 interface GroupDetailHeaderProps {

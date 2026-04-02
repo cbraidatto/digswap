@@ -1,13 +1,23 @@
-import { app, BrowserWindow, dialog, ipcMain, shell } from "electron";
-import type { AuthProvider, SupabaseSession } from "../shared/ipc-types";
+import { app, dialog, ipcMain, shell } from "electron";
+import type { DesktopShellSessionPayload, SupabaseSession } from "../shared/ipc-types";
 import type { DesktopSupabaseAuth } from "./supabase-auth";
 import type { DesktopSessionStore } from "./session-store";
 import type { DesktopTradeRuntime } from "./trade-runtime";
+import { getTradeWindow } from "./window";
 
 interface RegisterDesktopIpcOptions {
   authRuntime: DesktopSupabaseAuth;
   sessionStore: DesktopSessionStore;
   tradeRuntime: DesktopTradeRuntime;
+}
+
+function sendToTradeWindow<TPayload>(channel: string, payload: TPayload) {
+  const tradeWindow = getTradeWindow();
+  if (!tradeWindow || tradeWindow.isDestroyed()) {
+    return;
+  }
+
+  tradeWindow.webContents.send(channel, payload);
 }
 
 export function registerDesktopIpc({
@@ -26,8 +36,22 @@ export function registerDesktopIpc({
 
   ipcMain.handle("desktop:get-session", () => authRuntime.getSession());
 
-  ipcMain.handle("desktop:open-oauth", (_event, provider: AuthProvider) =>
-    authRuntime.startOAuthSignIn(provider),
+  ipcMain.handle("desktop-shell:sync-session", async (_event, session) => {
+    const payload = session as DesktopShellSessionPayload | null;
+
+    if (payload) {
+      await authRuntime.importSession(payload);
+      return;
+    }
+
+    await tradeRuntime.releaseAllLeases();
+    await authRuntime.clearImportedSession();
+  });
+
+  ipcMain.handle("desktop:open-oauth", (_event, provider) => authRuntime.startOAuthSignIn(provider));
+
+  ipcMain.handle("desktop:send-magic-link", (_event, email: string) =>
+    authRuntime.startMagicLinkSignIn(email),
   );
 
   ipcMain.handle("desktop:sign-out", async () => {
@@ -84,26 +108,18 @@ export function registerDesktopIpc({
   });
 
   authRuntime.onSessionChanged((session: SupabaseSession | null) => {
-    for (const window of BrowserWindow.getAllWindows()) {
-      window.webContents.send("desktop:session-changed", session);
-    }
+    sendToTradeWindow("desktop:session-changed", session);
   });
 
   tradeRuntime.onLobbyStateChanged((event) => {
-    for (const window of BrowserWindow.getAllWindows()) {
-      window.webContents.send("desktop:lobby-state-changed", event);
-    }
+    sendToTradeWindow("desktop:lobby-state-changed", event);
   });
 
   tradeRuntime.onTransferProgress((event) => {
-    for (const window of BrowserWindow.getAllWindows()) {
-      window.webContents.send("desktop:transfer-progress", event);
-    }
+    sendToTradeWindow("desktop:transfer-progress", event);
   });
 
   tradeRuntime.onTransferComplete((event) => {
-    for (const window of BrowserWindow.getAllWindows()) {
-      window.webContents.send("desktop:transfer-complete", event);
-    }
+    sendToTradeWindow("desktop:transfer-complete", event);
   });
 }

@@ -27,11 +27,6 @@ vi.mock("@/components/shell/notification-bell", () => ({
 	),
 }));
 
-// Mock trades server action
-vi.mock("@/actions/trades", () => ({
-	getActionableTradeCount: vi.fn().mockResolvedValue(2),
-}));
-
 import { AppHeader } from "@/components/shell/app-header";
 
 describe("AppHeader", () => {
@@ -54,28 +49,30 @@ describe("AppHeader", () => {
 		expect(dig.parentElement?.className).toContain("font-heading");
 	});
 
-	it("renders trade icon with swap_horiz", async () => {
+	it("renders main navigation links", async () => {
 		render(<AppHeader displayName="Test" avatarUrl={null} userId="test-user-id" />);
 
 		await waitFor(() => {
-			const icon = screen.getByText("swap_horiz");
-			expect(icon).toBeInTheDocument();
-			expect(icon.className).toContain("material-symbols-outlined");
+			expect(screen.getByText("Feed")).toHaveAttribute("href", "/feed");
+			expect(screen.getByText("Community")).toHaveAttribute("href", "/comunidade");
+			expect(screen.getByText("Explorar")).toHaveAttribute("href", "/explorar");
+			expect(screen.getByText("Profile")).toHaveAttribute("href", "/perfil");
 		});
 	});
 
-	it("trade icon links to /trades", async () => {
+	it("renders notification bell for the current user", async () => {
 		render(<AppHeader displayName="Test" avatarUrl={null} userId="test-user-id" />);
 
 		await waitFor(() => {
-			const link = screen.getByLabelText("Trades");
-			expect(link).toBeInTheDocument();
-			expect(link).toHaveAttribute("href", "/trades");
+			expect(screen.getByTestId("notification-bell")).toHaveAttribute(
+				"data-user-id",
+				"test-user-id",
+			);
 		});
 	});
 
-	it('trade icon has aria-label "Trades"', () => {
+	it("does not render XP badge when XP is zero", () => {
 		render(<AppHeader displayName="Test" avatarUrl={null} userId="test-user-id" />);
-		expect(screen.getByLabelText("Trades")).toBeInTheDocument();
+		expect(screen.queryByText(/XP:/i)).not.toBeInTheDocument();
 	});
 });

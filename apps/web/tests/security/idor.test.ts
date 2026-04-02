@@ -231,7 +231,7 @@ describe("IDOR Prevention", () => {
 				[{ id: "lead-1" }],
 			];
 
-			const result = await saveLead("user" as "user", "target-1", "note", "interested" as "interested");
+			const result = await saveLead("user" as "user", "target-1", "note", "watching");
 
 			expect(result.success).toBe(true);
 		});

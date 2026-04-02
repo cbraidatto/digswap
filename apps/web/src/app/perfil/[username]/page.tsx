@@ -44,6 +44,7 @@ export default async function PublicProfilePage({
 			avatarUrl: profiles.avatarUrl,
 			bio: profiles.bio,
 			createdAt: profiles.createdAt,
+			subscriptionTier: profiles.subscriptionTier,
 		})
 		.from(profiles)
 		.where(eq(profiles.username, username))
@@ -92,7 +93,7 @@ export default async function PublicProfilePage({
 
 			{/* Profile Header */}
 			<ProfileHeader
-				profile={targetProfile}
+				profile={{ ...targetProfile, subscriptionTier: targetProfile.subscriptionTier ?? "free" }}
 				followCounts={followCounts}
 				isFollowing={isFollowing}
 				collectionCount={totalCount}

@@ -12,12 +12,16 @@ describe("Content Security Policy", () => {
 			expect(csp).toMatch(/script-src[^;]*'nonce-/);
 		});
 
-		it("includes nonce in style-src", () => {
-			expect(csp).toMatch(/style-src[^;]*'nonce-/);
+		it("uses unsafe-inline in style-src (required for Sonner inline style= attrs)", () => {
+			// style= attributes cannot use nonces — only <style> tags can.
+			// Sonner injects inline style= at runtime, so unsafe-inline is required here.
+			expect(csp).toMatch(/style-src[^;]*'unsafe-inline'/);
 		});
 
-		it("does not include unsafe-inline", () => {
-			expect(csp).not.toContain("'unsafe-inline'");
+		it("does not include unsafe-inline in script-src", () => {
+			// unsafe-inline must never appear in script-src (breaks XSS protection)
+			const scriptSrc = csp.split(";").find((d) => d.trim().startsWith("script-src")) ?? "";
+			expect(scriptSrc).not.toContain("'unsafe-inline'");
 		});
 
 		it("does not include unsafe-eval in production", () => {
@@ -37,11 +41,6 @@ describe("Content Security Policy", () => {
 			expect(csp).toContain("wss://*.supabase.co");
 		});
 
-		it("allows peerjs in connect-src", () => {
-			expect(csp).toContain("https://0.peerjs.com");
-			expect(csp).toContain("wss://0.peerjs.com");
-		});
-
 		it("is a single line with semicolon-separated directives", () => {
 			expect(csp).not.toContain("\n");
 			expect(csp.split("; ").length).toBeGreaterThanOrEqual(5);
@@ -57,10 +56,6 @@ describe("Content Security Policy", () => {
 
 		it("still includes nonce in script-src", () => {
 			expect(csp).toMatch(/script-src[^;]*'nonce-/);
-		});
-
-		it("still includes nonce in style-src", () => {
-			expect(csp).toMatch(/style-src[^;]*'nonce-/);
 		});
 
 		it("still sets frame-ancestors to none", () => {

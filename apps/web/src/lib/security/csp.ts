@@ -18,6 +18,8 @@ export function generateCspHeader(nonce: string, isDev: boolean): string {
 		"media-src 'self'",
 		"worker-src 'self'",
 		"frame-src 'self' https://www.youtube-nocookie.com",
+		"object-src 'none'",
+		"base-uri 'self'",
 		"frame-ancestors 'none'",
 		"form-action 'self'",
 	];

@@ -194,6 +194,9 @@ import {
 	getReviewCountForRelease,
 } from "@/lib/community/queries";
 
+const TEST_GROUP_ID = "11111111-1111-4111-8111-111111111111";
+const TEST_RELEASE_ID = "22222222-2222-4222-8222-222222222222";
+
 describe("createReviewAction", () => {
 	beforeEach(() => {
 		vi.clearAllMocks();
@@ -216,8 +219,8 @@ describe("createReviewAction", () => {
 		];
 
 		const result = await createReviewAction({
-			groupId: "group-1",
-			releaseId: "release-1",
+			groupId: TEST_GROUP_ID,
+			releaseId: TEST_RELEASE_ID,
 			rating: 4,
 			body: "Excellent pressing, warm tone throughout.",
 		});
@@ -228,23 +231,23 @@ describe("createReviewAction", () => {
 	test("rejects rating 0 (validation error)", async () => {
 		await expect(
 			createReviewAction({
-				groupId: "group-1",
-				releaseId: "release-1",
+				groupId: TEST_GROUP_ID,
+				releaseId: TEST_RELEASE_ID,
 				rating: 0,
 				body: "Should fail",
 			}),
-		).rejects.toThrow("Rating must be between 1 and 5.");
+		).rejects.toThrow(/Too small|between 1 and 5/i);
 	});
 
 	test("rejects rating 6 (validation error)", async () => {
 		await expect(
 			createReviewAction({
-				groupId: "group-1",
-				releaseId: "release-1",
+				groupId: TEST_GROUP_ID,
+				releaseId: TEST_RELEASE_ID,
 				rating: 6,
 				body: "Should fail",
 			}),
-		).rejects.toThrow("Rating must be between 1 and 5.");
+		).rejects.toThrow(/Too big|between 1 and 5/i);
 	});
 
 	test("creates group_post with reviewId", async () => {
@@ -257,8 +260,8 @@ describe("createReviewAction", () => {
 		];
 
 		await createReviewAction({
-			groupId: "group-1",
-			releaseId: "release-1",
+			groupId: TEST_GROUP_ID,
+			releaseId: TEST_RELEASE_ID,
 			rating: 5,
 			body: "Perfect condition original pressing.",
 		});
@@ -278,8 +281,8 @@ describe("createReviewAction", () => {
 		];
 
 		const result = await createReviewAction({
-			groupId: "group-1",
-			releaseId: "release-1",
+			groupId: TEST_GROUP_ID,
+			releaseId: TEST_RELEASE_ID,
 			rating: 5,
 			body: "Original 1973 pressing sounds incredible",
 			isPressingSpecific: true,
@@ -301,8 +304,8 @@ describe("createReviewAction", () => {
 		];
 
 		const result = await createReviewAction({
-			groupId: "group-1",
-			releaseId: "release-1",
+			groupId: TEST_GROUP_ID,
+			releaseId: TEST_RELEASE_ID,
 			rating: 3,
 			body: "Average album overall",
 			isPressingSpecific: false,

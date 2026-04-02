@@ -1,7 +1,6 @@
 "use server";
 
 import { cookies } from "next/headers";
-import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { getRequestToken, deleteTokens } from "@/lib/discogs/oauth";
@@ -14,13 +13,15 @@ import { discogsRateLimit } from "@/lib/rate-limit";
  * 1. Verify user is authenticated
  * 2. Request a temporary token from Discogs
  * 3. Store the request token in an httpOnly cookie (10 min TTL)
- * 4. Redirect user to Discogs authorization page
+ * 4. Return the Discogs authorizeUrl for the client to navigate to
  *
- * The redirect() call from next/navigation throws internally --
- * it must be called outside try/catch or rethrown. This follows
- * the same pattern as existing server actions in src/actions/auth.ts.
+ * NOTE: redirect() from next/navigation cannot be used here because
+ * Next.js Server Actions process redirects via router.push() internally,
+ * which only works for same-origin paths. External URLs (discogs.com) are
+ * silently dropped, causing POST 200 with no navigation. The caller must
+ * do window.location.href = url to perform a full browser navigation.
  */
-export async function connectDiscogs(): Promise<never> {
+export async function connectDiscogs(): Promise<{ url: string }> {
 	const supabase = await createClient();
 	const {
 		data: { user },
@@ -57,7 +58,7 @@ export async function connectDiscogs(): Promise<never> {
 		},
 	);
 
-	redirect(authorizeUrl);
+	return { url: authorizeUrl };
 }
 
 /**

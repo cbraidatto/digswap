@@ -29,7 +29,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 13: Crates & Sets** - Pre-dig folder creation, add-to-crate from any surface, ordered sets with event metadata (completed 2026-03-29)
 - [ ] **Phase 14: Trade V2** - Explicit proposal with quality specs + collection linking, P2P 1-min preview, waveform visualization, full transfer after preview acceptance
 - [ ] **Phase 15: Social V2** - Trade-scoped messaging thread, online presence in trade context
-- [ ] **Phase 16: Monetization** - Stripe freemium, trade quotas, premium features
+- [x] **Phase 16: Monetization** - Stripe freemium, trade quotas, premium features (completed 2026-03-31)
 
 ## Phase Details
 
@@ -346,7 +346,13 @@ Plans:
   2. Premium users have no trade limit and access collection analytics, premium groups, priority matching
   3. User can subscribe to premium via Stripe (monthly or annual) and cancel anytime
   4. Subscription state syncs to the database via Stripe webhooks
-**Plans**: TBD
+**Plans**: 5 plans
+Plans:
+- [x] 16-01-PLAN.md — Stripe webhook handler + checkout/portal server actions (Codex)
+- [x] 16-02-PLAN.md — Entitlement layer: quota gate, canInitiateTrade, incrementTradeCount (Codex)
+- [x] 16-03-PLAN.md — Pricing page + /settings/billing subscription management UI (Claude)
+- [x] 16-04-PLAN.md — Premium surface gates: quota banner, trade block modal, premium badges (Claude)
+- [x] 16-05-PLAN.md — Tests + human verification checkpoint (split)
 
 ### Phase 17: Desktop Trade Runtime
 **Goal**: Electron desktop app as trade runtime — monorepo bootstrap, shared trade-domain package, auth handoff from web, IPC bridge, WebRTC transfer, filesystem, and desktop UI
@@ -371,10 +377,28 @@ Plans:
 - [x] 17-08-PLAN.md — Real file picker for sender: replace synthetic source with dialog.showOpenDialog (Codex)
 **UI hint**: yes
 
+### Phase 18: Desktop Shell Refactor
+**Goal**: Replace the standalone mini-app renderer with a native Electron shell that loads the real web app in the main window, while keeping the trade runtime isolated in a separate privileged local window
+**Depends on**: Phase 17
+**Requirements**: DESK-07, DESK-08, DESK-09
+**Success Criteria** (what must be TRUE):
+  1. Main window loads localhost:3000 (dev) / production URL (prod) — full web app visible, no standalone renderer
+  2. Main window uses a minimal preload (isDesktop, openTradeWindow, getAppVersion only) — no privileged bridge exposed to remote content
+  3. Trade window opens as a separate local BrowserWindow (~600×700) when digswap://trade-handoff fires
+  4. Trade window has the full privileged bridge (startTransfer, selectDownloadPath, openFileInExplorer, etc.)
+  5. Session sync: web app notifies main process on auth change via minimal bridge; trade runtime uses persisted session
+  6. No XSS in web app can reach native trade/filesystem APIs
+**Plans**: 3 plans
+Plans:
+- [x] 18-01-PLAN.md — Main process: split windows + dual preloads + origin allowlist + IPC routing (Codex)
+- [x] 18-02-PLAN.md — renderer-trade: second Vite entry + trade UI (LobbyScreen, TransferScreen, CompletionScreen) wired to privileged bridge (Claude)
+- [x] 18-03-PLAN.md — Session sync: web app minimal bridge contract + desktopAuth.setSession flow + cleanup of standalone screens (Codex)
+**UI hint**: yes
+
 ## Progress
 
 **Execution Order:**
-Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 4.5 -> 5 -> 6 -> 7 -> 8 -> 9(superseded) -> 10 -> 11 -> 12 -> 13 -> 14 -> 15 -> 16 -> 17
+Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 4.5 -> 5 -> 6 -> 7 -> 8 -> 9(superseded) -> 10 -> 11 -> 12 -> 13 -> 14 -> 15 -> 16 -> 17 -> 18
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
@@ -394,5 +418,6 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 4.5 -> 5 -> 6 -> 7 -> 8 -> 
 | 13. Crates & Sets | 4/4 | Complete | 2026-03-29 |
 | 14. Trade V2 | 4/5 | Complete* | 2026-03-31 |
 | 15. Social V2 | 4/4 | Complete | 2026-03-31 |
-| 16. Monetization | 0/TBD | Planned | - |
+| 16. Monetization | 5/5 | Complete ✓ | 2026-03-31 |
 | 17. Desktop Trade Runtime | 8/8 | Complete | 2026-03-31 |
+| 18. Desktop Shell Refactor | 3/3 | Complete ✓ | 2026-04-02 |
