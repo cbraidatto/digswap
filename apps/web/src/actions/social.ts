@@ -251,52 +251,30 @@ export async function searchUsers(
 		// Sanitize query to prevent SQL injection through ilike patterns
 		const sanitized = parsed.data.query.replace(/[%_\\]/g, "\\$&");
 
+		// Single query with subquery counts — eliminates N+1 (was 3 queries × 20 profiles)
 		const matchingProfiles = await db
 			.select({
 				id: profiles.id,
 				username: profiles.username,
 				displayName: profiles.displayName,
 				avatarUrl: profiles.avatarUrl,
+				recordCount: sql<number>`coalesce((select count(*) from collection_items where user_id = ${profiles.id}), 0)`,
+				followerCount: sql<number>`coalesce((select count(*) from follows where following_id = ${profiles.id}), 0)`,
+				isFollowing: sql<boolean>`exists(select 1 from follows where follower_id = ${user.id} and following_id = ${profiles.id})`,
 			})
 			.from(profiles)
 			.where(ilike(profiles.username, `%${sanitized}%`))
 			.limit(20);
 
-		// Enrich each profile with counts
-		const results: SearchResult[] = [];
-		for (const profile of matchingProfiles) {
-			const recordCountResult = await db
-				.select({ count: sql<number>`count(*)` })
-				.from(collectionItems)
-				.where(eq(collectionItems.userId, profile.id));
-
-			const followerCountResult = await db
-				.select({ count: sql<number>`count(*)` })
-				.from(follows)
-				.where(eq(follows.followingId, profile.id));
-
-			const isFollowingResult = await db
-				.select({ id: follows.id })
-				.from(follows)
-				.where(
-					and(
-						eq(follows.followerId, user.id),
-						eq(follows.followingId, profile.id),
-					),
-				);
-
-			results.push({
-				id: profile.id,
-				username: profile.username,
-				displayName: profile.displayName,
-				avatarUrl: profile.avatarUrl,
-				recordCount: Number(recordCountResult[0]?.count ?? 0),
-				followerCount: Number(followerCountResult[0]?.count ?? 0),
-				isFollowing: isFollowingResult.length > 0,
-			});
-		}
-
-		return results;
+		return matchingProfiles.map((p) => ({
+			id: p.id,
+			username: p.username,
+			displayName: p.displayName,
+			avatarUrl: p.avatarUrl,
+			recordCount: Number(p.recordCount),
+			followerCount: Number(p.followerCount),
+			isFollowing: Boolean(p.isFollowing),
+		}));
 	} catch (err) {
 		console.error("[searchUsers] error:", err);
 		return [];

@@ -8,6 +8,7 @@ import {
 	text,
 	real,
 	jsonb,
+	index,
 } from "drizzle-orm/pg-core";
 import { pgPolicy } from "drizzle-orm/pg-core";
 import { sql } from "drizzle-orm";
@@ -100,6 +101,7 @@ export const challengeEntries = pgTable(
 			to: authenticatedRole,
 			using: sql`${table.userId} = ${authUid}`,
 		}),
+		index("challenge_entries_challenge_id_idx").on(table.challengeId),
 	],
 );
 

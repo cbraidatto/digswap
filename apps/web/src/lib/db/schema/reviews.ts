@@ -7,6 +7,7 @@ import {
   integer,
   boolean,
   unique,
+  index,
 } from "drizzle-orm/pg-core";
 import { pgPolicy } from "drizzle-orm/pg-core";
 import { sql } from "drizzle-orm";
@@ -58,5 +59,7 @@ export const reviews = pgTable(
       to: authenticatedRole,
       using: sql`${table.userId} = ${authUid}`,
     }),
+    index("reviews_release_id_idx").on(table.releaseId),
+    index("reviews_user_id_idx").on(table.userId),
   ],
 );

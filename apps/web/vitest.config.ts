@@ -6,9 +6,20 @@ export default defineConfig({
 	plugins: [react()],
 	test: {
 		environment: "jsdom",
-		include: ["tests/**/*.test.ts", "tests/**/*.test.tsx"],
+		include: ["tests/**/*.test.ts", "tests/**/*.test.tsx", "src/tests/**/*.test.ts"],
 		globals: true,
 		setupFiles: ["tests/setup.ts"],
+		coverage: {
+			provider: "v8",
+			include: ["src/actions/**", "src/lib/**"],
+			exclude: [
+				"src/lib/db/schema/**",
+				"src/lib/supabase/**",
+				"**/*.d.ts",
+			],
+			reporter: ["text", "html", "json-summary"],
+			reportsDirectory: "./coverage",
+		},
 	},
 	resolve: {
 		alias: {

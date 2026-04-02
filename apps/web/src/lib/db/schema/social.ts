@@ -6,6 +6,7 @@ import {
   timestamp,
   jsonb,
   unique,
+  index,
 } from "drizzle-orm/pg-core";
 import { pgPolicy } from "drizzle-orm/pg-core";
 import { sql } from "drizzle-orm";
@@ -65,5 +66,7 @@ export const activityFeed = pgTable(
       to: authenticatedRole,
       withCheck: sql`${table.userId} = ${authUid}`,
     }),
+    index("activity_feed_user_id_idx").on(table.userId),
+    index("activity_feed_created_at_idx").on(table.createdAt),
   ],
 );

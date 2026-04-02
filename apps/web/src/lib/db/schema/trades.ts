@@ -1,5 +1,5 @@
 import { sql } from "drizzle-orm";
-import { integer, pgPolicy, pgTable, text, timestamp, uuid, varchar } from "drizzle-orm/pg-core";
+import { index, integer, pgPolicy, pgTable, text, timestamp, uuid, varchar } from "drizzle-orm/pg-core";
 import { authenticatedRole, authUid } from "drizzle-orm/supabase";
 import { releases } from "./releases";
 
@@ -80,6 +80,7 @@ export const tradeMessages = pgTable(
             AND (tr.requester_id = ${authUid} OR tr.provider_id = ${authUid})
         )`,
 		}),
+		index("trade_messages_trade_id_idx").on(table.tradeId),
 	],
 );
 

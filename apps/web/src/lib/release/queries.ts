@@ -1,3 +1,4 @@
+import { cache } from "react";
 import { eq, sql } from "drizzle-orm";
 import { db } from "@/lib/db";
 import { releases } from "@/lib/db/schema/releases";
@@ -16,14 +17,14 @@ export interface ReleaseOwner {
  * Fetch a release by its Discogs ID.
  * Uses Drizzle db client (bypasses RLS) for public page access.
  */
-export async function getReleaseByDiscogsId(discogsId: number) {
+export const getReleaseByDiscogsId = cache(async function getReleaseByDiscogsId(discogsId: number) {
   const [release] = await db
     .select()
     .from(releases)
     .where(eq(releases.discogsId, discogsId))
     .limit(1);
   return release ?? null;
-}
+});
 
 /**
  * Get users who own a specific release, with profile data.

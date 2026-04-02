@@ -5,6 +5,7 @@ import {
   text,
   timestamp,
   boolean,
+  index,
 } from "drizzle-orm/pg-core";
 import { pgPolicy } from "drizzle-orm/pg-core";
 import { sql } from "drizzle-orm";
@@ -41,6 +42,7 @@ export const notifications = pgTable(
       using: sql`${table.userId} = ${authUid}`,
       withCheck: sql`${table.userId} = ${authUid}`,
     }),
+    index("notifications_user_id_idx").on(table.userId),
   ],
 );
 

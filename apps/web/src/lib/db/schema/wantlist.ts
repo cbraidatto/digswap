@@ -5,6 +5,7 @@ import {
   text,
   timestamp,
   integer,
+  index,
 } from "drizzle-orm/pg-core";
 import { pgPolicy } from "drizzle-orm/pg-core";
 import { sql } from "drizzle-orm";
@@ -41,5 +42,6 @@ export const wantlistItems = pgTable(
       to: authenticatedRole,
       using: sql`${table.userId} = ${authUid}`,
     }),
+    index("wantlist_items_user_id_idx").on(table.userId),
   ],
 );

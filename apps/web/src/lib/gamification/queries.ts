@@ -1,3 +1,4 @@
+import { cache } from "react";
 import { eq, asc, sql } from "drizzle-orm";
 import { db } from "@/lib/db";
 import { userRankings, badges, userBadges } from "@/lib/db/schema/gamification";
@@ -106,7 +107,7 @@ export async function getGenreLeaderboard(
 // User Ranking
 // ---------------------------------------------------------------------------
 
-export async function getUserRanking(
+export const getUserRanking = cache(async function getUserRanking(
 	userId: string,
 ): Promise<UserRanking | null> {
 	const rows = await db
@@ -123,7 +124,7 @@ export async function getUserRanking(
 	if (rows.length === 0) return null;
 
 	return rows[0];
-}
+});
 
 // ---------------------------------------------------------------------------
 // User Badges

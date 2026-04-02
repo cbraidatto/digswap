@@ -5,6 +5,7 @@ import {
   text,
   timestamp,
   integer,
+  index,
 } from "drizzle-orm/pg-core";
 import { pgPolicy } from "drizzle-orm/pg-core";
 import { sql } from "drizzle-orm";
@@ -50,5 +51,7 @@ export const collectionItems = pgTable(
       to: authenticatedRole,
       using: sql`${table.userId} = ${authUid}`,
     }),
+    index("collection_items_user_id_idx").on(table.userId),
+    index("collection_items_release_id_idx").on(table.releaseId),
   ],
 );
