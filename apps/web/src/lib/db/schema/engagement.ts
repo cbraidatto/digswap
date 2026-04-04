@@ -100,6 +100,7 @@ export const challengeEntries = pgTable(
 			for: "update",
 			to: authenticatedRole,
 			using: sql`${table.userId} = ${authUid}`,
+			withCheck: sql`${table.userId} = ${authUid}`,
 		}),
 		index("challenge_entries_challenge_id_idx").on(table.challengeId),
 	],
