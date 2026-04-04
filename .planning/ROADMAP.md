@@ -421,7 +421,7 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 4.5 -> 5 -> 6 -> 7 -> 8 -> 
 | 16. Monetization | 5/5 | Complete ✓ | 2026-03-31 |
 | 17. Desktop Trade Runtime | 8/8 | Complete | 2026-03-31 |
 | 18. Desktop Shell Refactor | 3/3 | Complete ✓ | 2026-04-02 |
-| 19. Security Audit Closure | 0/3 | Planning Complete | - |
+| 19. Security Audit Closure | 1/3 | In Progress|  |
 
 ### Phase 19: Security Hardening — Fix 74 audit vulnerabilities
 
@@ -437,6 +437,6 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 4.5 -> 5 -> 6 -> 7 -> 8 -> 
   6. Full test suite (563+ tests) passes, TypeScript compiles cleanly
 **Plans**: 3 plans
 Plans:
-- [ ] 19-01-PLAN.md -- utilityProcess migration: replace BrowserWindow nodeIntegration:true with Electron utilityProcess for PeerJS bridge
+- [x] 19-01-PLAN.md -- utilityProcess migration: replace BrowserWindow nodeIntegration:true with Electron utilityProcess for PeerJS bridge
 - [ ] 19-02-PLAN.md -- Hash rejection + RPC rate limits + TTL alignment (3 focused security fixes)
 - [ ] 19-03-PLAN.md -- Schema spot-check + full test suite gate (verification)
