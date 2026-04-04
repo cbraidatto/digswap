@@ -806,8 +806,10 @@ export class DesktopTradeRuntime {
 
       // Use the file hash stored in the DB when the sender declared the file —
       // never trust the hash that comes from the sender over the data channel.
-      const declaredHash = context.senderDeclaredHash ?? null;
-      await receiveFile(connection, partPath, finalPath, declaredHash, {
+      if (!context.senderDeclaredHash) {
+        throw new Error("Cannot receive file: no server-verified hash available for this trade.");
+      }
+      await receiveFile(connection, partPath, finalPath, context.senderDeclaredHash, {
         onProgress: (bytesTransferred, totalBytes) => {
           this.emitTransferProgress({
             bytesReceived: bytesTransferred,

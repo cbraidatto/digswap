@@ -92,9 +92,19 @@ export async function receiveFile(
   conn: PeerTransportConnection,
   partPath: string,
   finalPath: string,
-  expectedSha256: string | null,
+  expectedSha256: string,
   callbacks: TransferCallbacks,
 ): Promise<void> {
+  // SECURITY: Reject transfer when no server-verified hash is available.
+  // Without a DB-stored hash, the receiver cannot independently verify file
+  // integrity — a malicious sender could forge both the file and the header hash.
+  if (!expectedSha256) {
+    throw new Error(
+      "Transfer rejected: expectedSha256 is required. " +
+      "The server must store the file hash before transfer can proceed."
+    );
+  }
+
   await fsp.mkdir(path.dirname(partPath), { recursive: true });
   await fsp.mkdir(path.dirname(finalPath), { recursive: true });
   await safeDeleteFile(partPath);
@@ -179,17 +189,7 @@ export async function receiveFile(
         await once(writeStream, "finish");
 
         const sha256 = hash.digest("hex");
-        // SECURITY: Prefer the DB-stored hash (set before transfer started).
-        // When absent, fall back to the sender's header hash — it still catches
-        // corruption, but a malicious sender can forge both file and hash.
-        if (!expectedSha256 && header.sha256) {
-          console.warn(
-            "[chunked-transfer] SECURITY WARNING: no DB hash for this trade — " +
-            "falling back to sender-declared hash. Integrity cannot be guaranteed.",
-          );
-        }
-        const hashToVerify = expectedSha256 ?? header.sha256;
-        if (hashToVerify && sha256 !== hashToVerify) {
+        if (sha256 !== expectedSha256) {
           throw new Error("SHA-256 mismatch after receiving the full trade file.");
         }
 
