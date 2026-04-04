@@ -1,6 +1,7 @@
 import { randomBytes, randomUUID } from "node:crypto";
 import { EventEmitter } from "node:events";
-import { BrowserWindow, ipcMain } from "electron";
+import path from "node:path";
+import { utilityProcess, type UtilityProcess } from "electron";
 
 export type PeerRole = "sender" | "receiver";
 
@@ -70,14 +71,12 @@ class PeerConnectionBridge extends EventEmitter implements PeerTransportConnecti
 }
 
 export class PeerSession {
-  private readonly commandChannel = `digswap-peer-command:${randomUUID()}`;
-  private readonly eventChannel = `digswap-peer-event:${randomUUID()}`;
   private readonly peerId: string;
   private readonly placeholderRemotePeerId: string;
   private expectedRemotePeerId: string;
   private readonly pendingCommands = new Map<string, PendingResolver>();
   private readonly eventHandler: BridgeEventHandler;
-  private bridgeWindow: BrowserWindow | null = null;
+  private bridgeProcess: UtilityProcess | null = null;
   private connection: PeerConnectionBridge | null = null;
   private expectedPeerIdIsPlaceholder = true;
   private isReady = false;
@@ -115,7 +114,6 @@ export class PeerSession {
       this.handleEvent(event);
     };
 
-    ipcMain.on(this.eventChannel, this.onEventFromBridge);
     void this.initialize();
   }
 
@@ -210,9 +208,9 @@ export class PeerSession {
       this.expectedPeerIdWaiters.clear();
     }
 
-    // Also propagate to the bridge script running in the hidden BrowserWindow
+    // Also propagate to the bridge worker running in the utilityProcess
     // so that wireConnection() uses the new value for incoming connections.
-    if (this.isReady && this.bridgeWindow && !this.bridgeWindow.isDestroyed()) {
+    if (this.isReady && this.bridgeProcess) {
       void this.invokeCommand({
         payload: peerId,
         requestId: randomUUID(),
@@ -231,7 +229,7 @@ export class PeerSession {
     }
     this.pendingCommands.clear();
 
-    if (this.bridgeWindow && !this.bridgeWindow.isDestroyed()) {
+    if (this.bridgeProcess) {
       try {
         if (this.isReady) {
           await this.invokeCommand({
@@ -243,55 +241,33 @@ export class PeerSession {
         // Session teardown should be best-effort.
       }
 
-      this.bridgeWindow.destroy();
+      this.bridgeProcess.kill();
     }
 
-    this.bridgeWindow = null;
+    this.bridgeProcess = null;
     this.connection = null;
-    ipcMain.removeListener(this.eventChannel, this.onEventFromBridge);
   }
-
-  private onEventFromBridge = (_event: Electron.IpcMainEvent, event: PeerBridgeEvent) => {
-    this.eventHandler(event);
-  };
 
   private async initialize() {
     try {
-      this.bridgeWindow = new BrowserWindow({
-        show: false,
-        webPreferences: {
-          backgroundThrottling: false,
-          // SECURITY NOTE: nodeIntegration:true + contextIsolation:false is required
-          // here because the bridge script uses ipcRenderer directly. Migration to
-          // utilityProcess is tracked as a future improvement. We mitigate by:
-          // 1. Loading only about:blank (no remote content)
-          // 2. Blocking all navigation away from about:blank
-          contextIsolation: false,
-          nodeIntegration: true,
-          sandbox: false,
-        },
-      });
-
-      // SECURITY: Prevent the bridge window from navigating to any URL.
-      // This mitigates the nodeIntegration:true risk — the window never loads
-      // remote content that could abuse Node.js APIs.
-      this.bridgeWindow.webContents.on("will-navigate", (event) => {
-        event.preventDefault();
-      });
-      this.bridgeWindow.webContents.setWindowOpenHandler(() => ({ action: "deny" }));
-
-      await this.bridgeWindow.loadURL("about:blank");
-      await this.bridgeWindow.webContents.executeJavaScript(
-        buildPeerBridgeScript({
-          commandChannel: this.commandChannel,
-          eventChannel: this.eventChannel,
-          expectedRemotePeerId: this.expectedRemotePeerId,
-          iceServers: this.iceServers,
-          peerId: this.peerId,
-          role: this.role,
-        }),
-        true,
+      this.bridgeProcess = utilityProcess.fork(
+        path.join(__dirname, "peer-bridge-worker.js"),
+        [],
+        { serviceName: `digswap-peer-${this.tradeId}` },
       );
+
+      this.bridgeProcess.on("message", (event: PeerBridgeEvent) => {
+        this.eventHandler(event);
+      });
+
+      // Send initialization config to the worker
+      this.bridgeProcess.postMessage({
+        type: "init",
+        peerId: this.peerId,
+        role: this.role,
+        iceServers: this.iceServers,
+        expectedRemotePeerId: this.expectedRemotePeerId,
+      });
     } catch (error) {
       this.failSession(error instanceof Error ? error : new Error("Failed to initialize peer session."));
     }
@@ -386,7 +362,7 @@ export class PeerSession {
 
     await this.invokeCommand({
       kind: isBinaryPayload ? "buffer" : "json",
-      payload: isBinaryPayload ? serializeBinaryPayload(payload) : payload,
+      payload,
       requestId: randomUUID(),
       type: "send",
     });
@@ -402,8 +378,8 @@ export class PeerSession {
   private async invokeCommand(command: PeerCommandMessage) {
     await this.ensureReady();
 
-    if (!this.bridgeWindow || this.bridgeWindow.isDestroyed()) {
-      throw new Error("Peer session bridge window is no longer available.");
+    if (!this.bridgeProcess) {
+      throw new Error("Peer session bridge process is no longer available.");
     }
 
     return new Promise<unknown>((resolve, reject) => {
@@ -412,7 +388,7 @@ export class PeerSession {
         resolve,
       });
 
-      this.bridgeWindow?.webContents.send(this.commandChannel, command);
+      this.bridgeProcess?.postMessage(command);
     });
   }
 
@@ -446,18 +422,6 @@ export class PeerSession {
   }
 }
 
-function serializeBinaryPayload(payload: ArrayBuffer | Buffer | Uint8Array) {
-  if (Buffer.isBuffer(payload)) {
-    return payload;
-  }
-
-  if (payload instanceof Uint8Array) {
-    return Buffer.from(payload.buffer.slice(payload.byteOffset, payload.byteOffset + payload.byteLength));
-  }
-
-  return Buffer.from(payload);
-}
-
 function coerceBuffer(value: unknown) {
   if (Buffer.isBuffer(value)) {
     return value;
@@ -479,254 +443,4 @@ function coerceBuffer(value: unknown) {
   }
 
   throw new Error("Received an invalid binary payload from the peer bridge.");
-}
-
-function buildPeerBridgeScript({
-  commandChannel,
-  eventChannel,
-  expectedRemotePeerId,
-  iceServers,
-  peerId,
-  role,
-}: {
-  commandChannel: string;
-  eventChannel: string;
-  expectedRemotePeerId: string;
-  iceServers: RTCIceServer[];
-  peerId: string;
-  role: PeerRole;
-}) {
-  return `
-(() => {
-  const { ipcRenderer } = require("electron");
-  const PeerModule = require("peerjs");
-  const Peer = PeerModule.default ?? PeerModule.Peer ?? PeerModule;
-  const commandChannel = ${JSON.stringify(commandChannel)};
-  const eventChannel = ${JSON.stringify(eventChannel)};
-  let expectedRemotePeerId = ${JSON.stringify(expectedRemotePeerId)};
-  const peerId = ${JSON.stringify(peerId)};
-  const role = ${JSON.stringify(role)};
-  const iceServers = ${JSON.stringify(iceServers)};
-  const seenIceTypes = new Set();
-  let conn = null;
-  let peer = null;
-
-  function emit(type, payload = {}) {
-    ipcRenderer.send(eventChannel, { type, ...payload });
-  }
-
-  function respond(requestId, payload = {}) {
-    emit("command-response", { requestId, ...payload });
-  }
-
-  function parseCandidateType(candidateValue) {
-    if (typeof candidateValue !== "string") {
-      return null;
-    }
-
-    const match = candidateValue.match(/ typ (host|srflx|relay) /u);
-    return match ? match[1] : null;
-  }
-
-  function toArrayBufferLike(value) {
-    if (value instanceof ArrayBuffer) {
-      return value;
-    }
-
-    if (ArrayBuffer.isView(value)) {
-      return value.buffer.slice(value.byteOffset, value.byteOffset + value.byteLength);
-    }
-
-    if (value && typeof value === "object" && Array.isArray(value.data)) {
-      return Uint8Array.from(value.data).buffer;
-    }
-
-    return value;
-  }
-
-  function startIceTracking(connection) {
-    const pc =
-      connection.peerConnection ||
-      connection._peerConnection ||
-      connection._negotiator?._pc ||
-      connection._negotiator?.pc ||
-      null;
-
-    if (!pc || typeof pc.addEventListener !== "function") {
-      return;
-    }
-
-    pc.addEventListener("icecandidate", (event) => {
-      const candidateString = event?.candidate?.candidate ?? "";
-      const candidateType = parseCandidateType(candidateString);
-
-      if (candidateType && !seenIceTypes.has(candidateType)) {
-        seenIceTypes.add(candidateType);
-        emit("ice-candidate", { payload: candidateType });
-      }
-    });
-  }
-
-  function wireConnection(nextConnection) {
-    conn = nextConnection;
-
-    if (conn.peer !== expectedRemotePeerId) {
-      emit("error", { error: \`Unexpected peer connection from \${conn.peer}\` });
-      try {
-        conn.close();
-      } catch {}
-      return;
-    }
-
-    startIceTracking(conn);
-
-    conn.on("open", () => {
-      emit("connected", { peerId: conn.peer });
-    });
-
-    conn.on("close", () => {
-      emit("disconnected");
-    });
-
-    conn.on("error", (error) => {
-      emit("error", { error: error?.message ?? "Peer connection error" });
-    });
-
-    conn.on("data", (data) => {
-      if (data && typeof data === "object" && !(data instanceof ArrayBuffer) && !ArrayBuffer.isView(data) && !Array.isArray(data)) {
-        emit("data-json", { payload: data });
-        return;
-      }
-
-      const normalized = toArrayBufferLike(data);
-      const buffer = Buffer.from(normalized);
-      emit("data-buffer", { payload: buffer });
-    });
-  }
-
-  peer = new Peer(peerId, {
-    config: {
-      iceServers,
-    },
-  });
-
-  peer.on("open", () => {
-    emit("peer-open", { peerId });
-  });
-
-  peer.on("error", (error) => {
-    emit("error", { error: error?.message ?? "Peer session error" });
-  });
-
-  if (role === "receiver") {
-    peer.on("connection", (nextConnection) => {
-      wireConnection(nextConnection);
-    });
-  }
-
-  ipcRenderer.on(commandChannel, async (_event, command) => {
-    try {
-      switch (command.type) {
-        case "connect": {
-          if (role !== "sender") {
-            respond(command.requestId, { error: "Only sender sessions can initiate connections." });
-            return;
-          }
-
-          if (conn && conn.open) {
-            respond(command.requestId, { payload: true });
-            return;
-          }
-
-          const nextConnection = peer.connect(expectedRemotePeerId, { reliable: true });
-          const onOpen = () => {
-            respond(command.requestId, { payload: true });
-          };
-          const onError = (error) => {
-            respond(command.requestId, { error: error?.message ?? "Failed to connect to peer." });
-          };
-
-          nextConnection.once("open", onOpen);
-          nextConnection.once("error", onError);
-          wireConnection(nextConnection);
-          return;
-        }
-
-        case "send": {
-          if (!conn || !conn.open) {
-            respond(command.requestId, { error: "Cannot send data before the peer connection is open." });
-            return;
-          }
-
-          const payload =
-            command.kind === "buffer"
-              ? toArrayBufferLike(command.payload)
-              : command.payload;
-
-          conn.send(payload);
-
-          const dataChannel =
-            conn.dataChannel ||
-            conn._dc ||
-            null;
-
-          if (dataChannel && dataChannel.bufferedAmount > 1024 * 1024) {
-            await new Promise((resolve) => {
-              const onLow = () => {
-                dataChannel.removeEventListener("bufferedamountlow", onLow);
-                resolve();
-              };
-              dataChannel.bufferedAmountLowThreshold = 256 * 1024;
-              dataChannel.addEventListener("bufferedamountlow", onLow);
-            });
-          }
-
-          respond(command.requestId, { payload: true });
-          return;
-        }
-
-        case "close-connection": {
-          if (conn) {
-            conn.close();
-            conn = null;
-          }
-          respond(command.requestId, { payload: true });
-          return;
-        }
-
-        case "destroy": {
-          if (conn) {
-            try {
-              conn.close();
-            } catch {}
-            conn = null;
-          }
-
-          if (peer && !peer.destroyed) {
-            peer.destroy();
-          }
-
-          respond(command.requestId, { payload: true });
-          return;
-        }
-
-        case "update-expected-peer": {
-          if (typeof command.payload === "string" && command.payload) {
-            expectedRemotePeerId = command.payload;
-          }
-          respond(command.requestId, { payload: true });
-          return;
-        }
-
-        default:
-          respond(command.requestId, { error: "Unknown peer command." });
-      }
-    } catch (error) {
-      respond(command.requestId, {
-        error: error instanceof Error ? error.message : "Unexpected peer bridge error",
-      });
-    }
-  });
-})();
-`;
 }

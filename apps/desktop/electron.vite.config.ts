@@ -8,6 +8,14 @@ const resolveFromRoot = (...segments: string[]) => path.resolve(__dirname, ...se
 export default defineConfig({
   main: {
     plugins: [externalizeDepsPlugin({ exclude: ["@digswap/trade-domain"] })],
+    build: {
+      rollupOptions: {
+        input: {
+          index: resolveFromRoot("src/main/index.ts"),
+          "peer-bridge-worker": resolveFromRoot("src/main/webrtc/peer-bridge-worker.ts"),
+        },
+      },
+    },
     resolve: {
       alias: {
         "@main": resolveFromRoot("src/main"),
