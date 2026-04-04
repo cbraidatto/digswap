@@ -105,6 +105,39 @@ const MIN_TRANSFER_BYTES = 512 * 1024;
 const MAX_TRANSFER_BYTES = 8 * 1024 * 1024;
 const PEER_ID_COORDINATION_TIMEOUT_MS = 15_000;
 
+type RpcName = "acquire_trade_lease" | "heartbeat_trade_lease" | "release_trade_lease";
+
+const RPC_THROTTLE_MS = 5_000; // 1 call per 5 seconds per function per trade
+
+/**
+ * Module-level in-memory throttle map. Key format: `${tradeId}:${rpcName}`.
+ * Value is the timestamp (Date.now()) of the last allowed call.
+ * Prevents abuse of SECURITY DEFINER RPC functions.
+ * Module-scoped (not a class field) so it persists across the process lifetime.
+ */
+const rpcThrottleMap = new Map<string, number>();
+
+function checkRpcThrottle(tradeId: string, rpcName: RpcName): boolean {
+  const key = `${tradeId}:${rpcName}`;
+  const now = Date.now();
+  const lastCall = rpcThrottleMap.get(key);
+
+  if (lastCall && now - lastCall < RPC_THROTTLE_MS) {
+    return false; // throttled
+  }
+
+  rpcThrottleMap.set(key, now);
+  return true; // allowed
+}
+
+function clearRpcThrottle(tradeId: string): void {
+  for (const key of rpcThrottleMap.keys()) {
+    if (key.startsWith(`${tradeId}:`)) {
+      rpcThrottleMap.delete(key);
+    }
+  }
+}
+
 class UserCancelledPickerError extends Error {
   constructor() {
     super("File picker cancelled by user");
@@ -153,6 +186,7 @@ export class DesktopTradeRuntime {
     await this.releaseAllLeases();
     this.unsubscribeSessionListener();
     this.clearHeartbeatTimers();
+    rpcThrottleMap.clear();
   }
 
   onLobbyStateChanged(listener: Listener<LobbyStateEvent>) {
@@ -298,6 +332,7 @@ export class DesktopTradeRuntime {
   async cancelTransfer(tradeId: string) {
     await this.cancelSession(tradeId);
     await this.releaseTradeLease(tradeId);
+    clearRpcThrottle(tradeId);
   }
 
   async confirmCompletion(tradeId: string, rating: number) {
@@ -353,6 +388,7 @@ export class DesktopTradeRuntime {
 
     await this.releaseTradeLease(tradeId);
     this.cachedTradeContexts.delete(tradeId);
+    clearRpcThrottle(tradeId);
   }
 
   async openFileInExplorer(_filePath: string) {
@@ -614,6 +650,11 @@ export class DesktopTradeRuntime {
   private async ensureTradeLease(tradeId: string, status: TradeStatus) {
     await this.releaseOtherLeases(tradeId);
 
+    if (!checkRpcThrottle(tradeId, "acquire_trade_lease")) {
+      console.warn("[trade-runtime] acquire_trade_lease throttled for trade", tradeId);
+      return; // Skip — called too recently
+    }
+
     const client = this.authRuntime.getClientOrThrow();
     const { data, error } = await client.rpc("acquire_trade_lease", {
       p_trade_id: tradeId,
@@ -658,14 +699,19 @@ export class DesktopTradeRuntime {
         return;
       }
 
-      const client = this.authRuntime.getClientOrThrow();
-      const { error } = await client.rpc("release_trade_lease", {
-        p_trade_id: tradeId,
-        p_device_id: this.deviceId,
-      });
+      if (!checkRpcThrottle(tradeId, "release_trade_lease")) {
+        console.warn("[trade-runtime] release_trade_lease throttled for trade", tradeId);
+        // Still clean up local state even when throttled — only the network call is skipped
+      } else {
+        const client = this.authRuntime.getClientOrThrow();
+        const { error } = await client.rpc("release_trade_lease", {
+          p_trade_id: tradeId,
+          p_device_id: this.deviceId,
+        });
 
-      if (error) {
-        throw new Error(error.message);
+        if (error) {
+          throw new Error(error.message);
+        }
       }
     } catch (error) {
       console.error("[trade-runtime] failed to release trade lease", error);
@@ -713,6 +759,10 @@ export class DesktopTradeRuntime {
     const activeLease = this.activeLeases.get(tradeId);
     if (!activeLease) {
       return;
+    }
+
+    if (!checkRpcThrottle(tradeId, "heartbeat_trade_lease")) {
+      return; // Skip this heartbeat cycle — too soon
     }
 
     const client = this.authRuntime.getClientOrThrow();
