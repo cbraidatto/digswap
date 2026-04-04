@@ -20,11 +20,15 @@ interface MessagePortLike {
   postMessage(value: unknown): void;
 }
 
-const parentPort = (process as unknown as { parentPort?: MessagePortLike }).parentPort;
+const _parentPort = (process as unknown as { parentPort?: MessagePortLike }).parentPort;
 
-if (!parentPort) {
+if (!_parentPort) {
   throw new Error("peer-bridge-worker must be run inside an Electron utilityProcess.");
 }
+
+// Re-assign to a non-optional const so TypeScript knows it's always defined
+// in all closures below (control-flow narrowing doesn't survive closures).
+const parentPort: MessagePortLike = _parentPort;
 
 interface InitMessage {
   type: "init";
@@ -293,11 +297,12 @@ function initializePeer(config: InitMessage) {
 }
 
 // Listen for messages from the parent process (PeerSession)
-parentPort.on("message", ({ data }: { data: IncomingMessage }) => {
-  if (data.type === "init") {
-    initializePeer(data as InitMessage);
+parentPort.on("message", ({ data }: { data: unknown }) => {
+  const msg = data as IncomingMessage;
+  if (msg.type === "init") {
+    initializePeer(msg as InitMessage);
     return;
   }
 
-  void handleCommand(data as CommandMessage);
+  void handleCommand(msg as CommandMessage);
 });
