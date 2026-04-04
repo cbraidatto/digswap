@@ -1,8 +1,8 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
-import { apiRateLimit } from "@/lib/rate-limit";
+import { apiRateLimit , safeLimit} from "@/lib/rate-limit";
 import { randomBytes } from "node:crypto";
-import { handoffStore } from "@/lib/desktop/handoff-store";
+import { storeHandoffCode } from "@/lib/desktop/handoff-store";
 
 /**
  * POST /api/desktop/session
@@ -28,16 +28,20 @@ export async function POST() {
 		return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
 	}
 
-	const { success } = await apiRateLimit.limit(user.id);
+	const { success } = await safeLimit(apiRateLimit, user.id, false);
 	if (!success) {
 		return NextResponse.json({ error: "Too many requests" }, { status: 429 });
 	}
 
 	// Generate single-use handoff code
 	const code = randomBytes(32).toString("base64url");
-	const expiresAt = Date.now() + 30_000; // 30 seconds
 
-	handoffStore.set(code, { userId: user.id, expiresAt });
+	try {
+		await storeHandoffCode(code, user.id);
+	} catch (err) {
+		console.error("[desktop/session] failed to store handoff code:", err);
+		return NextResponse.json({ error: "Service unavailable" }, { status: 503 });
+	}
 
 	return NextResponse.json({ code, expiresIn: 30 });
 }

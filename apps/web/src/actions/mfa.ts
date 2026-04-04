@@ -5,7 +5,8 @@ import { consumeBackupCode, generateBackupCodes, storeBackupCodes } from "@/lib/
 import { db } from "@/lib/db";
 import { backupCodes } from "@/lib/db/schema/sessions";
 import { profiles } from "@/lib/db/schema/users";
-import { totpRateLimit } from "@/lib/rate-limit";
+import { totpRateLimit , safeLimit} from "@/lib/rate-limit";
+import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
 import { backupCodeSchema, totpSchema } from "@/lib/validations/auth";
 
@@ -84,7 +85,7 @@ export async function verifyTotpEnrollment(factorId: string, code: string): Prom
 		}
 
 		// Rate limit by user ID
-		const { success: allowed } = await totpRateLimit.limit(user.id);
+		const { success: allowed } = await safeLimit(totpRateLimit, user.id, true);
 		if (!allowed) {
 			return {
 				success: false,
@@ -156,7 +157,7 @@ export async function challengeTotp(code: string): Promise<MfaResult<{ redirectT
 		}
 
 		// Rate limit by user ID
-		const { success: allowed } = await totpRateLimit.limit(user.id);
+		const { success: allowed } = await safeLimit(totpRateLimit, user.id, true);
 		if (!allowed) {
 			return {
 				success: false,
@@ -250,7 +251,7 @@ export async function useBackupCode(
 		}
 
 		// Rate limit by user ID
-		const { success: allowed } = await totpRateLimit.limit(user.id);
+		const { success: allowed } = await safeLimit(totpRateLimit, user.id, true);
 		if (!allowed) {
 			return {
 				success: false,
@@ -274,19 +275,28 @@ export async function useBackupCode(
 			};
 		}
 
-		// Backup code is valid -- we need to elevate session to AAL2
-		// Since Supabase doesn't natively support backup codes for AAL2,
-		// we use the TOTP factor challenge/verify flow.
-		// For backup codes, we mark the code as consumed and trust the verification.
-		// The user gets redirected but may not have full AAL2 -- this is a known
-		// limitation documented in the plan.
-
-		// Get user's TOTP factors and complete the MFA challenge
-		const { data: factorsData } = await supabase.auth.mfa.listFactors();
-		const totpFactor = factorsData?.totp.find((f) => f.status === "verified");
-
-		// Even with backup code, we note the factor exists for the session
-		// The backup code flow bypasses TOTP verification by design
+		// Backup code validated — elevate session context.
+		//
+		// Supabase's MFA API does not accept backup codes as a verify token,
+		// so we cannot call mfa.challenge/verify directly.  Instead we use
+		// the admin API to update user metadata to record the backup-code
+		// authentication event.  The session technically stays at AAL1 on the
+		// Supabase side, but we record it server-side so sensitive actions
+		// (like disabling TOTP) can require a fresh TOTP verification.
+		//
+		// For disableTotp() the AAL2 check will still block until the user
+		// re-authenticates with their TOTP app — backup code grants login
+		// access but not the ability to fully remove 2FA without the TOTP app.
+		try {
+			const admin = createAdminClient();
+			await admin.auth.admin.updateUserById(user.id, {
+				user_metadata: {
+					last_backup_code_auth: new Date().toISOString(),
+				},
+			});
+		} catch {
+			// Non-blocking — metadata update failure should not block login
+		}
 
 		// Check onboarding status
 		const [profile] = await db

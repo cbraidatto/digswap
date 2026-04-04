@@ -67,7 +67,7 @@ export default function OnboardingPage() {
 			case 2:
 				return <SecuritySetup onSkip={() => setCurrentStep(3)} />;
 			case 3:
-				return <DiscogsConnect />;
+				return <DiscogsConnect onSkip={() => setCurrentStep(4)} />;
 			case 4:
 				return <OnboardingComplete />;
 			default:

@@ -87,7 +87,13 @@ vi.mock("@/lib/supabase/admin", () => ({
 // Rate limit mock (default: not limited)
 // ---------------------------------------------------------------------------
 vi.mock("@/lib/rate-limit", () => ({
-	apiRateLimit: { limit: mockRateLimitFn },
+	authRateLimit: null,
+	resetRateLimit: null,
+	totpRateLimit: null,
+	apiRateLimit: null,
+	tradeRateLimit: null,
+	discogsRateLimit: null,
+	safeLimit: mockRateLimitFn.mockImplementation(async () => ({ success: true })),
 }));
 
 // ---------------------------------------------------------------------------

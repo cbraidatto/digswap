@@ -6,7 +6,7 @@ import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { db } from "@/lib/db";
 import { userSessions } from "@/lib/db/schema/sessions";
-import { apiRateLimit } from "@/lib/rate-limit";
+import { apiRateLimit , safeLimit} from "@/lib/rate-limit";
 import { sessionIdSchema, enforceSessionLimitSchema, recordSessionSchema } from "@/lib/validations/sessions";
 
 /**
@@ -73,7 +73,7 @@ export async function getSessions(): Promise<{
 
 	const userId = data.user.id;
 
-	const { success: rlSuccess } = await apiRateLimit.limit(userId);
+	const { success: rlSuccess } = await safeLimit(apiRateLimit, userId, false);
 	if (!rlSuccess) {
 		return { success: false, sessions: [], error: "Too many requests. Please wait a moment." };
 	}
@@ -130,7 +130,7 @@ export async function terminateSession(
 
 	const userId = data.user.id;
 
-	const { success: rlSuccess } = await apiRateLimit.limit(userId);
+	const { success: rlSuccess } = await safeLimit(apiRateLimit, userId, true);
 	if (!rlSuccess) {
 		return { success: false, error: "Too many requests. Please wait a moment." };
 	}
@@ -149,24 +149,23 @@ export async function terminateSession(
 			return { success: false, error: "Session not found" };
 		}
 
-		// Invalidate the Supabase auth session via admin client
-		// Note: signOut by session_id invalidates the token server-side
+		const admin = createAdminClient();
+
+		// Invalidate the Supabase JWT server-side using the session_id from the JWT
+		// (stored in user_sessions.session_id). This prevents the token from being
+		// used even if the attacker has it in memory — doesn't wait for expiry.
+		// admin.auth.admin.signOut(jwt) accepts the session_id claim directly.
 		try {
-			const admin = createAdminClient();
-			// Supabase admin API doesn't have per-session signout by our custom session_id,
-			// but we can delete the session record so it's no longer tracked.
-			// The Supabase session token will still work until it expires or is refreshed,
-			// but the user_sessions record is removed for our tracking.
-			await admin
-				.from("user_sessions")
-				.delete()
-				.eq("id", parsed.data.sessionId)
-				.eq("user_id", userId);
+			if (session.sessionId) {
+				await admin.auth.admin.signOut(session.sessionId);
+			}
 		} catch (adminError) {
-			console.error("Admin session invalidation error:", adminError);
+			// Non-fatal: the session record is still removed from tracking below.
+			// The token will expire naturally if the admin signout fails.
+			console.error("[terminateSession] admin signout error:", adminError);
 		}
 
-		// Also delete from our Drizzle-managed table
+		// Remove from our session tracking table (both admin client and Drizzle)
 		await db
 			.delete(userSessions)
 			.where(
@@ -198,6 +197,11 @@ export async function enforceSessionLimit(
 		if (!parsed.success) {
 			return;
 		}
+
+		// Security: verify caller owns this userId to prevent session DoS attacks
+		const supabase = await createClient();
+		const { data: { user } } = await supabase.auth.getUser();
+		if (!user || user.id !== parsed.data.userId) return;
 
 		// Count active sessions
 		const sessions = await db
@@ -257,6 +261,11 @@ export async function recordSession(
 		if (!parsed.success) {
 			return;
 		}
+
+		// Security: verify caller owns this userId
+		const supabase = await createClient();
+		const { data: { user } } = await supabase.auth.getUser();
+		if (!user || user.id !== parsed.data.userId) return;
 
 		const headerStore = await headers();
 		const deviceInfo = headerStore.get("user-agent") || "unknown";

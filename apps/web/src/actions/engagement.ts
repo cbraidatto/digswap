@@ -8,7 +8,7 @@ import { activityFeed } from "@/lib/db/schema/social";
 import { collectionItems } from "@/lib/db/schema/collections";
 import { releases } from "@/lib/db/schema/releases";
 import { eq, and, sql, count } from "drizzle-orm";
-import { apiRateLimit } from "@/lib/rate-limit";
+import { apiRateLimit , safeLimit} from "@/lib/rate-limit";
 import { z } from "zod";
 
 // ── Validation schemas ─────────────────────────────────────
@@ -44,50 +44,51 @@ export async function toggleDig(
 
 		const user = await requireUser();
 
-		const { success: rlSuccess } = await apiRateLimit.limit(user.id);
+		const { success: rlSuccess } = await safeLimit(apiRateLimit, user.id, true);
 		if (!rlSuccess) {
 			return { dug: false, digCount: 0, error: "Too many requests" };
 		}
 
-		// Check if already dug
-		const existing = await db
-			.select({ id: digs.id })
-			.from(digs)
-			.where(
-				and(
-					eq(digs.userId, user.id),
-					eq(digs.feedItemId, parsed.data.feedItemId),
-				),
-			);
-
-		if (existing.length > 0) {
-			// Un-dig
-			await db
-				.delete(digs)
+		// SECURITY: Atomic toggle via transaction to prevent race condition (double-dig)
+		const result = await db.transaction(async (tx) => {
+			const existing = await tx
+				.select({ id: digs.id })
+				.from(digs)
 				.where(
 					and(
 						eq(digs.userId, user.id),
 						eq(digs.feedItemId, parsed.data.feedItemId),
 					),
 				);
-		} else {
-			// Dig!
-			await db.insert(digs).values({
-				userId: user.id,
-				feedItemId: parsed.data.feedItemId,
-			});
-		}
 
-		// Get updated count
-		const countResult = await db
-			.select({ count: count() })
-			.from(digs)
-			.where(eq(digs.feedItemId, parsed.data.feedItemId));
+			if (existing.length > 0) {
+				await tx
+					.delete(digs)
+					.where(
+						and(
+							eq(digs.userId, user.id),
+							eq(digs.feedItemId, parsed.data.feedItemId),
+						),
+					);
+			} else {
+				await tx.insert(digs).values({
+					userId: user.id,
+					feedItemId: parsed.data.feedItemId,
+				});
+			}
 
-		return {
-			dug: existing.length === 0,
-			digCount: Number(countResult[0]?.count ?? 0),
-		};
+			const countResult = await tx
+				.select({ count: count() })
+				.from(digs)
+				.where(eq(digs.feedItemId, parsed.data.feedItemId));
+
+			return {
+				dug: existing.length === 0,
+				digCount: Number(countResult[0]?.count ?? 0),
+			};
+		});
+
+		return result;
 	} catch (err) {
 		console.error("[toggleDig] error:", err);
 		return { dug: false, digCount: 0, error: "Could not toggle dig" };
@@ -99,6 +100,11 @@ export async function getDigState(
 ): Promise<Record<string, { dug: boolean; digCount: number }>> {
 	try {
 		if (feedItemIds.length === 0) return {};
+
+		// SECURITY: Limit array size to prevent DoS via massive SQL IN clause
+		if (feedItemIds.length > 100) {
+			feedItemIds = feedItemIds.slice(0, 100);
+		}
 
 		const user = await requireUser();
 
@@ -164,7 +170,16 @@ export async function computeDiggerDna(
 	};
 
 	try {
-		const targetUserId = userId ?? (await requireUser()).id;
+		const currentUser = await requireUser();
+
+		// If a userId is provided it must match the authenticated user.
+		// Allowing arbitrary userId here would let any authenticated user
+		// overwrite another user's diggerDna row (IDOR on the upsert below).
+		if (userId && userId !== currentUser.id) {
+			return { ...empty, error: "Forbidden" };
+		}
+
+		const targetUserId = currentUser.id;
 
 		// Get all user's releases with metadata
 		const items = await db
@@ -283,8 +298,22 @@ export async function computeDiggerDna(
 
 export async function getDiggerDna(userId: string) {
 	try {
+		// SECURITY: Require authentication to prevent enumeration of all users' DNA profiles
+		const user = await requireUser();
+
+		const { success: rlSuccess } = await safeLimit(apiRateLimit, user.id, false);
+		if (!rlSuccess) return null;
+
 		const result = await db
-			.select()
+			.select({
+				userId: diggerDna.userId,
+				topGenres: diggerDna.topGenres,
+				topDecades: diggerDna.topDecades,
+				topCountries: diggerDna.topCountries,
+				rarityProfile: diggerDna.rarityProfile,
+				avgRarity: diggerDna.avgRarity,
+				totalRecords: diggerDna.totalRecords,
+			})
 			.from(diggerDna)
 			.where(eq(diggerDna.userId, userId));
 
@@ -304,7 +333,7 @@ export async function logListening(
 	try {
 		const user = await requireUser();
 
-		const { success: rlSuccess } = await apiRateLimit.limit(user.id);
+		const { success: rlSuccess } = await safeLimit(apiRateLimit, user.id, true);
 		if (!rlSuccess) {
 			return { success: false, error: "Too many requests" };
 		}

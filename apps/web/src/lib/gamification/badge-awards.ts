@@ -1,13 +1,13 @@
 import { createAdminClient } from "@/lib/supabase/admin";
 
 /**
- * Awards a badge to a user by slug. Idempotent -- returns false if
- * already awarded or if the badge slug doesn't exist.
+ * Awards a badge to a user by slug. Idempotent - duplicate awards are absorbed
+ * by the unique constraint on user_badges and treated as a no-op.
  *
  * Uses the admin client to bypass RLS (badges are service-managed).
  * Creates an in-app notification on successful award.
  *
- * @returns true if badge was newly awarded, false otherwise
+ * @returns true if badge was newly awarded, false if already had it or not found
  */
 export async function awardBadge(
 	userId: string,
@@ -24,43 +24,36 @@ export async function awardBadge(
 			.single();
 
 		if (badgeError || !badge) {
-			console.error(
-				`[awardBadge] Badge not found: ${badgeSlug}`,
-				badgeError,
-			);
+			console.error(`[awardBadge] Badge not found: ${badgeSlug}`, badgeError);
 			return false;
 		}
 
-		// Check if already awarded (idempotent)
-		const { data: existing } = await admin
-			.from("user_badges")
-			.select("id")
-			.eq("user_id", userId)
-			.eq("badge_id", badge.id)
-			.maybeSingle();
-
-		if (existing) {
-			return false; // Already awarded
-		}
-
-		// Award the badge
-		const { error: insertError } = await admin
+		// A concurrent duplicate hits the unique constraint and is treated as an
+		// already-awarded no-op below, so this remains safe under races.
+		const { data: inserted, error: insertError } = await admin
 			.from("user_badges")
 			.insert({
 				user_id: userId,
 				badge_id: badge.id,
 				earned_at: new Date().toISOString(),
-			});
+			})
+			.select("id")
+			.single();
 
 		if (insertError) {
-			console.error(
-				`[awardBadge] Failed to insert badge: ${badgeSlug}`,
-				insertError,
-			);
+			// 23505 = unique_violation - already awarded, not an error
+			if (insertError.code === "23505") {
+				return false;
+			}
+			console.error(`[awardBadge] Failed to insert badge: ${badgeSlug}`, insertError);
 			return false;
 		}
 
-		// Create notification
+		if (!inserted) {
+			return false;
+		}
+
+		// Create notification (non-blocking - badge award itself succeeded)
 		await admin.from("notifications").insert({
 			user_id: userId,
 			type: "new_badge",

@@ -13,9 +13,11 @@ const {
 	mockSubscriptionRetrieve,
 	mockToIsoFromUnixTimestamp,
 	mockGetPlanFromStripeSubscription,
+	mockGetTierFromSubscription,
 } = vi.hoisted(() => ({
 	mockConstructEvent: vi.fn(),
 	mockGetPlanFromStripeSubscription: vi.fn(),
+	mockGetTierFromSubscription: vi.fn(),
 	mockProfilesUpdate: vi.fn(),
 	mockProfilesUpdateEq: vi.fn(),
 	mockSubscriptionsMaybeSingle: vi.fn(),
@@ -30,6 +32,7 @@ const {
 
 vi.mock("@/lib/stripe", () => ({
 	getPlanFromStripeSubscription: mockGetPlanFromStripeSubscription,
+	getTierFromSubscription: mockGetTierFromSubscription,
 	getStripe: vi.fn(() => ({
 		subscriptions: {
 			retrieve: mockSubscriptionRetrieve,
@@ -66,6 +69,19 @@ vi.mock("@/lib/supabase/admin", () => ({
 				};
 			}
 
+			// stripe_event_log — idempotency table: select returns no existing event,
+			// insert is a no-op (always succeeds for test purposes)
+			if (table === "stripe_event_log") {
+				return {
+					select: vi.fn().mockReturnValue({
+						eq: vi.fn().mockReturnValue({
+							maybeSingle: vi.fn().mockResolvedValue({ data: null, error: null }),
+						}),
+					}),
+					insert: vi.fn().mockResolvedValue({ error: null }),
+				};
+			}
+
 			throw new Error(`Unexpected admin table: ${table}`);
 		}),
 	})),
@@ -89,6 +105,7 @@ beforeEach(() => {
 	process.env.STRIPE_WEBHOOK_SECRET = "whsec_test";
 
 	mockGetPlanFromStripeSubscription.mockReturnValue("premium_monthly");
+	mockGetTierFromSubscription.mockReturnValue("premium");
 	mockToIsoFromUnixTimestamp.mockImplementation((value: number | null | undefined) =>
 		typeof value === "number" ? new Date(value * 1000).toISOString() : null,
 	);

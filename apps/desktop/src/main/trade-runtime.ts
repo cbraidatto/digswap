@@ -1,6 +1,7 @@
 import fs from "node:fs/promises";
 import path from "node:path";
 import { dialog } from "electron";
+import type { RealtimeChannel } from "@supabase/supabase-js";
 import {
   TRADE_STATUS,
   tradeRuntimePolicy,
@@ -45,6 +46,7 @@ interface TradeRequestRow {
   declared_quality: string | null;
   condition_notes: string | null;
   file_size_bytes: number | null;
+  file_hash: string | null;
   created_at: string;
   updated_at: string;
 }
@@ -64,12 +66,21 @@ interface LeaseRpcRow {
   last_ice_candidate_type: string | null;
 }
 
+interface TradeRuntimeSessionPeerRow {
+  peer_id: string | null;
+  user_id: string;
+}
+
 interface CachedTradeContext {
   counterpartyId: string;
   detail: TradeDetail;
   normalizedTransferBytes: number;
   receivedFileName: string;
   transferRole: PeerRole;
+  /** SHA-256 hash declared by the sender at file offer time, stored in the DB.
+   *  Used by the receiver to verify the downloaded file independently of
+   *  any hash the sender may transmit over the data channel. */
+  senderDeclaredHash: string | null;
 }
 
 interface ActiveLease {
@@ -80,6 +91,7 @@ interface ActiveLease {
 
 interface ActiveSessionRecord {
   partPath: string | null;
+  realtimeChannel: RealtimeChannel | null;
   role: PeerRole;
   session: PeerSession;
 }
@@ -91,6 +103,7 @@ const UUID_PATTERN =
 const DEFAULT_TRANSFER_BYTES = 6 * 1024 * 1024;
 const MIN_TRANSFER_BYTES = 512 * 1024;
 const MAX_TRANSFER_BYTES = 8 * 1024 * 1024;
+const PEER_ID_COORDINATION_TIMEOUT_MS = 15_000;
 
 class UserCancelledPickerError extends Error {
   constructor() {
@@ -252,10 +265,14 @@ export class DesktopTradeRuntime {
         onIceCandidate: (type) => {
           this.setLastIceCandidateType(tradeId, type);
         },
+        onPeerIdRegistered: (peerId) => {
+          void this.publishAndSubscribePeerId(tradeId, peerId, session);
+        },
       });
 
       this.activeSessions.set(tradeId, {
         partPath: context.transferRole === "receiver" ? this.getPartPath(tradeId) : null,
+        realtimeChannel: null,
         role: context.transferRole,
         session,
       });
@@ -293,11 +310,18 @@ export class DesktopTradeRuntime {
       return;
     }
 
+    // `finalize_trade_transfer` already commits the receipt upsert, the
+    // trade_runtime_sessions update, and the trade_requests status change as a
+    // single Postgres RPC. By the time confirmCompletion() continues, transfer
+    // completion has either fully committed or fully rolled back.
     await this.reconcilePendingTransferReceipts();
 
     const context = await this.loadTradeContext(tradeId);
     const client = this.authRuntime.getClientOrThrow();
 
+    // The desktop rating is intentionally best-effort and outside the atomic
+    // transfer RPC: a review failure must never partially undo trade
+    // completion or leave the transfer receipt half-written.
     try {
       const { data: existingReview, error: reviewLookupError } = await client
         .from("trade_reviews")
@@ -413,7 +437,7 @@ export class DesktopTradeRuntime {
     const { data: tradeData, error: tradeError } = await client
       .from("trade_requests")
       .select(
-        "id, requester_id, provider_id, release_id, offering_release_id, status, message, expires_at, file_name, file_format, declared_quality, condition_notes, file_size_bytes, created_at, updated_at",
+        "id, requester_id, provider_id, release_id, offering_release_id, status, message, expires_at, file_name, file_format, declared_quality, condition_notes, file_size_bytes, file_hash, created_at, updated_at",
       )
       .eq("id", tradeId)
       .single();
@@ -473,6 +497,7 @@ export class DesktopTradeRuntime {
         providerLeg.fileNameHint ?? trade.file_name ?? `${providerLeg.title || "trade"}.bin`,
       ),
       transferRole: isProvider ? "sender" : "receiver",
+      senderDeclaredHash: trade.file_hash ?? null,
     };
 
     this.cachedTradeContexts.set(tradeId, context);
@@ -725,6 +750,11 @@ export class DesktopTradeRuntime {
         throw new Error("Sender transfer started without a selected source file.");
       }
 
+      // Race B: if the sender connects while expectedRemotePeerId is still the
+      // legacy placeholder (`${tradeId}-r` / `${tradeId}-s`), wireConnection()
+      // rejects the socket as an unexpected peer. Wait until the coordination
+      // channel replaces the placeholder with the real randomized peer ID.
+      await session.waitForExpectedPeerIdUpdate(PEER_ID_COORDINATION_TIMEOUT_MS);
       const connection = await session.connect();
 
       await sendFile(connection, sourceFilePath, {
@@ -774,7 +804,10 @@ export class DesktopTradeRuntime {
     try {
       const connection = await session.waitForConnection();
 
-      await receiveFile(connection, partPath, finalPath, null, {
+      // Use the file hash stored in the DB when the sender declared the file —
+      // never trust the hash that comes from the sender over the data channel.
+      const declaredHash = context.senderDeclaredHash ?? null;
+      await receiveFile(connection, partPath, finalPath, declaredHash, {
         onProgress: (bytesTransferred, totalBytes) => {
           this.emitTransferProgress({
             bytesReceived: bytesTransferred,
@@ -899,6 +932,10 @@ export class DesktopTradeRuntime {
       return;
     }
 
+    if (activeSession.realtimeChannel) {
+      await activeSession.realtimeChannel.unsubscribe();
+    }
+
     await activeSession.session.destroy();
     this.activeSessions.delete(tradeId);
   }
@@ -923,6 +960,11 @@ export class DesktopTradeRuntime {
         const attemptAt = new Date().toISOString();
 
         try {
+          // This RPC is the atomic boundary for transfer completion. The
+          // PL/pgSQL function performs the receipt upsert plus the related
+          // session/trade updates inside one database statement, so the desktop
+          // runtime should retry the whole RPC instead of splitting it into
+          // separate client-side mutations.
           const { error } = await client.rpc("finalize_trade_transfer", {
             p_trade_id: receipt.tradeId,
             p_device_id: receipt.deviceId,
@@ -956,10 +998,141 @@ export class DesktopTradeRuntime {
     }
   }
 
+  /**
+   * Called when PeerJS confirms our peer ID registration.
+   *
+   * 1. Publishes the peer ID to the DB via the `update_trade_peer_id` RPC so
+   *    the counterparty can read it via Realtime postgres_changes.
+   * 2. Subscribes to `trade_runtime_sessions` changes for this trade so we
+   *    receive the counterparty's peer ID and can validate their connection.
+   */
+  private async publishAndSubscribePeerId(
+    tradeId: string,
+    peerId: string,
+    session: PeerSession,
+  ) {
+    let channel: RealtimeChannel | null = null;
+
+    try {
+      const supabaseSession = await this.authRuntime.getSession();
+      if (!supabaseSession) {
+        return;
+      }
+
+      const client = this.authRuntime.getClientOrThrow();
+      const userId = supabaseSession.user.id;
+
+      // Race A: subscribing after we publish leaves a gap where the
+      // counterparty's UPDATE can land before our listener is active. The fix
+      // is "snapshot + listen": start the Realtime listener first, wait for the
+      // SUBSCRIBED ack, read the current counterparty peer_id directly from
+      // trade_runtime_sessions, then keep listening for future UPDATE events.
+      channel = client
+        .channel(`trade-peers:${tradeId}`)
+        .on(
+          "postgres_changes",
+          {
+            event: "UPDATE",
+            schema: "public",
+            table: "trade_runtime_sessions",
+            filter: `trade_id=eq.${tradeId}`,
+          },
+          (payload: { new: Record<string, unknown> }) => {
+            const row = payload.new;
+            if (
+              typeof row["user_id"] === "string" &&
+              typeof row["peer_id"] === "string" &&
+              row["user_id"] !== userId &&
+              row["peer_id"]
+            ) {
+              session.updateExpectedRemotePeerId(row["peer_id"] as string);
+            }
+          },
+        );
+
+      // Store the channel reference so it can be cleaned up on session end.
+      const activeSession = this.activeSessions.get(tradeId);
+      if (activeSession) {
+        activeSession.realtimeChannel = channel;
+      }
+
+      await this.waitForRealtimeSubscription(channel, tradeId);
+
+      const { data: snapshotRow, error: snapshotError } = await client
+        .from("trade_runtime_sessions")
+        .select("user_id, peer_id")
+        .eq("trade_id", tradeId)
+        .neq("user_id", userId)
+        .is("released_at", null)
+        .not("peer_id", "is", null)
+        .maybeSingle();
+
+      if (snapshotError) {
+        throw new Error(`Failed to snapshot counterparty peer ID: ${snapshotError.message}`);
+      }
+
+      const counterpartyPeerId = (snapshotRow as TradeRuntimeSessionPeerRow | null)?.peer_id ?? null;
+      if (counterpartyPeerId) {
+        session.updateExpectedRemotePeerId(counterpartyPeerId);
+      }
+
+      const { error: rpcError } = await client.rpc("update_trade_peer_id", {
+        p_trade_id: tradeId,
+        p_device_id: this.deviceId,
+        p_peer_id: peerId,
+      });
+
+      if (rpcError) {
+        console.error("[trade-runtime] failed to publish peer ID", rpcError.message);
+      }
+    } catch (error) {
+      if (channel) {
+        await channel.unsubscribe().catch(() => undefined);
+      }
+
+      const activeSession = this.activeSessions.get(tradeId);
+      if (activeSession?.realtimeChannel === channel) {
+        activeSession.realtimeChannel = null;
+      }
+
+      console.error("[trade-runtime] error in publishAndSubscribePeerId", error);
+    }
+  }
+
+  private async waitForRealtimeSubscription(channel: RealtimeChannel, tradeId: string) {
+    await new Promise<void>((resolve, reject) => {
+      const timeoutId = setTimeout(() => {
+        reject(
+          new Error(`Timed out subscribing to the peer ID channel for trade ${tradeId}.`),
+        );
+      }, PEER_ID_COORDINATION_TIMEOUT_MS);
+
+      channel.subscribe((status) => {
+        if (status === "SUBSCRIBED") {
+          clearTimeout(timeoutId);
+          console.log("[trade-runtime] subscribed to peer ID channel for trade", tradeId);
+          resolve();
+          return;
+        }
+
+        if (status === "CHANNEL_ERROR" || status === "CLOSED" || status === "TIMED_OUT") {
+          clearTimeout(timeoutId);
+          reject(
+            new Error(`Peer ID channel subscription failed with status ${status}.`),
+          );
+        }
+      });
+    });
+  }
+
   private async cancelSession(tradeId: string) {
     const activeSession = this.activeSessions.get(tradeId);
     if (!activeSession) {
       return;
+    }
+
+    if (activeSession.realtimeChannel) {
+      await activeSession.realtimeChannel.unsubscribe();
     }
 
     await activeSession.session.destroy();
@@ -1005,6 +1178,7 @@ function buildTradeLeg({
 }) {
   const fileNameHint = attachTransferMetadata ? trade.file_name : null;
   const fileSizeBytes = attachTransferMetadata ? trade.file_size_bytes : null;
+  const fileHash = attachTransferMetadata ? (trade.file_hash ?? null) : null;
 
   return {
     title: release?.title?.trim() || fallbackTitle,
@@ -1014,6 +1188,7 @@ function buildTradeLeg({
     notes: trade.condition_notes ?? trade.message,
     fileNameHint,
     fileSizeBytes,
+    fileHash,
   } satisfies TradeLeg;
 }
 

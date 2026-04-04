@@ -7,6 +7,7 @@ import type {
 } from "../shared/ipc-types";
 
 const DIGSWAP_PROTOCOL = "digswap";
+const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/iu;
 
 function createPayloadBase(rawUrl: string) {
   return {
@@ -44,7 +45,8 @@ export function parseProtocolUrl(rawUrl: string): DesktopProtocolPayload | null 
       const tradeId = parsed.pathname.replace(/^\/+/u, "");
       const token = parsed.searchParams.get("handoff");
 
-      if (!tradeId || !token) {
+      // SECURITY: Validate tradeId is a proper UUID to prevent injection via protocol handler
+      if (!tradeId || !token || !UUID_PATTERN.test(tradeId)) {
         return null;
       }
 

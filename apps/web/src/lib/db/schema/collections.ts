@@ -30,10 +30,10 @@ export const collectionItems = pgTable(
       .notNull(),
   },
   (table) => [
-    pgPolicy("collection_items_select_all", {
+    pgPolicy("collection_items_select_own", {
       for: "select",
       to: authenticatedRole,
-      using: sql`true`, // Public collections
+      using: sql`${table.userId} = ${authUid}`,
     }),
     pgPolicy("collection_items_insert_own", {
       for: "insert",

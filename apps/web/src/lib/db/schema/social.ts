@@ -56,10 +56,10 @@ export const activityFeed = pgTable(
       .notNull(),
   },
   (table) => [
-    pgPolicy("activity_feed_select_all", {
+    pgPolicy("activity_feed_select_own", {
       for: "select",
       to: authenticatedRole,
-      using: sql`true`, // All authenticated users can view activity
+      using: sql`${table.userId} = ${authUid}`,
     }),
     pgPolicy("activity_feed_insert_own", {
       for: "insert",

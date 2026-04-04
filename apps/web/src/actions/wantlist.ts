@@ -3,7 +3,7 @@
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { createDiscogsClient, computeRarityScore } from "@/lib/discogs/client";
-import { apiRateLimit } from "@/lib/rate-limit";
+import { apiRateLimit , safeLimit} from "@/lib/rate-limit";
 import { searchYouTube } from "@/lib/youtube/client";
 import { addToWantlistSchema, wantlistItemIdSchema, addFromYouTubeSchema } from "@/lib/validations/wantlist";
 export { searchYouTube };
@@ -23,7 +23,7 @@ export async function addToWantlist(
 		} = await supabase.auth.getUser();
 		if (!user) return { error: "Not authenticated" };
 
-		const { success: rlSuccess } = await apiRateLimit.limit(user.id);
+		const { success: rlSuccess } = await safeLimit(apiRateLimit, user.id, true);
 		if (!rlSuccess) {
 			return { error: "Too many requests. Please wait a moment." };
 		}
@@ -66,8 +66,20 @@ export async function addToWantlist(
 				.select("id")
 				.single();
 
-			if (insertError || !inserted) return { error: "Could not save release data." };
-			releaseId = inserted.id;
+			if (insertError?.code === "23505") {
+				const { data: concurrentRelease } = await admin
+					.from("releases")
+					.select("id")
+					.eq("discogs_id", release.id)
+					.maybeSingle();
+
+				if (!concurrentRelease) return { error: "Could not save release data." };
+				releaseId = concurrentRelease.id;
+			} else if (insertError || !inserted) {
+				return { error: "Could not save release data." };
+			} else {
+				releaseId = inserted.id;
+			}
 		}
 
 		// Duplicate check
@@ -89,7 +101,11 @@ export async function addToWantlist(
 				created_at: new Date().toISOString(),
 			});
 
-		if (wantError) return { error: "Could not add to wantlist." };
+		if (wantError) {
+			// 23505 = unique_violation — concurrent duplicate
+			if (wantError.code === "23505") return { error: "Already on your wantlist" };
+			return { error: "Could not add to wantlist." };
+		}
 
 		return { success: true };
 	} catch (err) {
@@ -113,7 +129,7 @@ export async function removeFromWantlist(
 		} = await supabase.auth.getUser();
 		if (!user) return { error: "Not authenticated" };
 
-		const { success: rlSuccess } = await apiRateLimit.limit(user.id);
+		const { success: rlSuccess } = await safeLimit(apiRateLimit, user.id, true);
 		if (!rlSuccess) {
 			return { error: "Too many requests. Please wait a moment." };
 		}
@@ -149,7 +165,7 @@ export async function markAsFound(
 		} = await supabase.auth.getUser();
 		if (!user) return { error: "Not authenticated" };
 
-		const { success: rlSuccess } = await apiRateLimit.limit(user.id);
+		const { success: rlSuccess } = await safeLimit(apiRateLimit, user.id, true);
 		if (!rlSuccess) {
 			return { error: "Too many requests. Please wait a moment." };
 		}
@@ -227,7 +243,7 @@ export async function addToWantlistFromYouTube(
 		} = await supabase.auth.getUser();
 		if (!user) return { error: "Not authenticated" };
 
-		const { success: rlSuccess } = await apiRateLimit.limit(user.id);
+		const { success: rlSuccess } = await safeLimit(apiRateLimit, user.id, true);
 		if (!rlSuccess) {
 			return { error: "Too many requests. Please wait a moment." };
 		}
@@ -259,8 +275,20 @@ export async function addToWantlistFromYouTube(
 				.select("id")
 				.single();
 
-			if (insertError || !inserted) return { error: "Could not save release data." };
-			releaseId = inserted.id;
+			if (insertError?.code === "23505") {
+				const { data: concurrentRelease } = await admin
+					.from("releases")
+					.select("id")
+					.eq("youtube_video_id", parsed.data.videoId)
+					.maybeSingle();
+
+				if (!concurrentRelease) return { error: "Could not save release data." };
+				releaseId = concurrentRelease.id;
+			} else if (insertError || !inserted) {
+				return { error: "Could not save release data." };
+			} else {
+				releaseId = inserted.id;
+			}
 		}
 
 		// Duplicate wantlist check
@@ -282,7 +310,10 @@ export async function addToWantlistFromYouTube(
 				created_at: new Date().toISOString(),
 			});
 
-		if (wantError) return { error: "Could not add to wantlist." };
+		if (wantError) {
+			if (wantError.code === "23505") return { error: "Already on your wantlist" };
+			return { error: "Could not add to wantlist." };
+		}
 
 		// Count how many others are already hunting this
 		const { count } = await admin

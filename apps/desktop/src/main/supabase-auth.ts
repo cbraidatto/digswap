@@ -268,6 +268,11 @@ export class DesktopSupabaseAuth {
     await this.clearImportedSession();
   }
 
+  /** Broadcasts the current in-memory session to all registered listeners. */
+  notifySessionListeners() {
+    void this.getSession().then((session) => this.emitSession(session));
+  }
+
   private rejectPendingOAuth(error: Error) {
     if (!this.pendingOAuth) {
       return;

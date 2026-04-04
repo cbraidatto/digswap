@@ -78,13 +78,14 @@ vi.mock("@/lib/supabase/admin", () => ({
 // Mock: Rate limiters (all allow through for auth testing)
 // ---------------------------------------------------------------------------
 vi.mock("@/lib/rate-limit", () => ({
-	authRateLimit: { limit: vi.fn().mockResolvedValue({ success: true }) },
-	resetRateLimit: { limit: vi.fn().mockResolvedValue({ success: true }) },
-	totpRateLimit: { limit: vi.fn().mockResolvedValue({ success: true }) },
-	apiRateLimit: { limit: vi.fn().mockResolvedValue({ success: true }) },
-	tradeRateLimit: { limit: vi.fn().mockResolvedValue({ success: true }) },
-	discogsRateLimit: { limit: vi.fn().mockResolvedValue({ success: true }) },
-}));
+	authRateLimit: null,
+	resetRateLimit: null,
+	totpRateLimit: null,
+	apiRateLimit: null,
+	tradeRateLimit: null,
+	discogsRateLimit: null,
+	safeLimit: vi.fn().mockImplementation(async () => ({ success: true })),
+}));;
 
 // ---------------------------------------------------------------------------
 // Mock: DB (thenable Drizzle chain)

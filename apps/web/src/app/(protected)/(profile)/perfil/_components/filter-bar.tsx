@@ -84,7 +84,7 @@ export function FilterBar({
 						/>
 					}
 				>
-					{currentFilters.genre ?? "Genero"}
+					{currentFilters.genre ?? "Genre"}
 				</DropdownMenuTrigger>
 				<DropdownMenuContent>
 					<DropdownMenuRadioGroup
@@ -119,7 +119,7 @@ export function FilterBar({
 						/>
 					}
 				>
-					{currentFilters.decade ?? "Decada"}
+					{currentFilters.decade ?? "Decade"}
 				</DropdownMenuTrigger>
 				<DropdownMenuContent>
 					<DropdownMenuRadioGroup
@@ -154,7 +154,7 @@ export function FilterBar({
 						/>
 					}
 				>
-					{currentFilters.format ?? "Formato"}
+					{currentFilters.format ?? "Format"}
 				</DropdownMenuTrigger>
 				<DropdownMenuContent>
 					<DropdownMenuRadioGroup
@@ -189,7 +189,7 @@ export function FilterBar({
 						/>
 					}
 				>
-					Ordenar: {SORT_OPTIONS.find((o) => o.value === currentFilters.sort)?.label ?? "Rarity"}
+					Sort: {SORT_OPTIONS.find((o) => o.value === currentFilters.sort)?.label ?? "Rarity"}
 				</DropdownMenuTrigger>
 				<DropdownMenuContent>
 					<DropdownMenuRadioGroup

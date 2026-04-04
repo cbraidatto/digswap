@@ -13,6 +13,10 @@ export interface TransferCallbacks {
 
 export const CHUNK_SIZE = 64 * 1024;
 
+// SECURITY: Maximum file size the receiver will accept (500 MB).
+// Prevents disk-filling DoS from a malicious sender declaring an enormous size.
+const MAX_RECEIVE_BYTES = 500 * 1024 * 1024;
+
 interface TransferHeader {
   filename: string;
   sha256: string;
@@ -150,6 +154,12 @@ export async function receiveFile(
       }
 
       if (isTransferHeader(payload)) {
+        // SECURITY: Reject transfers that declare a size exceeding the maximum.
+        if (payload.size > MAX_RECEIVE_BYTES) {
+          throw new Error(
+            `Transfer rejected: declared size ${payload.size} exceeds maximum of ${MAX_RECEIVE_BYTES} bytes.`,
+          );
+        }
         header = payload;
         continue;
       }
@@ -169,6 +179,15 @@ export async function receiveFile(
         await once(writeStream, "finish");
 
         const sha256 = hash.digest("hex");
+        // SECURITY: Prefer the DB-stored hash (set before transfer started).
+        // When absent, fall back to the sender's header hash — it still catches
+        // corruption, but a malicious sender can forge both file and hash.
+        if (!expectedSha256 && header.sha256) {
+          console.warn(
+            "[chunked-transfer] SECURITY WARNING: no DB hash for this trade — " +
+            "falling back to sender-declared hash. Integrity cannot be guaranteed.",
+          );
+        }
         const hashToVerify = expectedSha256 ?? header.sha256;
         if (hashToVerify && sha256 !== hashToVerify) {
           throw new Error("SHA-256 mismatch after receiving the full trade file.");
@@ -185,9 +204,18 @@ export async function receiveFile(
       }
 
       const buffer = normalizeBinaryPayload(payload);
+      receivedBytes += buffer.byteLength;
+
+      // SECURITY: Abort if the sender sends more data than declared in the header
+      // or exceeds the maximum allowed size (malicious sender could lie about size).
+      if (receivedBytes > MAX_RECEIVE_BYTES || receivedBytes > header.size + CHUNK_SIZE) {
+        throw new Error(
+          `Transfer aborted: received ${receivedBytes} bytes exceeds the allowed limit.`,
+        );
+      }
+
       writeStream.write(buffer);
       hash.update(buffer);
-      receivedBytes += buffer.byteLength;
       callbacks.onProgress(receivedBytes, header.size);
     }
   } catch (error) {

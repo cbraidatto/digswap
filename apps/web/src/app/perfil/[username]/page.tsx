@@ -47,6 +47,11 @@ export default async function PublicProfilePage({
 	} = await supabase.auth.getUser();
 
 	// Lookup target profile
+	// NOTE (M-15): 404 vs 200 enables username enumeration — accepted tradeoff for a
+	// social network where profiles are public by design. Rate limiting for this route
+	// is applied at the middleware layer (protectedPaths excludes /perfil/[username])
+	// but Upstash-based IP rate limiting should be added in middleware when Redis is
+	// configured. See security audit M-15.
 	const [targetProfile] = await db
 		.select({
 			id: profiles.id,

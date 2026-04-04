@@ -17,12 +17,15 @@ export async function checkWantlistMatches(
 	try {
 		const admin = createAdminClient();
 
-		// Find users who have this release on their wantlist (excluding the adder)
+		// Cap fan-out at 100 notifications per release add to prevent email/DB flooding
+		// on popular records. Users on position >100 will be notified on the next
+		// collection update that includes this release.
 		const { data: matches, error: matchError } = await admin
 			.from("wantlist_items")
 			.select("user_id")
 			.eq("release_id", releaseId)
-			.neq("user_id", excludeUserId);
+			.neq("user_id", excludeUserId)
+			.limit(100);
 
 		if (matchError || !matches || matches.length === 0) {
 			return;
@@ -56,6 +59,19 @@ export async function checkWantlistMatches(
 		// Notify each matched user
 		for (const match of matches) {
 			try {
+				// Dedup: skip if this user was already notified about this release in the last 24h
+				const since = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
+				const { data: existing } = await admin
+					.from("notifications")
+					.select("id")
+					.eq("user_id", match.user_id)
+					.eq("type", "wantlist_match")
+					.contains("body", release.title)
+					.gte("created_at", since)
+					.limit(1)
+					.maybeSingle();
+				if (existing) continue;
+
 				// Insert in-app notification
 				await admin.from("notifications").insert({
 					user_id: match.user_id,

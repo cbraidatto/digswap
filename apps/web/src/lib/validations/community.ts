@@ -12,6 +12,7 @@ export const createReviewSchema = z.object({
 	rating: z.number().int().min(1).max(5),
 	title: z.string().min(1).max(200).trim().optional(),
 	body: z.string().min(1, "Review body is required").max(5000).trim(),
+	pressingDetails: z.string().max(2000).trim().optional(),
 	groupId: uuidSchema.optional(),
 });
 

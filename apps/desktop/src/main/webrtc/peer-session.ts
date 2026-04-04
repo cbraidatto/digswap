@@ -1,4 +1,4 @@
-import { randomUUID } from "node:crypto";
+import { randomBytes, randomUUID } from "node:crypto";
 import { EventEmitter } from "node:events";
 import { BrowserWindow, ipcMain } from "electron";
 
@@ -9,11 +9,13 @@ export interface PeerSessionCallbacks {
   onDisconnected(): void;
   onError(err: Error): void;
   onIceCandidate(type: "host" | "srflx" | "relay"): void;
+  /** Called once the PeerJS server confirms our peer ID registration. */
+  onPeerIdRegistered?(peerId: string): void;
 }
 
-type PendingResolver = {
+type PendingResolver<TResult = unknown> = {
   reject: (error: Error) => void;
-  resolve: (result: unknown) => void;
+  resolve: (result: TResult) => void;
 };
 
 interface PeerBridgeEvent {
@@ -36,7 +38,7 @@ interface PeerCommandMessage {
   kind?: "buffer" | "json";
   payload?: unknown;
   requestId: string;
-  type: "close-connection" | "connect" | "destroy" | "send";
+  type: "close-connection" | "connect" | "destroy" | "send" | "update-expected-peer";
 }
 
 type BridgeEventHandler = (event: PeerBridgeEvent) => void;
@@ -71,16 +73,19 @@ export class PeerSession {
   private readonly commandChannel = `digswap-peer-command:${randomUUID()}`;
   private readonly eventChannel = `digswap-peer-event:${randomUUID()}`;
   private readonly peerId: string;
-  private readonly expectedRemotePeerId: string;
+  private readonly placeholderRemotePeerId: string;
+  private expectedRemotePeerId: string;
   private readonly pendingCommands = new Map<string, PendingResolver>();
   private readonly eventHandler: BridgeEventHandler;
   private bridgeWindow: BrowserWindow | null = null;
   private connection: PeerConnectionBridge | null = null;
+  private expectedPeerIdIsPlaceholder = true;
   private isReady = false;
   private readyPromise: Promise<void>;
   private rejectReady: ((error: Error) => void) | null = null;
   private resolveReady: (() => void) | null = null;
-  private waiters = new Set<PendingResolver>();
+  private waiters = new Set<PendingResolver<PeerTransportConnection>>();
+  private expectedPeerIdWaiters = new Set<PendingResolver<string>>();
 
   constructor(
     private readonly tradeId: string,
@@ -88,8 +93,20 @@ export class PeerSession {
     private readonly iceServers: RTCIceServer[],
     private readonly callbacks: PeerSessionCallbacks,
   ) {
-    this.peerId = role === "sender" ? `${tradeId}-s` : `${tradeId}-r`;
-    this.expectedRemotePeerId = role === "sender" ? `${tradeId}-r` : `${tradeId}-s`;
+    // Include a per-session random token in the peer ID so that an attacker
+    // who knows the tradeId cannot squat the peer ID before the legitimate
+    // participant registers with PeerJS. The remote peer ID is exchanged
+    // out-of-band via Supabase Realtime (trade_runtime_sessions table).
+    const sessionToken = randomBytes(8).toString("hex");
+    this.peerId = role === "sender"
+      ? `${tradeId}-${sessionToken}-s`
+      : `${tradeId}-${sessionToken}-r`;
+    // Seed expectedRemotePeerId with the old predictable format as a safe
+    // placeholder. The real unpredictable peer ID is exchanged out-of-band via
+    // Supabase Realtime (trade_runtime_sessions) and overwrites this value
+    // via updateExpectedRemotePeerId() before the remote peer connects.
+    this.placeholderRemotePeerId = role === "sender" ? `${tradeId}-r` : `${tradeId}-s`;
+    this.expectedRemotePeerId = this.placeholderRemotePeerId;
     this.readyPromise = new Promise<void>((resolve, reject) => {
       this.rejectReady = reject;
       this.resolveReady = resolve;
@@ -125,19 +142,83 @@ export class PeerSession {
         reject(new Error("Timed out waiting for the DigSwap peer session."));
       }, timeoutMs);
 
-      const waiter: PendingResolver = {
+      const waiter: PendingResolver<PeerTransportConnection> = {
         reject: (error: Error) => {
           clearTimeout(timeoutId);
           reject(error);
         },
         resolve: (connection) => {
           clearTimeout(timeoutId);
-          resolve(connection as PeerTransportConnection);
+          resolve(connection);
         },
       };
 
       this.waiters.add(waiter);
     });
+  }
+
+  async waitForExpectedPeerIdUpdate(timeoutMs = 30_000): Promise<string> {
+    await this.ensureReady();
+
+    if (!this.expectedPeerIdIsPlaceholder) {
+      return this.expectedRemotePeerId;
+    }
+
+    return new Promise<string>((resolve, reject) => {
+      const timeoutId = setTimeout(() => {
+        this.expectedPeerIdWaiters.delete(waiter);
+        reject(
+          new Error("Timed out waiting for the DigSwap counterparty peer ID."),
+        );
+      }, timeoutMs);
+
+      const waiter: PendingResolver<string> = {
+        reject: (error: Error) => {
+          clearTimeout(timeoutId);
+          reject(error);
+        },
+        resolve: (peerId) => {
+          clearTimeout(timeoutId);
+          resolve(peerId);
+        },
+      };
+
+      this.expectedPeerIdWaiters.add(waiter);
+    });
+  }
+
+  /**
+   * Update the expected remote peer ID after receiving it via the
+   * Supabase Realtime coordination channel. Must be called before the
+   * remote peer connects to ensure the identity check in `wireConnection`
+   * accepts the correct (unpredictable, squat-resistant) peer ID.
+   */
+  updateExpectedRemotePeerId(peerId: string) {
+    if (!peerId) {
+      return;
+    }
+
+    this.expectedRemotePeerId = peerId;
+    const isPlaceholder = peerId === this.placeholderRemotePeerId;
+    const resolvedPlaceholder = this.expectedPeerIdIsPlaceholder && !isPlaceholder;
+    this.expectedPeerIdIsPlaceholder = isPlaceholder;
+
+    if (resolvedPlaceholder) {
+      for (const waiter of this.expectedPeerIdWaiters) {
+        waiter.resolve(peerId);
+      }
+      this.expectedPeerIdWaiters.clear();
+    }
+
+    // Also propagate to the bridge script running in the hidden BrowserWindow
+    // so that wireConnection() uses the new value for incoming connections.
+    if (this.isReady && this.bridgeWindow && !this.bridgeWindow.isDestroyed()) {
+      void this.invokeCommand({
+        payload: peerId,
+        requestId: randomUUID(),
+        type: "update-expected-peer",
+      });
+    }
   }
 
   async destroy() {
@@ -180,11 +261,24 @@ export class PeerSession {
         show: false,
         webPreferences: {
           backgroundThrottling: false,
+          // SECURITY NOTE: nodeIntegration:true + contextIsolation:false is required
+          // here because the bridge script uses ipcRenderer directly. Migration to
+          // utilityProcess is tracked as a future improvement. We mitigate by:
+          // 1. Loading only about:blank (no remote content)
+          // 2. Blocking all navigation away from about:blank
           contextIsolation: false,
           nodeIntegration: true,
           sandbox: false,
         },
       });
+
+      // SECURITY: Prevent the bridge window from navigating to any URL.
+      // This mitigates the nodeIntegration:true risk — the window never loads
+      // remote content that could abuse Node.js APIs.
+      this.bridgeWindow.webContents.on("will-navigate", (event) => {
+        event.preventDefault();
+      });
+      this.bridgeWindow.webContents.setWindowOpenHandler(() => ({ action: "deny" }));
 
       await this.bridgeWindow.loadURL("about:blank");
       await this.bridgeWindow.webContents.executeJavaScript(
@@ -214,6 +308,9 @@ export class PeerSession {
         this.resolveReady?.();
         this.resolveReady = null;
         this.rejectReady = null;
+        if (this.callbacks.onPeerIdRegistered) {
+          this.callbacks.onPeerIdRegistered(this.peerId);
+        }
         return;
       case "command-response":
         if (!event.requestId) {
@@ -330,6 +427,11 @@ export class PeerSession {
       waiter.reject(error);
     }
     this.waiters.clear();
+
+    for (const waiter of this.expectedPeerIdWaiters) {
+      waiter.reject(error);
+    }
+    this.expectedPeerIdWaiters.clear();
   }
 
   private failSession(error: Error) {
@@ -401,7 +503,7 @@ function buildPeerBridgeScript({
   const Peer = PeerModule.default ?? PeerModule.Peer ?? PeerModule;
   const commandChannel = ${JSON.stringify(commandChannel)};
   const eventChannel = ${JSON.stringify(eventChannel)};
-  const expectedRemotePeerId = ${JSON.stringify(expectedRemotePeerId)};
+  let expectedRemotePeerId = ${JSON.stringify(expectedRemotePeerId)};
   const peerId = ${JSON.stringify(peerId)};
   const role = ${JSON.stringify(role)};
   const iceServers = ${JSON.stringify(iceServers)};
@@ -604,6 +706,14 @@ function buildPeerBridgeScript({
             peer.destroy();
           }
 
+          respond(command.requestId, { payload: true });
+          return;
+        }
+
+        case "update-expected-peer": {
+          if (typeof command.payload === "string" && command.payload) {
+            expectedRemotePeerId = command.payload;
+          }
           respond(command.requestId, { payload: true });
           return;
         }

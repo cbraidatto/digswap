@@ -1,4 +1,7 @@
 import { pgTable, uuid, text, timestamp, unique } from 'drizzle-orm/pg-core';
+import { pgPolicy } from 'drizzle-orm/pg-core';
+import { sql } from 'drizzle-orm';
+import { authenticatedRole, authUid } from 'drizzle-orm/supabase';
 import { profiles } from './users';
 
 export const leads = pgTable('leads', {
@@ -10,9 +13,30 @@ export const leads = pgTable('leads', {
   status: text('status').notNull().default('watching'), // 'watching' | 'contacted' | 'dead_end' | 'found'
   createdAt: timestamp('created_at').defaultNow().notNull(),
   updatedAt: timestamp('updated_at').defaultNow().notNull(),
-}, (table) => ({
-  userTargetUnique: unique().on(table.userId, table.targetType, table.targetId),
-}));
+}, (table) => [
+  unique().on(table.userId, table.targetType, table.targetId),
+  pgPolicy("leads_select_own", {
+    for: "select",
+    to: authenticatedRole,
+    using: sql`${table.userId} = ${authUid}`,
+  }),
+  pgPolicy("leads_insert_own", {
+    for: "insert",
+    to: authenticatedRole,
+    withCheck: sql`${table.userId} = ${authUid}`,
+  }),
+  pgPolicy("leads_update_own", {
+    for: "update",
+    to: authenticatedRole,
+    using: sql`${table.userId} = ${authUid}`,
+    withCheck: sql`${table.userId} = ${authUid}`,
+  }),
+  pgPolicy("leads_delete_own", {
+    for: "delete",
+    to: authenticatedRole,
+    using: sql`${table.userId} = ${authUid}`,
+  }),
+]);
 
 export type Lead = typeof leads.$inferSelect;
 export type NewLead = typeof leads.$inferInsert;

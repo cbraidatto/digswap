@@ -9,8 +9,6 @@ interface DesktopShellBridge {
 	 * server-side for a session. The browser never sees the actual tokens.
 	 */
 	syncHandoffCode(code: string | null): Promise<void>;
-	/** @deprecated Use syncHandoffCode instead */
-	syncSession?: (session: { accessToken: string; refreshToken: string } | null) => Promise<void>;
 }
 
 function getDesktopShell() {

@@ -3,7 +3,7 @@
 import { eq } from "drizzle-orm";
 import { db } from "@/lib/db";
 import { profiles } from "@/lib/db/schema/users";
-import { apiRateLimit } from "@/lib/rate-limit";
+import { apiRateLimit , safeLimit} from "@/lib/rate-limit";
 import { createClient } from "@/lib/supabase/server";
 import { onboardingProfileSchema, skipToStepSchema } from "@/lib/validations/onboarding";
 
@@ -25,7 +25,7 @@ export async function updateProfile(
 		return { success: false, error: "Not authenticated." };
 	}
 
-	const { success: rlSuccess } = await apiRateLimit.limit(user.id);
+	const { success: rlSuccess } = await safeLimit(apiRateLimit, user.id, true);
 	if (!rlSuccess) {
 		return { success: false, error: "Too many requests. Please wait a moment." };
 	}
@@ -77,7 +77,7 @@ export async function completeOnboarding(): Promise<{
 		return { success: false, error: "Not authenticated." };
 	}
 
-	const { success: rlSuccess } = await apiRateLimit.limit(user.id);
+	const { success: rlSuccess } = await safeLimit(apiRateLimit, user.id, true);
 	if (!rlSuccess) {
 		return { success: false, error: "Too many requests. Please wait a moment." };
 	}
@@ -109,6 +109,13 @@ export async function skipToStep(step: number): Promise<{ success: boolean; next
 		const parsed = skipToStepSchema.safeParse({ step });
 		if (!parsed.success) {
 			return { success: false, nextStep: step, error: "Invalid step number" };
+		}
+
+		// Auth check — prevent unauthenticated access to onboarding state
+		const supabase = await createClient();
+		const { data: { user } } = await supabase.auth.getUser();
+		if (!user) {
+			return { success: false, nextStep: step, error: "Not authenticated" };
 		}
 
 		return { success: true, nextStep: parsed.data.step };

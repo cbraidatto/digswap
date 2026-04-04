@@ -6,7 +6,7 @@ import { follows, activityFeed } from "@/lib/db/schema/social";
 import { profiles } from "@/lib/db/schema/users";
 import { collectionItems } from "@/lib/db/schema/collections";
 import { eq, and, ilike, sql } from "drizzle-orm";
-import { apiRateLimit } from "@/lib/rate-limit";
+import { apiRateLimit , safeLimit} from "@/lib/rate-limit";
 import {
 	getGlobalFeed,
 	getPersonalFeed,
@@ -54,31 +54,9 @@ export interface SearchResult {
 	isFollowing: boolean;
 }
 
-export async function logActivity(
-	userId: string,
-	actionType: string,
-	targetType: string | null,
-	targetId: string | null,
-	metadata: Record<string, unknown> | null,
-): Promise<void> {
-	try {
-		const parsed = logActivitySchema.safeParse({ userId, actionType, targetType, targetId, metadata });
-		if (!parsed.success) {
-			return;
-		}
-
-		await db.insert(activityFeed).values({
-			userId: parsed.data.userId,
-			actionType: parsed.data.actionType,
-			targetType: parsed.data.targetType,
-			targetId: parsed.data.targetId,
-			metadata: parsed.data.metadata,
-		});
-	} catch (err) {
-		console.error("[logActivity] error:", err);
-		// Non-blocking: activity logging failure should not crash the caller
-	}
-}
+// SECURITY: logActivity moved to @/lib/social/log-activity.ts (not a "use server" file)
+// to prevent direct client RPC calls. Import from there for server-side use.
+import { logActivity } from "@/lib/social/log-activity";
 
 export async function followUser(
 	targetUserId: string,
@@ -98,7 +76,7 @@ export async function followUser(
 			return { error: "Not authenticated" };
 		}
 
-		const { success: rlSuccess } = await apiRateLimit.limit(user.id);
+		const { success: rlSuccess } = await safeLimit(apiRateLimit, user.id, true);
 		if (!rlSuccess) {
 			return { error: "Too many requests. Please wait a moment." };
 		}
@@ -123,8 +101,13 @@ export async function followUser(
 		});
 
 		return { success: true };
-	} catch {
-		return { error: "Already following this user" };
+	} catch (err) {
+		// 23505 = unique_violation — already following
+		if (err && typeof err === "object" && "code" in err && err.code === "23505") {
+			return { error: "Already following this user" };
+		}
+		console.error("[followUser] error:", err);
+		return { error: "Could not follow user. Please try again." };
 	}
 }
 
@@ -146,7 +129,7 @@ export async function unfollowUser(
 			return { error: "Not authenticated" };
 		}
 
-		const { success: rlSuccess } = await apiRateLimit.limit(user.id);
+		const { success: rlSuccess } = await safeLimit(apiRateLimit, user.id, true);
 		if (!rlSuccess) {
 			return { error: "Too many requests. Please wait a moment." };
 		}
@@ -229,6 +212,11 @@ export async function fetchFollowersList(
 			return [];
 		}
 
+		// Auth check — prevent unauthenticated enumeration of follower graphs
+		const supabase = await createClient();
+		const { data: { user } } = await supabase.auth.getUser();
+		if (!user) return [];
+
 		return await getFollowers(parsed.data.userId);
 	} catch (err) {
 		console.error("[fetchFollowersList] error:", err);
@@ -244,6 +232,11 @@ export async function fetchFollowingList(
 		if (!parsed.success) {
 			return [];
 		}
+
+		// Auth check — prevent unauthenticated enumeration of following graphs
+		const supabase = await createClient();
+		const { data: { user } } = await supabase.auth.getUser();
+		if (!user) return [];
 
 		return await getFollowing(parsed.data.userId);
 	} catch (err) {
@@ -270,7 +263,7 @@ export async function searchUsers(
 			return [];
 		}
 
-		const { success: rlSuccess } = await apiRateLimit.limit(user.id);
+		const { success: rlSuccess } = await safeLimit(apiRateLimit, user.id, false);
 		if (!rlSuccess) {
 			return [];
 		}

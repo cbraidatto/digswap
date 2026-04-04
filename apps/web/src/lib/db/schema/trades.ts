@@ -103,6 +103,9 @@ export const tradeReviews = pgTable(
 			to: authenticatedRole,
 			using: sql`true`, // All authenticated users can view reviews
 		}),
+		// NOTE: Production migration (20260405) has a simpler check (reviewer_id = auth.uid() only).
+		// The schema version is more secure - validates trade completion + participant role.
+		// If drizzle-kit push runs, it will UPGRADE production security for this table.
 		pgPolicy("trade_reviews_insert_own", {
 			for: "insert",
 			to: authenticatedRole,
@@ -149,6 +152,7 @@ export const handoffTokens = pgTable(
 			for: "all",
 			to: authenticatedRole,
 			using: sql`false`,
+			withCheck: sql`false`,
 		}),
 	],
 );
@@ -171,6 +175,7 @@ export const tradeRuntimeSessions = pgTable(
 		clientKind: varchar("client_kind", { length: 20 }).default("desktop").notNull(),
 		desktopVersion: integer("desktop_version").default(1).notNull(),
 		tradeProtocolVersion: integer("trade_protocol_version").default(1).notNull(),
+		peerId: varchar("peer_id", { length: 100 }),
 		lastIceCandidateType: varchar("last_ice_candidate_type", { length: 16 }),
 		acquiredAt: timestamp("acquired_at", { withTimezone: true }).defaultNow().notNull(),
 		heartbeatAt: timestamp("heartbeat_at", { withTimezone: true }).defaultNow().notNull(),

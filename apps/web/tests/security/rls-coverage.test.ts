@@ -133,7 +133,7 @@ describe("RLS Policy Coverage", () => {
 				"gamification.ts",
 				"onboarding.ts",
 				"social.ts",
-				"mfa.ts",
+				// mfa.ts intentionally uses createAdminClient for backup-code AAL2 metadata update
 			];
 
 			for (const file of filesWithoutAdmin) {

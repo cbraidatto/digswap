@@ -10,11 +10,11 @@ import { connectDiscogs } from "@/actions/discogs";
 /**
  * Onboarding Step 3: Discogs connection.
  *
- * Non-skippable step. User must connect Discogs to proceed.
+ * Optional step — user can skip and connect later from Settings.
  * The connectDiscogs server action redirects to Discogs for authorization.
  * After OAuth, the import starts async and user proceeds to completion.
  */
-export function DiscogsConnect() {
+export function DiscogsConnect({ onSkip }: { onSkip?: () => void }) {
 	const [isPending, startTransition] = useTransition();
 
 	const handleConnect = () => {
@@ -60,8 +60,18 @@ export function DiscogsConnect() {
 					)}
 				</Button>
 
-				<p className="font-mono text-xs text-on-surface-variant text-center mt-4">
-					<span className="text-tertiary">[REQUIRED]</span> // Connect Discogs to activate the Radar. Without Discogs, the Radar is blind.
+				{onSkip && (
+					<button
+						type="button"
+						onClick={onSkip}
+						className="w-full font-mono text-xs text-on-surface-variant hover:text-on-surface transition-colors py-2"
+					>
+						Skip for now — connect later in Settings
+					</button>
+				)}
+
+				<p className="font-mono text-xs text-on-surface-variant text-center mt-2">
+					<span className="text-tertiary">[OPTIONAL]</span> // Connect Discogs to activate the Radar. Without Discogs, the Radar is blind.
 				</p>
 			</div>
 		</div>

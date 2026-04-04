@@ -98,7 +98,9 @@ export function NotificationPreferences() {
 			try {
 				const prefs = await getPreferencesAction();
 				if (mounted) {
-					setPreferences(fromDbRow(prefs as Record<string, unknown>));
+					if (prefs) {
+						setPreferences(fromDbRow(prefs as Record<string, unknown>));
+					}
 				}
 			} catch {
 				// Silently fail -- preferences will show loading state
@@ -151,7 +153,16 @@ export function NotificationPreferences() {
 	}
 
 	if (!preferences) {
-		return null;
+		return (
+			<div className="space-y-4">
+				<h2 className="font-heading text-xl font-semibold">
+					Notification Preferences
+				</h2>
+				<p className="font-mono text-xs text-on-surface-variant">
+					Could not load preferences. Try refreshing the page.
+				</p>
+			</div>
+		);
 	}
 
 	return (

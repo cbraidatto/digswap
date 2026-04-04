@@ -1,3 +1,4 @@
+import { timingSafeEqual } from "node:crypto";
 import { type NextRequest, NextResponse } from "next/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import {
@@ -24,11 +25,23 @@ export const maxDuration = 60;
  * 6. On final completion: updates lastSyncedAt on profile
  */
 export async function POST(request: NextRequest) {
-	// 1. Authenticate via shared secret
-	const authHeader = request.headers.get("authorization");
-	const expectedToken = `Bearer ${process.env.IMPORT_WORKER_SECRET}`;
+	// 1. Authenticate via shared secret using constant-time comparison to
+	//    prevent timing attacks that could leak the secret character by character.
+	//    Also guards against the `Bearer undefined` bypass when the env var is unset.
+	const authHeader = request.headers.get("authorization") ?? "";
+	const secret = process.env.IMPORT_WORKER_SECRET;
 
-	if (!authHeader || authHeader !== expectedToken) {
+	if (!secret) {
+		console.error("[import-worker] IMPORT_WORKER_SECRET is not configured");
+		return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+	}
+
+	const expected = `Bearer ${secret}`;
+	const isValid =
+		authHeader.length === expected.length &&
+		timingSafeEqual(Buffer.from(authHeader), Buffer.from(expected));
+
+	if (!isValid) {
 		return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 	}
 

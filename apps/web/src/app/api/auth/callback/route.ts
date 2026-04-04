@@ -1,5 +1,6 @@
 import { createClient } from "@/lib/supabase/server";
 import { NextResponse } from "next/server";
+import { authRateLimit, safeLimit } from "@/lib/rate-limit";
 
 /**
  * Validates a redirect path to prevent open redirect attacks.
@@ -26,8 +27,16 @@ function validateRedirectPath(next: string | null): string {
  *
  * Per D-06: new users redirect to /onboarding after successful auth.
  * Per D-09: uses exchangeCodeForSession for PKCE flow.
+ * SECURITY: Rate limited per IP to prevent brute-force of auth codes.
  */
 export async function GET(request: Request) {
+	const ip = request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ?? "unknown";
+	const { success: rlOk } = await safeLimit(authRateLimit, `auth-cb:${ip}`, true);
+	if (!rlOk) {
+		const { origin } = new URL(request.url);
+		return NextResponse.redirect(`${origin}/signin?error=rate_limited`);
+	}
+
 	const { searchParams, origin } = new URL(request.url);
 	const code = searchParams.get("code");
 	const next = validateRedirectPath(searchParams.get("next"));

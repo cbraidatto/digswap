@@ -32,12 +32,6 @@ export const listeningLogs = pgTable(
 			to: authenticatedRole,
 			using: sql`${table.userId} = ${authUid}`,
 		}),
-		// RLS: all authenticated can select for feed display
-		pgPolicy("listening_logs_select_all", {
-			for: "select",
-			to: authenticatedRole,
-			using: sql`true`,
-		}),
 		// RLS: only insert own
 		pgPolicy("listening_logs_insert_own", {
 			for: "insert",

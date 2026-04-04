@@ -2,7 +2,7 @@
 
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { apiRateLimit } from "@/lib/rate-limit";
+import { apiRateLimit , safeLimit} from "@/lib/rate-limit";
 import {
 	getUnreadCount,
 	getRecentNotifications,
@@ -112,7 +112,7 @@ export async function markNotificationRead(
 			return { error: "Not authenticated" };
 		}
 
-		const { success: rlSuccess } = await apiRateLimit.limit(user.id);
+		const { success: rlSuccess } = await safeLimit(apiRateLimit, user.id, true);
 		if (!rlSuccess) {
 			return { error: "Too many requests. Please wait a moment." };
 		}
@@ -159,7 +159,7 @@ export async function markAllRead(): Promise<{
 			return { error: "Not authenticated" };
 		}
 
-		const { success: rlSuccess } = await apiRateLimit.limit(user.id);
+		const { success: rlSuccess } = await safeLimit(apiRateLimit, user.id, true);
 		if (!rlSuccess) {
 			return { error: "Too many requests. Please wait a moment." };
 		}
@@ -253,7 +253,7 @@ export async function updatePreferencesAction(prefs: {
 			return { error: "Not authenticated" };
 		}
 
-		const { success: rlSuccess } = await apiRateLimit.limit(user.id);
+		const { success: rlSuccess } = await safeLimit(apiRateLimit, user.id, true);
 		if (!rlSuccess) {
 			return { error: "Too many requests. Please wait a moment." };
 		}

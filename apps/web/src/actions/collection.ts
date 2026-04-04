@@ -5,8 +5,8 @@ import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { createDiscogsClient, computeRarityScore } from "@/lib/discogs/client";
 import { CONDITION_GRADES } from "@/lib/collection/filters";
-import { logActivity } from "@/actions/social";
-import { apiRateLimit } from "@/lib/rate-limit";
+import { logActivity } from "@/lib/social/log-activity";
+import { apiRateLimit , safeLimit} from "@/lib/rate-limit";
 import { checkWantlistMatches } from "@/lib/notifications/match";
 import { awardBadge } from "@/lib/gamification/badge-awards";
 
@@ -30,7 +30,7 @@ export async function searchDiscogs(query: string) {
 			return [];
 		}
 
-		const { success: rlSuccess } = await apiRateLimit.limit(user.id);
+		const { success: rlSuccess } = await safeLimit(apiRateLimit, user.id, false);
 		if (!rlSuccess) {
 			return [];
 		}
@@ -91,7 +91,7 @@ export async function addRecordToCollection(
 			return { error: "Not authenticated" };
 		}
 
-		const { success: rlSuccess } = await apiRateLimit.limit(user.id);
+		const { success: rlSuccess } = await safeLimit(apiRateLimit, user.id, true);
 		if (!rlSuccess) {
 			return { error: "Too many requests. Please wait a moment." };
 		}
@@ -138,11 +138,23 @@ export async function addRecordToCollection(
 				.select("id")
 				.single();
 
-			if (insertError || !inserted) {
-				return { error: "Could not save release data." };
-			}
+			if (insertError?.code === "23505") {
+				const { data: concurrentRelease } = await admin
+					.from("releases")
+					.select("id")
+					.eq("discogs_id", release.id)
+					.maybeSingle();
 
-			releaseId = inserted.id;
+				if (!concurrentRelease) {
+					return { error: "Could not save release data." };
+				}
+
+				releaseId = concurrentRelease.id;
+			} else if (insertError || !inserted) {
+				return { error: "Could not save release data." };
+			} else {
+				releaseId = inserted.id;
+			}
 		}
 
 		// Check for duplicate collection item
@@ -157,7 +169,7 @@ export async function addRecordToCollection(
 			return { error: "Record already in your collection" };
 		}
 
-		// Insert collection item
+		// Insert collection item — unique constraint (user_id, release_id) catches concurrent duplicates
 		const { error: collectionError } = await admin
 			.from("collection_items")
 			.insert({
@@ -169,6 +181,10 @@ export async function addRecordToCollection(
 			});
 
 		if (collectionError) {
+			// 23505 = unique_violation — already in collection (concurrent request)
+			if (collectionError.code === "23505") {
+				return { error: "Record already in your collection" };
+			}
 			return { error: "Could not add record to collection." };
 		}
 
@@ -196,6 +212,7 @@ export async function addRecordToCollection(
 
 			const itemCount = collectionCount ?? 0;
 
+			// awardBadge is idempotent and absorbs duplicate-award races internally.
 			if (itemCount === 1) await awardBadge(user.id, "first_dig");
 			if (itemCount >= 100) await awardBadge(user.id, "century_club");
 
@@ -239,7 +256,7 @@ export async function updateConditionGrade(
 			return { error: "Not authenticated" };
 		}
 
-		const { success: rlSuccess } = await apiRateLimit.limit(user.id);
+		const { success: rlSuccess } = await safeLimit(apiRateLimit, user.id, true);
 		if (!rlSuccess) {
 			return { error: "Too many requests. Please wait a moment." };
 		}

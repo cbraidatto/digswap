@@ -2,7 +2,9 @@
 
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
-import { authRateLimit, resetRateLimit } from "@/lib/rate-limit";
+import { sql } from "drizzle-orm";
+import { db } from "@/lib/db";
+import { authRateLimit, resetRateLimit , safeLimit} from "@/lib/rate-limit";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
 import {
@@ -11,6 +13,21 @@ import {
 	signInSchema,
 	signUpSchema,
 } from "@/lib/validations/auth";
+
+/**
+ * Extracts the Supabase session_id claim from a JWT access token.
+ * Mirrors the same logic in middleware.ts so the two sides agree on the ID.
+ */
+function extractSessionId(accessToken: string): string | null {
+	try {
+		const payload = accessToken.split(".")[1];
+		if (!payload) return null;
+		const decoded = JSON.parse(Buffer.from(payload, "base64url").toString());
+		return decoded.session_id ?? null;
+	} catch {
+		return null;
+	}
+}
 
 /**
  * Generic auth error message per OWASP guidelines.
@@ -50,7 +67,7 @@ export async function signUp(
 	try {
 		// Rate limit by IP
 		const ip = await getClientIp();
-		const { success: allowed } = await authRateLimit.limit(ip);
+		const { success: allowed } = await safeLimit(authRateLimit, ip, true);
 		if (!allowed) {
 			return {
 				success: false,
@@ -118,7 +135,7 @@ export async function signIn(formData: FormData): Promise<{
 	try {
 		// Rate limit by IP
 		const ip = await getClientIp();
-		const { success: allowed } = await authRateLimit.limit(ip);
+		const { success: allowed } = await safeLimit(authRateLimit, ip, true);
 		if (!allowed) {
 			return {
 				success: false,
@@ -167,26 +184,32 @@ export async function signIn(formData: FormData): Promise<{
 			try {
 				const admin = createAdminClient();
 
+				// Use the real Supabase session_id from the JWT so the middleware
+				// allowlist check (which also extracts session_id from the JWT) will
+				// find a matching row.  Falling back to randomUUID() would make every
+				// session look "untracked" and either pass silently or block the user.
+				const sessionId =
+					extractSessionId(data.session.access_token) ?? crypto.randomUUID();
+
 				// Insert new session record
 				await admin.from("user_sessions").insert({
 					user_id: data.user.id,
-					session_id: data.session.access_token.slice(-32), // Unique identifier from token
+					session_id: sessionId,
 					device_info: deviceInfo,
 					ip_address: ip,
 				});
 
-				// Enforce max sessions: if > MAX_SESSIONS, delete oldest
-				const { data: sessions } = await admin
-					.from("user_sessions")
-					.select("id, created_at")
-					.eq("user_id", data.user.id)
-					.order("created_at", { ascending: true });
-
-				if (sessions && sessions.length > MAX_SESSIONS) {
-					const sessionsToRemove = sessions.slice(0, sessions.length - MAX_SESSIONS);
-					const idsToRemove = sessionsToRemove.map((s) => s.id);
-					await admin.from("user_sessions").delete().in("id", idsToRemove);
-				}
+				// Enforce max sessions atomically: keep the newest MAX_SESSIONS rows.
+				await db.execute(sql`
+					DELETE FROM user_sessions
+					WHERE id IN (
+						SELECT id
+						FROM user_sessions
+						WHERE user_id = ${data.user.id}
+						ORDER BY created_at ASC
+						OFFSET ${MAX_SESSIONS}
+					)
+				`);
 			} catch (sessionError) {
 				// Session tracking failure should not block login.
 				console.error("Session tracking error:", sessionError);
@@ -214,7 +237,7 @@ export async function resendVerification(
 		}
 
 		// Rate limit by email
-		const { success: allowed } = await authRateLimit.limit(`resend:${email}`);
+		const { success: allowed } = await safeLimit(authRateLimit, `resend:${email}`, true);
 		if (!allowed) {
 			return {
 				success: false,
@@ -270,7 +293,7 @@ export async function forgotPassword(
 		const { email } = parsed.data;
 
 		// Rate limit by email (3 per 15 min)
-		const { success: withinLimit } = await resetRateLimit.limit(email.toLowerCase());
+		const { success: withinLimit } = await safeLimit(resetRateLimit, email.toLowerCase(), true);
 		if (!withinLimit) {
 			return {
 				success: false,
@@ -289,7 +312,7 @@ export async function forgotPassword(
 		// ALWAYS return success to prevent email enumeration
 		return {
 			success: true,
-			message: `Check your inbox. We sent a reset link to ${email}.`,
+			message: "If an account exists for this email, a reset link has been sent. Check your inbox.",
 		};
 	} catch (err) {
 		console.error("[forgotPassword] error:", err);
@@ -330,7 +353,7 @@ export async function resetPassword(
 
 		// Rate limit by IP
 		const ip = await getClientIp();
-		const { success: withinLimit } = await authRateLimit.limit(ip);
+		const { success: withinLimit } = await safeLimit(authRateLimit, ip, true);
 		if (!withinLimit) {
 			return {
 				success: false,

@@ -3,7 +3,7 @@
 import { createClient } from "@/lib/supabase/server";
 import { db } from "@/lib/db";
 import { searchSignals } from "@/lib/db/schema/search-signals";
-import { eq } from "drizzle-orm";
+import { eq, sql } from "drizzle-orm";
 import { z } from "zod";
 
 const schema = z.object({
@@ -22,32 +22,26 @@ export async function logSearchSignal(terms: string[], genres: string[]) {
     const parsed = schema.safeParse({ terms, genres });
     if (!parsed.success) return;
 
-    // Upsert: reinforce existing signal or create new
-    const existing = await db
-      .select()
-      .from(searchSignals)
-      .where(eq(searchSignals.userId, user.id))
-      .limit(1);
-
-    if (existing.length > 0) {
-      const row = existing[0];
-      await db
-        .update(searchSignals)
-        .set({
-          terms: [...new Set([...row.terms, ...parsed.data.terms])],
-          genres: [...new Set([...row.genres, ...parsed.data.genres])],
-          strength: Math.min(1.0, (row.strength ?? 0) + 0.1),
-          lastReinforcedAt: new Date(),
-        })
-        .where(eq(searchSignals.userId, user.id));
-    } else {
-      await db.insert(searchSignals).values({
+    // Atomic upsert using ON CONFLICT — eliminates TOCTOU race condition
+    // where two concurrent requests could both insert a new row.
+    // Requires unique constraint on user_id (added in migration).
+    await db
+      .insert(searchSignals)
+      .values({
         userId: user.id,
         terms: parsed.data.terms,
         genres: parsed.data.genres,
         strength: 0.1,
+      })
+      .onConflictDoUpdate({
+        target: searchSignals.userId,
+        set: {
+          terms: sql`array(SELECT DISTINCT unnest(${searchSignals.terms} || ${parsed.data.terms}::text[]))`,
+          genres: sql`array(SELECT DISTINCT unnest(${searchSignals.genres} || ${parsed.data.genres}::text[]))`,
+          strength: sql`LEAST(1.0, ${searchSignals.strength} + 0.1)`,
+          lastReinforcedAt: new Date(),
+        },
       });
-    }
   } catch (err) {
     console.error("[logSearchSignal]", err);
   }

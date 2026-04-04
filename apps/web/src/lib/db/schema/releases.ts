@@ -6,6 +6,7 @@ import {
   timestamp,
   integer,
   real,
+  index,
 } from "drizzle-orm/pg-core";
 import { pgPolicy } from "drizzle-orm/pg-core";
 import { sql } from "drizzle-orm";
@@ -36,7 +37,11 @@ export const releases = pgTable(
       .defaultNow()
       .notNull(),
   },
-  () => [
+  (table) => [
+    // GIN indexes for array containment queries (@>, &&) on genre and style.
+    // Required for genre leaderboard and explore feed — without GIN these use seq scans.
+    index("releases_genre_gin_idx").using("gin", table.genre),
+    index("releases_style_gin_idx").using("gin", table.style),
     pgPolicy("releases_select_all", {
       for: "select",
       to: authenticatedRole,

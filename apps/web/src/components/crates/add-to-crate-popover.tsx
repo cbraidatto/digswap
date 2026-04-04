@@ -116,7 +116,7 @@ export function AddToCratePopover({
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
-      <PopoverTrigger render={<span className="inline-flex" />}>
+      <PopoverTrigger render={<span className="inline-flex" />} nativeButton={false}>
         {children}
       </PopoverTrigger>
       <PopoverContent className="w-72 p-4 bg-surface-container border-outline-variant/20">

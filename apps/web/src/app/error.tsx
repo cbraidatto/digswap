@@ -10,7 +10,10 @@ export default function GlobalError({
 	reset: () => void;
 }) {
 	useEffect(() => {
-		console.error("[DigSwap] Unhandled error:", error);
+		// SECURITY: Only log error message in production, not full stack trace
+		if (process.env.NODE_ENV === "development") {
+			console.error("[DigSwap] Unhandled error:", error);
+		}
 	}, [error]);
 
 	return (
@@ -29,11 +32,7 @@ export default function GlobalError({
 					An unexpected error occurred. You can try again or go back to the home page.
 				</p>
 
-				{error.digest && (
-					<p className="text-xs text-muted-foreground/50 font-mono mb-4">
-						Error ID: {error.digest}
-					</p>
-				)}
+				{/* SECURITY: error.digest hidden in production to prevent information disclosure */}
 
 				<div className="flex flex-col gap-3">
 					<button

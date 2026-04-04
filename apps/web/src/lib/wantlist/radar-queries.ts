@@ -1,3 +1,4 @@
+import { unstable_cache } from "next/cache";
 import { and, eq, ne, inArray, sql } from "drizzle-orm";
 import { db } from "@/lib/db";
 import { wantlistItems } from "@/lib/db/schema/wantlist";
@@ -22,13 +23,12 @@ export interface RadarMatch {
  * Returns users who own records from currentUserId's wantlist.
  * Sorted by overlapCount desc (users with the most wantlist matches first).
  * Each entry represents the top-matching release per user.
+ * Cached for 10 minutes — radar matches change only when collections/wantlists update.
  */
-export async function getRadarMatches(
+async function _getRadarMatches(
   currentUserId: string,
-  options: { limit?: number; rarityTier?: "common" | "rare" | "ultra_rare" } = {},
+  limit: number,
 ): Promise<RadarMatch[]> {
-  const { limit = 5 } = options;
-
   // Step 1: Get current user's wantlist release IDs (unfound items only)
   const myWantlist = await db
     .select({ releaseId: wantlistItems.releaseId })
@@ -94,6 +94,20 @@ export async function getRadarMatches(
   }
 
   return deduped;
+}
+
+const _getCachedRadarMatches = unstable_cache(
+  _getRadarMatches,
+  ["radar-matches"],
+  { revalidate: 600, tags: ["wantlist", "collection"] },
+);
+
+export async function getRadarMatches(
+  currentUserId: string,
+  options: { limit?: number; rarityTier?: "common" | "rare" | "ultra_rare" } = {},
+): Promise<RadarMatch[]> {
+  const { limit = 5 } = options;
+  return _getCachedRadarMatches(currentUserId, limit);
 }
 
 /**

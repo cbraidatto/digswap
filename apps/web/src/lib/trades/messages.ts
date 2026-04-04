@@ -1,4 +1,4 @@
-import { and, asc, count, desc, eq, gt, inArray, ne, or } from "drizzle-orm";
+import { and, asc, count, desc, eq, gt, inArray, ne, or, sql } from "drizzle-orm";
 import { db } from "@/lib/db";
 import { tradeMessages, tradeRequests } from "@/lib/db/schema/trades";
 import { profiles } from "@/lib/db/schema/users";
@@ -186,7 +186,31 @@ export async function listTradeThreads(userId: string): Promise<TradeThreadListI
 	const tradeIds = contexts.map((context) => context.tradeId);
 	const counterpartyIds = [...new Set(contexts.map((context) => context.counterpartyId))];
 
-	const [counterpartyRows, latestMessageRows] = await Promise.all([
+	// Batch unread counts with a single aggregation query instead of N+1 getTradeUnreadCount calls.
+	// Uses conditional COUNT to compute per-trade unread counts in one round trip.
+	const unreadCountQuery = db.execute(sql`
+		SELECT
+			tr.id AS trade_id,
+			COUNT(tm.id) FILTER (
+				WHERE tm.sender_id != ${userId}
+				AND (
+					CASE
+						WHEN tr.requester_id = ${userId} THEN tr.requester_last_read_at
+						ELSE tr.provider_last_read_at
+					END
+				) IS NULL
+				OR tm.created_at > CASE
+					WHEN tr.requester_id = ${userId} THEN tr.requester_last_read_at
+					ELSE tr.provider_last_read_at
+				END
+			) AS unread_count
+		FROM trade_requests tr
+		LEFT JOIN trade_messages tm ON tm.trade_id = tr.id
+		WHERE tr.id = ANY(${sql`ARRAY[${sql.join(tradeIds.map(id => sql`${id}::uuid`), sql`, `)}]`})
+		GROUP BY tr.id, tr.requester_id, tr.requester_last_read_at, tr.provider_last_read_at
+	`);
+
+	const [counterpartyRows, latestMessageRows, unreadCountRows] = await Promise.all([
 		db
 			.select({
 				avatarUrl: profiles.avatarUrl,
@@ -207,6 +231,7 @@ export async function listTradeThreads(userId: string): Promise<TradeThreadListI
 			.from(tradeMessages)
 			.where(inArray(tradeMessages.tradeId, tradeIds))
 			.orderBy(tradeMessages.tradeId, desc(tradeMessages.createdAt)),
+		unreadCountQuery,
 	]);
 
 	const counterpartyById = new Map(
@@ -232,12 +257,12 @@ export async function listTradeThreads(userId: string): Promise<TradeThreadListI
 		]),
 	);
 
-	const unreadCounts = new Map<string, number>();
-	await Promise.all(
-		contexts.map(async (context) => {
-			const unreadCount = await getTradeUnreadCount(context.tradeId, userId);
-			unreadCounts.set(context.tradeId, unreadCount);
-		}),
+	// Build unread count map from the batch aggregation result
+	const unreadCounts = new Map<string, number>(
+		(unreadCountRows as unknown as { trade_id: string; unread_count: string }[]).map((row) => [
+			row.trade_id,
+			Number(row.unread_count ?? 0),
+		]),
 	);
 
 	return contexts

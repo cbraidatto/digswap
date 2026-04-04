@@ -1,7 +1,7 @@
 "use server";
 
 import { createClient } from "@/lib/supabase/server";
-import { apiRateLimit } from "@/lib/rate-limit";
+import { apiRateLimit , safeLimit} from "@/lib/rate-limit";
 import {
 	getGlobalLeaderboard,
 	getGenreLeaderboard,
@@ -43,7 +43,7 @@ export async function loadGlobalLeaderboard(
 
 		const user = await requireUser();
 
-		const { success: rlSuccess } = await apiRateLimit.limit(user.id);
+		const { success: rlSuccess } = await safeLimit(apiRateLimit, user.id, false);
 		if (!rlSuccess) {
 			return [];
 		}
@@ -67,7 +67,7 @@ export async function loadGenreLeaderboard(
 
 		const user = await requireUser();
 
-		const { success: rlSuccess } = await apiRateLimit.limit(user.id);
+		const { success: rlSuccess } = await safeLimit(apiRateLimit, user.id, false);
 		if (!rlSuccess) {
 			return [];
 		}
@@ -83,7 +83,7 @@ export async function loadLeaderboardCount(): Promise<number> {
 	try {
 		const user = await requireUser();
 
-		const { success: rlSuccess } = await apiRateLimit.limit(user.id);
+		const { success: rlSuccess } = await safeLimit(apiRateLimit, user.id, false);
 		if (!rlSuccess) {
 			return 0;
 		}
@@ -106,7 +106,7 @@ export async function loadGenreLeaderboardCount(
 
 		const user = await requireUser();
 
-		const { success: rlSuccess } = await apiRateLimit.limit(user.id);
+		const { success: rlSuccess } = await safeLimit(apiRateLimit, user.id, false);
 		if (!rlSuccess) {
 			return 0;
 		}

@@ -21,9 +21,8 @@ export function DigButton({ feedItemId, initialDug, initialCount, track }: DigBu
 	const addToQueue = usePlayerStore((s) => s.addToQueue);
 
 	function handleToggle() {
-		setOptimisticDug(!optimisticDug);
-
 		startTransition(async () => {
+			setOptimisticDug(!optimisticDug);
 			const result = await toggleDig(feedItemId);
 			if (!result.error) {
 				setDug(result.dug);

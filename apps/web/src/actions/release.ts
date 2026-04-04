@@ -4,7 +4,7 @@ import { createAdminClient } from "@/lib/supabase/admin";
 import { db } from "@/lib/db";
 import { releases } from "@/lib/db/schema/releases";
 import { eq } from "drizzle-orm";
-import { apiRateLimit } from "@/lib/rate-limit";
+import { apiRateLimit , safeLimit} from "@/lib/rate-limit";
 import { createClient } from "@/lib/supabase/server";
 import { getReviewsForRelease } from "@/lib/community/queries";
 import { releaseIdSchema, getMoreReviewsSchema } from "@/lib/validations/release";
@@ -36,7 +36,7 @@ export async function searchYouTubeForRelease(
     if (!user) return { videoId: null, error: "Authentication required" };
 
     // Rate limit
-    const { success } = await apiRateLimit.limit(user.id);
+    const { success } = await safeLimit(apiRateLimit, user.id, false);
     if (!success) return { videoId: null, error: "Rate limited" };
 
     // Fetch release data
@@ -106,6 +106,11 @@ export async function getMoreReviews(releaseId: string, cursor: string, limit = 
     if (!parsed.success) {
       return [];
     }
+
+    // Auth check — reviews are public but require authentication to paginate
+    const supabase = await createClient();
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return [];
 
     return await getReviewsForRelease(parsed.data.releaseId, parsed.data.cursor, parsed.data.limit);
   } catch (err) {

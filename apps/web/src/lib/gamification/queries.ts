@@ -64,7 +64,9 @@ export async function getGlobalLeaderboard(
 }
 
 // ---------------------------------------------------------------------------
-// Genre Leaderboard
+// Genre Leaderboard — reads from pre-aggregated materialized view
+// Run `REFRESH MATERIALIZED VIEW CONCURRENTLY genre_leaderboard_mv` on a
+// schedule (pg_cron or Supabase Edge Function, every 15 min) to keep fresh.
 // ---------------------------------------------------------------------------
 
 export async function getGenreLeaderboard(
@@ -74,21 +76,20 @@ export async function getGenreLeaderboard(
 ): Promise<LeaderboardEntry[]> {
 	const offset = (page - 1) * pageSize;
 
+	// Query the materialized view instead of scanning collection_items × releases.
+	// The MV pre-aggregates genre_score per user+genre; the index on (genre, genre_score DESC)
+	// makes this a fast index scan instead of a full-table aggregation.
 	const rows = await db.execute(sql`
 		SELECT
-			ci.user_id AS "userId",
-			p.username,
-			p.display_name AS "displayName",
-			SUM(LN(1 + COALESCE(r.rarity_score, 0))) AS "globalScore",
-			ROW_NUMBER() OVER (ORDER BY SUM(LN(1 + COALESCE(r.rarity_score, 0))) DESC) AS "globalRank",
-			ur.title
-		FROM collection_items ci
-		INNER JOIN releases r ON r.id = ci.release_id
-		INNER JOIN profiles p ON p.id = ci.user_id
-		LEFT JOIN user_rankings ur ON ur.user_id = ci.user_id
-		WHERE r.genre @> ARRAY[${genre}]::text[]
-		GROUP BY ci.user_id, p.username, p.display_name, ur.title
-		ORDER BY "globalScore" DESC
+			mv.user_id AS "userId",
+			mv.username,
+			mv.display_name AS "displayName",
+			mv.genre_score AS "globalScore",
+			ROW_NUMBER() OVER (ORDER BY mv.genre_score DESC) AS "globalRank",
+			mv.title
+		FROM genre_leaderboard_mv mv
+		WHERE mv.genre = ${genre}
+		ORDER BY mv.genre_score DESC
 		LIMIT ${pageSize}
 		OFFSET ${offset}
 	`);
@@ -161,11 +162,11 @@ export async function getLeaderboardCount(): Promise<number> {
 export async function getGenreLeaderboardCount(
 	genre: string,
 ): Promise<number> {
+	// Count from the materialized view — O(1) index lookup instead of full scan
 	const result = await db.execute(sql`
-		SELECT COUNT(DISTINCT ci.user_id) AS count
-		FROM collection_items ci
-		INNER JOIN releases r ON r.id = ci.release_id
-		WHERE r.genre @> ARRAY[${genre}]::text[]
+		SELECT COUNT(*) AS count
+		FROM genre_leaderboard_mv
+		WHERE genre = ${genre}
 	`);
 
 	const rows = result as unknown as Record<string, unknown>[];

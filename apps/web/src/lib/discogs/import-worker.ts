@@ -55,29 +55,17 @@ async function upsertRelease(
 		updated_at: new Date().toISOString(),
 	};
 
-	const { error: upsertError } = await admin
+	// Upsert with RETURNING to get the UUID in one round trip instead of two
+	const { data: releaseRow, error: upsertError } = await admin
 		.from("releases")
-		.upsert(releaseData, { onConflict: "discogs_id" });
+		.upsert(releaseData, { onConflict: "discogs_id" })
+		.select("id")
+		.single();
 
-	if (upsertError) {
+	if (upsertError || !releaseRow) {
 		console.error(
 			`Release upsert failed for discogs_id ${info.id}:`,
 			upsertError,
-		);
-		return null;
-	}
-
-	// Fetch the release UUID after upsert
-	const { data: releaseRow, error: fetchError } = await admin
-		.from("releases")
-		.select("id")
-		.eq("discogs_id", info.id)
-		.single();
-
-	if (fetchError || !releaseRow) {
-		console.error(
-			`Failed to fetch release UUID for discogs_id ${info.id}:`,
-			fetchError,
 		);
 		return null;
 	}
@@ -175,17 +163,10 @@ export async function processImportPage(jobId: string): Promise<PageResult> {
 			const releaseId = await upsertRelease(admin, item);
 
 			if (releaseId) {
-				// Insert collection item via admin client
-				// Use select-then-insert to avoid duplicates (no unique constraint on user_id + discogs_instance_id)
-				const { data: existing } = await admin
-					.from("collection_items")
-					.select("id")
-					.eq("user_id", job.user_id)
-					.eq("discogs_instance_id", item.instance_id)
-					.maybeSingle();
-
-				if (!existing) {
-					await admin.from("collection_items").insert({
+				// Upsert collection item — unique partial index on (user_id, discogs_instance_id)
+				// handles concurrent imports and resume without a select-then-insert race.
+				await admin.from("collection_items").upsert(
+					{
 						user_id: job.user_id,
 						release_id: releaseId,
 						discogs_instance_id: item.instance_id,
@@ -193,17 +174,9 @@ export async function processImportPage(jobId: string): Promise<PageResult> {
 						created_at:
 							(item as unknown as { date_added?: string }).date_added || new Date().toISOString(),
 						updated_at: new Date().toISOString(),
-					});
-				} else {
-					// Update existing item to refresh the release link
-					await admin
-						.from("collection_items")
-						.update({
-							release_id: releaseId,
-							updated_at: new Date().toISOString(),
-						})
-						.eq("id", existing.id);
-				}
+					},
+					{ onConflict: "user_id,discogs_instance_id", ignoreDuplicates: false },
+				);
 			}
 
 			processed++;

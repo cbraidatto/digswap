@@ -1,6 +1,13 @@
 import { describe, test, expect, vi, beforeEach } from "vitest";
 
-// Track call count to return different results for sequential queries
+// Track call count to return different results for sequential queries.
+// The new getSuggestedRecords removes the "ownedIds" prefetch query —
+// exclusion is done via NOT EXISTS subquery in the DB.
+// Query order is now:
+//   1. topGenres
+//   2. genreSuggestions (only if genres exist)
+//   3. followedUsers
+//   4. followSuggestions (only if followed users exist)
 let queryCallCount = 0;
 let queryResults: unknown[][] = [];
 
@@ -91,9 +98,7 @@ describe("getSuggestedRecords", () => {
 				{ genre: "Jazz", genreCount: 10 },
 				{ genre: "Soul", genreCount: 5 },
 			],
-			// Query 2: owned release IDs
-			[{ releaseId: "owned-1" }, { releaseId: "owned-2" }],
-			// Query 3: genre-based suggestions
+			// Query 2: genre-based suggestions (NOT EXISTS handles owned exclusion in DB)
 			[
 				{
 					id: "sug-1",
@@ -108,7 +113,7 @@ describe("getSuggestedRecords", () => {
 					ownerCount: 2,
 				},
 			],
-			// Query 4: followed users
+			// Query 3: followed users
 			[],
 			// No follow suggestions (no followed users)
 		];
@@ -121,14 +126,12 @@ describe("getSuggestedRecords", () => {
 
 	test("returns records from followed users they don't own", async () => {
 		queryResults = [
-			// Query 1: top genres (empty -- user has no genres)
-			[],
-			// Query 2: owned release IDs (empty)
+			// Query 1: top genres (empty — user has no genres)
 			[],
 			// No genre suggestions since no genres
-			// Query 3: followed users
+			// Query 2: followed users
 			[{ followingId: "friend-1" }],
-			// Query 4: follow suggestions
+			// Query 3: follow suggestions (NOT EXISTS handles owned exclusion in DB)
 			[
 				{
 					id: "sug-2",
@@ -155,10 +158,8 @@ describe("getSuggestedRecords", () => {
 		queryResults = [
 			// Query 1: top genres (empty)
 			[],
-			// Query 2: owned release IDs (empty)
-			[],
 			// No genre suggestions
-			// Query 3: followed users (empty)
+			// Query 2: followed users (empty)
 			[],
 			// No follow suggestions
 		];
@@ -185,19 +186,17 @@ describe("getSuggestedRecords", () => {
 		queryResults = [
 			// Query 1: top genres
 			[{ genre: "Jazz", genreCount: 10 }],
-			// Query 2: owned release IDs (empty)
-			[],
-			// Query 3: genre suggestions (contains sharedRecord)
+			// Query 2: genre suggestions (contains sharedRecord)
 			[sharedRecord],
-			// Query 4: followed users
+			// Query 3: followed users
 			[{ followingId: "friend-1" }],
-			// Query 5: follow suggestions (same record)
+			// Query 4: follow suggestions (same record)
 			[sharedRecord],
 		];
 
 		const results = await getSuggestedRecords("user-1", 8);
 
-		// Should deduplicate -- only one instance of shared-1
+		// Should deduplicate — only one instance of shared-1
 		const ids = results.map((r) => r.id);
 		const uniqueIds = new Set(ids);
 		expect(uniqueIds.size).toBe(ids.length);

@@ -9,7 +9,17 @@ vi.mock("@/lib/db", () => ({
 		insert: vi.fn(),
 		delete: vi.fn(),
 	},
+}))
+vi.mock("@/lib/rate-limit", () => ({
+	authRateLimit: null,
+	resetRateLimit: null,
+	totpRateLimit: null,
+	apiRateLimit: null,
+	tradeRateLimit: null,
+	discogsRateLimit: null,
+	safeLimit: vi.fn().mockImplementation(async () => ({ success: true })),
 }));
+;
 
 // -- Mock social schema --
 vi.mock("@/lib/db/schema/social", () => ({

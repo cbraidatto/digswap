@@ -84,6 +84,19 @@ export const groupMembers = pgTable(
       to: authenticatedRole,
       using: sql`${table.userId} = ${authUid}`,
     }),
+    pgPolicy("group_members_update_admin_only", {
+      for: "update",
+      to: authenticatedRole,
+      using: sql`
+        EXISTS (
+          SELECT 1 FROM group_members admin_check
+          WHERE admin_check.group_id = ${table.groupId}
+            AND admin_check.user_id = ${authUid}
+            AND admin_check.role = 'admin'
+        )
+      `,
+      withCheck: sql`${table.groupId} = group_id`,
+    }),
   ],
 );
 
@@ -106,15 +119,16 @@ export const groupPosts = pgTable(
       .notNull(),
   },
   (table) => [
-    pgPolicy("group_posts_select_all", {
+    pgPolicy("group_posts_select_member", {
       for: "select",
       to: authenticatedRole,
-      using: sql`true`, // All authenticated users can view group posts
+      using: sql`${table.groupId} IN (SELECT group_id FROM group_members WHERE user_id = ${authUid})`,
     }),
-    pgPolicy("group_posts_insert_own", {
+    pgPolicy("group_posts_insert_member", {
       for: "insert",
       to: authenticatedRole,
-      withCheck: sql`${table.userId} = ${authUid}`,
+      withCheck: sql`${table.userId} = ${authUid}
+        AND ${table.groupId} IN (SELECT group_id FROM group_members WHERE user_id = ${authUid})`,
     }),
     pgPolicy("group_posts_update_own", {
       for: "update",

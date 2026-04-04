@@ -1,3 +1,4 @@
+import { unstable_cache } from "next/cache";
 import { eq, desc, asc, and, gte, lt, sql } from "drizzle-orm";
 import { db } from "@/lib/db";
 import { collectionItems } from "@/lib/db/schema/collections";
@@ -128,55 +129,67 @@ export async function getCollectionCount(
 /**
  * Returns all unique genres across a user's collection.
  * Unnests the genre array column for distinct values.
+ * Cached for 5 minutes — genres change only on import/removal.
  */
-export async function getUniqueGenres(userId: string): Promise<string[]> {
-	const rows = await db
-		.selectDistinct({
-			genre: sql<string>`unnest(${releases.genre})`,
-		})
-		.from(collectionItems)
-		.innerJoin(releases, eq(collectionItems.releaseId, releases.id))
-		.where(eq(collectionItems.userId, userId));
+export const getUniqueGenres = unstable_cache(
+	async (userId: string): Promise<string[]> => {
+		const rows = await db
+			.selectDistinct({
+				genre: sql<string>`unnest(${releases.genre})`,
+			})
+			.from(collectionItems)
+			.innerJoin(releases, eq(collectionItems.releaseId, releases.id))
+			.where(eq(collectionItems.userId, userId));
 
-	return rows.map((r) => r.genre).filter(Boolean).sort();
-}
+		return rows.map((r) => r.genre).filter(Boolean).sort();
+	},
+	["collection-genres"],
+	{ revalidate: 300, tags: ["collection"] },
+);
 
 /**
  * Returns the top N genres by record count in a user's collection.
+ * Cached for 5 minutes.
  */
-export async function getTopGenres(
-	userId: string,
-	limit = 3,
-): Promise<{ genre: string; count: number }[]> {
-	const rows = await db
-		.select({
-			genre: sql<string>`unnest(${releases.genre})`,
-			count: sql<number>`count(*)`,
-		})
-		.from(collectionItems)
-		.innerJoin(releases, eq(collectionItems.releaseId, releases.id))
-		.where(eq(collectionItems.userId, userId))
-		.groupBy(sql`unnest(${releases.genre})`)
-		.orderBy(sql`count(*) desc`)
-		.limit(limit);
+export const getTopGenres = unstable_cache(
+	async (userId: string, limit = 3): Promise<{ genre: string; count: number }[]> => {
+		const rows = await db
+			.select({
+				genre: sql<string>`unnest(${releases.genre})`,
+				count: sql<number>`count(*)`,
+			})
+			.from(collectionItems)
+			.innerJoin(releases, eq(collectionItems.releaseId, releases.id))
+			.where(eq(collectionItems.userId, userId))
+			.groupBy(sql`unnest(${releases.genre})`)
+			.orderBy(sql`count(*) desc`)
+			.limit(limit);
 
-	return rows.map((r) => ({ genre: r.genre, count: Number(r.count) }));
-}
+		return rows.map((r) => ({ genre: r.genre, count: Number(r.count) }));
+	},
+	["collection-top-genres"],
+	{ revalidate: 300, tags: ["collection"] },
+);
 
 /**
  * Returns all unique formats across a user's collection.
+ * Cached for 5 minutes — formats change only on import/removal.
  */
-export async function getUniqueFormats(userId: string): Promise<string[]> {
-	const rows = await db
-		.selectDistinct({
-			format: releases.format,
-		})
-		.from(collectionItems)
-		.innerJoin(releases, eq(collectionItems.releaseId, releases.id))
-		.where(eq(collectionItems.userId, userId));
+export const getUniqueFormats = unstable_cache(
+	async (userId: string): Promise<string[]> => {
+		const rows = await db
+			.selectDistinct({
+				format: releases.format,
+			})
+			.from(collectionItems)
+			.innerJoin(releases, eq(collectionItems.releaseId, releases.id))
+			.where(eq(collectionItems.userId, userId));
 
-	return rows
-		.map((r) => r.format)
-		.filter((f): f is string => f !== null)
-		.sort();
-}
+		return rows
+			.map((r) => r.format)
+			.filter((f): f is string => f !== null)
+			.sort();
+	},
+	["collection-formats"],
+	{ revalidate: 300, tags: ["collection"] },
+);

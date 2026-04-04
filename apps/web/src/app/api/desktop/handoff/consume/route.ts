@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { verifyAndConsumeHandoffToken } from "@/lib/desktop/handoff-token";
-import { tradeRateLimit } from "@/lib/rate-limit";
+import { tradeRateLimit , safeLimit} from "@/lib/rate-limit";
 
 export const runtime = "nodejs";
 
@@ -45,7 +45,7 @@ export async function POST(request: NextRequest) {
   }
 
   // SEC-04: rate limit by user ID — prevents brute force of handoff tokens
-  const { success: rlSuccess } = await tradeRateLimit.limit(user.id);
+  const { success: rlSuccess } = await safeLimit(tradeRateLimit, user.id, false);
   if (!rlSuccess) {
     return NextResponse.json({ error: "Too many requests" }, { status: 429 });
   }

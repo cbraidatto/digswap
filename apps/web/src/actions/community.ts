@@ -8,9 +8,9 @@ import { groupInvites } from "@/lib/db/schema/group-invites";
 import { reviews } from "@/lib/db/schema/reviews";
 import { profiles } from "@/lib/db/schema/users";
 import { eq, and, sql } from "drizzle-orm";
-import { logActivity } from "@/actions/social";
+import { logActivity } from "@/lib/social/log-activity";
 import { awardBadge } from "@/lib/gamification/badge-awards";
-import { apiRateLimit } from "@/lib/rate-limit";
+import { apiRateLimit , safeLimit} from "@/lib/rate-limit";
 import { slugify } from "@/lib/community/slugify";
 import { createPostSchema, createReviewSchema } from "@/lib/validations/community";
 import {
@@ -55,7 +55,7 @@ export async function createGroupAction(data: {
 	try {
 		const user = await requireUser();
 
-		const { success: rlSuccess } = await apiRateLimit.limit(user.id);
+		const { success: rlSuccess } = await safeLimit(apiRateLimit, user.id, true);
 		if (!rlSuccess) {
 			return { error: "Too many requests. Please wait a moment." };
 		}
@@ -121,7 +121,7 @@ export async function joinGroupAction(
 	try {
 		const user = await requireUser();
 
-		const { success: rlSuccess } = await apiRateLimit.limit(user.id);
+		const { success: rlSuccess } = await safeLimit(apiRateLimit, user.id, true);
 		if (!rlSuccess) {
 			return { error: "Too many requests. Please wait a moment." };
 		}
@@ -163,20 +163,20 @@ export async function joinGroupAction(
 			return { error: "This is a private group. You need an invite link to join." };
 		}
 
-		// Insert member
-		await db.insert(groupMembers).values({
-			groupId,
-			userId: user.id,
-			role: "member",
+		// Atomic: insert member + increment count in a single transaction
+		await db.transaction(async (tx) => {
+			await tx.insert(groupMembers).values({
+				groupId,
+				userId: user.id,
+				role: "member",
+			});
+			await tx
+				.update(groups)
+				.set({ memberCount: sql`${groups.memberCount} + 1` })
+				.where(eq(groups.id, groupId));
 		});
 
-		// Increment member count
-		await db
-			.update(groups)
-			.set({ memberCount: sql`${groups.memberCount} + 1` })
-			.where(eq(groups.id, groupId));
-
-		// Log activity
+		// Log activity (non-blocking, outside transaction)
 		await logActivity(user.id, "joined_group", "group", groupId, {
 			groupName: group.name,
 			groupSlug: group.slug,
@@ -202,7 +202,7 @@ export async function leaveGroupAction(
 	try {
 		const user = await requireUser();
 
-		const { success: rlSuccess } = await apiRateLimit.limit(user.id);
+		const { success: rlSuccess } = await safeLimit(apiRateLimit, user.id, true);
 		if (!rlSuccess) {
 			return { error: "Too many requests. Please wait a moment." };
 		}
@@ -243,16 +243,17 @@ export async function leaveGroupAction(
 			}
 		}
 
-		// Remove member
-		await db
-			.delete(groupMembers)
-			.where(eq(groupMembers.id, membership.id));
+		// SECURITY: Use transaction to ensure member removal and count decrement are atomic
+		await db.transaction(async (tx) => {
+			await tx
+				.delete(groupMembers)
+				.where(eq(groupMembers.id, membership.id));
 
-		// Decrement member count
-		await db
-			.update(groups)
-			.set({ memberCount: sql`${groups.memberCount} - 1` })
-			.where(eq(groups.id, groupId));
+			await tx
+				.update(groups)
+				.set({ memberCount: sql`GREATEST(${groups.memberCount} - 1, 0)` })
+				.where(eq(groups.id, groupId));
+		});
 
 		return { success: true };
 	} catch (err) {
@@ -273,7 +274,7 @@ export async function createPostAction(data: {
 	try {
 		const user = await requireUser();
 
-		const { success: rlSuccess } = await apiRateLimit.limit(user.id);
+		const { success: rlSuccess } = await safeLimit(apiRateLimit, user.id, true);
 		if (!rlSuccess) {
 			return { error: "Too many requests. Please wait a moment." };
 		}
@@ -354,7 +355,7 @@ export async function createReviewAction(data: {
 	try {
 		const user = await requireUser();
 
-		const { success: rlSuccess } = await apiRateLimit.limit(user.id);
+		const { success: rlSuccess } = await safeLimit(apiRateLimit, user.id, true);
 		if (!rlSuccess) {
 			return { error: "Too many requests. Please wait a moment." };
 		}
@@ -470,7 +471,7 @@ export async function generateInviteAction(
 	try {
 		const user = await requireUser();
 
-		const { success: rlSuccess } = await apiRateLimit.limit(user.id);
+		const { success: rlSuccess } = await safeLimit(apiRateLimit, user.id, true);
 		if (!rlSuccess) {
 			return { error: "Too many requests. Please wait a moment." };
 		}
@@ -492,11 +493,15 @@ export async function generateInviteAction(
 		}
 
 		const token = crypto.randomUUID();
+		// Tokens expire after 7 days — permanent invite links are a security risk
+		// if the link is accidentally shared outside the intended audience.
+		const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
 
 		await db.insert(groupInvites).values({
 			groupId,
 			token,
 			createdBy: user.id,
+			expiresAt,
 		});
 
 		return { token };
@@ -513,7 +518,7 @@ export async function inviteUserAction(
 	try {
 		const user = await requireUser();
 
-		const { success: rlSuccess } = await apiRateLimit.limit(user.id);
+		const { success: rlSuccess } = await safeLimit(apiRateLimit, user.id, true);
 		if (!rlSuccess) {
 			return { error: "Too many requests. Please wait a moment." };
 		}
@@ -567,6 +572,23 @@ export async function inviteUserAction(
 
 		// Insert notification via admin client (bypasses RLS)
 		const admin = createAdminClient();
+
+		// Dedup: skip if target was already invited to this group in the last 24h
+		const since = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
+		const { data: existingInvite } = await admin
+			.from("notifications")
+			.select("id")
+			.eq("user_id", targetUser.id)
+			.eq("type", "group_invite")
+			.gte("created_at", since)
+			.contains("link", group.slug)
+			.limit(1)
+			.maybeSingle();
+
+		if (existingInvite) {
+			return { success: true }; // Already notified recently, silently succeed
+		}
+
 		await admin.from("notifications").insert({
 			user_id: targetUser.id,
 			type: "group_invite",
@@ -588,7 +610,7 @@ export async function acceptInviteAction(
 	try {
 		const user = await requireUser();
 
-		const { success: rlSuccess } = await apiRateLimit.limit(user.id);
+		const { success: rlSuccess } = await safeLimit(apiRateLimit, user.id, true);
 		if (!rlSuccess) {
 			return { error: "Too many requests. Please wait a moment." };
 		}
@@ -635,18 +657,22 @@ export async function acceptInviteAction(
 			return { slug: group?.slug ?? "" };
 		}
 
-		// Insert member
-		await db.insert(groupMembers).values({
-			groupId: invite.groupId,
-			userId: user.id,
-			role: "member",
-		});
+		// SECURITY: Use transaction for atomic insert + count increment + token consumption
+		await db.transaction(async (tx) => {
+			await tx.insert(groupMembers).values({
+				groupId: invite.groupId,
+				userId: user.id,
+				role: "member",
+			});
 
-		// Increment member count
-		await db
-			.update(groups)
-			.set({ memberCount: sql`${groups.memberCount} + 1` })
-			.where(eq(groups.id, invite.groupId));
+			await tx
+				.update(groups)
+				.set({ memberCount: sql`${groups.memberCount} + 1` })
+				.where(eq(groups.id, invite.groupId));
+
+			// Consume the invite token — one-time-use prevents re-entry after being removed
+			await tx.delete(groupInvites).where(eq(groupInvites.token, token));
+		});
 
 		// Get group slug for redirect
 		const [group] = await db
@@ -659,6 +685,130 @@ export async function acceptInviteAction(
 	} catch (err) {
 		console.error("[acceptInviteAction] error:", err);
 		return { error: "Failed to accept invite. Please try again." };
+	}
+}
+
+// ---------------------------------------------------------------------------
+// Member management (admin only)
+// ---------------------------------------------------------------------------
+
+export async function removeMemberAction(
+	groupId: string,
+	targetUserId: string,
+): Promise<{ success?: boolean; error?: string }> {
+	try {
+		const user = await requireUser();
+
+		const { success: rlSuccess } = await safeLimit(apiRateLimit, user.id, true);
+		if (!rlSuccess) return { error: "Too many requests." };
+
+		// Verify caller is admin
+		const [callerMembership] = await db
+			.select({ role: groupMembers.role })
+			.from(groupMembers)
+			.where(and(eq(groupMembers.groupId, groupId), eq(groupMembers.userId, user.id)))
+			.limit(1);
+
+		if (!callerMembership || callerMembership.role !== "admin") {
+			return { error: "Only group admins can remove members." };
+		}
+
+		// Cannot remove yourself via this action — use leaveGroupAction
+		if (targetUserId === user.id) {
+			return { error: "Use 'Leave group' to remove yourself." };
+		}
+
+		// Find target membership
+		const [targetMembership] = await db
+			.select({ id: groupMembers.id })
+			.from(groupMembers)
+			.where(and(eq(groupMembers.groupId, groupId), eq(groupMembers.userId, targetUserId)))
+			.limit(1);
+
+		if (!targetMembership) return { error: "User is not a member of this group." };
+
+		await db.transaction(async (tx) => {
+			await tx.delete(groupMembers).where(eq(groupMembers.id, targetMembership.id));
+			await tx.update(groups)
+				.set({ memberCount: sql`${groups.memberCount} - 1` })
+				.where(eq(groups.id, groupId));
+		});
+
+		return { success: true };
+	} catch (err) {
+		console.error("[removeMemberAction] error:", err);
+		return { error: "Failed to remove member. Please try again." };
+	}
+}
+
+export async function promoteToAdminAction(
+	groupId: string,
+	targetUserId: string,
+): Promise<{ success?: boolean; error?: string }> {
+	try {
+		const user = await requireUser();
+
+		const { success: rlSuccess } = await safeLimit(apiRateLimit, user.id, true);
+		if (!rlSuccess) return { error: "Too many requests." };
+
+		// Verify caller is admin
+		const [callerMembership] = await db
+			.select({ role: groupMembers.role })
+			.from(groupMembers)
+			.where(and(eq(groupMembers.groupId, groupId), eq(groupMembers.userId, user.id)))
+			.limit(1);
+
+		if (!callerMembership || callerMembership.role !== "admin") {
+			return { error: "Only group admins can promote members." };
+		}
+
+		// Find target membership
+		const [targetMembership] = await db
+			.select({ id: groupMembers.id, role: groupMembers.role })
+			.from(groupMembers)
+			.where(and(eq(groupMembers.groupId, groupId), eq(groupMembers.userId, targetUserId)))
+			.limit(1);
+
+		if (!targetMembership) return { error: "User is not a member of this group." };
+		if (targetMembership.role === "admin") return { error: "User is already an admin." };
+
+		await db.update(groupMembers)
+			.set({ role: "admin" })
+			.where(eq(groupMembers.id, targetMembership.id));
+
+		return { success: true };
+	} catch (err) {
+		console.error("[promoteToAdminAction] error:", err);
+		return { error: "Failed to promote member. Please try again." };
+	}
+}
+
+export async function revokeInviteAction(
+	groupId: string,
+): Promise<{ success?: boolean; error?: string }> {
+	try {
+		const user = await requireUser();
+
+		const { success: rlSuccess } = await safeLimit(apiRateLimit, user.id, true);
+		if (!rlSuccess) return { error: "Too many requests." };
+
+		// Verify caller is admin
+		const [membership] = await db
+			.select({ role: groupMembers.role })
+			.from(groupMembers)
+			.where(and(eq(groupMembers.groupId, groupId), eq(groupMembers.userId, user.id)))
+			.limit(1);
+
+		if (!membership || membership.role !== "admin") {
+			return { error: "Only group admins can revoke invites." };
+		}
+
+		await db.delete(groupInvites).where(eq(groupInvites.groupId, groupId));
+
+		return { success: true };
+	} catch (err) {
+		console.error("[revokeInviteAction] error:", err);
+		return { error: "Failed to revoke invites. Please try again." };
 	}
 }
 

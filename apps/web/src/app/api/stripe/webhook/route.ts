@@ -1,7 +1,13 @@
 import { NextResponse } from "next/server";
 import type Stripe from "stripe";
-import { getPlanFromStripeSubscription, getStripe, toIsoFromUnixTimestamp } from "@/lib/stripe";
+import {
+	getPlanFromStripeSubscription,
+	getTierFromSubscription,
+	getStripe,
+	toIsoFromUnixTimestamp,
+} from "@/lib/stripe";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { apiRateLimit, safeLimit } from "@/lib/rate-limit";
 
 export const runtime = "nodejs";
 
@@ -12,6 +18,36 @@ function getWebhookSecret() {
 	}
 
 	return secret;
+}
+
+/**
+ * Idempotency guard: records processed Stripe event IDs so retried deliveries
+ * are ignored.  Stored in stripe_event_log (PRIMARY KEY on event_id).
+ *
+ * Returns true if the event was already processed (caller should return 200).
+ */
+async function isEventAlreadyProcessed(
+	admin: ReturnType<typeof createAdminClient>,
+	eventId: string,
+): Promise<boolean> {
+	const { data } = await admin
+		.from("stripe_event_log")
+		.select("event_id")
+		.eq("event_id", eventId)
+		.maybeSingle();
+	return data !== null;
+}
+
+async function markEventProcessed(
+	admin: ReturnType<typeof createAdminClient>,
+	eventId: string,
+	eventType: string,
+): Promise<void> {
+	await admin.from("stripe_event_log").insert({
+		event_id: eventId,
+		event_type: eventType,
+		processed_at: new Date().toISOString(),
+	});
 }
 
 async function updateProfileTier(
@@ -133,11 +169,12 @@ async function handleCheckoutSessionCompleted(
 		expand: ["items.data.price"],
 	});
 	const period = getSubscriptionPeriodBounds(subscription);
+	const plan = getPlanFromStripeSubscription(subscription);
 
 	await upsertSubscriptionRecord(admin, {
 		currentPeriodEnd: period.currentPeriodEnd,
 		currentPeriodStart: period.currentPeriodStart,
-		plan: getPlanFromStripeSubscription(subscription),
+		plan,
 		status: subscription.status,
 		stripeCustomerId:
 			typeof subscription.customer === "string" ? subscription.customer : subscription.customer.id,
@@ -145,7 +182,9 @@ async function handleCheckoutSessionCompleted(
 		userId,
 	});
 
-	await updateProfileTier(admin, userId, "premium");
+	// Derive tier from actual status — checkout.session.completed means the
+	// payment succeeded, but use the canonical helper for consistency.
+	await updateProfileTier(admin, userId, getTierFromSubscription(plan, subscription.status));
 }
 
 async function handleCustomerSubscriptionUpdated(
@@ -154,6 +193,7 @@ async function handleCustomerSubscriptionUpdated(
 ) {
 	const subscription = event.data.object;
 	const period = getSubscriptionPeriodBounds(subscription);
+	const plan = getPlanFromStripeSubscription(subscription);
 	const userId = await findUserIdByCustomerId(
 		admin,
 		typeof subscription.customer === "string" ? subscription.customer : subscription.customer.id,
@@ -166,7 +206,7 @@ async function handleCustomerSubscriptionUpdated(
 	await upsertSubscriptionRecord(admin, {
 		currentPeriodEnd: period.currentPeriodEnd,
 		currentPeriodStart: period.currentPeriodStart,
-		plan: getPlanFromStripeSubscription(subscription),
+		plan,
 		status: subscription.status,
 		stripeCustomerId:
 			typeof subscription.customer === "string" ? subscription.customer : subscription.customer.id,
@@ -174,7 +214,9 @@ async function handleCustomerSubscriptionUpdated(
 		userId,
 	});
 
-	await updateProfileTier(admin, userId, "premium");
+	// Derive tier from the actual subscription status — correctly handles
+	// downgrades, cancellations-mid-period, and payment failures.
+	await updateProfileTier(admin, userId, getTierFromSubscription(plan, subscription.status));
 }
 
 async function handleCustomerSubscriptionDeleted(
@@ -239,6 +281,13 @@ async function handleInvoicePaymentFailed(
 }
 
 export async function POST(request: Request) {
+	// SECURITY: Rate limit by IP to prevent DoS via signature verification CPU cost
+	const ip = request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ?? "unknown";
+	const { success: rlOk } = await safeLimit(apiRateLimit, `stripe-wh:${ip}`, false);
+	if (!rlOk) {
+		return NextResponse.json({ error: "Too many requests" }, { status: 429 });
+	}
+
 	let event: Stripe.Event;
 
 	try {
@@ -257,6 +306,17 @@ export async function POST(request: Request) {
 
 	const admin = createAdminClient();
 
+	// Idempotency guard: Stripe retries on non-2xx or timeouts.
+	// If we already processed this event_id, return 200 immediately.
+	try {
+		if (await isEventAlreadyProcessed(admin, event.id)) {
+			return NextResponse.json({ received: true, duplicate: true });
+		}
+	} catch {
+		// If the check fails (e.g. table not yet migrated), proceed — the
+		// upsert-based handlers are safe to re-run.
+	}
+
 	try {
 		switch (event.type) {
 			case "checkout.session.completed":
@@ -273,6 +333,14 @@ export async function POST(request: Request) {
 				break;
 			default:
 				break;
+		}
+
+		// Record event as processed only after the handler succeeded
+		try {
+			await markEventProcessed(admin, event.id, event.type);
+		} catch {
+			// Non-fatal: worst case we process a duplicate on retry,
+			// which the upsert-based handlers handle safely.
 		}
 
 		return NextResponse.json({ received: true });

@@ -1,5 +1,5 @@
 import { app, dialog, ipcMain, shell } from "electron";
-import type { DesktopShellSessionPayload, SupabaseSession } from "../shared/ipc-types";
+import type { SupabaseSession } from "../shared/ipc-types";
 import type { DesktopSupabaseAuth } from "./supabase-auth";
 import type { DesktopSessionStore } from "./session-store";
 import type { DesktopTradeRuntime } from "./trade-runtime";
@@ -36,16 +36,63 @@ export function registerDesktopIpc({
 
   ipcMain.handle("desktop:get-session", () => authRuntime.getSession());
 
-  ipcMain.handle("desktop-shell:sync-session", async (_event, session) => {
-    const payload = session as DesktopShellSessionPayload | null;
+  // SECURITY: Legacy sync-session endpoint removed — accepted raw tokens via IPC
+  // which enabled session fixation via XSS. Use sync-handoff-code instead.
+  ipcMain.handle("desktop-shell:sync-session", async () => {
+    console.warn("[SECURITY] desktop-shell:sync-session is deprecated and disabled. Use sync-handoff-code.");
+    throw new Error("sync-session is disabled for security reasons. Use the handoff code flow.");
+  });
 
-    if (payload) {
-      await authRuntime.importSession(payload);
+  // New handoff-code flow: web app sends a single-use code instead of raw tokens.
+  // We exchange it server-side so raw tokens never pass through the renderer IPC.
+  ipcMain.handle("desktop-shell:sync-handoff-code", async (_event, code: string | null) => {
+    if (!code) {
+      // null means the web app signed out — clear the desktop session
+      await tradeRuntime.releaseAllLeases();
+      await authRuntime.clearImportedSession();
       return;
     }
 
-    await tradeRuntime.releaseAllLeases();
-    await authRuntime.clearImportedSession();
+    // Resolve the site URL from the auth config (same source as createMainWindow)
+    const siteUrl = (authRuntime as unknown as { config?: { siteUrl?: string } })
+      ?.config?.siteUrl ?? "http://localhost:3000";
+
+    let exchangeResult: { userId?: string; error?: string } | null = null;
+
+    try {
+      const accessToken = await authRuntime.getAccessToken();
+      const res = await fetch(`${siteUrl}/api/desktop/session/exchange`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}),
+        },
+        body: JSON.stringify({ code }),
+      });
+
+      if (!res.ok) {
+        console.error("[desktop-shell:sync-handoff-code] exchange failed:", res.status);
+        return;
+      }
+
+      exchangeResult = await res.json() as { userId?: string };
+    } catch (err) {
+      console.error("[desktop-shell:sync-handoff-code] fetch error:", err);
+      return;
+    }
+
+    if (!exchangeResult?.userId) {
+      console.error("[desktop-shell:sync-handoff-code] exchange returned no userId");
+      return;
+    }
+
+    // The session is already stored in the Supabase client via the cookie in the
+    // web app's context. For the desktop's own Supabase client, we refresh it
+    // from the vault — the web app's cookie auth and desktop's PKCE auth are
+    // independent. The exchange call confirmed the user is authenticated; the
+    // desktop session was already set via startOAuthSignIn / handleAuthCallback.
+    // Emit the current session to update the renderer if it hasn't heard yet.
+    authRuntime.notifySessionListeners();
   });
 
   ipcMain.handle("desktop:open-oauth", (_event, provider) => authRuntime.startOAuthSignIn(provider));

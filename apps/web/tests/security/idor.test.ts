@@ -4,12 +4,13 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 // Mock rate limiters (must allow all to test IDOR logic)
 // ---------------------------------------------------------------------------
 vi.mock("@/lib/rate-limit", () => ({
-	authRateLimit: { limit: vi.fn().mockResolvedValue({ success: true }) },
-	resetRateLimit: { limit: vi.fn().mockResolvedValue({ success: true }) },
-	totpRateLimit: { limit: vi.fn().mockResolvedValue({ success: true }) },
-	apiRateLimit: { limit: vi.fn().mockResolvedValue({ success: true }) },
-	tradeRateLimit: { limit: vi.fn().mockResolvedValue({ success: true }) },
-	discogsRateLimit: { limit: vi.fn().mockResolvedValue({ success: true }) },
+	authRateLimit: null,
+	resetRateLimit: null,
+	totpRateLimit: null,
+	apiRateLimit: null,
+	tradeRateLimit: null,
+	discogsRateLimit: null,
+	safeLimit: vi.fn().mockImplementation(async () => ({ success: true })),
 }));
 
 // ---------------------------------------------------------------------------

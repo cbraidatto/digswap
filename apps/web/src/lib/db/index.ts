@@ -6,7 +6,7 @@ import * as schema from "./schema";
 // PgBouncer in transaction mode does not support prepared statements
 const client = postgres(process.env.DATABASE_URL!, {
 	prepare: false,
-	max: 1,
+	max: 10,
 	idle_timeout: 20,
 	connect_timeout: 10,
 });

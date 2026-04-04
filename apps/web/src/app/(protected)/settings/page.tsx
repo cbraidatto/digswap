@@ -44,6 +44,15 @@ export default async function SettingsPage({
 
 	return (
 		<div className="mx-auto w-full max-w-[640px] space-y-6 px-4 py-6">
+			<div className="flex items-center gap-3 mb-2">
+				<Link
+					href="/feed"
+					className="font-mono text-xs text-on-surface-variant hover:text-primary flex items-center gap-1 transition-colors"
+				>
+					<span className="material-symbols-outlined text-[14px]">arrow_back</span>
+					BACK
+				</Link>
+			</div>
 			<h1 className="font-heading text-xl font-semibold">Settings</h1>
 
 			<Link

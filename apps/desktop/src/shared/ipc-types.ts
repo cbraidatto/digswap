@@ -87,7 +87,12 @@ export interface DesktopShellSessionPayload {
 export interface DesktopMainShellBridge {
   isDesktop(): boolean;
   getAppVersion(): Promise<string>;
-  syncSession(session: DesktopShellSessionPayload | null): Promise<void>;
+  /**
+   * Handoff-code flow: the web app sends a single-use code (30s TTL)
+   * instead of raw tokens. The desktop exchanges it server-side via
+   * POST /api/desktop/session/exchange, keeping tokens out of the browser.
+   */
+  syncHandoffCode(code: string | null): Promise<void>;
 }
 
 /**
@@ -124,6 +129,8 @@ export interface TradeLeg {
   notes: string | null;
   fileNameHint: string | null;
   fileSizeBytes: number | null;
+  /** SHA-256 hash declared by the provider when they committed the file. */
+  fileHash: string | null;
 }
 
 /** Full proposal context shown in LobbyScreen. */

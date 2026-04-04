@@ -39,3 +39,28 @@ export const subscriptions = pgTable(
 		}),
 	],
 );
+
+/**
+ * Idempotency log for Stripe webhook events.
+ * Before processing any event, the handler checks this table.
+ * If the event_id is already present, the handler returns 200 without
+ * re-applying changes — safe against Stripe retries and duplicate deliveries.
+ *
+ * No RLS needed: only the service role (webhook handler via admin client)
+ * ever reads or writes this table.
+ */
+export const stripeEventLog = pgTable(
+	"stripe_event_log",
+	{
+		eventId: text("event_id").primaryKey(),       // Stripe evt_xxx identifier
+		eventType: text("event_type").notNull(),
+		processedAt: timestamp("processed_at", { withTimezone: true }).defaultNow().notNull(),
+	},
+	() => [
+		pgPolicy("stripe_event_log_no_user_access", {
+			for: "all",
+			to: authenticatedRole,
+			using: sql`false`, // Authenticated users have no direct access
+		}),
+	],
+);

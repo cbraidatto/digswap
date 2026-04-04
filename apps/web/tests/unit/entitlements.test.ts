@@ -139,6 +139,7 @@ describe("getUserSubscription", () => {
 
 		await expect(getUserSubscription(USER_ID)).resolves.toEqual({
 			plan: "free",
+			status: "active",
 			tradesMonthReset: now,
 			tradesThisMonth: 0,
 		});

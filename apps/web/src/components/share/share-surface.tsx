@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 interface ShareSurfaceProps {
   url: string;
@@ -9,6 +9,11 @@ interface ShareSurfaceProps {
 
 export function ShareSurface({ url, label = "COPY_LINK" }: ShareSurfaceProps) {
   const [copied, setCopied] = useState(false);
+  const [canShare, setCanShare] = useState(false);
+
+  useEffect(() => {
+    setCanShare(typeof navigator !== "undefined" && "share" in navigator);
+  }, []);
 
   const handleCopy = async () => {
     await navigator.clipboard.writeText(url);
@@ -36,7 +41,7 @@ export function ShareSurface({ url, label = "COPY_LINK" }: ShareSurfaceProps) {
         </span>
         {copied ? "COPIED" : label}
       </button>
-      {typeof navigator !== "undefined" && "share" in navigator && (
+      {canShare && (
         <button
           type="button"
           onClick={handleShare}

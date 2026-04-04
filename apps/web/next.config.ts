@@ -17,10 +17,10 @@ const securityHeaders = [
 		key: "X-Content-Type-Options",
 		value: "nosniff",
 	},
-	{
-		key: "Referrer-Policy",
-		value: "origin-when-cross-origin",
-	},
+	// NOTE: Referrer-Policy intentionally omitted here — middleware sets
+	// strict-origin-when-cross-origin (stricter) on every response. Defining
+	// it here with origin-when-cross-origin would create a conflicting value.
+	// See security audit L-04 / middleware.ts SEC-02 block.
 	{
 		key: "Permissions-Policy",
 		value: "camera=(), microphone=(), geolocation=()",
@@ -29,6 +29,8 @@ const securityHeaders = [
 ];
 
 const nextConfig: NextConfig = {
+	productionBrowserSourceMaps: false, // Never expose source maps in production (M-12/M-16)
+	poweredByHeader: false, // Remove X-Powered-By fingerprinting (M-16)
 	experimental: {
 		serverActions: {
 			bodySizeLimit: "6mb",

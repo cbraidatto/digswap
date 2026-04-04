@@ -4,6 +4,7 @@ import { DiscogsClient } from "@lionralfs/discogs-client";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { getAccessToken, storeTokens } from "@/lib/discogs/oauth";
+import { authRateLimit, safeLimit } from "@/lib/rate-limit";
 
 /**
  * Discogs OAuth 1.0a callback handler.
@@ -19,8 +20,18 @@ import { getAccessToken, storeTokens } from "@/lib/discogs/oauth";
  * 8. Create import job (collection first per D-07)
  * 9. Fire-and-forget import worker invocation
  * 10. Redirect to /import-progress
+ *
+ * SECURITY: Rate limited per IP to prevent abuse of Discogs API quota.
  */
 export async function GET(request: NextRequest) {
+	const ip = request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ?? "unknown";
+	const { success: rlOk } = await safeLimit(authRateLimit, `discogs-cb:${ip}`, true);
+	if (!rlOk) {
+		const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
+		return NextResponse.redirect(
+			`${siteUrl}/settings?error=${encodeURIComponent("Too many requests. Please try again later.")}`,
+		);
+	}
 	const { searchParams } = new URL(request.url);
 	const oauthToken = searchParams.get("oauth_token");
 	const oauthVerifier = searchParams.get("oauth_verifier");

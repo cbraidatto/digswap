@@ -31,11 +31,6 @@ export const notifications = pgTable(
       to: authenticatedRole,
       using: sql`${table.userId} = ${authUid}`,
     }),
-    pgPolicy("notifications_insert_own", {
-      for: "insert",
-      to: authenticatedRole,
-      withCheck: sql`${table.userId} = ${authUid}`,
-    }),
     pgPolicy("notifications_update_own", {
       for: "update",
       to: authenticatedRole,

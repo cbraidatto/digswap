@@ -9,12 +9,19 @@ const mockTradeLimit = vi.fn();
 const mockDiscogsLimit = vi.fn();
 
 vi.mock("@/lib/rate-limit", () => ({
-	authRateLimit: { limit: vi.fn().mockResolvedValue({ success: true }) },
-	resetRateLimit: { limit: vi.fn().mockResolvedValue({ success: true }) },
-	totpRateLimit: { limit: vi.fn().mockResolvedValue({ success: true }) },
-	apiRateLimit: { limit: (...args: unknown[]) => mockApiLimit(...args) },
-	tradeRateLimit: { limit: (...args: unknown[]) => mockTradeLimit(...args) },
-	discogsRateLimit: { limit: (...args: unknown[]) => mockDiscogsLimit(...args) },
+	authRateLimit: null,
+	resetRateLimit: null,
+	totpRateLimit: null,
+	apiRateLimit: "api",       // sentinel value so safeLimit can identify it
+	tradeRateLimit: "trade",
+	discogsRateLimit: "discogs",
+	// safeLimit(limiter, key, failClosed) — route to the right mock based on limiter sentinel
+	safeLimit: vi.fn().mockImplementation(async (limiter: unknown, key: unknown) => {
+		if (limiter === "api") return mockApiLimit(key);
+		if (limiter === "trade") return mockTradeLimit(key);
+		if (limiter === "discogs") return mockDiscogsLimit(key);
+		return { success: true };
+	}),
 }));
 
 // ---------------------------------------------------------------------------

@@ -7,12 +7,12 @@ import userEvent from "@testing-library/user-event";
 // The Popover mock uses a context to wire onOpenChange to the trigger button.
 // ---------------------------------------------------------------------------
 vi.mock("@/components/ui/popover", () => {
-	// Import React inside the factory to avoid hoisting issues
-	const React = require("react");
+	// Use React.createElement throughout — JSX is not available inside vi.mock
+	// factories because they are hoisted before Vite's JSX transform runs.
+	const React = require("react") as typeof import("react");
 	const { createContext, useContext } = React;
 
-	// eslint-disable-next-line @typescript-eslint/no-explicit-any
-	const Ctx = createContext({} as { onOpenChange?: (v: boolean) => void });
+	const Ctx = createContext<{ onOpenChange?: (v: boolean) => void }>({});
 
 	return {
 		Popover: ({
@@ -23,13 +23,16 @@ vi.mock("@/components/ui/popover", () => {
 			children: React.ReactNode;
 			open?: boolean;
 			onOpenChange?: (v: boolean) => void;
-		}) => (
-			<Ctx.Provider value={{ onOpenChange }}>
-				<div data-testid="popover-root" data-open={String(open)}>
-					{children}
-				</div>
-			</Ctx.Provider>
-		),
+		}) =>
+			React.createElement(
+				Ctx.Provider,
+				{ value: { onOpenChange } },
+				React.createElement(
+					"div",
+					{ "data-testid": "popover-root", "data-open": String(open) },
+					children,
+				),
+			),
 		PopoverTrigger: ({
 			children,
 		}: {
@@ -37,18 +40,18 @@ vi.mock("@/components/ui/popover", () => {
 			render?: React.ReactElement;
 		}) => {
 			const { onOpenChange } = useContext(Ctx);
-			return (
-				<div
-					data-testid="popover-trigger"
-					onClick={() => onOpenChange?.(true)}
-					role="button"
-					tabIndex={0}
-					onKeyDown={(e: React.KeyboardEvent) => {
+			return React.createElement(
+				"div",
+				{
+					"data-testid": "popover-trigger",
+					onClick: () => onOpenChange?.(true),
+					role: "button",
+					tabIndex: 0,
+					onKeyDown: (e: React.KeyboardEvent) => {
 						if (e.key === "Enter") onOpenChange?.(true);
-					}}
-				>
-					{children}
-				</div>
+					},
+				},
+				children,
 			);
 		},
 		PopoverContent: ({
@@ -57,11 +60,12 @@ vi.mock("@/components/ui/popover", () => {
 		}: {
 			children: React.ReactNode;
 			className?: string;
-		}) => (
-			<div data-testid="popover-content" className={className}>
-				{children}
-			</div>
-		),
+		}) =>
+			React.createElement(
+				"div",
+				{ "data-testid": "popover-content", className },
+				children,
+			),
 	};
 });
 

@@ -1,4 +1,4 @@
-import { eq } from "drizzle-orm";
+import { eq, sql } from "drizzle-orm";
 import { db } from "@/lib/db";
 import { collectionItems } from "@/lib/db/schema/collections";
 import { releases } from "@/lib/db/schema/releases";
@@ -18,16 +18,12 @@ export interface ComparisonResult {
 }
 
 /**
- * Build a matching key for a collection item.
- * Prefer discogsId when available; fall back to normalized artist+title.
+ * Compare two collections using database-side JOINs.
+ * Previously fetched both full collections into Node.js and intersected in JS —
+ * this was O(N+M) data transfer. Now pushes all three queries to the DB.
+ *
+ * Each query uses indexed joins on (user_id, release_id).
  */
-function getMatchKey(item: ComparisonItem): string {
-	if (item.discogsId !== null && item.discogsId !== undefined) {
-		return `discogs:${item.discogsId}`;
-	}
-	return `name:${item.artist.toLowerCase()}|||${item.title.toLowerCase()}`;
-}
-
 export async function getCollectionComparison(
 	myUserId: string,
 	theirUserId: string,
@@ -40,53 +36,57 @@ export async function getCollectionComparison(
 		rarityScore: releases.rarityScore,
 	};
 
-	const myItems: ComparisonItem[] = await db
-		.select(selectFields)
-		.from(collectionItems)
-		.innerJoin(releases, eq(collectionItems.releaseId, releases.id))
-		.where(eq(collectionItems.userId, myUserId));
+	// All three queries run in parallel
+	const [inCommon, uniqueToMe, uniqueToThem] = await Promise.all([
+		// Records both users own — inner join between the two collections
+		db
+			.select(selectFields)
+			.from(collectionItems)
+			.innerJoin(
+				db
+					.select({ releaseId: collectionItems.releaseId })
+					.from(collectionItems)
+					.where(eq(collectionItems.userId, theirUserId))
+					.as("theirs"),
+				sql`"theirs"."release_id" = ${collectionItems.releaseId}`,
+			)
+			.innerJoin(releases, eq(releases.id, collectionItems.releaseId))
+			.where(eq(collectionItems.userId, myUserId))
+			.orderBy(sql`${releases.rarityScore} DESC NULLS LAST`)
+			.limit(500),
 
-	const theirItems: ComparisonItem[] = await db
-		.select(selectFields)
-		.from(collectionItems)
-		.innerJoin(releases, eq(collectionItems.releaseId, releases.id))
-		.where(eq(collectionItems.userId, theirUserId));
+		// Records I own that they don't
+		db
+			.select(selectFields)
+			.from(collectionItems)
+			.innerJoin(releases, eq(releases.id, collectionItems.releaseId))
+			.where(
+				sql`${collectionItems.userId} = ${myUserId}
+					AND NOT EXISTS (
+						SELECT 1 FROM collection_items b
+						WHERE b.user_id = ${theirUserId}
+						  AND b.release_id = ${collectionItems.releaseId}
+					)`,
+			)
+			.orderBy(sql`${releases.rarityScore} DESC NULLS LAST`)
+			.limit(500),
 
-	// Safeguard: if either collection > 5000 items, return error-like empty result
-	if (myItems.length > 5000 || theirItems.length > 5000) {
-		return { uniqueToMe: [], inCommon: [], uniqueToThem: [] };
-	}
-
-	// Build key sets
-	const myKeyMap = new Map<string, ComparisonItem>();
-	for (const item of myItems) {
-		myKeyMap.set(getMatchKey(item), item);
-	}
-
-	const theirKeyMap = new Map<string, ComparisonItem>();
-	for (const item of theirItems) {
-		theirKeyMap.set(getMatchKey(item), item);
-	}
-
-	const uniqueToMe: ComparisonItem[] = [];
-	const inCommon: ComparisonItem[] = [];
-	const uniqueToThem: ComparisonItem[] = [];
-
-	// Items in my collection
-	for (const [key, item] of myKeyMap) {
-		if (theirKeyMap.has(key)) {
-			inCommon.push(item);
-		} else {
-			uniqueToMe.push(item);
-		}
-	}
-
-	// Items only in their collection
-	for (const [key, item] of theirKeyMap) {
-		if (!myKeyMap.has(key)) {
-			uniqueToThem.push(item);
-		}
-	}
+		// Records they own that I don't
+		db
+			.select(selectFields)
+			.from(collectionItems)
+			.innerJoin(releases, eq(releases.id, collectionItems.releaseId))
+			.where(
+				sql`${collectionItems.userId} = ${theirUserId}
+					AND NOT EXISTS (
+						SELECT 1 FROM collection_items b
+						WHERE b.user_id = ${myUserId}
+						  AND b.release_id = ${collectionItems.releaseId}
+					)`,
+			)
+			.orderBy(sql`${releases.rarityScore} DESC NULLS LAST`)
+			.limit(500),
+	]);
 
 	return { uniqueToMe, inCommon, uniqueToThem };
 }

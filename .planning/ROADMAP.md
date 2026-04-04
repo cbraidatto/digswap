@@ -17,7 +17,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 3: Discogs Integration** - OAuth 1.0a connection, collection/wantlist import, async pipeline with progress (completed 2026-03-25)
 - [x] **Phase 4: Collection Management** - Public collection profiles, rarity scoring, filtering, sorting, manual entry (completed 2026-03-25)
 - [x] **Phase 4.5: Template Alignment** - Remove GitHub metaphors, align navigation language, clean placeholder content, wire empty states to product vision (INSERTED, completed 2026-03-25)
-- [ ] **Phase 5: Social Layer** - Follow system, activity feed, collection comparison, public profiles
+- [x] **Phase 5: Social Layer** - Follow system, activity feed, collection comparison, public profiles (completed 2026-03-26)
 - [x] **Phase 6: Discovery + Notifications** - Cross-collection search, wantlist matching, in-app/email/push notifications (completed 2026-03-26)
 - [x] **Phase 7: Community + Reviews** - Genre/era groups, group activity feeds, pressing and release reviews (completed 2026-03-26)
 - [x] **Phase 8: Gamification + Rankings** - Global/genre leaderboards, badges, titles, composite ranking formula (completed 2026-03-31)
@@ -27,7 +27,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 12: Release Pages** - Public SEO-indexable page per release: Discogs link, YouTube embed, owners list, reviews
  (completed 2026-03-29)
 - [x] **Phase 13: Crates & Sets** - Pre-dig folder creation, add-to-crate from any surface, ordered sets with event metadata (completed 2026-03-29)
-- [ ] **Phase 14: Trade V2** - Explicit proposal with quality specs + collection linking, P2P 1-min preview, waveform visualization, full transfer after preview acceptance
+- [x] **Phase 14: Trade V2** - Explicit proposal with quality specs + collection linking, P2P 1-min preview, waveform visualization, full transfer after preview acceptance (completed 2026-04-02)
 - [ ] **Phase 15: Social V2** - Trade-scoped messaging thread, online presence in trade context
 - [x] **Phase 16: Monetization** - Stripe freemium, trade quotas, premium features (completed 2026-03-31)
 
@@ -299,8 +299,8 @@ Plans:
 Plans:
 - [x] 13-01-PLAN.md -- Schema + data layer: crates/crate_items/sets/set_tracks tables, RLS, server actions, query functions, Zod validation
 - [x] 13-02-PLAN.md -- Crates routes: /crates list page, /crates/[id] detail, CrateCard, SetBuilderPanel (@dnd-kit), SetsSection, [MY_CRATES →] on /perfil
-- [ ] 13-03-PLAN.md -- AddToCratePopover + AddToCrateButton: injection into CollectionCard, RecordSearchCard, and release page
-- [ ] 13-04-PLAN.md -- Unit tests (server actions + component), human verification checkpoint
+- [x] 13-03-PLAN.md -- AddToCratePopover + AddToCrateButton: injection into CollectionCard, RecordSearchCard, and release page
+- [x] 13-04-PLAN.md -- Unit tests (server actions + component), human verification checkpoint
 
 ### Phase 14: Trade V2
 **Goal**: Trade flow becomes a 3-phase negotiation: explicit proposal → P2P audio preview → full transfer
@@ -320,7 +320,7 @@ Plans:
 - [x] 14-02-PLAN.md -- Proposal form redesign: collection offering picker, quality metadata, no file upload
 - [x] 14-03-PLAN.md -- Lobby state machine, Supabase Presence, bilateral negotiation phase
 - [x] 14-04-PLAN.md -- Preview subsystem: SHA-256, Blob.slice preview, P2P transfer, amplitude bars player, bilateral accept
-- [ ] 14-05-PLAN.md -- Unit tests + human verification checkpoint
+- [x] 14-05-PLAN.md -- Unit tests + human verification checkpoint
 **UI hint**: yes
 
 ### Phase 15: Social V2
@@ -416,8 +416,18 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 4.5 -> 5 -> 6 -> 7 -> 8 -> 
 | 11. Security Hardening | 3/3 | Complete | 2026-03-28 |
 | 12. Release Pages | 3/3 | Complete | 2026-03-29 |
 | 13. Crates & Sets | 4/4 | Complete | 2026-03-29 |
-| 14. Trade V2 | 4/5 | Complete* | 2026-03-31 |
+| 14. Trade V2 | 5/5 | Complete | 2026-04-02 |
 | 15. Social V2 | 4/4 | Complete | 2026-03-31 |
 | 16. Monetization | 5/5 | Complete ✓ | 2026-03-31 |
 | 17. Desktop Trade Runtime | 8/8 | Complete | 2026-03-31 |
 | 18. Desktop Shell Refactor | 3/3 | Complete ✓ | 2026-04-02 |
+
+### Phase 19: Security Hardening — Fix 74 audit vulnerabilities
+
+**Goal:** [To be planned]
+**Requirements**: TBD
+**Depends on:** Phase 18
+**Plans:** 0 plans
+
+Plans:
+- [ ] TBD (run /gsd:plan-phase 19 to break down)

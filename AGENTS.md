@@ -181,6 +181,12 @@ Conventions not yet established. Will populate as patterns emerge during develop
 Architecture not yet mapped. Follow existing patterns found in the codebase.
 <!-- GSD:architecture-end -->
 
+## Skills
+
+| Use Case | Skill |
+|----------|-------|
+| AppSec hardening, security review, threat modeling, and pre-launch security checks for DigSwap auth, RLS, WebRTC, Discogs OAuth, Stripe, and browser security | `.pi/agent/skills/digswap-appsec/SKILL.md` |
+
 <!-- GSD:workflow-start source:GSD defaults -->
 ## GSD Workflow Enforcement
 

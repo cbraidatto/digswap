@@ -1,4 +1,4 @@
-import { eq, sql, desc } from "drizzle-orm";
+import { eq, sql, desc, and, gt } from "drizzle-orm";
 import { db } from "@/lib/db";
 import { follows, activityFeed } from "@/lib/db/schema/social";
 import { profiles } from "@/lib/db/schema/users";
@@ -12,35 +12,35 @@ export async function getExploreFeed(
 	cursor: string | null,
 	limit = 20,
 ): Promise<FeedItem[]> {
-	// 1. Fetch digger DNA top genres
-	const dnaRows = await db
-		.select({ topGenres: diggerDna.topGenres })
-		.from(diggerDna)
-		.where(eq(diggerDna.userId, userId))
-		.limit(1);
+	const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
+
+	// Parallelize all preflight queries — was 3 sequential round trips
+	const [dnaRows, signalRows, followingRows] = await Promise.all([
+		db
+			.select({ topGenres: diggerDna.topGenres })
+			.from(diggerDna)
+			.where(eq(diggerDna.userId, userId))
+			.limit(1),
+		db
+			.select({ genres: searchSignals.genres, strength: searchSignals.strength })
+			.from(searchSignals)
+			.where(
+				and(
+					eq(searchSignals.userId, userId),
+					gt(searchSignals.lastReinforcedAt, sevenDaysAgo),
+				),
+			)
+			.limit(1),
+		db
+			.select({ followingId: follows.followingId })
+			.from(follows)
+			.where(eq(follows.followerId, userId)),
+	]);
 
 	const dnaGenres: string[] = dnaRows[0]?.topGenres?.map((g) => g.name) ?? [];
-
-	// 2. Fetch active search signals (last 7 days, not decayed)
-	const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
-	const signalRows = await db
-		.select({ genres: searchSignals.genres, strength: searchSignals.strength })
-		.from(searchSignals)
-		.where(
-			sql`${searchSignals.userId} = ${userId} AND ${searchSignals.lastReinforcedAt} > ${sevenDaysAgo}`,
-		)
-		.limit(1);
-
-	// Merge DNA genres + signal genres, deduplicated. Signal genres get a boost
-	// by appearing first (affects ordering via contextReason matching).
+	// Signal genres get a boost by appearing first (affects contextReason matching)
 	const signalGenres = signalRows[0]?.genres ?? [];
 	const topGenres = [...new Set([...signalGenres, ...dnaGenres])];
-
-	// 2. Build exclusion list: user themselves + who they follow
-	const followingRows = await db
-		.select({ followingId: follows.followingId })
-		.from(follows)
-		.where(eq(follows.followerId, userId));
 
 	const excludedIds = [userId, ...followingRows.map((r) => r.followingId)];
 

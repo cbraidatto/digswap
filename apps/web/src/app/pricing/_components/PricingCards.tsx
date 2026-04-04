@@ -67,6 +67,7 @@ export function PricingCards({ currentPlan, monthlyPriceId, annualPriceId }: Pro
 			{/* Billing toggle */}
 			<div className="flex items-center gap-1 bg-surface-container border border-outline-variant rounded p-0.5">
 				<button
+					type="button"
 					onClick={() => setBilling("monthly")}
 					className={`px-4 py-1.5 text-xs font-mono rounded transition-all ${
 						billing === "monthly"
@@ -77,6 +78,7 @@ export function PricingCards({ currentPlan, monthlyPriceId, annualPriceId }: Pro
 					MONTHLY
 				</button>
 				<button
+					type="button"
 					onClick={() => setBilling("annual")}
 					className={`px-4 py-1.5 text-xs font-mono rounded transition-all ${
 						billing === "annual"
@@ -85,7 +87,7 @@ export function PricingCards({ currentPlan, monthlyPriceId, annualPriceId }: Pro
 					}`}
 				>
 					ANNUAL
-					<span className="ml-1.5 text-[9px] text-tertiary">SAVE 17%</span>
+					<span className="ml-1.5 text-[9px] text-tertiary pointer-events-none">SAVE 17%</span>
 				</button>
 			</div>
 

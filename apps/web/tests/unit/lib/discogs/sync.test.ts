@@ -105,11 +105,10 @@ describe("Delta sync", () => {
 			},
 		});
 
-		// Releases upsert + select
+		// Releases upsert + select("id").single() — returns the UUID in one round trip
 		const releasesChain = createChainedMock();
-		releasesChain.upsert = vi.fn().mockReturnValue({ error: null });
-		releasesChain.select = vi.fn().mockReturnValue({
-			eq: vi.fn().mockReturnValue({
+		releasesChain.upsert = vi.fn().mockReturnValue({
+			select: vi.fn().mockReturnValue({
 				single: vi.fn().mockResolvedValue({
 					data: { id: "release-uuid-sync" },
 					error: null,
@@ -174,9 +173,8 @@ describe("Delta sync", () => {
 		});
 
 		const releasesChain = createChainedMock();
-		releasesChain.upsert = vi.fn().mockReturnValue({ error: null });
-		releasesChain.select = vi.fn().mockReturnValue({
-			eq: vi.fn().mockReturnValue({
+		releasesChain.upsert = vi.fn().mockReturnValue({
+			select: vi.fn().mockReturnValue({
 				single: vi.fn().mockResolvedValue({
 					data: { id: "release-uuid-old" },
 					error: null,

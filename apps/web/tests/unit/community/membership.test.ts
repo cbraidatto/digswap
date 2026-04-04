@@ -79,8 +79,23 @@ vi.mock("@/lib/db", () => {
 		})),
 	}));
 
+	// Transaction: executes callback with the same chain (test isolation)
+	chain.transaction = vi.fn().mockImplementation(async (cb: (tx: unknown) => Promise<unknown>) => {
+		return cb(chain);
+	});
+
 	return { db: chain };
-});
+})
+vi.mock("@/lib/rate-limit", () => ({
+	authRateLimit: null,
+	resetRateLimit: null,
+	totpRateLimit: null,
+	apiRateLimit: null,
+	tradeRateLimit: null,
+	discogsRateLimit: null,
+	safeLimit: vi.fn().mockImplementation(async () => ({ success: true })),
+}));
+;
 
 // ---------------------------------------------------------------------------
 // Schema mocks

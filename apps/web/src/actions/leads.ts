@@ -3,7 +3,7 @@
 import { eq, and } from "drizzle-orm";
 import { db } from "@/lib/db";
 import { leads, type LeadStatus, type LeadTargetType } from "@/lib/db/schema/leads";
-import { apiRateLimit } from "@/lib/rate-limit";
+import { apiRateLimit , safeLimit} from "@/lib/rate-limit";
 import { createClient } from "@/lib/supabase/server";
 import { saveLeadSchema, getLeadSchema, getLeadsFilterSchema } from "@/lib/validations/leads";
 
@@ -25,7 +25,7 @@ export async function saveLead(
     } = await supabase.auth.getUser();
     if (!user) return { error: "Not authenticated" };
 
-    const { success: rlSuccess } = await apiRateLimit.limit(user.id);
+    const { success: rlSuccess } = await safeLimit(apiRateLimit, user.id, true);
     if (!rlSuccess) {
       return { error: "Too many requests. Please wait a moment." };
     }
@@ -65,7 +65,7 @@ export async function getLead(targetType: LeadTargetType, targetId: string) {
     } = await supabase.auth.getUser();
     if (!user) return null;
 
-    const { success: rlSuccess } = await apiRateLimit.limit(user.id);
+    const { success: rlSuccess } = await safeLimit(apiRateLimit, user.id, false);
     if (!rlSuccess) return null;
 
     const [lead] = await db
@@ -103,7 +103,7 @@ export async function getLeads(filters?: {
     } = await supabase.auth.getUser();
     if (!user) return [];
 
-    const { success: rlSuccess } = await apiRateLimit.limit(user.id);
+    const { success: rlSuccess } = await safeLimit(apiRateLimit, user.id, false);
     if (!rlSuccess) return [];
 
     const conditions = [eq(leads.userId, user.id)];

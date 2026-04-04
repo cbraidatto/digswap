@@ -41,6 +41,10 @@ export function getSiteUrl() {
 	return "http://localhost:3000";
 }
 
+// NOTE: Price IDs are in NEXT_PUBLIC_ vars so the pricing page can read them
+// client-side. This is an accepted risk — price IDs are semi-public and the
+// backend validates them before creating checkout sessions. They do not grant
+// payment access. See security audit LOW finding L-03.
 export function getStripePriceIds() {
 	return {
 		premiumAnnual: requireEnv("NEXT_PUBLIC_STRIPE_PRICE_ANNUAL"),
@@ -77,4 +81,26 @@ export function getPlanFromStripeSubscription(subscription: Stripe.Subscription)
 
 export function toIsoFromUnixTimestamp(value: number | null | undefined) {
 	return typeof value === "number" ? new Date(value * 1000).toISOString() : null;
+}
+
+/**
+ * Subscription statuses that entitle the user to premium access.
+ * "trialing" and "active" are the only valid active states.
+ * "past_due" keeps access during the retry grace period — Stripe will
+ * send a `customer.subscription.deleted` event if payment ultimately fails.
+ */
+export const PREMIUM_ACTIVE_STATUSES = new Set(["active", "trialing", "past_due"]);
+
+/**
+ * Returns the tier a user should be on given their subscription plan and
+ * Stripe subscription status.  Always pass both — never call with status
+ * omitted, as the fallback would grant premium to cancelled users.
+ */
+export function getTierFromSubscription(
+	plan: SubscriptionPlan,
+	status: string,
+): "free" | "premium" {
+	const isPremiumPlan = plan === "premium_monthly" || plan === "premium_annual";
+	if (!isPremiumPlan) return "free";
+	return PREMIUM_ACTIVE_STATUSES.has(status) ? "premium" : "free";
 }

@@ -282,15 +282,12 @@ export async function getSuggestedRecords(
 
 	const genreNames = topGenres.map((g) => g.genre);
 
-	// Step 2: Get release IDs user already owns (to exclude)
-	const ownedReleaseIds = await db
-		.select({ releaseId: collectionItems.releaseId })
-		.from(collectionItems)
-		.where(eq(collectionItems.userId, userId));
-
-	const ownedIds = ownedReleaseIds
-		.map((r) => r.releaseId)
-		.filter((id): id is string => id !== null);
+	// NOT EXISTS subquery to exclude owned records — avoids transferring IDs to Node.js
+	const notOwnedExpr = sql`NOT EXISTS (
+		SELECT 1 FROM collection_items ci_owned
+		WHERE ci_owned.user_id = ${userId}
+		  AND ci_owned.release_id = ${releases.id}
+	)`;
 
 	// Step 3: Genre-based suggestions -- records in user's top genres they don't own
 	let genreSuggestions: SuggestionResult[] = [];
@@ -318,12 +315,7 @@ export async function getSuggestedRecords(
 			.where(
 				and(
 					or(...genreConditions),
-					ownedIds.length > 0
-						? sql`${releases.id} NOT IN (${sql.join(
-								ownedIds.map((id) => sql`${id}::uuid`),
-								sql`, `,
-							)})`
-						: undefined,
+					notOwnedExpr,
 					ne(collectionItems.userId, userId),
 				),
 			)
@@ -378,12 +370,7 @@ export async function getSuggestedRecords(
 			.where(
 				and(
 					inArray(collectionItems.userId, followedIds),
-					ownedIds.length > 0
-						? sql`${releases.id} NOT IN (${sql.join(
-								ownedIds.map((id) => sql`${id}::uuid`),
-								sql`, `,
-							)})`
-						: undefined,
+					notOwnedExpr,
 				),
 			)
 			.groupBy(

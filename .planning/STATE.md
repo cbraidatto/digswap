@@ -225,6 +225,10 @@ Recent decisions affecting current work:
 - [Phase 08]: social.ts not modified for gamification — follows captured by pg_cron batch (D-12)
 - [Phase 08]: Trade points excluded from ranking CTE until Phase 9 completes trade tracking
 
+### Roadmap Evolution
+
+- Phase 19 added: Security Hardening — Fix 74 audit vulnerabilities (2026-04-03)
+
 ### Pending Todos
 
 None yet.

@@ -17,26 +17,25 @@ interface RarityCardModalProps {
   displayName?: string;
   totalRecords?: number;
   avgRarity?: number;
+  ogSig?: string;
 }
 
-export function RarityCardModal({ username, appUrl, displayName, totalRecords = 0, avgRarity = 0 }: RarityCardModalProps) {
+export function RarityCardModal({ username, appUrl, displayName, totalRecords = 0, avgRarity = 0, ogSig }: RarityCardModalProps) {
   const [open, setOpen] = useState(false);
   const params = new URLSearchParams({
     name: displayName ?? username,
     total: String(totalRecords),
     avg: String(avgRarity),
+    ...(ogSig ? { sig: ogSig } : {}),
   });
   const cardUrl = `${appUrl}/api/og/rarity/${username}?${params.toString()}`;
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger>
-        <button
-          type="button"
-          className="font-mono text-xs text-on-surface-variant hover:text-primary transition-colors"
-        >
-          GENERATE_RARITY_CARD
-        </button>
+      <DialogTrigger
+        className="font-mono text-xs text-on-surface-variant hover:text-primary transition-colors"
+      >
+        GENERATE_RARITY_CARD
       </DialogTrigger>
       <DialogContent className="bg-surface-container border-outline-variant/20 sm:max-w-2xl">
         <DialogHeader>

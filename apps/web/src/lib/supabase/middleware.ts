@@ -71,7 +71,10 @@ export async function updateSession(request: NextRequest) {
 			!pathname.startsWith("/signup") &&
 			!pathname.startsWith("/forgot-password") &&
 			!pathname.startsWith("/reset-password") &&
-			!pathname.startsWith("/api/") &&
+			!pathname.startsWith("/api/stripe/") &&
+			!pathname.startsWith("/api/og/") &&
+			!pathname.startsWith("/api/discogs/import") &&
+			!pathname.startsWith("/api/desktop/") &&
 			!pathname.startsWith("/onboarding");
 
 		if (isProtectedPath) {
@@ -134,6 +137,11 @@ export async function updateSession(request: NextRequest) {
 		"/explorar",
 		"/comunidade",
 		"/import-progress",
+		"/crates",        // M-16: added — under (protected) layout
+		"/radar",         // M-16: added — under (protected) layout
+		"/wrapped",       // M-16: added — under (protected) layout
+		"/trades",        // M-16: added — under (protected) layout
+		"/notifications", // M-16: added — under (protected) layout
 	];
 	const isProtectedRoute = protectedPaths.some((path) => pathname.startsWith(path));
 	// /perfil is protected ONLY as exact path (own profile), not /perfil/[username] (public profile)

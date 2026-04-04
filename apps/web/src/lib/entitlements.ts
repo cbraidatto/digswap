@@ -148,6 +148,53 @@ export async function canInitiateTrade(userId: string): Promise<TradeEntitlement
 	};
 }
 
+/**
+ * Atomically check and increment the trade counter for a free user.
+ * Returns the allowed status AFTER the atomic increment — if the row was
+ * not updated (count already at limit), returns allowed=false.
+ *
+ * This replaces the two-step canInitiateTrade() + incrementTradeCount()
+ * pattern which had a TOCTOU race under concurrency.
+ */
+export async function checkAndIncrementTradeCount(
+	userId: string,
+): Promise<{ allowed: boolean; tradesUsed: number; tradesLimit: number | null }> {
+	const subscription = await getUserSubscription(userId);
+	const plan = subscription?.plan ?? "free";
+	const status = subscription?.status ?? "active";
+	const tradesUsed = subscription?.tradesThisMonth ?? 0;
+
+	if (isPremium(plan, status)) {
+		return { allowed: true, tradesUsed, tradesLimit: null };
+	}
+
+	const now = new Date();
+	// Atomic conditional increment: only updates if count < limit
+	const updated = await db
+		.update(subscriptions)
+		.set({
+			tradesMonthReset: subscription?.tradesMonthReset ?? now,
+			tradesThisMonth: sql`${subscriptions.tradesThisMonth} + 1`,
+			updatedAt: now,
+		})
+		.where(
+			sql`${subscriptions.userId} = ${userId}
+				AND ${subscriptions.tradesThisMonth} < ${FREE_TRADE_LIMIT}`,
+		)
+		.returning({ tradesThisMonth: subscriptions.tradesThisMonth });
+
+	if (updated.length === 0) {
+		// Limit already reached — no row was updated
+		return { allowed: false, tradesUsed, tradesLimit: FREE_TRADE_LIMIT };
+	}
+
+	return {
+		allowed: true,
+		tradesUsed: updated[0].tradesThisMonth,
+		tradesLimit: FREE_TRADE_LIMIT,
+	};
+}
+
 export async function incrementTradeCount(userId: string): Promise<void> {
 	const subscription = await getUserSubscription(userId);
 	const plan = subscription?.plan ?? "free";

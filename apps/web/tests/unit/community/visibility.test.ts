@@ -67,8 +67,28 @@ vi.mock("@/lib/db", () => {
 		})),
 	}));
 
+	// Delete chain
+	chain.delete = vi.fn().mockImplementation(() => ({
+		where: vi.fn().mockResolvedValue(undefined),
+	}));
+
+	// Transaction chain — executes the callback immediately
+	chain.transaction = vi.fn().mockImplementation(async (cb: (tx: unknown) => Promise<unknown>) => {
+		return cb(chain);
+	});
+
 	return { db: chain };
-});
+})
+vi.mock("@/lib/rate-limit", () => ({
+	authRateLimit: null,
+	resetRateLimit: null,
+	totpRateLimit: null,
+	apiRateLimit: null,
+	tradeRateLimit: null,
+	discogsRateLimit: null,
+	safeLimit: vi.fn().mockImplementation(async () => ({ success: true })),
+}));
+;
 
 // ---------------------------------------------------------------------------
 // Schema mocks
@@ -167,8 +187,19 @@ vi.mock("@/lib/supabase/server", () => ({
 }));
 
 const mockAdminInsert = vi.fn().mockResolvedValue({ data: null, error: null });
-const mockAdminFrom = vi.fn().mockReturnValue({
-	insert: mockAdminInsert,
+// Admin from mock — supports both insert (notifications) and select (dedup check)
+const mockAdminFrom = vi.fn().mockImplementation((table: string) => {
+	if (table === "notifications") {
+		// Dedup select chain: always returns no existing notification (allow insert)
+		const dedupChain: Record<string, unknown> = {};
+		const dedupMethods = ["select", "eq", "gte", "contains", "limit"];
+		for (const m of dedupMethods) {
+			dedupChain[m] = vi.fn().mockReturnValue(dedupChain);
+		}
+		dedupChain.maybeSingle = vi.fn().mockResolvedValue({ data: null, error: null });
+		return { select: dedupChain.select, insert: mockAdminInsert };
+	}
+	return { insert: mockAdminInsert };
 });
 vi.mock("@/lib/supabase/admin", () => ({
 	createAdminClient: () => ({

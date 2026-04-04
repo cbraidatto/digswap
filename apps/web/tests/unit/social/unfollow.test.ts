@@ -9,7 +9,17 @@ vi.mock("@/lib/supabase/server", () => ({
 			getUser: () => mockGetUser(),
 		},
 	}),
+}))
+vi.mock("@/lib/rate-limit", () => ({
+	authRateLimit: null,
+	resetRateLimit: null,
+	totpRateLimit: null,
+	apiRateLimit: null,
+	tradeRateLimit: null,
+	discogsRateLimit: null,
+	safeLimit: vi.fn().mockImplementation(async () => ({ success: true })),
 }));
+;
 
 // -- Mock next/headers --
 vi.mock("next/headers", () => ({

@@ -27,10 +27,10 @@ export const wantlistItems = pgTable(
       .notNull(),
   },
   (table) => [
-    pgPolicy("wantlist_items_select_all", {
+    pgPolicy("wantlist_items_select_own", {
       for: "select",
       to: authenticatedRole,
-      using: sql`true`, // Public wantlists
+      using: sql`${table.userId} = ${authUid}`,
     }),
     pgPolicy("wantlist_items_insert_own", {
       for: "insert",
@@ -41,6 +41,12 @@ export const wantlistItems = pgTable(
       for: "delete",
       to: authenticatedRole,
       using: sql`${table.userId} = ${authUid}`,
+    }),
+    pgPolicy("wantlist_items_update_own", {
+      for: "update",
+      to: authenticatedRole,
+      using: sql`${table.userId} = ${authUid}`,
+      withCheck: sql`${table.userId} = ${authUid}`,
     }),
     index("wantlist_items_user_id_idx").on(table.userId),
   ],

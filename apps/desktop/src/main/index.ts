@@ -14,7 +14,17 @@ import {
   getMainWindow,
 } from "./window";
 
-const gotLock = app.requestSingleInstanceLock();
+// Allow a second dev instance via DIGSWAP_SECOND_INSTANCE=1.
+// The second instance gets its own userData path so sessions and stores
+// are fully isolated from the first instance.
+const isSecondInstance = process.env.DIGSWAP_SECOND_INSTANCE === "1";
+
+if (isSecondInstance) {
+  const path = require("node:path") as typeof import("node:path");
+  app.setPath("userData", path.join(app.getPath("userData"), "-second"));
+}
+
+const gotLock = isSecondInstance || app.requestSingleInstanceLock();
 
 if (!gotLock) {
   app.quit();

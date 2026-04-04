@@ -1,7 +1,7 @@
 "use server";
 
 import { createClient } from "@/lib/supabase/server";
-import { apiRateLimit } from "@/lib/rate-limit";
+import { apiRateLimit , safeLimit} from "@/lib/rate-limit";
 import {
 	searchRecords,
 	browseRecords,
@@ -34,7 +34,7 @@ export async function searchRecordsAction(term: string) {
 			return [];
 		}
 
-		const { success: rlSuccess } = await apiRateLimit.limit(user.id);
+		const { success: rlSuccess } = await safeLimit(apiRateLimit, user.id, false);
 		if (!rlSuccess) {
 			return [];
 		}
@@ -79,7 +79,7 @@ export async function browseRecordsAction(
 			return [];
 		}
 
-		const { success: rlSuccess } = await apiRateLimit.limit(user.id);
+		const { success: rlSuccess } = await safeLimit(apiRateLimit, user.id, false);
 		if (!rlSuccess) {
 			return [];
 		}
@@ -128,7 +128,7 @@ export async function getSuggestionsAction() {
 			return [];
 		}
 
-		const { success: rlSuccess } = await apiRateLimit.limit(user.id);
+		const { success: rlSuccess } = await safeLimit(apiRateLimit, user.id, false);
 		if (!rlSuccess) {
 			return [];
 		}

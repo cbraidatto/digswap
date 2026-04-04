@@ -53,7 +53,17 @@ vi.mock("@/lib/db", () => {
 	}));
 
 	return { db: chain };
-});
+})
+vi.mock("@/lib/rate-limit", () => ({
+	authRateLimit: null,
+	resetRateLimit: null,
+	totpRateLimit: null,
+	apiRateLimit: null,
+	tradeRateLimit: null,
+	discogsRateLimit: null,
+	safeLimit: vi.fn().mockImplementation(async () => ({ success: true })),
+}));
+;
 
 // ---------------------------------------------------------------------------
 // Schema mocks
@@ -145,7 +155,7 @@ vi.mock("@/lib/supabase/admin", () => ({
 	}),
 }));
 
-vi.mock("@/actions/social", () => ({
+vi.mock("@/lib/social/log-activity", () => ({
 	logActivity: vi.fn().mockResolvedValue(undefined),
 }));
 
@@ -165,7 +175,7 @@ vi.mock("@/lib/community/queries", () => ({
 // Import after mocks
 // ---------------------------------------------------------------------------
 import { createPostAction } from "@/actions/community";
-import { logActivity } from "@/actions/social";
+import { logActivity } from "@/lib/social/log-activity";
 
 const TEST_GROUP_ID = "11111111-1111-4111-8111-111111111111";
 const TEST_RELEASE_ID = "22222222-2222-4222-8222-222222222222";

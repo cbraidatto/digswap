@@ -92,11 +92,11 @@
 - [x] **NOTF-02**: User receives email notifications for: wantlist match, trade request
 - [ ] **NOTF-03**: User can enable browser push notifications
 - [x] **NOTF-04**: User can configure which notification types they want to receive
-- [ ] **NOTF-05**: Notification badge count resets to 0 after user reads all notifications (no stale count)
+- [x] **NOTF-05**: Notification badge count resets to 0 after user reads all notifications (no stale count)
 
 ### Navigation
 
-- [ ] **NAV-04**: Trade inbox icon visible in navbar beside the notification bell with its own unread count badge
+- [x] **NAV-04**: Trade inbox icon visible in navbar beside the notification bell with its own unread count badge
 
 ### Release Pages
 
@@ -134,13 +134,13 @@
 
 ### Monetization (Freemium)
 
-- [ ] **MON-01**: Free tier allows up to 5 P2P trades per month
-- [ ] **MON-02**: Premium tier unlocks unlimited P2P trades
-- [ ] **MON-03**: Premium tier unlocks collection analytics (estimated value, rarity history, insights)
-- [ ] **MON-04**: Premium tier unlocks creating and joining premium-only groups
-- [ ] **MON-05**: Premium tier gives priority wantlist matching (your request surfaces first to users who have the record)
-- [ ] **MON-06**: User can subscribe to premium via Stripe (monthly/annual)
-- [ ] **MON-07**: User can cancel premium subscription and retains access until end of billing period
+- [x] **MON-01**: Free tier allows up to 5 P2P trades per month
+- [x] **MON-02**: Premium tier unlocks unlimited P2P trades
+- [x] **MON-03**: Premium tier unlocks collection analytics (estimated value, rarity history, insights)
+- [x] **MON-04**: Premium tier unlocks creating and joining premium-only groups
+- [x] **MON-05**: Premium tier gives priority wantlist matching (your request surfaces first to users who have the record)
+- [x] **MON-06**: User can subscribe to premium via Stripe (monthly/annual)
+- [x] **MON-07**: User can cancel premium subscription and retains access until end of billing period
 
 ### Security
 
@@ -236,6 +236,8 @@
 | NOTF-02 | Phase 6: Discovery + Notifications | Complete |
 | NOTF-03 | Phase 6: Discovery + Notifications | Pending |
 | NOTF-04 | Phase 6: Discovery + Notifications | Complete |
+| NOTF-05 | Phase 12: Release Pages | Complete |
+| NAV-04 | Phase 12: Release Pages | Complete |
 | COMM-01 | Phase 7: Community + Reviews | Complete |
 | COMM-02 | Phase 7: Community + Reviews | Complete |
 | COMM-03 | Phase 7: Community + Reviews | Complete |
@@ -260,13 +262,13 @@
 | SEC-05 | Phase 9: P2P Audio Trading | Complete |
 | SEC-06 | Phase 9: P2P Audio Trading | Complete |
 | SEC-07 | Phase 9: P2P Audio Trading | Complete |
-| MON-01 | Phase 10: Monetization | Pending |
-| MON-02 | Phase 10: Monetization | Pending |
-| MON-03 | Phase 10: Monetization | Pending |
-| MON-04 | Phase 10: Monetization | Pending |
-| MON-05 | Phase 10: Monetization | Pending |
-| MON-06 | Phase 10: Monetization | Pending |
-| MON-07 | Phase 10: Monetization | Pending |
+| MON-01 | Phase 16: Monetization | Complete |
+| MON-02 | Phase 16: Monetization | Complete |
+| MON-03 | Phase 16: Monetization | Complete |
+| MON-04 | Phase 16: Monetization | Complete |
+| MON-05 | Phase 16: Monetization | Complete |
+| MON-06 | Phase 16: Monetization | Complete |
+| MON-07 | Phase 16: Monetization | Complete |
 | SEC-02 | Phase 11: Security Hardening | Complete |
 | SEC-03 | Phase 11: Security Hardening | Complete |
 | SEC-04 | Phase 11: Security Hardening | Complete |
@@ -278,4 +280,4 @@
 
 ---
 *Requirements defined: 2026-03-25*
-*Last updated: 2026-03-25 after roadmap creation*
+*Last updated: 2026-04-02 after milestone M003 cleanup*

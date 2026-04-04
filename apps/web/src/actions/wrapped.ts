@@ -5,6 +5,7 @@ import { collectionItems } from "@/lib/db/schema/collections";
 import { releases } from "@/lib/db/schema/releases";
 import { reviews } from "@/lib/db/schema/reviews";
 import { follows } from "@/lib/db/schema/social";
+import { createClient } from "@/lib/supabase/server";
 import { eq, and, sql, gte, count } from "drizzle-orm";
 
 interface WrappedStats {
@@ -21,6 +22,13 @@ interface WrappedStats {
 
 export async function generateWrapped(userId: string, year?: number): Promise<WrappedStats | null> {
 	try {
+		// Auth enforcement: ignore the caller-supplied userId, always use the
+		// authenticated user's ID. Server Actions are RPC endpoints — any
+		// authenticated user could supply another user's UUID without this check.
+		const supabase = await createClient();
+		const { data: { user } } = await supabase.auth.getUser();
+		if (!user) return null;
+		if (user.id !== userId) return null; // reject mismatched caller
 		const targetYear = year ?? new Date().getFullYear();
 		const startDate = new Date(`${targetYear}-01-01T00:00:00Z`);
 		const endDate = new Date(`${targetYear + 1}-01-01T00:00:00Z`);

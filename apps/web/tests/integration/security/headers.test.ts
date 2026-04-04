@@ -92,12 +92,17 @@ describe("Security Headers Configuration", () => {
 	});
 
 	it("includes Referrer-Policy header", async () => {
+		// Referrer-Policy is intentionally set in middleware (not next.config)
+		// to avoid conflicting values — middleware sets the stricter
+		// "strict-origin-when-cross-origin" on every response.
+		// See: middleware.ts SEC-02 block and security audit L-04.
 		const fs = await import("node:fs");
 		const path = await import("node:path");
-		const configPath = path.resolve(process.cwd(), "next.config.ts");
-		const content = fs.readFileSync(configPath, "utf-8");
+		const middlewarePath = path.resolve(process.cwd(), "src/middleware.ts");
+		const content = fs.readFileSync(middlewarePath, "utf-8");
 
-		expect(content).toContain('"Referrer-Policy"');
+		expect(content).toContain("Referrer-Policy");
+		expect(content).toContain("strict-origin-when-cross-origin");
 	});
 
 	it("includes Permissions-Policy header", async () => {

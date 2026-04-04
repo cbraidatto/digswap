@@ -5,6 +5,16 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 // ---------------------------------------------------------------------------
 const mockExchangeCodeForSession = vi.fn();
 
+vi.mock("@/lib/rate-limit", () => ({
+	authRateLimit: null,
+	resetRateLimit: null,
+	totpRateLimit: null,
+	apiRateLimit: null,
+	tradeRateLimit: null,
+	discogsRateLimit: null,
+	safeLimit: vi.fn().mockImplementation(async () => ({ success: true })),
+}));
+
 vi.mock("@/lib/supabase/server", () => ({
 	createClient: vi.fn(async () => ({
 		auth: {

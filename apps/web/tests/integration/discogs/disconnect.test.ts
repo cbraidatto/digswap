@@ -53,6 +53,11 @@ vi.mock("@/lib/discogs/oauth", () => ({
 	getRequestToken: vi.fn(),
 }));
 
+vi.mock("@/lib/rate-limit", () => ({
+	discogsRateLimit: {},
+	safeLimit: vi.fn().mockResolvedValue({ success: true }),
+}));
+
 // -- Mock next/headers --
 vi.mock("next/headers", () => ({
 	cookies: vi.fn().mockResolvedValue({

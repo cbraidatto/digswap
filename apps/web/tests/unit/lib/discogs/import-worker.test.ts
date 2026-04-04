@@ -100,22 +100,22 @@ describe("Import worker", () => {
 			data: { releases: mockResponse.releases, pagination: mockResponse.pagination },
 		});
 
-		// Releases table: upsert succeeds, then select returns UUID
+		// Releases table: upsert with RETURNING — returns UUID in one call
 		const releasesChain = createChainedMock();
-		releasesChain.upsert = vi.fn().mockReturnValue({ error: null });
-		releasesChain.select = vi.fn().mockReturnValue({
-			eq: vi.fn().mockReturnValue({
+		const upsertSelectChain = {
+			select: vi.fn().mockReturnValue({
 				single: vi.fn().mockResolvedValue({
 					data: { id: "release-uuid-001" },
 					error: null,
 				}),
 			}),
-		});
+		};
+		releasesChain.upsert = vi.fn().mockReturnValue(upsertSelectChain);
 		fromHandlers["releases"] = releasesChain;
 
-		// Collection items: no existing item
+		// Collection items: upsert (ON CONFLICT DO NOTHING)
 		const collectionChain = createChainedMock({ data: null, error: null });
-		collectionChain.insert = vi.fn().mockResolvedValue({ error: null });
+		collectionChain.upsert = vi.fn().mockResolvedValue({ error: null });
 		fromHandlers["collection_items"] = collectionChain;
 	}
 

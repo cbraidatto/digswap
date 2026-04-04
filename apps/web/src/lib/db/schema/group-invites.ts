@@ -19,20 +19,17 @@ export const groupInvites = pgTable(
       .notNull(),
   },
   (table) => [
-    pgPolicy("group_invites_select_all", {
+    // NOTE: This schema currently models token invites without an invitee_id column,
+    // so the production invitee-specific UPDATE policy cannot be represented here yet.
+    pgPolicy("group_invites_select_participant", {
       for: "select",
       to: authenticatedRole,
-      using: sql`true`,
+      using: sql`${table.createdBy} = ${authUid}`,
     }),
     pgPolicy("group_invites_insert_own", {
       for: "insert",
       to: authenticatedRole,
       withCheck: sql`${table.createdBy} = ${authUid}`,
-    }),
-    pgPolicy("group_invites_delete_own", {
-      for: "delete",
-      to: authenticatedRole,
-      using: sql`${table.createdBy} = ${authUid}`,
     }),
   ],
 );

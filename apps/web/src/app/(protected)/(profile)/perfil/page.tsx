@@ -46,6 +46,7 @@ import Link from "next/link";
 import { ShareSurface } from "@/components/share/share-surface";
 import { HolyGrailSelector } from "./_components/holy-grail-selector";
 import { RarityCardModal } from "./_components/rarity-card-modal";
+import { signOgParams } from "@/lib/og/sign";
 import { RankCard } from "./_components/rank-card";
 import { BadgeRow } from "./_components/badge-row";
 
@@ -427,6 +428,7 @@ export default async function PerfilPage({ searchParams }: PerfilPageProps) {
 							displayName={profile?.displayName ?? undefined}
 							totalRecords={totalCount}
 							avgRarity={rarityScore}
+							ogSig={signOgParams(profile?.username ?? "", totalCount, 0, rarityScore)}
 						/>
 					</div>
 				</div>

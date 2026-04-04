@@ -4,7 +4,7 @@ import { cookies } from "next/headers";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { getRequestToken, deleteTokens } from "@/lib/discogs/oauth";
-import { discogsRateLimit } from "@/lib/rate-limit";
+import { discogsRateLimit , safeLimit} from "@/lib/rate-limit";
 
 /**
  * Initiate Discogs OAuth 1.0a connection flow.
@@ -32,7 +32,7 @@ export async function connectDiscogs(): Promise<{ url: string } | { error: strin
 			return { error: "Not authenticated" };
 		}
 
-		const { success: rlSuccess } = await discogsRateLimit.limit(user.id);
+		const { success: rlSuccess } = await safeLimit(discogsRateLimit, user.id, true);
 		if (!rlSuccess) {
 			return { error: "Too many requests. Please wait a moment." };
 		}
@@ -88,7 +88,7 @@ export async function triggerSync(): Promise<{
 			return { error: "Not authenticated" };
 		}
 
-		const { success: rlSuccess } = await discogsRateLimit.limit(user.id);
+		const { success: rlSuccess } = await safeLimit(discogsRateLimit, user.id, true);
 		if (!rlSuccess) {
 			return { error: "Too many requests. Please wait a moment." };
 		}
@@ -172,7 +172,7 @@ export async function disconnectDiscogs(): Promise<{
 			return { error: "Not authenticated" };
 		}
 
-		const { success: rlSuccess } = await discogsRateLimit.limit(user.id);
+		const { success: rlSuccess } = await safeLimit(discogsRateLimit, user.id, true);
 		if (!rlSuccess) {
 			return { error: "Too many requests. Please wait a moment." };
 		}
@@ -251,7 +251,7 @@ export async function triggerReimport(): Promise<{
 			return { error: "Not authenticated" };
 		}
 
-		const { success: rlSuccess } = await discogsRateLimit.limit(user.id);
+		const { success: rlSuccess } = await safeLimit(discogsRateLimit, user.id, true);
 		if (!rlSuccess) {
 			return { error: "Too many requests. Please wait a moment." };
 		}

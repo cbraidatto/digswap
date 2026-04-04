@@ -29,6 +29,20 @@
       "when": 1774693070144,
       "tag": "0003_free_gateway",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1743624655000,
+      "tag": "0004_gin_indexes_genre_leaderboard_mv",
+      "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1743624900000,
+      "tag": "0005_stripe_event_log",
+      "breakpoints": true
     }
   ]
 }

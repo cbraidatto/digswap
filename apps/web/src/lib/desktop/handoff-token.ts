@@ -13,8 +13,12 @@ import { eq, and, isNull } from "drizzle-orm";
 import { db } from "@/lib/db";
 import { handoffTokens } from "@/lib/db/schema/trades";
 
-/** Token TTL: 5 minutes (300 seconds) */
-const TOKEN_TTL_MS = 300_000;
+/**
+ * Token TTL: 60 seconds — aligned with TRADE_HANDOFF_TOKEN_TTL_MS in trade-domain.
+ * SECURITY: Shorter TTL reduces the window for token interception/replay.
+ * Previously 5 minutes; reduced to match the declared constant.
+ */
+const TOKEN_TTL_MS = 60_000;
 
 function getHmacSecret(): string {
   const secret = process.env.HANDOFF_HMAC_SECRET;
