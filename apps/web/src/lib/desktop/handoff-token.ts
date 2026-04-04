@@ -14,11 +14,11 @@ import { db } from "@/lib/db";
 import { handoffTokens } from "@/lib/db/schema/trades";
 
 /**
- * Token TTL: 60 seconds — aligned with TRADE_HANDOFF_TOKEN_TTL_MS in trade-domain.
+ * Token TTL: 30 seconds — aligned with TRADE_HANDOFF_TOKEN_TTL_MS in trade-domain
+ * and HANDOFF_TTL_SECONDS in handoff-store.ts.
  * SECURITY: Shorter TTL reduces the window for token interception/replay.
- * Previously 5 minutes; reduced to match the declared constant.
  */
-const TOKEN_TTL_MS = 60_000;
+const TOKEN_TTL_MS = 30_000;
 
 function getHmacSecret(): string {
   const secret = process.env.HANDOFF_HMAC_SECRET;
