@@ -20,7 +20,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 5: Social Layer** - Follow system, activity feed, collection comparison, public profiles (completed 2026-03-26)
 - [x] **Phase 6: Discovery + Notifications** - Cross-collection search, wantlist matching, in-app/email/push notifications (completed 2026-03-26)
 - [x] **Phase 7: Community + Reviews** - Genre/era groups, group activity feeds, pressing and release reviews (completed 2026-03-26)
-- [x] **Phase 8: Gamification + Rankings** - Global/genre leaderboards, badges, titles, composite ranking formula (completed 2026-03-31)
+- [x] **Phase 8: Gamification + Rankings** - Global/genre leaderboards, badges, titles, composite ranking formula (completed 2026-03-31)
 - [ ] **Phase 9: P2P Audio Trading** - DMCA compliance, WebRTC file transfer, trade reputation, TURN relay
 - [x] **Phase 10: Positioning, Radar & Workspace Foundation** - Repositioned landing, The Radar as hero feature, public acquisition surfaces, Digger Memory primitives (completed 2026-03-28)
 - [x] **Phase 11: Security Hardening** - OWASP API coverage, security test suite, penetration testing (completed 2026-03-28)
@@ -398,7 +398,7 @@ Plans:
 ## Progress
 
 **Execution Order:**
-Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 4.5 -> 5 -> 6 -> 7 -> 8 -> 9(superseded) -> 10 -> 11 -> 12 -> 13 -> 14 -> 15 -> 16 -> 17 -> 18
+Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 4.5 -> 5 -> 6 -> 7 -> 8 -> 9(superseded) -> 10 -> 11 -> 12 -> 13 -> 14 -> 15 -> 16 -> 17 -> 18 -> 19
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
@@ -421,13 +421,22 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 4.5 -> 5 -> 6 -> 7 -> 8 -> 
 | 16. Monetization | 5/5 | Complete ✓ | 2026-03-31 |
 | 17. Desktop Trade Runtime | 8/8 | Complete | 2026-03-31 |
 | 18. Desktop Shell Refactor | 3/3 | Complete ✓ | 2026-04-02 |
+| 19. Security Audit Closure | 0/3 | Planning Complete | - |
 
 ### Phase 19: Security Hardening — Fix 74 audit vulnerabilities
 
-**Goal:** [To be planned]
-**Requirements**: TBD
+**Goal:** Close all remaining security audit vulnerabilities — eliminate nodeIntegration:true from Electron, harden hash validation, add RPC rate limits, align configuration, and verify schema/test coverage
+**Requirements**: SEC-AUDIT-01, SEC-AUDIT-02, SEC-AUDIT-03, SEC-AUDIT-04, SEC-AUDIT-05, SEC-AUDIT-06
 **Depends on:** Phase 18
-**Plans:** 0 plans
-
+**Success Criteria** (what must be TRUE):
+  1. PeerJS bridge runs in Electron utilityProcess (no BrowserWindow with nodeIntegration:true)
+  2. File transfer is rejected when expectedSha256 from DB is null (no sender hash fallback)
+  3. Trade RPC calls are rate-limited (1 call per 5s per function per trade)
+  4. Handoff token TTL is aligned to 30s across web and desktop
+  5. All 8 Drizzle schema files verified against production security migrations
+  6. Full test suite (563+ tests) passes, TypeScript compiles cleanly
+**Plans**: 3 plans
 Plans:
-- [ ] TBD (run /gsd:plan-phase 19 to break down)
+- [ ] 19-01-PLAN.md -- utilityProcess migration: replace BrowserWindow nodeIntegration:true with Electron utilityProcess for PeerJS bridge
+- [ ] 19-02-PLAN.md -- Hash rejection + RPC rate limits + TTL alignment (3 focused security fixes)
+- [ ] 19-03-PLAN.md -- Schema spot-check + full test suite gate (verification)
