@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: verifying
-stopped_at: Completed 08-02-PLAN.md
-last_updated: "2026-03-31T18:22:53.637Z"
-last_activity: 2026-03-31
+stopped_at: Completed 19-02-PLAN.md
+last_updated: "2026-04-04T18:03:55.249Z"
+last_activity: 2026-04-04
 progress:
-  total_phases: 18
-  completed_phases: 13
-  total_plans: 75
-  completed_plans: 72
+  total_phases: 20
+  completed_phases: 18
+  total_plans: 91
+  completed_plans: 88
   percent: 98
 ---
 
@@ -29,7 +29,7 @@ Phase: 14 (trade-v2) — COMPLETE (web P2P layer removed)
 Plan: 5 of 5 executed (14-05 unit tests skipped — web layer removed)
 Next: Phase 17 — Desktop Trade Runtime (Electron app)
 Status: Phase complete — ready for verification
-Last activity: 2026-03-31
+Last activity: 2026-04-04
 
 Progress: [█████████░] 98%
 
@@ -101,6 +101,7 @@ Progress: [█████████░] 98%
 | Phase 17 P05 | 6min | 2 tasks | 7 files |
 | Phase 17-desktop-trade-runtime P04 | 25 | 3 tasks | 9 files |
 | Phase 17-desktop-trade-runtime P06 | 3 | 3 tasks | 6 files |
+| Phase 19 P02 | 4min | 3 tasks | 4 files |
 
 ## Accumulated Context
 
@@ -224,6 +225,8 @@ Recent decisions affecting current work:
 - [Phase 17-desktop-trade-runtime]: IPC trade runtime types (DesktopBridgeTradeRuntime) defined by renderer, implemented by Codex in main process
 - [Phase 08]: social.ts not modified for gamification — follows captured by pg_cron batch (D-12)
 - [Phase 08]: Trade points excluded from ranking CTE until Phase 9 completes trade tracking
+- [Phase 19]: expectedSha256 changed from string|null to string — TypeScript enforces non-null at all call sites
+- [Phase 19]: RPC throttle is module-scoped (not class field) so it persists across DesktopTradeRuntime lifecycle
 
 ### Roadmap Evolution
 
@@ -251,6 +254,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-31T18:22:38.869Z
-Stopped at: Completed 08-02-PLAN.md
+Last session: 2026-04-04T18:03:55.242Z
+Stopped at: Completed 19-02-PLAN.md
 Resume file: None
