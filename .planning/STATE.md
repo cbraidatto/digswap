@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-stopped_at: Completed 19-03-PLAN.md
-last_updated: "2026-04-04T18:12:07.865Z"
-last_activity: 2026-04-04
+stopped_at: Completed 20-01-PLAN.md
+last_updated: "2026-04-06T19:13:34.358Z"
+last_activity: 2026-04-06
 progress:
-  total_phases: 20
+  total_phases: 21
   completed_phases: 19
-  total_plans: 91
-  completed_plans: 90
+  total_plans: 96
+  completed_plans: 91
   percent: 98
 ---
 
@@ -26,10 +26,10 @@ See: .planning/PROJECT.md (updated 2026-03-25)
 ## Current Position
 
 Phase: 19 (security-hardening-fix-74-audit-vulnerabilities) — EXECUTING
-Plan: 2 of 3
+Plan: 3 of 3
 Next: Phase 17 — Desktop Trade Runtime (Electron app)
 Status: Ready to execute
-Last activity: 2026-04-04
+Last activity: 2026-04-06
 
 Progress: [█████████░] 98%
 
@@ -102,6 +102,7 @@ Progress: [█████████░] 98%
 | Phase 17-desktop-trade-runtime P04 | 25 | 3 tasks | 9 files |
 | Phase 17-desktop-trade-runtime P06 | 3 | 3 tasks | 6 files |
 | Phase 19 P03 | 5min | 2 tasks | 3 files |
+| Phase 20 P01 | 3min | 1 tasks | 7 files |
 
 ## Accumulated Context
 
@@ -227,6 +228,8 @@ Recent decisions affecting current work:
 - [Phase 08]: Trade points excluded from ranking CTE until Phase 9 completes trade tracking
 - [Phase 19]: parentPort closure narrowing: const reassignment after null check for type safety in utilityProcess worker
 - [Phase 19]: challenge_entries_update_own WITH CHECK added to match 20260411 migration (discovered during schema spot-check)
+- [Phase 20]: Gem colors declared theme-independently in :root (not per-theme) for brand consistency across all themes
+- [Phase 20]: Gem distribution computed at SQL query time via CASE expression -- no derived column on releases table
 
 ### Roadmap Evolution
 
@@ -254,6 +257,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-04-04T18:12:07.859Z
-Stopped at: Completed 19-03-PLAN.md
+Last session: 2026-04-06T19:13:34.352Z
+Stopped at: Completed 20-01-PLAN.md
 Resume file: None
