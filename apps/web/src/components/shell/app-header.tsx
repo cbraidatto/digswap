@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { NotificationBell } from "@/components/shell/notification-bell";
 import { ChatToggleButton } from "@/components/chat/chat-toggle-button";
+import { GlobalSearch } from "@/components/shell/global-search";
 
 interface AppHeaderProps {
 	displayName: string | null;
@@ -54,6 +55,7 @@ export function AppHeader({ xp = 0, userId }: AppHeaderProps) {
 			</nav>
 
 			<div className="flex items-center gap-4 ml-auto">
+				<GlobalSearch />
 				{xp > 0 && (
 					<div className="hidden sm:flex items-center bg-surface-container-high px-3 py-1 rounded border border-outline-variant/20">
 						<span className="font-mono text-xs text-primary uppercase tracking-wider">
