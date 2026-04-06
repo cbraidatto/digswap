@@ -27,5 +27,18 @@ export const showcaseSearchSchema = z.object({
 	term: z.string().min(1).max(200).trim(),
 });
 
+export const showcaseSlotSchema = z.object({
+	slot: z.enum(["searching", "rarest", "favorite"]),
+	releaseId: z.string().uuid("Invalid release ID").nullable(),
+});
+
+export const holyGrailsSchema = z.object({
+	ids: z.array(z.string().uuid("Invalid release ID")).max(3, "Maximum 3 Holy Grails allowed"),
+});
+
+export const coverPositionSchema = z.object({
+	positionY: z.number().min(0).max(100),
+});
+
 export type UpdateProfileInput = z.infer<typeof updateProfileSchema>;
 export type ShowcaseSearchInput = z.infer<typeof showcaseSearchSchema>;

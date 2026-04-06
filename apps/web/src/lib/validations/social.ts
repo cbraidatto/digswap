@@ -26,6 +26,10 @@ export const searchUsersSchema = z.object({
 	query: z.string().min(2, "Search query must be at least 2 characters").max(200).trim(),
 });
 
+export const exploreFeedSchema = z.object({
+	cursor: z.string().nullable(),
+});
+
 export type LogActivityInput = z.infer<typeof logActivitySchema>;
 export type FollowUserInput = z.infer<typeof followUserSchema>;
 export type LoadMoreFeedInput = z.infer<typeof loadMoreFeedSchema>;

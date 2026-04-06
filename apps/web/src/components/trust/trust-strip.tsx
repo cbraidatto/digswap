@@ -1,6 +1,4 @@
-import { avg, count, sql } from "drizzle-orm";
-import { db } from "@/lib/db";
-import { tradeReviews, tradeRequests } from "@/lib/db/schema/trades";
+import { getTrustMetrics } from "@/lib/trades/queries";
 
 interface TrustStripProps {
   userId: string;
@@ -11,39 +9,8 @@ export async function TrustStrip({
   userId,
   variant = "full",
 }: TrustStripProps) {
-  // Fetch trade reputation data server-side
-  const [reviewData] = await db
-    .select({
-      avgQuality: avg(tradeReviews.qualityRating).mapWith(Number),
-      totalReviews: count(tradeReviews.id),
-    })
-    .from(tradeReviews)
-    .where(sql`${tradeReviews.reviewedId} = ${userId}`);
-
-  const [requestData] = await db
-    .select({
-      total: count(tradeRequests.id),
-      completed: sql<number>`count(*) filter (where ${tradeRequests.status} = 'completed')`,
-      responded: sql<number>`count(*) filter (where ${tradeRequests.status} != 'pending' and ${tradeRequests.providerId} = ${userId})`,
-      received: sql<number>`count(*) filter (where ${tradeRequests.providerId} = ${userId})`,
-    })
-    .from(tradeRequests)
-    .where(
-      sql`${tradeRequests.requesterId} = ${userId} OR ${tradeRequests.providerId} = ${userId}`,
-    );
-
-  const completionRate =
-    requestData.total > 0
-      ? Math.round((requestData.completed / requestData.total) * 100)
-      : 0;
-  const responseRate =
-    requestData.received > 0
-      ? Math.round((requestData.responded / requestData.received) * 100)
-      : 0;
-  const avgQuality = reviewData.avgQuality
-    ? reviewData.avgQuality.toFixed(1)
-    : "\u2014";
-  const totalTrades = reviewData.totalReviews ?? 0;
+  const { responseRate, completionRate, avgQuality, totalTrades } =
+    await getTrustMetrics(userId);
 
   const metrics = [
     { label: "RESPONSE", value: `${responseRate}%` },

@@ -37,3 +37,16 @@ export const updateSetTracksSchema = z.object({
   setId: z.string().uuid(),
   trackOrder: z.array(z.string().uuid()).min(1),
 });
+
+export const crateIdSchema = z.object({
+  crateId: z.string().uuid("Invalid crate ID"),
+});
+
+export const toggleCrateVisibilitySchema = z.object({
+  crateId: z.string().uuid("Invalid crate ID"),
+  isPublic: z.boolean(),
+});
+
+export const setIdSchema = z.object({
+  setId: z.string().uuid("Invalid set ID"),
+});

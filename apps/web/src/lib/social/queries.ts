@@ -4,7 +4,7 @@ import { follows, activityFeed } from "@/lib/db/schema/social";
 import { groupMembers } from "@/lib/db/schema/groups";
 import { profiles } from "@/lib/db/schema/users";
 import { releases } from "@/lib/db/schema/releases";
-import type { FeedItem } from "@/actions/social";
+import type { FeedItem } from "@/lib/social/types";
 
 export type FollowUser = {
 	id: string;

@@ -1,0 +1,22 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e3]:
+    - link "arrow_back BACK" [ref=e5] [cursor=pointer]:
+      - /url: /feed
+      - generic [ref=e6]: arrow_back
+      - text: BACK
+    - heading "Settings" [level=1] [ref=e7]
+    - link "credit_card Billing Manage your subscription and trade quota chevron_right" [ref=e8] [cursor=pointer]:
+      - /url: /settings/billing
+      - generic [ref=e9]:
+        - generic [ref=e10]: credit_card
+        - generic [ref=e11]:
+          - generic [ref=e12]: Billing
+          - generic [ref=e13]: Manage your subscription and trade quota
+      - generic [ref=e14]: chevron_right
+    - generic [ref=e15]:
+      - generic [ref=e16]:
+        - generic [ref=e17]: Discogs
+        - generic [ref=e18]: Connect your Discogs account to import your collection.
+      - button "Connect Discogs" [ref=e20]
+    - heading "Notification Preferences" [level=2] [ref=e23]
+  - region "Notifications alt+T"

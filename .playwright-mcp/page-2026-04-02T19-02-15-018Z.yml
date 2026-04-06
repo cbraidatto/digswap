@@ -1,0 +1,185 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e2]:
+    - banner [ref=e4]:
+      - link "DIGSWAP" [ref=e5] [cursor=pointer]:
+        - /url: /feed
+        - generic [ref=e6]: DIGSWAP
+      - navigation [ref=e7]:
+        - link "Feed" [ref=e8] [cursor=pointer]:
+          - /url: /feed
+        - link "Community" [ref=e9] [cursor=pointer]:
+          - /url: /comunidade
+        - link "Explore" [ref=e10] [cursor=pointer]:
+          - /url: /explorar
+        - link "Profile" [ref=e11] [cursor=pointer]:
+          - /url: /perfil
+      - button "Notifications" [ref=e13]:
+        - generic [ref=e14]: notifications
+        - generic "9 unread notifications" [ref=e15]: "9"
+    - complementary [ref=e16]:
+      - generic [ref=e17]:
+        - generic [ref=e18]:
+          - generic [ref=e20]: terminal
+          - generic [ref=e21]:
+            - generic [ref=e22]: Test Digger
+            - generic [ref=e24]: Digger
+        - link "add New collection" [ref=e25] [cursor=pointer]:
+          - /url: /perfil
+          - generic [ref=e26]: add
+          - text: New collection
+      - navigation [ref=e27]:
+        - generic [ref=e28]:
+          - text: Navigation
+          - generic [ref=e29]:
+            - link "history Feed" [ref=e30] [cursor=pointer]:
+              - /url: /feed
+              - generic [ref=e31]: history
+              - generic [ref=e32]: Feed
+            - link "explore Explore" [ref=e33] [cursor=pointer]:
+              - /url: /explorar
+              - generic [ref=e34]: explore
+              - generic [ref=e35]: Explore
+            - link "swap_horiz Trades" [ref=e36] [cursor=pointer]:
+              - /url: /trades
+              - generic [ref=e37]: swap_horiz
+              - generic [ref=e38]: Trades
+            - link "group Community" [ref=e39] [cursor=pointer]:
+              - /url: /comunidade
+              - generic [ref=e40]: group
+              - generic [ref=e41]: Community
+            - link "database Profile" [ref=e42] [cursor=pointer]:
+              - /url: /perfil
+              - generic [ref=e43]: database
+              - generic [ref=e44]: Profile
+      - link "settings Settings" [ref=e46] [cursor=pointer]:
+        - /url: /settings
+        - generic [ref=e47]: settings
+        - text: Settings
+    - main [ref=e48]:
+      - main [ref=e50]:
+        - generic [ref=e51]:
+          - button "< back" [ref=e53]:
+            - generic [ref=e54]: <
+            - text: back
+          - heading "SIGNAL_BOARD" [level=1] [ref=e55]
+        - generic [ref=e56]:
+          - generic [ref=e57]: radar
+          - heading "No signal yet" [level=3] [ref=e58]
+          - paragraph [ref=e59]: Connect your Discogs wantlist to activate the Radar and find who has what you're looking for.
+          - link "Connect Discogs arrow_forward" [ref=e60] [cursor=pointer]:
+            - /url: /settings
+            - text: Connect Discogs
+            - generic [ref=e61]: arrow_forward
+        - generic [ref=e62]:
+          - generic [ref=e63]:
+            - generic [ref=e64]: Onboarding_Progress
+            - generic [ref=e65]: 0 / 3 COMPLETE
+          - progressbar [ref=e66]: x
+          - generic [ref=e68]:
+            - generic [ref=e69]:
+              - generic [ref=e70]: radio_button_unchecked
+              - link "Connect Discogs" [ref=e71] [cursor=pointer]:
+                - /url: /settings
+            - generic [ref=e72]:
+              - generic [ref=e73]: radio_button_unchecked
+              - link "Follow 3 diggers (1/3)" [ref=e74] [cursor=pointer]:
+                - /url: /explorar
+            - generic [ref=e75]:
+              - generic [ref=e76]: lock
+              - generic [ref=e77]: Join a group
+              - generic [ref=e78]: "[PHASE_7]"
+        - generic [ref=e79]:
+          - tablist "Content tabs" [ref=e80]:
+            - tab "Feed" [selected] [ref=e81]
+            - tab "Explore" [ref=e82]
+          - paragraph [ref=e83]: // signals from diggers you follow
+          - tablist [ref=e84]:
+            - tab "Global" [ref=e85]
+            - tab "Following" [selected] [ref=e86]
+          - generic [ref=e87]:
+            - article [ref=e88]:
+              - generic [ref=e90]:
+                - img "hekkell" [ref=e92]
+                - link "hekkell" [ref=e93] [cursor=pointer]:
+                  - /url: /perfil/hekkell
+                - generic [ref=e94]: "#e7f0"
+                - generic [ref=e95]: 6d ago
+                - generic [ref=e96]: New find
+              - generic [ref=e97]:
+                - img "Lana Del Rey - Lana Del Rey A.K.A. Lizzy Grant" [ref=e99]
+                - generic [ref=e100]:
+                  - heading "Lana Del Rey A.K.A. Lizzy Grant" [level=3] [ref=e101]
+                  - paragraph [ref=e102]: Lana Del Rey
+                  - paragraph [ref=e103]: Pop · Unknown
+                  - generic [ref=e104]: Ultra Rare · 4.2
+                  - button "Dig this find" [ref=e106]:
+                    - generic [ref=e107]: thumb_up
+                    - generic [ref=e108]: Dig!
+            - article [ref=e109]:
+              - generic [ref=e111]:
+                - img "hekkell" [ref=e113]
+                - link "hekkell" [ref=e114] [cursor=pointer]:
+                  - /url: /perfil/hekkell
+                - generic [ref=e115]: "#721c"
+                - generic [ref=e116]: 6d ago
+                - generic [ref=e117]: New find
+              - generic [ref=e118]:
+                - img "Sensient - Zenon Records 10 Years" [ref=e120]
+                - generic [ref=e121]:
+                  - heading "Zenon Records 10 Years" [level=3] [ref=e122]
+                  - paragraph [ref=e123]: Sensient
+                  - paragraph [ref=e124]: Electronic · Unknown
+                  - generic [ref=e125]: Common · 0.3
+                  - button "Dig this find" [ref=e127]:
+                    - generic [ref=e128]: thumb_up
+                    - generic [ref=e129]: Dig!
+            - article [ref=e130]:
+              - generic [ref=e132]:
+                - img "hekkell" [ref=e134]
+                - link "hekkell" [ref=e135] [cursor=pointer]:
+                  - /url: /perfil/hekkell
+                - generic [ref=e136]: "#0f21"
+                - generic [ref=e137]: 6d ago
+                - generic [ref=e138]: New find
+              - generic [ref=e139]:
+                - img "Disappears - Live Over The Rainbo" [ref=e141]
+                - generic [ref=e142]:
+                  - heading "Live Over The Rainbo" [level=3] [ref=e143]
+                  - paragraph [ref=e144]: Disappears
+                  - paragraph [ref=e145]: Rock · Unknown
+                  - generic [ref=e146]: Common · 0.3
+                  - button "Dig this find" [ref=e148]:
+                    - generic [ref=e149]: thumb_up
+                    - generic [ref=e150]: Dig!
+            - article [ref=e151]:
+              - generic [ref=e153]:
+                - img "hekkell" [ref=e155]
+                - link "hekkell" [ref=e156] [cursor=pointer]:
+                  - /url: /perfil/hekkell
+                - generic [ref=e157]: "#1812"
+                - generic [ref=e158]: 6d ago
+                - generic [ref=e159]: New find
+              - generic [ref=e160]:
+                - 'img "Arctic Monkeys - Arctic Monkeys: Back on the Farm, Glastonbury 2023" [ref=e162]'
+                - generic [ref=e163]:
+                  - 'heading "Arctic Monkeys: Back on the Farm, Glastonbury 2023" [level=3] [ref=e164]'
+                  - paragraph [ref=e165]: Arctic Monkeys
+                  - paragraph [ref=e166]: Rock · Unknown
+                  - generic [ref=e167]: Common · 0.5
+                  - button "Dig this find" [ref=e169]:
+                    - generic [ref=e170]: thumb_up
+                    - generic [ref=e171]: Dig!
+          - generic [ref=e173]: "[END_OF_FEED]"
+  - region "Notifications alt+T"
+  - generic [ref=e178] [cursor=pointer]:
+    - button "Open Next.js Dev Tools" [ref=e179]:
+      - img [ref=e180]
+    - generic [ref=e184]:
+      - button "Open issues overlay" [ref=e185]:
+        - generic [ref=e186]:
+          - generic [ref=e187]: "0"
+          - generic [ref=e188]: "1"
+        - generic [ref=e189]: Issue
+      - button "Collapse issues badge" [ref=e190]:
+        - img [ref=e191]
+  - alert [ref=e183]

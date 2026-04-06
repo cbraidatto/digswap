@@ -1,3 +1,5 @@
+import "server-only";
+
 import { createClient } from "@/lib/supabase/server";
 import { PricingCards } from "./_components/PricingCards";
 import type { SubscriptionPlan } from "@/lib/stripe";

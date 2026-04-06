@@ -5,22 +5,9 @@ import { z } from "zod";
 import { db } from "@/lib/db";
 import { subscriptions } from "@/lib/db/schema/subscriptions";
 import { getSiteUrl, getStripe, getStripePriceIds } from "@/lib/stripe";
-import { createClient } from "@/lib/supabase/server";
+import { requireUser } from "@/lib/auth/require-user";
 
 const checkoutPriceSchema = z.string().min(1, "Invalid price.");
-
-async function requireUser() {
-	const supabase = await createClient();
-	const {
-		data: { user },
-	} = await supabase.auth.getUser();
-
-	if (!user) {
-		throw new Error("Not authenticated");
-	}
-
-	return user;
-}
 
 async function ensureSubscriptionRecord(userId: string) {
 	const rows = await db

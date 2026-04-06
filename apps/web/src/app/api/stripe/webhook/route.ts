@@ -283,7 +283,8 @@ async function handleInvoicePaymentFailed(
 export async function POST(request: Request) {
 	// SECURITY: Rate limit by IP to prevent DoS via signature verification CPU cost
 	const ip = request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ?? "unknown";
-	const { success: rlOk } = await safeLimit(apiRateLimit, `stripe-wh:${ip}`, false);
+	// fail-closed: if Redis is down, reject — Stripe will retry automatically.
+	const { success: rlOk } = await safeLimit(apiRateLimit, `stripe-wh:${ip}`, true);
 	if (!rlOk) {
 		return NextResponse.json({ error: "Too many requests" }, { status: 429 });
 	}

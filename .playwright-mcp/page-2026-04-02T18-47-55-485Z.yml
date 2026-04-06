@@ -1,0 +1,61 @@
+- generic [ref=e1]:
+  - generic [ref=e4]:
+    - generic [ref=e5]:
+      - generic [ref=e6]: Pricing
+      - heading "Choose your dig level" [level=1] [ref=e7]
+      - paragraph [ref=e8]: Free forever for casual diggers. Go Premium for unlimited trades and deeper tools.
+    - generic [ref=e9]:
+      - generic [ref=e10]:
+        - button "MONTHLY" [ref=e11]
+        - button "ANNUALSAVE 17%" [active] [ref=e12]
+      - generic [ref=e13]:
+        - generic [ref=e14]:
+          - generic [ref=e15]:
+            - generic [ref=e16]: Free
+            - generic [ref=e17]: $0/month
+          - list [ref=e18]:
+            - listitem [ref=e19]:
+              - generic [ref=e20]: ✓
+              - generic [ref=e21]: 5 trades per month
+            - listitem [ref=e22]:
+              - generic [ref=e23]: ✓
+              - generic [ref=e24]: Full Discogs collection import
+            - listitem [ref=e25]:
+              - generic [ref=e26]: ✓
+              - generic [ref=e27]: Wantlist matching
+            - listitem [ref=e28]:
+              - generic [ref=e29]: ✓
+              - generic [ref=e30]: Community access
+            - listitem [ref=e31]:
+              - generic [ref=e32]: ✓
+              - generic [ref=e33]: Global leaderboard
+          - link "Get started free" [ref=e35] [cursor=pointer]:
+            - /url: /signup
+        - generic [ref=e36]:
+          - generic [ref=e37]: MOST POPULAR
+          - generic [ref=e38]:
+            - generic [ref=e39]: Premium
+            - generic [ref=e40]: $9.90/month
+          - list [ref=e41]:
+            - listitem [ref=e42]:
+              - generic [ref=e43]: ✓
+              - generic [ref=e44]: Unlimited trades
+            - listitem [ref=e45]:
+              - generic [ref=e46]: ✓
+              - generic [ref=e47]: Collection analytics
+            - listitem [ref=e48]:
+              - generic [ref=e49]: ✓
+              - generic [ref=e50]: Premium groups
+            - listitem [ref=e51]:
+              - generic [ref=e52]: ✓
+              - generic [ref=e53]: Priority matching
+            - listitem [ref=e54]:
+              - generic [ref=e55]: ✓
+              - generic [ref=e56]: Supporter badge on profile
+            - listitem [ref=e57]:
+              - generic [ref=e58]: ✓
+              - generic [ref=e59]: Everything in Free
+          - link "Upgrade to Premium" [ref=e61] [cursor=pointer]:
+            - /url: /signup
+    - paragraph [ref=e62]: Cancel anytime. No hidden fees. Prices in USD.
+  - region "Notifications alt+T"

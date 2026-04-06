@@ -3,7 +3,7 @@
 import { useState, useEffect, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { useInView } from "react-intersection-observer";
-import type { FeedItem } from "@/actions/social";
+import type { FeedItem } from "@/lib/social/types";
 import { loadMoreFeed, loadExploreFeed } from "@/actions/social";
 import { FeedCard } from "./feed-card";
 import { FollowEventCard } from "./follow-event-card";

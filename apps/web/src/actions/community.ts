@@ -1,7 +1,7 @@
 "use server";
 
-import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { requireUser } from "@/lib/auth/require-user";
 import { db } from "@/lib/db";
 import { groups, groupMembers, groupPosts } from "@/lib/db/schema/groups";
 import { groupInvites } from "@/lib/db/schema/group-invites";
@@ -12,7 +12,7 @@ import { logActivity } from "@/lib/social/log-activity";
 import { awardBadge } from "@/lib/gamification/badge-awards";
 import { apiRateLimit , safeLimit} from "@/lib/rate-limit";
 import { slugify } from "@/lib/community/slugify";
-import { createPostSchema, createReviewSchema } from "@/lib/validations/community";
+import { createGroupSchema, createPostSchema, createReviewSchema } from "@/lib/validations/community";
 import {
 	getGroupPosts,
 	getGenreGroups,
@@ -24,23 +24,6 @@ import {
 	type GroupPost,
 	type ReviewItem,
 } from "@/lib/community/queries";
-
-// ---------------------------------------------------------------------------
-// Auth helper
-// ---------------------------------------------------------------------------
-
-async function requireUser() {
-	const supabase = await createClient();
-	const {
-		data: { user },
-	} = await supabase.auth.getUser();
-
-	if (!user) {
-		throw new Error("Not authenticated");
-	}
-
-	return user;
-}
 
 // ---------------------------------------------------------------------------
 // Group CRUD
@@ -60,21 +43,20 @@ export async function createGroupAction(data: {
 			return { error: "Too many requests. Please wait a moment." };
 		}
 
-		const name = data.name.trim();
-		if (!name || name.length === 0) {
-			return { error: "Group name is required." };
+		const parsed = createGroupSchema.safeParse(data);
+		if (!parsed.success) {
+			return { error: parsed.error.issues[0]?.message ?? "Invalid group data" };
 		}
-		if (name.length > 80) {
-			return { error: "Group name must be 80 characters or fewer." };
-		}
+
+		const { name, category, description, visibility } = parsed.data;
 
 		// Generate slug with conflict resolution
 		let baseSlug = slugify(name);
 		let candidateSlug = baseSlug;
 		let suffix = 2;
 
-		// eslint-disable-next-line no-constant-condition
-		while (true) {
+		const MAX_SLUG_ATTEMPTS = 100;
+		while (suffix <= MAX_SLUG_ATTEMPTS) {
 			const existing = await db
 				.select({ id: groups.id })
 				.from(groups)
@@ -87,6 +69,10 @@ export async function createGroupAction(data: {
 			suffix++;
 		}
 
+		if (suffix > MAX_SLUG_ATTEMPTS) {
+			return { error: "Could not generate a unique group name. Try a different name." };
+		}
+
 		// Insert group
 		const [group] = await db
 			.insert(groups)
@@ -94,9 +80,9 @@ export async function createGroupAction(data: {
 				creatorId: user.id,
 				name,
 				slug: candidateSlug,
-				description: data.description ?? null,
-				category: data.category ?? null,
-				visibility: data.visibility,
+				description: description ?? null,
+				category: category ?? null,
+				visibility,
 				memberCount: 1,
 			})
 			.returning({ id: groups.id, slug: groups.slug });

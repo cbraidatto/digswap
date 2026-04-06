@@ -82,6 +82,51 @@ export async function POST(request: NextRequest) {
 		);
 	}
 
+	// Safety: max pages limit prevents infinite self-invocation loops.
+	// Discogs returns 50 items/page; 500 pages = 25,000 items (covers the largest collections).
+	const MAX_PAGES = 500;
+	const currentPage: number = job.current_page ?? 1;
+
+	if (currentPage > MAX_PAGES) {
+		console.error(`[import-worker] job ${jobId} exceeded ${MAX_PAGES} pages — marking as failed`);
+		await admin
+			.from("import_jobs")
+			.update({
+				status: "failed",
+				error_message: `Import exceeded maximum of ${MAX_PAGES} pages`,
+				completed_at: new Date().toISOString(),
+			})
+			.eq("id", jobId);
+
+		return NextResponse.json(
+			{ error: "Import exceeded maximum page limit" },
+			{ status: 200 },
+		);
+	}
+
+	// Safety: stale job timeout — if processing for over 30 minutes, mark as failed.
+	// Prevents zombie jobs that block new imports indefinitely.
+	const STALE_JOB_TIMEOUT_MS = 30 * 60 * 1000;
+	if (job.status === "processing" && job.started_at) {
+		const startedAt = new Date(job.started_at).getTime();
+		if (Date.now() - startedAt > STALE_JOB_TIMEOUT_MS) {
+			console.error(`[import-worker] job ${jobId} timed out after 30 minutes — marking as failed`);
+			await admin
+				.from("import_jobs")
+				.update({
+					status: "failed",
+					error_message: "Import timed out after 30 minutes",
+					completed_at: new Date().toISOString(),
+				})
+				.eq("id", jobId);
+
+			return NextResponse.json(
+				{ error: "Import timed out" },
+				{ status: 200 },
+			);
+		}
+	}
+
 	// Transition pending -> processing on first invocation
 	if (job.status === "pending") {
 		await admin

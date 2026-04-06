@@ -1,0 +1,23 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e4]:
+    - generic [ref=e6]: error
+    - heading "Something went wrong" [level=1] [ref=e7]
+    - paragraph [ref=e8]: An unexpected error occurred. You can try again or go back to the home page.
+    - paragraph [ref=e9]: "Error ID: 2271863891"
+    - generic [ref=e10]:
+      - button "Try again" [ref=e11]
+      - link "Back to home" [ref=e12] [cursor=pointer]:
+        - /url: /
+  - region "Notifications alt+T"
+  - generic [ref=e17] [cursor=pointer]:
+    - button "Open Next.js Dev Tools" [ref=e18]:
+      - img [ref=e19]
+    - generic [ref=e22]:
+      - button "Open issues overlay" [ref=e23]:
+        - generic [ref=e24]:
+          - generic [ref=e25]: "0"
+          - generic [ref=e26]: "1"
+        - generic [ref=e27]: Issue
+      - button "Collapse issues badge" [ref=e28]:
+        - img [ref=e29]
+  - alert [ref=e31]

@@ -17,9 +17,51 @@ export const createReviewSchema = z.object({
 });
 
 export const createGroupSchema = z.object({
-	name: z.string().min(3, "Group name must be at least 3 characters").max(100).trim(),
+	name: z.string().min(1, "Group name is required.").max(80, "Group name must be 80 characters or fewer.").trim(),
 	description: z.string().max(500).trim().optional(),
+	category: z.string().max(100).trim().optional(),
 	visibility: z.enum(["public", "private"]).default("public"),
+});
+
+export const groupIdSchema = z.object({
+	groupId: uuidSchema,
+});
+
+export const inviteUserSchema = z.object({
+	groupId: uuidSchema,
+	username: z.string().min(1, "Username is required").max(100).trim(),
+});
+
+export const inviteTokenSchema = z.object({
+	token: z.string().uuid("Invalid invite token"),
+});
+
+export const groupMemberSchema = z.object({
+	groupId: uuidSchema,
+	targetUserId: uuidSchema,
+});
+
+export const loadGroupPostsSchema = z.object({
+	groupId: uuidSchema,
+	cursor: z.string().uuid().optional(),
+});
+
+export const genreFilterSchema = z.object({
+	genreFilter: z.string().max(100).trim().optional(),
+});
+
+export const genreFilterCursorSchema = z.object({
+	genreFilter: z.string().max(100).trim().optional(),
+	cursor: z.string().uuid().optional(),
+});
+
+export const releaseIdCursorSchema = z.object({
+	releaseId: uuidSchema,
+	cursor: z.string().uuid().optional(),
+});
+
+export const releaseIdSchema = z.object({
+	releaseId: uuidSchema,
 });
 
 export type CreatePostInput = z.infer<typeof createPostSchema>;

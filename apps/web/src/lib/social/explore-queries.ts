@@ -5,7 +5,7 @@ import { profiles } from "@/lib/db/schema/users";
 import { releases } from "@/lib/db/schema/releases";
 import { diggerDna } from "@/lib/db/schema/engagement";
 import { searchSignals } from "@/lib/db/schema/search-signals";
-import type { FeedItem } from "@/actions/social";
+import type { FeedItem } from "@/lib/social/types";
 
 export async function getExploreFeed(
 	userId: string,

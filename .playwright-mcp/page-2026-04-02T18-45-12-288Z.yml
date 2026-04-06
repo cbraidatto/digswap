@@ -1,0 +1,42 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e105]:
+    - heading "DIGSWAP" [level=1] [ref=e107]
+    - generic [ref=e109]:
+      - generic [ref=e111]: Welcome Back
+      - generic [ref=e113]:
+        - generic [ref=e114]:
+          - alert [ref=e138]: Invalid email or password. Please try again.
+          - generic [ref=e115]:
+            - generic [ref=e116]: Email
+            - textbox "Email" [ref=e117]:
+              - /placeholder: you@example.com
+              - text: fakedigger@test.com
+          - generic [ref=e118]:
+            - generic [ref=e119]:
+              - generic [ref=e120]: Password
+              - link "Forgot your password?" [ref=e121] [cursor=pointer]:
+                - /url: /forgot-password
+            - textbox "Password" [ref=e122]:
+              - /placeholder: Enter your password
+              - text: wrongpassword123
+          - button "Sign In" [ref=e123]
+        - generic [ref=e124]:
+          - generic [ref=e125]:
+            - separator [ref=e126]
+            - generic [ref=e127]: or continue with
+            - separator [ref=e128]
+          - region "Social login" [ref=e129]:
+            - button "Google" [ref=e130]:
+              - img
+              - text: Google
+            - button "GitHub" [ref=e131]:
+              - img
+              - text: GitHub
+      - paragraph [ref=e134]:
+        - text: New to DigSwap?
+        - link "Create an account" [ref=e135] [cursor=pointer]:
+          - /url: /signup
+  - region "Notifications alt+T"
+  - button "Open Next.js Dev Tools" [ref=e100] [cursor=pointer]:
+    - img [ref=e101]
+  - alert [ref=e104]: Welcome Back | DigSwap

@@ -13,21 +13,7 @@ import {
 	signInSchema,
 	signUpSchema,
 } from "@/lib/validations/auth";
-
-/**
- * Extracts the Supabase session_id claim from a JWT access token.
- * Mirrors the same logic in middleware.ts so the two sides agree on the ID.
- */
-function extractSessionId(accessToken: string): string | null {
-	try {
-		const payload = accessToken.split(".")[1];
-		if (!payload) return null;
-		const decoded = JSON.parse(Buffer.from(payload, "base64url").toString());
-		return decoded.session_id ?? null;
-	} catch {
-		return null;
-	}
-}
+import { extractSessionId } from "@/lib/auth/session-utils";
 
 /**
  * Generic auth error message per OWASP guidelines.
@@ -199,15 +185,16 @@ export async function signIn(formData: FormData): Promise<{
 					ip_address: ip,
 				});
 
-				// Enforce max sessions atomically: keep the newest MAX_SESSIONS rows.
+				// Enforce max sessions: keep the newest MAX_SESSIONS, delete the rest.
 				await db.execute(sql`
 					DELETE FROM user_sessions
-					WHERE id IN (
+					WHERE user_id = ${data.user.id}
+					  AND id NOT IN (
 						SELECT id
 						FROM user_sessions
 						WHERE user_id = ${data.user.id}
-						ORDER BY created_at ASC
-						OFFSET ${MAX_SESSIONS}
+						ORDER BY created_at DESC
+						LIMIT ${MAX_SESSIONS}
 					)
 				`);
 			} catch (sessionError) {

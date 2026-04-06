@@ -48,6 +48,10 @@ next-env.d.ts
 # test artifacts
 /apps/*/playwright-report/
 /apps/*/test-results/
+test-*.png
+.tmp-*.log
+tmp-*.json
+tsc-errors.log
 
 # ── GSD baseline (auto-generated) ──
 .gsd
@@ -75,3 +79,6 @@ vendor/
 coverage/
 .cache/
 tmp/
+
+# ── GSD baseline (auto-generated) ──
+.gsd-id

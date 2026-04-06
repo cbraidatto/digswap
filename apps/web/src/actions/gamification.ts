@@ -1,6 +1,6 @@
 "use server";
 
-import { createClient } from "@/lib/supabase/server";
+import { requireUser } from "@/lib/auth/require-user";
 import { apiRateLimit , safeLimit} from "@/lib/rate-limit";
 import {
 	getGlobalLeaderboard,
@@ -10,23 +10,6 @@ import {
 	type LeaderboardEntry,
 } from "@/lib/gamification/queries";
 import { leaderboardPageSchema, genreLeaderboardSchema } from "@/lib/validations/gamification";
-
-// ---------------------------------------------------------------------------
-// Auth helper
-// ---------------------------------------------------------------------------
-
-async function requireUser() {
-	const supabase = await createClient();
-	const {
-		data: { user },
-	} = await supabase.auth.getUser();
-
-	if (!user) {
-		throw new Error("Not authenticated");
-	}
-
-	return user;
-}
 
 // ---------------------------------------------------------------------------
 // Leaderboard server actions

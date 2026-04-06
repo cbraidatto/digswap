@@ -1,0 +1,4 @@
+interface:
+  display_name: "DigSwap AppSec"
+  short_description: "DigSwap security hardening skill"
+  default_prompt: "Use $digswap-appsec to review this DigSwap change for security risks."

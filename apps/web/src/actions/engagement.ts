@@ -1,7 +1,7 @@
 "use server";
 
-import { createClient } from "@/lib/supabase/server";
 import { db } from "@/lib/db";
+import { requireUser } from "@/lib/auth/require-user";
 import { digs, diggerDna } from "@/lib/db/schema/engagement";
 import { listeningLogs } from "@/lib/db/schema/listening-logs";
 import { activityFeed } from "@/lib/db/schema/social";
@@ -23,15 +23,6 @@ const logListeningSchema = z.object({
 });
 
 // ── Helpers ────────────────────────────────────────────────
-async function requireUser() {
-	const supabase = await createClient();
-	const {
-		data: { user },
-	} = await supabase.auth.getUser();
-	if (!user) throw new Error("Not authenticated");
-	return user;
-}
-
 // ── "Dig!" reaction ────────────────────────────────────────
 export async function toggleDig(
 	feedItemId: string,

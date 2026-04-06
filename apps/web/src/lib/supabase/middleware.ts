@@ -1,20 +1,6 @@
 import { createServerClient } from "@supabase/ssr";
 import { type NextRequest, NextResponse } from "next/server";
-
-/**
- * Extract the Supabase session ID (sub claim `session_id`) from a JWT access token.
- * The JWT payload is base64url-encoded in the second segment.
- */
-function extractSessionId(accessToken: string): string | null {
-	try {
-		const payload = accessToken.split(".")[1];
-		if (!payload) return null;
-		const decoded = JSON.parse(Buffer.from(payload, "base64url").toString());
-		return decoded.session_id ?? null;
-	} catch {
-		return null;
-	}
-}
+import { extractSessionId } from "@/lib/auth/session-utils";
 
 /**
  * Updates the auth session, refreshing the JWT token if expired.
@@ -122,8 +108,14 @@ export async function updateSession(request: NextRequest) {
 						}
 					}
 				}
-			} catch {
-				// Non-blocking: fail-open if check fails
+			} catch (err) {
+				// Fail-closed: if session allowlist check fails, force re-auth.
+				// A revoked session must not slip through due to a transient DB error.
+				console.error("[middleware] session allowlist check failed — forcing sign-out:", err);
+				await supabase.auth.signOut();
+				const url = request.nextUrl.clone();
+				url.pathname = "/signin";
+				return NextResponse.redirect(url);
 			}
 		}
 	}

@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import type { FeedItem } from "@/actions/social";
+import type { FeedItem } from "@/lib/social/types";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 function formatRelativeTime(dateStr: string): string {

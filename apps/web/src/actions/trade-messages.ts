@@ -5,7 +5,7 @@ import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import { db } from "@/lib/db";
 import { tradeMessages, tradeRequests } from "@/lib/db/schema/trades";
-import { createClient } from "@/lib/supabase/server";
+import { requireUser } from "@/lib/auth/require-user";
 import { getTradeParticipantContext } from "@/lib/trades/messages";
 import { uuidSchema } from "@/lib/validations/common";
 
@@ -13,19 +13,6 @@ const sendTradeMessageSchema = z.object({
 	body: z.string().trim().min(1, "Message cannot be empty.").max(2000, "Message is too long."),
 	tradeId: uuidSchema,
 });
-
-async function requireUser() {
-	const supabase = await createClient();
-	const {
-		data: { user },
-	} = await supabase.auth.getUser();
-
-	if (!user) {
-		throw new Error("Not authenticated");
-	}
-
-	return user;
-}
 
 export async function sendTradeMessage(
 	tradeId: string,
