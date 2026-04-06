@@ -29,9 +29,9 @@ export async function OwnersSection({ releaseId }: OwnersSectionProps) {
 			) : (
 				<>
 					<div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
-						{owners.map((owner) => (
+						{owners.map((owner, idx) => (
 							<div
-								key={owner.userId}
+								key={`${owner.userId}-${idx}`}
 								className="bg-surface-container-low border border-outline-variant/10 rounded p-3 hover:border-outline-variant/30 transition-colors"
 							>
 								<div className="flex items-start gap-2">
