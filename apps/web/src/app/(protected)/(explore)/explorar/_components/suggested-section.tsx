@@ -7,6 +7,7 @@ import { CoverArt } from "@/components/ui/cover-art";
 import { RarityPill } from "@/components/ui/rarity-pill";
 import { RecordLink } from "@/components/ui/record-link";
 import { RecordContextMenu } from "@/components/ui/record-context-menu";
+import { PlayOverlay } from "@/components/ui/play-overlay";
 
 export function SuggestedSection() {
 	const [suggestions, setSuggestions] = useState<SuggestionResult[]>([]);
@@ -52,12 +53,18 @@ export function SuggestedSection() {
 							key={record.id}
 							className="bg-surface-container-low rounded-xl overflow-hidden border border-outline-variant/5 hover:border-outline-variant/15 hover:shadow-lg hover:shadow-black/5 transition-all group"
 						>
-							<RecordLink discogsId={record.discogsId} className="block relative aspect-square">
+							<RecordLink discogsId={record.discogsId} className="block relative aspect-square group/cover">
 								<CoverArt
 									src={record.coverImageUrl}
 									alt={record.title}
 									size="full"
 									containerClassName="w-full h-full"
+								/>
+								<PlayOverlay
+									videoId={record.youtubeVideoId}
+									title={record.title}
+									artist={record.artist}
+									coverUrl={record.coverImageUrl}
 								/>
 							</RecordLink>
 							<div className="p-2.5">

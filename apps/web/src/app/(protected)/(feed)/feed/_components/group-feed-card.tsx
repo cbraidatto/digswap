@@ -3,6 +3,7 @@
 import Link from "next/link";
 import type { FeedItem } from "@/lib/social/types";
 import { StarRating } from "@/components/ui/star-rating";
+import { RarityPill } from "@/components/ui/rarity-pill";
 
 function formatRelativeTime(dateStr: string): string {
 	const diff = Date.now() - new Date(dateStr).getTime();
@@ -93,11 +94,19 @@ export function GroupFeedCard({ item }: { item: FeedItem }) {
 			)}
 
 			{/* Linked record reference */}
-			{releaseId && linkedTitle && (
-				<div className="px-4 pb-3">
-					<span className="font-mono text-xs text-on-surface-variant">
-						{"\u2514"} LINKED: {linkedTitle}
+			{linkedTitle && (
+				<div className="px-4 pb-3 flex items-center gap-2">
+					<span className="font-mono text-xs text-on-surface-variant">{"\u2514"}</span>
+					<span className="material-symbols-outlined text-[14px] text-on-surface-variant/50">album</span>
+					<span className="font-mono text-xs text-on-surface">
+						{linkedTitle}
 					</span>
+					{item.releaseArtist && (
+						<span className="font-mono text-[10px] text-on-surface-variant">
+							· {item.releaseArtist}
+						</span>
+					)}
+					<RarityPill score={item.releaseRarityScore} showScore={false} />
 				</div>
 			)}
 		</article>

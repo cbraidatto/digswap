@@ -122,7 +122,7 @@ export default async function PerfilPage({ searchParams }: PerfilPageProps) {
 			.where(and(eq(collectionItems.userId, user.id), gte(collectionItems.createdAt, weekAgo))),
 		getTopGenres(user.id),
 		showcaseIds.length > 0
-			? db.select({ id: releases.id, title: releases.title, artist: releases.artist, year: releases.year, coverImageUrl: releases.coverImageUrl })
+			? db.select({ id: releases.id, discogsId: releases.discogsId, title: releases.title, artist: releases.artist, year: releases.year, coverImageUrl: releases.coverImageUrl })
 				.from(releases)
 				.where(inArray(releases.id, showcaseIds))
 			: Promise.resolve([]),

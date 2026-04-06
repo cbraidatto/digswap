@@ -12,6 +12,7 @@ import { LeadAction } from "@/components/digger-memory/lead-action";
 import { ContextTooltip } from "@/components/digger-memory/context-tooltip";
 import { BackButton } from "@/components/shell/back-button";
 import { AddToCrateButton } from "@/components/crates/add-to-crate-button";
+import { ProposeTradeButton } from "@/components/trades/ProposeTradeButton";
 import Link from "next/link";
 
 const RARITY_TIERS = [
@@ -130,9 +131,13 @@ export default async function RadarPage({ searchParams }: RadarPageProps) {
                     </div>
                     <div className="font-mono text-xs text-on-surface-variant truncate">
                       has{" "}
-                      <span className="text-on-surface">
-                        {match.releaseTitle}
-                      </span>
+                      {match.discogsId ? (
+                        <Link href={`/release/${match.discogsId}`} className="text-on-surface hover:text-primary transition-colors">
+                          {match.releaseTitle}
+                        </Link>
+                      ) : (
+                        <span className="text-on-surface">{match.releaseTitle}</span>
+                      )}
                       {match.releaseArtist && (
                         <span> · {match.releaseArtist}</span>
                       )}
@@ -157,6 +162,11 @@ export default async function RadarPage({ searchParams }: RadarPageProps) {
                       title={match.releaseTitle ?? null}
                       artist={match.releaseArtist ?? null}
                       coverImageUrl={null}
+                    />
+                    <ProposeTradeButton
+                      providerId={match.matchUserId}
+                      releaseId={match.releaseId ?? undefined}
+                      compact
                     />
                     <LeadAction type="user" id={match.matchUserId} />
                     <Link

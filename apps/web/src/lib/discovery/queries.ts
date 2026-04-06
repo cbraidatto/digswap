@@ -53,6 +53,7 @@ export interface BrowseResult {
 	genre: string[] | null;
 	rarityScore: number | null;
 	coverImageUrl: string | null;
+	youtubeVideoId: string | null;
 	ownerCount: number;
 	isOwned?: boolean;
 }
@@ -68,6 +69,7 @@ export interface SuggestionResult {
 	genre: string[] | null;
 	rarityScore: number | null;
 	coverImageUrl: string | null;
+	youtubeVideoId: string | null;
 	ownerCount: number;
 }
 
@@ -101,6 +103,7 @@ export async function searchRecords(
 			genre: releases.genre,
 			rarityScore: releases.rarityScore,
 			coverImageUrl: releases.coverImageUrl,
+			youtubeVideoId: releases.youtubeVideoId,
 		})
 		.from(releases)
 		.where(
@@ -258,6 +261,7 @@ export async function browseRecords(
 			genre: releases.genre,
 			rarityScore: releases.rarityScore,
 			coverImageUrl: releases.coverImageUrl,
+			youtubeVideoId: releases.youtubeVideoId,
 			ownerCount: countDistinct(collectionItems.userId).as("owner_count"),
 			...(userId
 				? {
@@ -281,6 +285,7 @@ export async function browseRecords(
 			releases.genre,
 			releases.rarityScore,
 			releases.coverImageUrl,
+			releases.youtubeVideoId,
 		)
 		.orderBy(
 			sort === "year" ? desc(sql`COALESCE(${releases.year}, 0)`)
@@ -350,6 +355,7 @@ export async function getSuggestedRecords(
 				genre: releases.genre,
 				rarityScore: releases.rarityScore,
 				coverImageUrl: releases.coverImageUrl,
+			youtubeVideoId: releases.youtubeVideoId,
 				ownerCount: countDistinct(collectionItems.userId).as("owner_count"),
 			})
 			.from(releases)
@@ -405,6 +411,7 @@ export async function getSuggestedRecords(
 				genre: releases.genre,
 				rarityScore: releases.rarityScore,
 				coverImageUrl: releases.coverImageUrl,
+			youtubeVideoId: releases.youtubeVideoId,
 				ownerCount: countDistinct(collectionItems.userId).as("owner_count"),
 			})
 			.from(collectionItems)
@@ -462,6 +469,7 @@ export interface TrendingRecord {
 	title: string;
 	artist: string;
 	coverImageUrl: string | null;
+	youtubeVideoId: string | null;
 	rarityScore: number | null;
 	addCount: number;
 }
@@ -479,6 +487,7 @@ export async function getTrendingRecords(limit = 10): Promise<TrendingRecord[]> 
 			title: releases.title,
 			artist: releases.artist,
 			coverImageUrl: releases.coverImageUrl,
+			youtubeVideoId: releases.youtubeVideoId,
 			rarityScore: releases.rarityScore,
 			addCount: count(collectionItems.id).as("add_count"),
 		})
@@ -491,6 +500,7 @@ export async function getTrendingRecords(limit = 10): Promise<TrendingRecord[]> 
 			releases.title,
 			releases.artist,
 			releases.coverImageUrl,
+			releases.youtubeVideoId,
 			releases.rarityScore,
 		)
 		.orderBy(desc(sql`add_count`))

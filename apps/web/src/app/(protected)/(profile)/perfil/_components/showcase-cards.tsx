@@ -8,9 +8,11 @@ import {
 	updateShowcase,
 	type ShowcaseSlot,
 } from "@/actions/profile";
+import { RecordLink } from "@/components/ui/record-link";
 
 interface ShowcaseRelease {
 	id: string;
+	discogsId: number | null;
 	title: string;
 	artist: string;
 	year: number | null;

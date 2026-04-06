@@ -125,6 +125,7 @@ export async function searchCollectionForShowcase(query: string) {
 		const rows = await db
 			.selectDistinctOn([releases.id], {
 				id:            releases.id,
+				discogsId:     releases.discogsId,
 				title:         releases.title,
 				artist:        releases.artist,
 				year:          releases.year,

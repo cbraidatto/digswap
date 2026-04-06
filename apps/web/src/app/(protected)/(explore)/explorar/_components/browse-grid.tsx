@@ -86,7 +86,7 @@ export function BrowseGrid({
 					className="bg-surface-container-low rounded-xl overflow-hidden border border-outline-variant/5 hover:border-outline-variant/15 hover:shadow-lg hover:shadow-black/5 transition-all group"
 				>
 					{/* Cover with play overlay */}
-					<RecordLink discogsId={record.discogsId} className="block relative aspect-square">
+					<RecordLink discogsId={record.discogsId} className="block relative aspect-square group/cover">
 						<CoverArt
 							src={record.coverImageUrl}
 							alt={record.title}
@@ -94,7 +94,7 @@ export function BrowseGrid({
 							containerClassName="w-full h-full"
 						/>
 						<PlayOverlay
-							videoId={null}
+							videoId={record.youtubeVideoId}
 							title={record.title}
 							artist={record.artist}
 							coverUrl={record.coverImageUrl}
