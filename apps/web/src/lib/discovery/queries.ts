@@ -11,6 +11,7 @@ import {
 	and,
 	ilike,
 	desc,
+	gte,
 	inArray,
 	isNull,
 	ne,
@@ -449,4 +450,54 @@ export async function getSuggestedRecords(
 	}
 
 	return merged;
+}
+
+// ---------------------------------------------------------------------------
+// Trending records — most added to collections in the last 7 days
+// ---------------------------------------------------------------------------
+
+export interface TrendingRecord {
+	id: string;
+	discogsId: number | null;
+	title: string;
+	artist: string;
+	coverImageUrl: string | null;
+	rarityScore: number | null;
+	addCount: number;
+}
+
+/**
+ * Get records most frequently added to collections in the last 7 days.
+ */
+export async function getTrendingRecords(limit = 10): Promise<TrendingRecord[]> {
+	const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
+
+	const rows = await db
+		.select({
+			id: releases.id,
+			discogsId: releases.discogsId,
+			title: releases.title,
+			artist: releases.artist,
+			coverImageUrl: releases.coverImageUrl,
+			rarityScore: releases.rarityScore,
+			addCount: count(collectionItems.id).as("add_count"),
+		})
+		.from(collectionItems)
+		.innerJoin(releases, eq(collectionItems.releaseId, releases.id))
+		.where(gte(collectionItems.createdAt, sevenDaysAgo))
+		.groupBy(
+			releases.id,
+			releases.discogsId,
+			releases.title,
+			releases.artist,
+			releases.coverImageUrl,
+			releases.rarityScore,
+		)
+		.orderBy(desc(sql`add_count`))
+		.limit(limit);
+
+	return rows.map((r) => ({
+		...r,
+		addCount: Number(r.addCount),
+	}));
 }

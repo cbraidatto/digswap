@@ -7,6 +7,7 @@ import { BrowseFilters } from "./browse-filters";
 import { AdvancedSearchFilters } from "./advanced-search-filters";
 import { BrowseGrid } from "./browse-grid";
 import { SuggestedSection } from "./suggested-section";
+import { TrendingSection } from "./trending-section";
 
 export function RecordsTab() {
 	const router = useRouter();
@@ -44,6 +45,7 @@ export function RecordsTab() {
 	return (
 		<div className="w-full p-8 md:p-12">
 			<div className="max-w-4xl mx-auto space-y-8">
+				<TrendingSection />
 				<RecordSearch />
 				<div className="space-y-4">
 					{/* Advanced stackable filters (URL-driven: genre chips, country, format, rarity) */}

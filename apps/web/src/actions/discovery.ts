@@ -6,6 +6,8 @@ import {
 	searchRecords,
 	browseRecords,
 	getSuggestedRecords,
+	getTrendingRecords,
+	type TrendingRecord,
 } from "@/lib/discovery/queries";
 import { searchRecordsSchema, browseRecordsSchema } from "@/lib/validations/discovery";
 import { logSearchSignal } from "@/actions/search-signals";
@@ -147,6 +149,28 @@ export async function getSuggestionsAction() {
 		return getSuggestedRecords(user.id);
 	} catch (err) {
 		console.error("[getSuggestionsAction] error:", err);
+		return [];
+	}
+}
+
+/**
+ * Get trending records — most added to collections in the last 7 days.
+ */
+export async function getTrendingAction(): Promise<TrendingRecord[]> {
+	try {
+		const supabase = await createClient();
+		const {
+			data: { user },
+		} = await supabase.auth.getUser();
+
+		if (!user) return [];
+
+		const { success: rlSuccess } = await safeLimit(apiRateLimit, user.id, false);
+		if (!rlSuccess) return [];
+
+		return getTrendingRecords(10);
+	} catch (err) {
+		console.error("[getTrendingAction] error:", err);
 		return [];
 	}
 }
