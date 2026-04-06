@@ -53,10 +53,19 @@ export function ProfileHero({ profile, stats, badges, isOwner }: ProfileHeroProp
 						priority
 					/>
 				) : (
-					<div className="absolute inset-0 bg-gradient-to-br from-primary/20 via-surface-container-high to-secondary/10" />
+					<>
+						<div className="absolute inset-0 bg-gradient-to-br from-primary/15 via-surface-container-high to-secondary/10" />
+						{/* Noise texture for visual interest */}
+						<div
+							className="absolute inset-0 opacity-20 mix-blend-overlay"
+							style={{
+								backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")`,
+							}}
+						/>
+					</>
 				)}
 				{/* Gradient overlay for text readability */}
-				<div className="absolute inset-0 bg-gradient-to-t from-surface-dim via-surface-dim/60 to-transparent" />
+				<div className="absolute inset-0 bg-gradient-to-t from-surface-dim via-surface-dim/50 to-transparent" />
 			</div>
 
 			{/* Profile info — overlaps the cover */}
@@ -64,7 +73,7 @@ export function ProfileHero({ profile, stats, badges, isOwner }: ProfileHeroProp
 				<div className="flex items-end gap-4 md:gap-5">
 					{/* Avatar with glow */}
 					<div className="relative flex-shrink-0">
-						<div className="w-24 h-24 md:w-28 md:h-28 rounded-xl border-4 border-surface-dim overflow-hidden bg-surface-container-high shadow-lg shadow-primary/10">
+						<div className="w-24 h-24 md:w-28 md:h-28 rounded-xl border-4 border-surface-dim overflow-hidden bg-surface-container-high shadow-lg shadow-primary/20 ring-2 ring-primary/10">
 							{profile.avatarUrl ? (
 								<Image
 									src={profile.avatarUrl}

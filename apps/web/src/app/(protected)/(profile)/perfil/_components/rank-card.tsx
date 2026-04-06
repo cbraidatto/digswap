@@ -25,38 +25,29 @@ export function RankCard({
 				</div>
 			</div>
 
-			<div className="grid grid-cols-3 gap-2 mt-3">
+			<div className="grid grid-cols-3 gap-3 mt-3">
 				<div>
-					<div className="text-2xl font-bold font-heading text-secondary">
-						{globalRank ? `#${globalRank}` : "#--"}
+					<div className="text-xl font-bold font-heading text-secondary">
+						{globalRank ? `#${globalRank}` : "—"}
 					</div>
-					<div className="font-mono text-xs text-outline uppercase">
-						GLOBAL_RANK
-					</div>
-					<div className="font-mono text-xs text-outline uppercase">
-						Score_pts
+					<div className="font-mono text-[9px] text-on-surface-variant/50 uppercase tracking-widest">
+						Global Rank
 					</div>
 				</div>
 				<div>
-					<div className="text-2xl font-bold font-heading text-primary">
+					<div className="text-xl font-bold font-heading text-primary">
 						{rarityScore.toFixed(1)}
 					</div>
-					<div className="font-mono text-xs text-outline uppercase">
-						RARITY
-					</div>
-					<div className="font-mono text-xs text-outline uppercase">
-						Score_pts
+					<div className="font-mono text-[9px] text-on-surface-variant/50 uppercase tracking-widest">
+						Rarity
 					</div>
 				</div>
 				<div>
-					<div className="text-2xl font-bold font-heading text-tertiary">
+					<div className="text-xl font-bold font-heading text-tertiary">
 						{contributionScore.toFixed(1)}
 					</div>
-					<div className="font-mono text-xs text-outline uppercase">
-						CONTRIBUTION
-					</div>
-					<div className="font-mono text-xs text-outline uppercase">
-						Score_pts
+					<div className="font-mono text-[9px] text-on-surface-variant/50 uppercase tracking-widest">
+						Contribution
 					</div>
 				</div>
 			</div>

@@ -48,17 +48,21 @@ export function AboutTab({
 			{/* Stats grid */}
 			<div className="grid grid-cols-2 md:grid-cols-4 gap-3">
 				{[
-					{ label: "Records", value: stats.collectionCount.toLocaleString(), color: "text-primary", icon: "album" },
-					{ label: "Rank", value: stats.globalRank ? `#${stats.globalRank}` : "—", color: "text-secondary", icon: "leaderboard" },
-					{ label: "Score", value: globalScore.toFixed(1), color: "text-tertiary", icon: "score" },
-					{ label: "Trades", value: stats.totalTrades.toLocaleString(), color: "text-primary", icon: "swap_horiz" },
+					{ label: "Records", value: stats.collectionCount.toLocaleString(), color: "text-primary", accent: "from-primary/10", icon: "album" },
+					{ label: "Rank", value: stats.globalRank ? `#${stats.globalRank}` : "—", color: "text-secondary", accent: "from-secondary/10", icon: "leaderboard" },
+					{ label: "Score", value: globalScore.toFixed(1), color: "text-tertiary", accent: "from-tertiary/10", icon: "score" },
+					{ label: "Trades", value: stats.totalTrades.toLocaleString(), color: "text-primary", accent: "from-primary/10", icon: "swap_horiz" },
 				].map((s) => (
-					<div key={s.label} className="bg-surface-container-low rounded-xl p-4 border border-outline-variant/5">
-						<div className="flex items-center gap-1.5 mb-1.5">
-							<span className={`material-symbols-outlined text-[14px] ${s.color}`}>{s.icon}</span>
-							<span className="font-mono text-[9px] text-on-surface-variant uppercase tracking-widest">{s.label}</span>
+					<div key={s.label} className={`relative overflow-hidden bg-surface-container-low rounded-xl p-4 border border-outline-variant/5`}>
+						{/* Subtle gradient accent */}
+						<div className={`absolute inset-0 bg-gradient-to-br ${s.accent} to-transparent opacity-50`} />
+						<div className="relative">
+							<div className="flex items-center gap-1.5 mb-1.5">
+								<span className={`material-symbols-outlined text-[14px] ${s.color}`}>{s.icon}</span>
+								<span className="font-mono text-[9px] text-on-surface-variant uppercase tracking-widest">{s.label}</span>
+							</div>
+							<div className={`text-2xl font-bold font-heading ${s.color}`}>{s.value}</div>
 						</div>
-						<div className={`text-2xl font-bold font-heading ${s.color}`}>{s.value}</div>
 					</div>
 				))}
 			</div>

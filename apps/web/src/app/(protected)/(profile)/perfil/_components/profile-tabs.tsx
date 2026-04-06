@@ -83,8 +83,12 @@ export function ProfileTabs({
 				})}
 			</div>
 
-			{/* Tab content */}
-			<div role="tabpanel">
+			{/* Tab content with fade transition */}
+			<div
+				role="tabpanel"
+				key={activeTab}
+				className="animate-in fade-in duration-200"
+			>
 				{children[activeTab]}
 			</div>
 		</div>
