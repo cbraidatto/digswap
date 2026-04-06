@@ -18,6 +18,8 @@ export function FloatingPlayer() {
 	const {
 		currentTrack,
 		queue,
+		volume,
+		setVolume,
 		isPlaying,
 		currentTime,
 		duration,
@@ -243,6 +245,30 @@ export function FloatingPlayer() {
 											</span>
 										)}
 									</button>
+
+									{/* Volume control */}
+									<div className="hidden sm:flex items-center gap-1.5 ml-1">
+										<button
+											type="button"
+											onClick={() => setVolume(volume === 0 ? 80 : 0)}
+											className="p-1 text-on-surface-variant hover:text-on-surface transition-colors"
+											aria-label={volume === 0 ? "Unmute" : "Mute"}
+										>
+											<span className="material-symbols-outlined text-lg">
+												{volume === 0 ? "volume_off" : volume < 50 ? "volume_down" : "volume_up"}
+											</span>
+										</button>
+										<input
+											type="range"
+											min={0}
+											max={100}
+											step={1}
+											value={volume}
+											onChange={(e) => setVolume(Number(e.target.value))}
+											className="w-20 accent-primary h-1 cursor-pointer"
+											aria-label="Volume"
+										/>
+									</div>
 								</div>
 							</div>
 						</>

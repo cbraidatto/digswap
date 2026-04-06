@@ -32,6 +32,9 @@ interface PlayerState {
 	seekGeneration: number;
 	seekTo: number;
 	requestSeek: (time: number) => void;
+	/** Volume 0-100 */
+	volume: number;
+	setVolume: (volume: number) => void;
 }
 
 export const usePlayerStore = create<PlayerState>((set, get) => ({
@@ -43,6 +46,7 @@ export const usePlayerStore = create<PlayerState>((set, get) => ({
 	embedError: false,
 	seekGeneration: 0,
 	seekTo: 0,
+	volume: 80,
 
 	play: (track) => {
 		set({ currentTrack: track, isPlaying: true, embedError: false, currentTime: 0 });
@@ -95,4 +99,6 @@ export const usePlayerStore = create<PlayerState>((set, get) => ({
 		const { seekGeneration } = get();
 		set({ seekTo: time, seekGeneration: seekGeneration + 1, currentTime: time });
 	},
+
+	setVolume: (volume) => set({ volume: Math.max(0, Math.min(100, volume)) }),
 }));

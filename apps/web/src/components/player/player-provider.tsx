@@ -24,6 +24,7 @@ export function PlayerProvider() {
 		next,
 		seekGeneration,
 		seekTo,
+		volume,
 	} = usePlayerStore();
 
 	// Load YouTube API once on mount
@@ -75,6 +76,7 @@ export function PlayerProvider() {
 					onReady: (e: YT.PlayerEvent) => {
 						if (!isMountedRef.current) return;
 						setDuration(e.target.getDuration());
+						try { e.target.setVolume(usePlayerStore.getState().volume); } catch { /* ignore */ }
 						if (shouldAutoPlay) {
 							e.target.playVideo();
 						}
@@ -135,6 +137,14 @@ export function PlayerProvider() {
 		} catch { /* ignore */ }
 	// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [seekGeneration]);
+
+	// Sync volume to YT player
+	useEffect(() => {
+		if (!playerRef.current) return;
+		try {
+			playerRef.current.setVolume?.(volume);
+		} catch { /* ignore */ }
+	}, [volume]);
 
 	return (
 		// Hidden container — the actual YT iframe lives here, visually hidden
