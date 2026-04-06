@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { NotificationBell } from "@/components/shell/notification-bell";
+import { ChatToggleButton } from "@/components/chat/chat-toggle-button";
 
 interface AppHeaderProps {
 	displayName: string | null;
@@ -54,6 +55,7 @@ export function AppHeader({ xp = 0, userId }: AppHeaderProps) {
 						</span>
 					</div>
 				)}
+				<ChatToggleButton />
 				<NotificationBell userId={userId} />
 			</div>
 		</header>

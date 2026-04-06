@@ -7,6 +7,7 @@ import { Sidebar } from "@/components/shell/sidebar";
 import { PlayerProvider } from "@/components/player/player-provider";
 import { FloatingPlayer } from "@/components/player/floating-player";
 import { usePlayerStore } from "@/lib/player/store";
+import { ChatSidebar } from "@/components/chat/chat-sidebar";
 
 const SHELL_EXCLUDED_PREFIXES = ["/onboarding", "/settings"];
 
@@ -54,6 +55,7 @@ export function AppShell({ user, banner, children }: AppShellProps) {
 				{children}
 			</main>
 			<FloatingPlayer />
+			<ChatSidebar />
 			<BottomBar />
 		</>
 	);
