@@ -1,7 +1,8 @@
 "use client";
 
 import { useRouter, useSearchParams, usePathname } from "next/navigation";
-import { useCallback } from "react";
+import { useCallback, useMemo, useState } from "react";
+import { DISCOGS_STYLES_BY_GENRE, type DiscogsGenre } from "@/lib/discogs/taxonomy";
 
 const GENRE_OPTIONS = [
   "Jazz",
@@ -33,9 +34,25 @@ export function AdvancedSearchFilters() {
 
   // Read current values from URL
   const activeGenres = searchParams.getAll("genre");
+  const activeStyles = searchParams.getAll("style");
   const activeCountry = searchParams.get("country") ?? "";
+  const activeLabel = searchParams.get("label") ?? "";
   const activeFormat = searchParams.get("format") ?? "";
   const activeMinRarity = Number(searchParams.get("minRarity") ?? "0");
+  const [showStyles, setShowStyles] = useState(false);
+
+  // Compute available styles based on selected genres
+  const availableStyles = useMemo(() => {
+    if (activeGenres.length === 0) return [];
+    const styles = new Set<string>();
+    for (const g of activeGenres) {
+      const genreStyles = DISCOGS_STYLES_BY_GENRE[g as DiscogsGenre];
+      if (genreStyles) {
+        for (const s of genreStyles) styles.add(s);
+      }
+    }
+    return [...styles].sort();
+  }, [activeGenres]);
 
   const updateParam = useCallback(
     (updates: Record<string, string | string[] | null>) => {
@@ -63,11 +80,23 @@ export function AdvancedSearchFilters() {
     const next = activeGenres.includes(genre)
       ? activeGenres.filter((g) => g !== genre)
       : [...activeGenres, genre];
-    updateParam({ genre: next });
+    // Clear styles when genres change (styles depend on genres)
+    updateParam({ genre: next, style: [] });
+  };
+
+  const toggleStyle = (style: string) => {
+    const next = activeStyles.includes(style)
+      ? activeStyles.filter((s) => s !== style)
+      : [...activeStyles, style];
+    updateParam({ style: next });
   };
 
   const handleCountryChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     updateParam({ country: e.target.value });
+  };
+
+  const handleLabelChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    updateParam({ label: e.target.value });
   };
 
   const handleFormatChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
@@ -81,12 +110,15 @@ export function AdvancedSearchFilters() {
 
   const hasActiveFilters =
     activeGenres.length > 0 ||
+    activeStyles.length > 0 ||
     activeCountry !== "" ||
+    activeLabel !== "" ||
     activeFormat !== "" ||
     activeMinRarity > 0;
 
   const clearAll = () => {
-    updateParam({ genre: [], country: null, format: null, minRarity: null });
+    updateParam({ genre: [], style: [], country: null, label: null, format: null, minRarity: null });
+    setShowStyles(false);
   };
 
   return (
@@ -129,8 +161,63 @@ export function AdvancedSearchFilters() {
         })}
       </div>
 
-      {/* Second row: country, format, minRarity */}
+      {/* Style chips — shown when genres are selected */}
+      {activeGenres.length > 0 && availableStyles.length > 0 && (
+        <div>
+          <button
+            type="button"
+            onClick={() => setShowStyles(!showStyles)}
+            className="font-mono text-[10px] text-on-surface-variant uppercase tracking-widest mb-1.5 flex items-center gap-1 hover:text-on-surface transition-colors"
+          >
+            <span className="material-symbols-outlined text-xs">
+              {showStyles ? "expand_less" : "expand_more"}
+            </span>
+            Styles ({availableStyles.length})
+            {activeStyles.length > 0 && (
+              <span className="text-primary ml-1">· {activeStyles.length} selected</span>
+            )}
+          </button>
+          {showStyles && (
+            <div className="flex gap-1.5 overflow-x-auto scrollbar-none pb-1 flex-wrap">
+              {availableStyles.map((style) => {
+                const isActive = activeStyles.includes(style);
+                return (
+                  <button
+                    key={style}
+                    type="button"
+                    onClick={() => toggleStyle(style)}
+                    aria-pressed={isActive}
+                    className={`px-2 py-0.5 rounded-full font-mono text-[10px] whitespace-nowrap shrink-0 transition-colors border ${
+                      isActive
+                        ? "bg-secondary/10 text-secondary border-secondary"
+                        : "bg-surface-container-low text-on-surface-variant border-outline-variant/20 hover:bg-surface-container hover:text-on-surface"
+                    }`}
+                  >
+                    {style}
+                  </button>
+                );
+              })}
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Second row: label, country, format, minRarity */}
       <div className="flex flex-wrap gap-3 items-end">
+        {/* Label */}
+        <div className="flex flex-col gap-1 min-w-[140px]">
+          <label className="font-mono text-[10px] text-on-surface-variant uppercase tracking-widest">
+            Label
+          </label>
+          <input
+            type="text"
+            value={activeLabel}
+            onChange={handleLabelChange}
+            placeholder="e.g. Blue Note..."
+            className="bg-surface-container-low border border-outline-variant/20 rounded px-2 py-1 font-mono text-xs text-on-surface placeholder:text-on-surface-variant/40 focus:outline-none focus:border-primary/50 w-full"
+          />
+        </div>
+
         {/* Country */}
         <div className="flex flex-col gap-1 min-w-[120px]">
           <label className="font-mono text-[10px] text-on-surface-variant uppercase tracking-widest">

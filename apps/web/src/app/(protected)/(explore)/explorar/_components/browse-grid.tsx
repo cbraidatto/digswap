@@ -23,7 +23,9 @@ interface BrowseGridProps {
 	genre: string | null;
 	decade: string | null;
 	genres?: string[];
+	styles?: string[];
 	country?: string | null;
+	label?: string | null;
 	format?: string | null;
 	minRarity?: number;
 }
@@ -32,7 +34,9 @@ export function BrowseGrid({
 	genre,
 	decade,
 	genres = [],
+	styles = [],
 	country = null,
+	label = null,
 	format = null,
 	minRarity = 0,
 }: BrowseGridProps) {
@@ -41,7 +45,7 @@ export function BrowseGrid({
 	const [isPending, startTransition] = useTransition();
 
 	const hasAnyFilter =
-		!!genre || !!decade || genres.length > 0 || !!country || !!format || minRarity > 0;
+		!!genre || !!decade || genres.length > 0 || styles.length > 0 || !!country || !!label || !!format || minRarity > 0;
 
 	useEffect(() => {
 		// Don't query if no filters selected
@@ -52,11 +56,11 @@ export function BrowseGrid({
 		}
 
 		startTransition(async () => {
-			const data = await browseRecordsAction(genre, decade, 1, genres, country, format, minRarity);
+			const data = await browseRecordsAction(genre, decade, 1, genres, country, format, minRarity, styles, label);
 			setResults(data);
 			setHasQueried(true);
 		});
-	}, [genre, decade, genres, country, format, minRarity, hasAnyFilter]);
+	}, [genre, decade, genres, styles, country, label, format, minRarity, hasAnyFilter]);
 
 	// No filters selected: render nothing
 	if (!hasAnyFilter) {

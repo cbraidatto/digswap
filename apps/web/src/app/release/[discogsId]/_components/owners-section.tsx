@@ -104,7 +104,7 @@ export async function OwnersSection({ releaseId }: OwnersSectionProps) {
 					{ownerCount > 12 && (
 						<div className="text-center pt-2">
 							<span className="font-mono text-xs text-primary hover:underline cursor-pointer">
-								VER_TODOS ({ownerCount})
+								VIEW_ALL ({ownerCount})
 							</span>
 						</div>
 					)}

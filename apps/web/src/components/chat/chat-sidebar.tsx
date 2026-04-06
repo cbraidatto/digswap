@@ -23,7 +23,7 @@ export function ChatSidebar() {
 
 			{/* Panel */}
 			<aside
-				className="fixed right-0 top-14 h-[calc(100vh-56px)] w-80 bg-surface-container-low border-l border-outline-variant/10 z-50 flex flex-col shadow-lg animate-in slide-in-from-right duration-200"
+				className="fixed right-0 top-14 h-[calc(100vh-56px)] w-full md:w-80 bg-surface-container-low border-l border-outline-variant/10 z-50 flex flex-col shadow-lg animate-in slide-in-from-right duration-200"
 			>
 				{/* Header */}
 				<div className="flex items-center justify-between px-4 py-3 border-b border-outline-variant/10">

@@ -170,6 +170,8 @@ export async function browseRecords(
 	country: string | null = null,
 	format: string | null = null,
 	minRarity = 0,
+	styles: string[] = [],
+	label: string | null = null,
 ): Promise<BrowseResult[]> {
 	// Build WHERE conditions
 	const conditions = [];
@@ -201,8 +203,21 @@ export async function browseRecords(
 		}
 	}
 
+	// Style filter (any of): combine with OR on style array
+	if (styles.length > 0) {
+		const styleConditions = styles.map(
+			(s) => sql`${releases.style} @> ARRAY[${s}]::text[]`,
+		);
+		conditions.push(or(...styleConditions)!);
+	}
+
 	if (country) {
 		conditions.push(ilike(releases.country, `%${country}%`));
+	}
+
+	if (label) {
+		const sanitizedLabel = label.replace(/[%_\\]/g, "\\$&");
+		conditions.push(ilike(releases.label, `%${sanitizedLabel}%`));
 	}
 
 	if (format) {

@@ -15,7 +15,9 @@ export function RecordsTab() {
 
 	// URL-driven filter values
 	const urlGenres = searchParams.getAll("genre");
+	const urlStyles = searchParams.getAll("style");
 	const urlCountry = searchParams.get("country") ?? null;
+	const urlLabel = searchParams.get("label") ?? null;
 	const urlFormat = searchParams.get("format") ?? null;
 	const urlMinRarity = Number(searchParams.get("minRarity") ?? "0");
 	// Legacy single-genre and decade (kept for BrowseFilters)
@@ -56,7 +58,9 @@ export function RecordsTab() {
 						genre={legacyGenre}
 						decade={legacyDecade}
 						genres={urlGenres}
+						styles={urlStyles}
 						country={urlCountry}
+						label={urlLabel}
 						format={urlFormat}
 						minRarity={urlMinRarity}
 					/>
