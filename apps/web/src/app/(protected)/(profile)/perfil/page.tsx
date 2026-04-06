@@ -38,8 +38,7 @@ import { FilterBar } from "./_components/filter-bar";
 import { Pagination } from "./_components/pagination";
 import { AddRecordButton } from "./_components/add-record-button";
 import { ExportCollectionButton } from "./_components/export-collection-button";
-import { WantlistGrid } from "./_components/wantlist-grid";
-import { WantlistAddButton } from "./_components/wantlist-add-button";
+import { WantlistTab } from "./_components/wantlist-tab";
 
 interface PerfilPageProps {
 	searchParams: Promise<Record<string, string | string[] | undefined>>;
@@ -112,6 +111,13 @@ export default async function PerfilPage({ searchParams }: PerfilPageProps) {
 	// Open for trade items (for Trading tab)
 	const openForTradeItems = items.filter((i) => i.openForTrade === 1);
 
+	// Heatmap data — count records added per day (last 140 days)
+	const heatmapData: Record<string, number> = {};
+	for (const item of items) {
+		const key = item.createdAt.toISOString().split("T")[0];
+		heatmapData[key] = (heatmapData[key] ?? 0) + 1;
+	}
+
 	return (
 		<div className="max-w-5xl mx-auto px-4 md:px-6 py-6">
 			{/* Hero header */}
@@ -181,18 +187,12 @@ export default async function PerfilPage({ searchParams }: PerfilPageProps) {
 
 					/* ── Wantlist Tab ── */
 					wantlist: (
-						<div>
-							<div className="flex items-center justify-between mb-4">
-								<h2 className="font-heading text-lg font-bold text-on-surface">Wantlist</h2>
-								<WantlistAddButton />
-							</div>
-							<WantlistGrid items={wantlistData} isOwner={true} />
-							{wantlistTotal > WANTLIST_PAGE_SIZE && (
-								<p className="mt-4 text-center font-mono text-[10px] text-on-surface-variant/40">
-									Showing {Math.min(WANTLIST_PAGE_SIZE, wantlistTotal)} of {wantlistTotal}
-								</p>
-							)}
-						</div>
+						<WantlistTab
+							items={wantlistData}
+							total={wantlistTotal}
+							pageSize={WANTLIST_PAGE_SIZE}
+							isOwner={true}
+						/>
 					),
 
 					/* ── Trading Tab ── */
@@ -231,6 +231,8 @@ export default async function PerfilPage({ searchParams }: PerfilPageProps) {
 								releaseArtist: item.artist ?? null,
 							}))}
 							topGenres={topGenres}
+							badges={userBadgeData}
+							heatmapData={heatmapData}
 							isOwner={true}
 						/>
 					),

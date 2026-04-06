@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { CountUp } from "@/components/ui/count-up";
 import { RankCard } from "./rank-card";
 import { ShowcaseCards } from "./showcase-cards";
 import { HolyGrailSelector } from "./holy-grail-selector";
@@ -6,6 +7,10 @@ import { RarityCardModal } from "./rarity-card-modal";
 import { ShareSurface } from "@/components/share/share-surface";
 import { TrustStrip } from "@/components/trust/trust-strip";
 import { signOgParams } from "@/lib/og/sign";
+import { CollectionHeatmap } from "./collection-heatmap";
+import { AchievementShelf } from "./achievement-shelf";
+import { DnaRadarChart } from "./dna-radar-chart";
+import type { UserBadge } from "@/lib/gamification/queries";
 
 interface AboutTabProps {
 	userId: string;
@@ -29,6 +34,8 @@ interface AboutTabProps {
 	};
 	wantlistItems: { id: string; releaseTitle: string | null; releaseArtist: string | null }[];
 	topGenres: { genre: string; count: number }[];
+	badges: UserBadge[];
+	heatmapData: Record<string, number>;
 	isOwner: boolean;
 }
 
@@ -39,6 +46,8 @@ export function AboutTab({
 	showcase,
 	wantlistItems,
 	topGenres,
+	badges,
+	heatmapData,
 	isOwner,
 }: AboutTabProps) {
 	const globalScore = stats.rarityScore * 0.7 + stats.contributionScore * 0.3;
@@ -54,14 +63,21 @@ export function AboutTab({
 					{ label: "Trades", value: stats.totalTrades.toLocaleString(), color: "text-primary", accent: "from-primary/10", icon: "swap_horiz" },
 				].map((s) => (
 					<div key={s.label} className={`relative overflow-hidden bg-surface-container-low rounded-xl p-4 border border-outline-variant/5`}>
-						{/* Subtle gradient accent */}
 						<div className={`absolute inset-0 bg-gradient-to-br ${s.accent} to-transparent opacity-50`} />
 						<div className="relative">
 							<div className="flex items-center gap-1.5 mb-1.5">
 								<span className={`material-symbols-outlined text-[14px] ${s.color}`}>{s.icon}</span>
 								<span className="font-mono text-[9px] text-on-surface-variant uppercase tracking-widest">{s.label}</span>
 							</div>
-							<div className={`text-2xl font-bold font-heading ${s.color}`}>{s.value}</div>
+							<div className={`text-2xl font-bold font-heading ${s.color}`}>
+								{s.label === "Score" ? (
+									<CountUp end={Number(s.value)} decimals={1} />
+								) : s.value.startsWith("#") ? (
+									<>#{s.value === "—" ? "—" : <CountUp end={Number(s.value.replace("#", ""))} prefix="" />}</>
+								) : (
+									<CountUp end={Number(s.value.replace(/,/g, ""))} />
+								)}
+							</div>
 						</div>
 					</div>
 				))}
@@ -81,27 +97,14 @@ export function AboutTab({
 				</div>
 			</div>
 
-			{/* Top genres */}
-			{topGenres.length > 0 && (
-				<div className="bg-surface-container-low rounded-xl p-5 border border-outline-variant/5">
-					<h3 className="font-mono text-[10px] text-on-surface-variant uppercase tracking-widest mb-3 flex items-center gap-1.5">
-						<span className="material-symbols-outlined text-[14px] text-secondary">fingerprint</span>
-						Digger DNA
-					</h3>
-					<div className="flex gap-2 flex-wrap">
-						{topGenres.map((g, i) => (
-							<span
-								key={g.genre}
-								className="font-mono text-xs bg-surface-container-high px-3 py-1.5 rounded-full border border-outline-variant/10"
-							>
-								<span className="text-on-surface-variant/40 mr-1">{i + 1}.</span>
-								<span className="text-on-surface">{g.genre}</span>
-								<span className="text-primary ml-1.5">{g.count}</span>
-							</span>
-						))}
-					</div>
-				</div>
-			)}
+			{/* Digger DNA radar chart */}
+			{topGenres.length >= 3 && <DnaRadarChart genres={topGenres} />}
+
+			{/* Collection heatmap */}
+			<CollectionHeatmap data={heatmapData} />
+
+			{/* Achievement shelf */}
+			<AchievementShelf earned={badges} />
 
 			{/* Showcase */}
 			<ShowcaseCards

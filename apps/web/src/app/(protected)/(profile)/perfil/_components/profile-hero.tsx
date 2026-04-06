@@ -4,6 +4,7 @@ import { EditProfileModal } from "./edit-profile-modal";
 import { SocialLinks } from "./social-links";
 import { ShareSurface } from "@/components/share/share-surface";
 import { PremiumBadge } from "@/components/ui/PremiumBadge";
+import { NowSpinning } from "./now-spinning";
 import type { UserBadge } from "@/lib/gamification/queries";
 
 interface ProfileHeroProps {
@@ -68,7 +69,7 @@ export function ProfileHero({ profile, stats, badges, isOwner }: ProfileHeroProp
 				<div className="absolute inset-0 bg-gradient-to-t from-surface-dim via-surface-dim/50 to-transparent" />
 			</div>
 
-			{/* Profile info — overlaps the cover */}
+			{/* Profile info — overlaps the cover with glassmorphism */}
 			<div className="relative -mt-16 px-4 md:px-6">
 				<div className="flex items-end gap-4 md:gap-5">
 					{/* Avatar with glow */}
@@ -161,6 +162,9 @@ export function ProfileHero({ profile, stats, badges, isOwner }: ProfileHeroProp
 						</div>
 					)}
 				</div>
+
+				{/* Now Spinning status */}
+				<NowSpinning />
 
 				{/* Bio */}
 				{profile.bio && (

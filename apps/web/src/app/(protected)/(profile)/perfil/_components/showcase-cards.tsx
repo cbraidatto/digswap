@@ -48,7 +48,7 @@ function ShowcaseCard({
 	const meta = SLOT_META[slot];
 
 	return (
-		<div className="group relative flex flex-col rounded-lg overflow-hidden border border-outline/[0.08] bg-surface-container-high">
+		<div className="group relative flex flex-col rounded-lg overflow-hidden border border-outline/[0.08] bg-surface-container-high transition-transform duration-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-primary/10" style={{ perspective: "800px" }}>
 			{/* Cover — fixed height */}
 			<div className="relative h-36 w-full overflow-hidden bg-surface-container flex-shrink-0">
 				<CoverArt
