@@ -29,6 +29,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 13: Crates & Sets** - Pre-dig folder creation, add-to-crate from any surface, ordered sets with event metadata (completed 2026-03-29)
 - [x] **Phase 14: Trade V2** - Explicit proposal with quality specs + collection linking, P2P 1-min preview, waveform visualization, full transfer after preview acceptance (completed 2026-04-02)
 - [ ] **Phase 15: Social V2** - Trade-scoped messaging thread, online presence in trade context
+- [ ] **Phase 20: Gem Economy** - Dynamic gem-based rarity system replacing static scores — 6 gem tiers (Quartzo→Diamante), market-like fluctuation, weighted scoring, visual effects
 - [x] **Phase 16: Monetization** - Stripe freemium, trade quotas, premium features (completed 2026-03-31)
 
 ## Phase Details
@@ -398,7 +399,7 @@ Plans:
 ## Progress
 
 **Execution Order:**
-Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 4.5 -> 5 -> 6 -> 7 -> 8 -> 9(superseded) -> 10 -> 11 -> 12 -> 13 -> 14 -> 15 -> 16 -> 17 -> 18 -> 19
+Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 4.5 -> 5 -> 6 -> 7 -> 8 -> 9(superseded) -> 10 -> 11 -> 12 -> 13 -> 14 -> 15 -> 16 -> 17 -> 18 -> 19 -> 20
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
@@ -422,6 +423,7 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 4.5 -> 5 -> 6 -> 7 -> 8 -> 
 | 17. Desktop Trade Runtime | 8/8 | Complete | 2026-03-31 |
 | 18. Desktop Shell Refactor | 3/3 | Complete ✓ | 2026-04-02 |
 | 19. Security Audit Closure | 3/3 | Complete   | 2026-04-04 |
+| 20. Gem Economy | 0/0 | Planning | - |
 
 ### Phase 19: Security Hardening — Fix 74 audit vulnerabilities
 
@@ -440,3 +442,24 @@ Plans:
 - [x] 19-01-PLAN.md -- utilityProcess migration: replace BrowserWindow nodeIntegration:true with Electron utilityProcess for PeerJS bridge
 - [x] 19-02-PLAN.md -- Hash rejection + RPC rate limits + TTL alignment (3 focused security fixes)
 - [x] 19-03-PLAN.md -- Schema spot-check + full test suite gate (verification)
+
+### Phase 20: Gem Economy
+**Goal**: Replace the static rarity scoring system with a dynamic gem-based economy — 6 gem tiers that fluctuate like a stock market based on Discogs supply/demand, replacing the current ranking system entirely
+**Depends on**: Phase 19
+**Requirements**: GEM-01, GEM-02, GEM-03, GEM-04, GEM-05, GEM-06, GEM-07
+**Success Criteria** (what must be TRUE):
+  1. Every record displays a gem badge (Quartzo/Ametista/Esmeralda/Rubi/Safira/Diamante) instead of the old rarity pill
+  2. Gem tier is dynamically computed from current Discogs have/want ratio — changes when ratio changes on re-sync
+  3. Gem Score (weighted sum of all gems in collection) replaces rarity_score in global ranking formula
+  4. Profile shows gem distribution (vault/portfolio view) with total gem value
+  5. Gem tier changes trigger notifications ("Your record X upgraded from Rubi to Safira!")
+  6. Leaderboard ranks by Gem Score instead of raw rarity
+  7. Higher-tier gems have visual effects (sparkle, glow, prismatic animations on Diamante)
+**Plans**: 5 plans
+Plans:
+- [ ] 20-01-PLAN.md -- Gem constants, GemBadge component, CSS animations, and unit tests
+- [ ] 20-02-PLAN.md -- Ranking SQL migration, gamification constants, leaderboard queries
+- [ ] 20-03-PLAN.md -- Replace RarityPill with GemBadge across all consumer files + RankCard + LeaderboardRow
+- [ ] 20-04-PLAN.md -- GemVault profile component, gem distribution queries, tier change notifications, OG image update
+- [ ] 20-05-PLAN.md -- Badge awards, Digger DNA labels, RarityCardModal, visual verification checkpoint
+**UI hint**: yes
