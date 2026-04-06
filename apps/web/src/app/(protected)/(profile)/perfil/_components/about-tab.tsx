@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { CountUp } from "@/components/ui/count-up";
 import { RankCard } from "./rank-card";
+import { GemVault } from "./gem-vault";
 import { ShowcaseCards } from "./showcase-cards";
 import { HolyGrailSelector } from "./holy-grail-selector";
 import { RarityCardModal } from "./rarity-card-modal";
@@ -11,6 +12,7 @@ import { CollectionHeatmap } from "./collection-heatmap";
 import { AchievementShelf } from "./achievement-shelf";
 import { DnaRadarChart } from "./dna-radar-chart";
 import type { UserBadge } from "@/lib/gamification/queries";
+import type { GemTier } from "@/lib/gems/constants";
 
 interface AboutTabProps {
 	userId: string;
@@ -35,6 +37,8 @@ interface AboutTabProps {
 	wantlistItems: { id: string; releaseTitle: string | null; releaseArtist: string | null }[];
 	topGenres: { genre: string; count: number }[];
 	badges: UserBadge[];
+	gemDistribution: Record<GemTier, number>;
+	totalGemScore: number;
 	heatmapData: Record<string, number>;
 	recentlyAdded: { title: string; artist: string; createdAt: string; discogsId: number | null }[];
 	isOwner: boolean;
@@ -48,6 +52,8 @@ export function AboutTab({
 	wantlistItems,
 	topGenres,
 	badges,
+	gemDistribution,
+	totalGemScore,
 	heatmapData,
 	recentlyAdded,
 	isOwner,
@@ -84,6 +90,13 @@ export function AboutTab({
 					</div>
 				))}
 			</div>
+
+			{/* Gem Vault */}
+			<GemVault
+				distribution={gemDistribution}
+				totalGemScore={totalGemScore}
+				totalRecords={stats.collectionCount}
+			/>
 
 			{/* Rank + Trust */}
 			<div className="grid grid-cols-1 md:grid-cols-2 gap-4">

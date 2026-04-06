@@ -26,6 +26,7 @@ import {
 import { getFollowCounts } from "@/lib/social/queries";
 import { getWantlistPage, getWantlistTotalCount, WANTLIST_PAGE_SIZE } from "@/lib/wantlist/queries";
 import { getUserRanking, getUserBadges } from "@/lib/gamification/queries";
+import { getGemDistribution, getGemScoreForUser } from "@/lib/gems/queries";
 import { signOgParams } from "@/lib/og/sign";
 
 // Components
@@ -76,6 +77,7 @@ export default async function PerfilPage({ searchParams }: PerfilPageProps) {
 		items, totalCount, genres, formats, followCounts, topGenres,
 		showcaseReleases, wantlistData, wantlistTotal, ranking, userBadgeData,
 		[{ tradesTotal }], [{ activeTradeCount }],
+		gemDistribution, gemScore,
 	] = await Promise.all([
 		getCollectionPage(user.id, filters),
 		getCollectionCount(user.id, filters),
@@ -100,6 +102,8 @@ export default async function PerfilPage({ searchParams }: PerfilPageProps) {
 				or(eq(tradeRequests.requesterId, user.id), eq(tradeRequests.providerId, user.id)),
 				eq(tradeRequests.status, "pending"),
 			)),
+		getGemDistribution(user.id),
+		getGemScoreForUser(user.id),
 	]);
 
 	const totalPages = Math.ceil(totalCount / PAGE_SIZE);
@@ -243,6 +247,8 @@ export default async function PerfilPage({ searchParams }: PerfilPageProps) {
 							}))}
 							topGenres={topGenres}
 							badges={userBadgeData}
+							gemDistribution={gemDistribution}
+							totalGemScore={gemScore}
 							heatmapData={heatmapData}
 							recentlyAdded={recentlyAdded}
 							isOwner={true}
