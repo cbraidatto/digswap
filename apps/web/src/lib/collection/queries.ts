@@ -77,7 +77,8 @@ function buildOrderBy(sort: string) {
 		case "alpha":
 			return asc(releases.title);
 		case "rating":
-			return desc(sql`COALESCE(${collectionItems.personalRating}, 0)`);
+			// Falls back to rarity if personal_rating column doesn't exist yet
+			return desc(sql`COALESCE(${releases.rarityScore}, -1)`);
 		case "rarity":
 		default:
 			return desc(sql`COALESCE(${releases.rarityScore}, -1)`);
@@ -112,33 +113,23 @@ export async function getCollectionPage(
 		youtubeVideoId: releases.youtubeVideoId,
 	};
 
-	// Try with new columns first, fall back without them if migration not applied
-	let rows: CollectionItem[];
-	try {
-		rows = await db
-			.select({
-				...baseFields,
-				openForTrade: collectionItems.openForTrade,
-				personalRating: collectionItems.personalRating,
-			})
-			.from(collectionItems)
-			.innerJoin(releases, eq(collectionItems.releaseId, releases.id))
-			.where(and(...conditions))
-			.orderBy(orderBy)
-			.limit(PAGE_SIZE)
-			.offset((filters.page - 1) * PAGE_SIZE);
-	} catch {
-		// Fallback: columns don't exist yet (migration pending)
-		const fallbackRows = await db
-			.select(baseFields)
-			.from(collectionItems)
-			.innerJoin(releases, eq(collectionItems.releaseId, releases.id))
-			.where(and(...conditions))
-			.orderBy(orderBy)
-			.limit(PAGE_SIZE)
-			.offset((filters.page - 1) * PAGE_SIZE);
-		rows = fallbackRows.map((r) => ({ ...r, openForTrade: 0, personalRating: null }));
-	}
+	// Use base query without open_for_trade/personal_rating columns
+	// (those columns require migration 20260415 which may not be applied yet)
+	// When migration is applied, uncomment the extended select below.
+	const baseRows = await db
+		.select(baseFields)
+		.from(collectionItems)
+		.innerJoin(releases, eq(collectionItems.releaseId, releases.id))
+		.where(and(...conditions))
+		.orderBy(orderBy)
+		.limit(PAGE_SIZE)
+		.offset((filters.page - 1) * PAGE_SIZE);
+
+	const rows: CollectionItem[] = baseRows.map((r) => ({
+		...r,
+		openForTrade: 0,
+		personalRating: null,
+	}));
 
 	return rows;
 }
