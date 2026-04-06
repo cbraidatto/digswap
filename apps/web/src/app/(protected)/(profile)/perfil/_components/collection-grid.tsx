@@ -9,6 +9,7 @@ export type ViewMode = "grid" | "list";
 interface CollectionGridProps {
 	items: CollectionItem[];
 	isOwner: boolean;
+	/** @deprecated Use RecordContextMenu instead */
 	renderAction?: (item: CollectionItem) => ReactNode;
 	/** When set, only renders items whose releaseId is in this array (client-side filter). */
 	filterToIds?: string[];
@@ -112,7 +113,6 @@ export function CollectionGrid({
 					key={item.id}
 					item={item}
 					isOwner={isOwner}
-					actionSlot={renderAction?.(item)}
 				/>
 			))}
 		</div>

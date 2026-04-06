@@ -3,7 +3,7 @@
 import { useState } from "react";
 import type { CollectionItem } from "@/lib/collection/queries";
 import { CollectionViewToggle, type ViewMode } from "./collection-view-toggle";
-import { CollectionGridWithCrates } from "./collection-grid-with-crates";
+import { CollectionGrid } from "./collection-grid";
 
 interface CollectionSectionClientProps {
   items: CollectionItem[];
@@ -11,7 +11,6 @@ interface CollectionSectionClientProps {
 
 /**
  * Client shell that owns viewMode state for the collection section.
- * Wraps the view toggle and the grid so the server page stays clean.
  */
 export function CollectionSectionClient({ items }: CollectionSectionClientProps) {
   const [viewMode, setViewMode] = useState<ViewMode>("list");
@@ -20,7 +19,7 @@ export function CollectionSectionClient({ items }: CollectionSectionClientProps)
     <>
       <CollectionViewToggle onChange={setViewMode} />
       <div className="mt-4">
-        <CollectionGridWithCrates items={items} viewMode={viewMode} />
+        <CollectionGrid items={items} isOwner={true} viewMode={viewMode} />
       </div>
     </>
   );

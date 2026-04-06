@@ -5,7 +5,6 @@ import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
-import type { ReactNode } from "react";
 import type { CollectionItem } from "@/lib/collection/queries";
 import { getRarityTier } from "@/lib/collection/rarity";
 import { PlayButton } from "@/components/player/play-button";
@@ -16,10 +15,9 @@ import { RecordContextMenu } from "@/components/ui/record-context-menu";
 interface CollectionCardProps {
 	item: CollectionItem;
 	isOwner: boolean;
-	actionSlot?: ReactNode;
 }
 
-export function CollectionCard({ item, isOwner, actionSlot }: CollectionCardProps) {
+export function CollectionCard({ item, isOwner }: CollectionCardProps) {
 	const tier = getRarityTier(item.rarityScore);
 	const router = useRouter();
 	const [isRemoving, startRemoveTransition] = useTransition();
@@ -189,7 +187,6 @@ export function CollectionCard({ item, isOwner, actionSlot }: CollectionCardProp
 					</div>
 				)}
 
-				{actionSlot}
 			</div>
 		</div>
 	);

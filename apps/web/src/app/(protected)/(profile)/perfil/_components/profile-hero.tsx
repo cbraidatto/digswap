@@ -2,7 +2,6 @@ import Image from "next/image";
 import Link from "next/link";
 import { EditProfileModal } from "./edit-profile-modal";
 import { SocialLinks } from "./social-links";
-import { ShareSurface } from "@/components/share/share-surface";
 import { PremiumBadge } from "@/components/ui/PremiumBadge";
 import { NowSpinning } from "./now-spinning";
 import type { UserBadge } from "@/lib/gamification/queries";
@@ -43,30 +42,27 @@ export function ProfileHero({ profile, stats, badges, isOwner }: ProfileHeroProp
 	return (
 		<div className="relative mb-8">
 			{/* Cover image / fallback gradient */}
-			<div className="h-40 md:h-52 rounded-xl overflow-hidden relative">
-				{profile.coverUrl ? (
+			<div className="h-36 md:h-44 rounded-xl overflow-hidden relative">
+				{/* Always show gradient base — image overlays on top */}
+				<div className="absolute inset-0 bg-gradient-to-br from-primary/20 via-surface-container-high to-secondary/15" />
+				<div
+					className="absolute inset-0 opacity-15 mix-blend-overlay"
+					style={{
+						backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")`,
+					}}
+				/>
+				{profile.coverUrl && (
 					<Image
 						src={profile.coverUrl}
-						alt="Cover"
+						alt=""
 						fill
 						className="object-cover"
 						style={{ objectPosition: `center ${coverY}%` }}
 						priority
+						unoptimized
 					/>
-				) : (
-					<>
-						<div className="absolute inset-0 bg-gradient-to-br from-primary/15 via-surface-container-high to-secondary/10" />
-						{/* Noise texture for visual interest */}
-						<div
-							className="absolute inset-0 opacity-20 mix-blend-overlay"
-							style={{
-								backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")`,
-							}}
-						/>
-					</>
 				)}
-				{/* Gradient overlay for text readability */}
-				<div className="absolute inset-0 bg-gradient-to-t from-surface-dim via-surface-dim/50 to-transparent" />
+				<div className="absolute inset-0 bg-gradient-to-t from-surface-dim via-surface-dim/40 to-transparent" />
 			</div>
 
 			{/* Profile info — overlaps the cover with glassmorphism */}
@@ -119,59 +115,55 @@ export function ProfileHero({ profile, stats, badges, isOwner }: ProfileHeroProp
 				</div>
 
 				{/* Stats + actions row */}
-				<div className="mt-4 flex items-center justify-between flex-wrap gap-3">
+				<div className="mt-3 flex items-center justify-between flex-wrap gap-2">
 					{/* Stats inline */}
-					<div className="flex items-center gap-4 font-mono text-xs">
+					<div className="flex items-center gap-3 font-mono text-[11px]">
 						<span>
-							<span className="text-on-surface font-semibold">{stats.collectionCount}</span>
-							<span className="text-on-surface-variant/50 ml-1">records</span>
+							<span className="text-on-surface font-bold">{stats.collectionCount}</span>
+							<span className="text-on-surface-variant/40 ml-1">records</span>
 						</span>
-						<span className="text-outline-variant/20">·</span>
+						<span className="text-outline-variant/15">·</span>
 						<span>
-							<span className="text-on-surface font-semibold">{stats.followerCount}</span>
-							<span className="text-on-surface-variant/50 ml-1">followers</span>
+							<span className="text-on-surface font-bold">{stats.followerCount}</span>
+							<span className="text-on-surface-variant/40 ml-1">followers</span>
 						</span>
-						<span className="text-outline-variant/20">·</span>
+						<span className="text-outline-variant/15">·</span>
 						<span>
-							<span className="text-on-surface font-semibold">{stats.followingCount}</span>
-							<span className="text-on-surface-variant/50 ml-1">following</span>
+							<span className="text-on-surface font-bold">{stats.followingCount}</span>
+							<span className="text-on-surface-variant/40 ml-1">following</span>
 						</span>
 					</div>
 
-					{/* Actions */}
+					{/* Actions — single edit button */}
 					{isOwner && (
-						<div className="flex items-center gap-2">
-							<EditProfileModal
-								initial={{
-									displayName: profile.displayName ?? "",
-									username: profile.username ?? "",
-									location: profile.location ?? "",
-									bio: profile.bio ?? "",
-									youtubeUrl: profile.youtubeUrl ?? "",
-									instagramUrl: profile.instagramUrl ?? "",
-									soundcloudUrl: profile.soundcloudUrl ?? "",
-									discogsUrl: profile.discogsUrl ?? "",
-									beatportUrl: profile.beatportUrl ?? "",
-									avatarUrl: profile.avatarUrl ?? null,
-								}}
-							/>
-							<ShareSurface
-								url={`${process.env.NEXT_PUBLIC_APP_URL ?? ""}/perfil/${profile.username}`}
-								label="Share"
-							/>
-						</div>
+						<EditProfileModal
+							initial={{
+								displayName: profile.displayName ?? "",
+								username: profile.username ?? "",
+								location: profile.location ?? "",
+								bio: profile.bio ?? "",
+								youtubeUrl: profile.youtubeUrl ?? "",
+								instagramUrl: profile.instagramUrl ?? "",
+								soundcloudUrl: profile.soundcloudUrl ?? "",
+								discogsUrl: profile.discogsUrl ?? "",
+								beatportUrl: profile.beatportUrl ?? "",
+								avatarUrl: profile.avatarUrl ?? null,
+							}}
+						/>
 					)}
 				</div>
 
-				{/* Now Spinning status */}
-				<NowSpinning />
-
 				{/* Bio */}
 				{profile.bio && (
-					<p className="mt-3 font-mono text-xs text-on-surface-variant/70 leading-relaxed max-w-lg">
+					<p className="mt-2 font-mono text-xs text-on-surface-variant/60 leading-relaxed max-w-lg">
 						{profile.bio}
 					</p>
 				)}
+
+				{/* Now Spinning status */}
+				<div className="mt-2">
+					<NowSpinning />
+				</div>
 
 				{/* Social links + badges — compact row */}
 				<div className="mt-3 flex items-center gap-3 flex-wrap">
