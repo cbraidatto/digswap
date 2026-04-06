@@ -124,6 +124,13 @@ export async function addRecordToCollection(
 			const have = release.community?.have ?? 0;
 			const want = release.community?.want ?? 0;
 
+			// Extract tracklist if available
+			const tracklist = release.tracklist?.map((t: { position?: string; title?: string; duration?: string }) => ({
+				position: t.position ?? "",
+				title: t.title ?? "",
+				duration: t.duration ?? "",
+			})) ?? null;
+
 			const { data: inserted, error: insertError } = await admin
 				.from("releases")
 				.insert({
@@ -140,6 +147,7 @@ export async function addRecordToCollection(
 					discogs_have: have,
 					discogs_want: want,
 					rarity_score: computeRarityScore(have, want),
+					tracklist,
 					updated_at: new Date().toISOString(),
 				})
 				.select("id")

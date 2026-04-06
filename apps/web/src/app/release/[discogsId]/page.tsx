@@ -9,6 +9,7 @@ import { YouTubeEmbed } from "./_components/youtube-embed";
 import { OwnersSection } from "./_components/owners-section";
 import { WhoHasItSection } from "./_components/who-has-it-section";
 import { ReviewsSection } from "./_components/reviews-section";
+import { TracklistSection } from "./_components/tracklist-section";
 
 interface ReleasePageProps {
 	params: Promise<{ discogsId: string }>;
@@ -86,6 +87,8 @@ export default async function ReleasePage({ params }: ReleasePageProps) {
 					coverImageUrl={release.coverImageUrl ?? null}
 				/>
 			)}
+
+			<TracklistSection tracklist={release.tracklist} />
 
 			<YouTubeEmbed
 				videoId={release.youtubeVideoId}

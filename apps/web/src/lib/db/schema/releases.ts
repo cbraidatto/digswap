@@ -7,6 +7,7 @@ import {
   integer,
   real,
   index,
+  jsonb,
 } from "drizzle-orm/pg-core";
 import { pgPolicy } from "drizzle-orm/pg-core";
 import { sql } from "drizzle-orm";
@@ -27,6 +28,8 @@ export const releases = pgTable(
     format: varchar("format", { length: 100 }), // LP/CD/7"/etc
     label: varchar("label", { length: 500 }),
     coverImageUrl: text("cover_image_url"),
+    /** Tracklist from Discogs API: [{position, title, duration}] */
+    tracklist: jsonb("tracklist"),
     discogsHave: integer("discogs_have").default(0).notNull(),
     discogsWant: integer("discogs_want").default(0).notNull(),
     rarityScore: real("rarity_score"), // Computed from have/want ratio
