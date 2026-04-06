@@ -9,6 +9,7 @@ import { logActivity } from "@/lib/social/log-activity";
 import { apiRateLimit , safeLimit} from "@/lib/rate-limit";
 import { checkWantlistMatches } from "@/lib/notifications/match";
 import { awardBadge } from "@/lib/gamification/badge-awards";
+import { uuidSchema } from "@/lib/validations/common";
 
 /**
  * Search the Discogs database for releases matching a query string.
@@ -82,6 +83,12 @@ export async function addRecordToCollection(
 	discogsId: number,
 ): Promise<{ success?: boolean; error?: string }> {
 	try {
+		// S-02: Validate discogsId at runtime
+		const parsedId = z.number().int().positive().safeParse(discogsId);
+		if (!parsedId.success) {
+			return { error: "Invalid Discogs ID." };
+		}
+
 		const supabase = await createClient();
 		const {
 			data: { user },
@@ -317,9 +324,9 @@ export async function removeRecordFromCollection(
 			return { error: "Too many requests. Please wait a moment." };
 		}
 
-		// Validate UUID format
-		const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
-		if (!uuidRegex.test(collectionItemId)) {
+		// S-04: Use project-standard uuidSchema for validation
+		const parsedItemId = uuidSchema.safeParse(collectionItemId);
+		if (!parsedItemId.success) {
 			return { error: "Invalid collection item ID." };
 		}
 

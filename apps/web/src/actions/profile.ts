@@ -6,12 +6,16 @@ import { db } from "@/lib/db";
 import { collectionItems } from "@/lib/db/schema/collections";
 import { releases } from "@/lib/db/schema/releases";
 import { profiles } from "@/lib/db/schema/users";
+import { z } from "zod";
 import { apiRateLimit , safeLimit} from "@/lib/rate-limit";
 import { createClient } from "@/lib/supabase/server";
-import { sanitizeWildcards } from "@/lib/validations/common";
+import { sanitizeWildcards, uuidSchema } from "@/lib/validations/common";
 import { updateProfileSchema } from "@/lib/validations/profile";
 
 export type ShowcaseSlot = "searching" | "rarest" | "favorite";
+
+const showcaseSlotSchema = z.enum(["searching", "rarest", "favorite"]);
+const showcaseReleaseIdSchema = uuidSchema.nullable();
 
 const SLOT_COLUMN = {
 	searching: "showcaseSearchingId",
@@ -68,6 +72,18 @@ async function validateImageFile(file: File): Promise<string | null> {
 
 export async function updateShowcase(slot: ShowcaseSlot, releaseId: string | null) {
 	try {
+		// S-01: Validate slot at runtime — TypeScript types don't enforce RPC boundaries
+		const parsedSlot = showcaseSlotSchema.safeParse(slot);
+		if (!parsedSlot.success) {
+			return { error: "Invalid showcase slot." };
+		}
+
+		// S-05: Validate releaseId as UUID
+		const parsedReleaseId = showcaseReleaseIdSchema.safeParse(releaseId);
+		if (!parsedReleaseId.success) {
+			return { error: "Invalid release ID." };
+		}
+
 		const supabase = await createClient();
 		const { data: { user } } = await supabase.auth.getUser();
 		if (!user) return { error: "Unauthenticated" };
@@ -79,7 +95,7 @@ export async function updateShowcase(slot: ShowcaseSlot, releaseId: string | nul
 
 		await db
 			.update(profiles)
-			.set({ [SLOT_COLUMN[slot]]: releaseId, updatedAt: new Date() })
+			.set({ [SLOT_COLUMN[parsedSlot.data]]: parsedReleaseId.data, updatedAt: new Date() })
 			.where(eq(profiles.id, user.id));
 
 		revalidatePath("/perfil");
@@ -101,7 +117,7 @@ export async function searchCollectionForShowcase(query: string) {
 			return [];
 		}
 
-		const term = query.trim();
+		const term = query.trim().slice(0, 200);
 		if (!term) return [];
 
 		const sanitized = sanitizeWildcards(term);
@@ -357,6 +373,12 @@ export async function updateHolyGrails(ids: string[]) {
 
 export async function saveCoverPosition(positionY: number) {
 	try {
+		// S-03: Validate positionY at runtime — reject NaN/Infinity
+		const parsed = z.number().finite().safeParse(positionY);
+		if (!parsed.success) {
+			return { error: "Invalid position value." };
+		}
+
 		const supabase = await createClient();
 		const {
 			data: { user },
@@ -368,7 +390,7 @@ export async function saveCoverPosition(positionY: number) {
 			return { error: "Too many requests. Please wait a moment." };
 		}
 
-		const clamped = Math.min(100, Math.max(0, positionY));
+		const clamped = Math.min(100, Math.max(0, parsed.data));
 
 		await db
 			.update(profiles)
