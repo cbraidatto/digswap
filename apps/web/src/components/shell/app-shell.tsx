@@ -29,7 +29,14 @@ export function AppShell({ user, banner, children }: AppShellProps) {
 	const hasTrack = usePlayerStore((s) => s.currentTrack !== null);
 
 	if (!showShell) {
-		return <>{children}</>;
+		return (
+			<>
+				{/* Keep player alive even on shell-excluded routes (settings, onboarding)
+				    so music doesn't restart when navigating back */}
+				<PlayerProvider />
+				{children}
+			</>
+		);
 	}
 
 	return (

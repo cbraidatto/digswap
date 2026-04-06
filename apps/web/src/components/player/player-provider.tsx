@@ -38,6 +38,10 @@ export function PlayerProvider() {
 	useEffect(() => {
 		if (!currentTrack) return;
 
+		// Capture playing state at effect start — if the user had paused before
+		// a remount/recreation, we should not auto-play.
+		const shouldAutoPlay = usePlayerStore.getState().isPlaying;
+
 		let progressInterval: ReturnType<typeof setInterval>;
 
 		loadYouTubeAPI().then(() => {
@@ -59,7 +63,7 @@ export function PlayerProvider() {
 			playerRef.current = new YT.Player(playerDiv, {
 				videoId: currentTrack.videoId,
 				playerVars: {
-					autoplay: 1,
+					autoplay: shouldAutoPlay ? 1 : 0,
 					controls: 0,
 					disablekb: 1,
 					fs: 0,
@@ -71,7 +75,9 @@ export function PlayerProvider() {
 					onReady: (e: YT.PlayerEvent) => {
 						if (!isMountedRef.current) return;
 						setDuration(e.target.getDuration());
-						e.target.playVideo();
+						if (shouldAutoPlay) {
+							e.target.playVideo();
+						}
 
 						// Progress ticker
 						progressInterval = setInterval(() => {
