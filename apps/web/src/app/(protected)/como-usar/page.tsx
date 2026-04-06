@@ -91,7 +91,7 @@ const PROFILE_FEATURES: TutorialStep[] = [
 			"Destaque 3 discos como seus Holy Grails e configure cards de showcase (buscando, mais raro, favorito) que aparecem no seu perfil.",
 	},
 	{
-		icon: "dna",
+		icon: "fingerprint",
 		title: "Digger DNA",
 		description:
 			"Uma análise automática da sua coleção: seus gêneros mais ouvidos, décadas preferidas, países de origem, e perfil de raridade. Atualiza conforme sua coleção cresce.",
