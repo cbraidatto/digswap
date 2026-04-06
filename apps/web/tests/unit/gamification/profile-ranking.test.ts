@@ -101,11 +101,11 @@ describe("getUserRanking", () => {
 		queryResults = [];
 	});
 
-	test("returns ranking data for ranked user", async () => {
+	test("returns ranking data for ranked user (gemScore mapped from DB rarityScore)", async () => {
 		queryResults = [
 			[
 				{
-					rarityScore: 127.3,
+					rarityScore: 127.3, // DB column still named rarity_score
 					contributionScore: 38.5,
 					globalRank: 42,
 					title: "Wax Prophet",
@@ -116,7 +116,7 @@ describe("getUserRanking", () => {
 		const result = await getUserRanking("user-1");
 
 		expect(result).not.toBeNull();
-		expect(result!.rarityScore).toBe(127.3);
+		expect(result!.gemScore).toBe(127.3); // mapped from DB rarity_score to gemScore
 		expect(result!.contributionScore).toBe(38.5);
 		expect(result!.globalRank).toBe(42);
 		expect(result!.title).toBe("Wax Prophet");
@@ -137,18 +137,18 @@ describe("profile ranking display logic", () => {
 			return {
 				title: ranking?.title ?? "Vinyl Rookie",
 				globalRank: ranking?.globalRank ?? null,
-				rarityScore: ranking?.rarityScore ?? 0,
+				gemScore: ranking?.gemScore ?? 0,
 				contributionScore: ranking?.contributionScore ?? 0,
 			};
 		}
 
 		// When getUserRanking returns null, profile uses fallbacks
-		const { title, globalRank, rarityScore, contributionScore } =
+		const { title, globalRank, gemScore, contributionScore } =
 			getRankingDisplay(null);
 
 		expect(title).toBe("Vinyl Rookie");
 		expect(globalRank).toBeNull();
-		expect(rarityScore).toBe(0);
+		expect(gemScore).toBe(0);
 		expect(contributionScore).toBe(0);
 
 		// Display format for unranked user
