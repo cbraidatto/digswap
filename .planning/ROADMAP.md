@@ -423,7 +423,7 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 4.5 -> 5 -> 6 -> 7 -> 8 -> 
 | 17. Desktop Trade Runtime | 8/8 | Complete | 2026-03-31 |
 | 18. Desktop Shell Refactor | 3/3 | Complete ✓ | 2026-04-02 |
 | 19. Security Audit Closure | 3/3 | Complete   | 2026-04-04 |
-| 20. Gem Economy | 1/5 | In Progress|  |
+| 20. Gem Economy | 3/5 | In Progress|  |
 
 ### Phase 19: Security Hardening — Fix 74 audit vulnerabilities
 
@@ -459,7 +459,7 @@ Plans:
 Plans:
 - [x] 20-01-PLAN.md -- Gem constants, GemBadge component, CSS animations, and unit tests
 - [x] 20-02-PLAN.md -- Ranking SQL migration, gamification constants, leaderboard queries
-- [ ] 20-03-PLAN.md -- Replace RarityPill with GemBadge across all consumer files + RankCard + LeaderboardRow
+- [x] 20-03-PLAN.md -- Replace RarityPill with GemBadge across all consumer files + RankCard + LeaderboardRow
 - [ ] 20-04-PLAN.md -- GemVault profile component, gem distribution queries, tier change notifications, OG image update
 - [ ] 20-05-PLAN.md -- Badge awards, Digger DNA labels, RarityCardModal, visual verification checkpoint
 **UI hint**: yes
