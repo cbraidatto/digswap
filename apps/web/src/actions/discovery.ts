@@ -66,6 +66,8 @@ export async function browseRecordsAction(
 	styles: string[] = [],
 	label: string | null = null,
 	sort = "rarity",
+	yearFrom: number | null = null,
+	yearTo: number | null = null,
 ) {
 	try {
 		const parsed = browseRecordsSchema.safeParse({ genre, decade, page, genres, country, format, minRarity });
@@ -110,6 +112,9 @@ export async function browseRecordsAction(
 			styles,
 			label,
 			sort,
+			yearFrom,
+			yearTo,
+			user.id,
 		);
 	} catch (err) {
 		console.error("[browseRecordsAction] error:", err);

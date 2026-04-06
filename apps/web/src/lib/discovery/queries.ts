@@ -53,6 +53,7 @@ export interface BrowseResult {
 	rarityScore: number | null;
 	coverImageUrl: string | null;
 	ownerCount: number;
+	isOwned?: boolean;
 }
 
 export interface SuggestionResult {
@@ -173,6 +174,9 @@ export async function browseRecords(
 	styles: string[] = [],
 	label: string | null = null,
 	sort = "rarity",
+	yearFrom: number | null = null,
+	yearTo: number | null = null,
+	userId: string | null = null,
 ): Promise<BrowseResult[]> {
 	// Build WHERE conditions
 	const conditions = [];
@@ -225,6 +229,14 @@ export async function browseRecords(
 		conditions.push(ilike(releases.format, `%${format}%`));
 	}
 
+	if (yearFrom) {
+		conditions.push(sql`${releases.year} >= ${yearFrom}`);
+	}
+
+	if (yearTo) {
+		conditions.push(sql`${releases.year} <= ${yearTo}`);
+	}
+
 	if (minRarity > 0) {
 		// rarityScore is stored 0-1 range or 0-100 depending on compute — treat as 0-1, scale input
 		conditions.push(
@@ -246,6 +258,13 @@ export async function browseRecords(
 			rarityScore: releases.rarityScore,
 			coverImageUrl: releases.coverImageUrl,
 			ownerCount: countDistinct(collectionItems.userId).as("owner_count"),
+			...(userId
+				? {
+						isOwned: sql<boolean>`bool_or(${collectionItems.userId} = ${userId})`.as(
+							"is_owned",
+						),
+					}
+				: {}),
 		})
 		.from(collectionItems)
 		.innerJoin(releases, eq(collectionItems.releaseId, releases.id))
@@ -274,6 +293,7 @@ export async function browseRecords(
 	return rows.map((r) => ({
 		...r,
 		ownerCount: Number(r.ownerCount),
+		isOwned: "isOwned" in r ? Boolean(r.isOwned) : false,
 	}));
 }
 

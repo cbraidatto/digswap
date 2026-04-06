@@ -47,6 +47,8 @@ export function AdvancedSearchFilters() {
   const activeFormat = searchParams.get("format") ?? "";
   const activeSort = searchParams.get("sort") ?? "rarity";
   const activeMinRarity = Number(searchParams.get("minRarity") ?? "0");
+  const activeYearFrom = searchParams.get("yearFrom") ?? "";
+  const activeYearTo = searchParams.get("yearTo") ?? "";
   const [showStyles, setShowStyles] = useState(false);
 
   // Compute available styles based on selected genres
@@ -115,6 +117,14 @@ export function AdvancedSearchFilters() {
     updateParam({ sort: e.target.value === "rarity" ? null : e.target.value });
   };
 
+  const handleYearFromChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    updateParam({ yearFrom: e.target.value || null });
+  };
+
+  const handleYearToChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    updateParam({ yearTo: e.target.value || null });
+  };
+
   const handleMinRarityChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const val = Number(e.target.value);
     updateParam({ minRarity: val > 0 ? String(val) : null });
@@ -126,10 +136,12 @@ export function AdvancedSearchFilters() {
     activeCountry !== "" ||
     activeLabel !== "" ||
     activeFormat !== "" ||
-    activeMinRarity > 0;
+    activeMinRarity > 0 ||
+    activeYearFrom !== "" ||
+    activeYearTo !== "";
 
   const clearAll = () => {
-    updateParam({ genre: [], style: [], country: null, label: null, format: null, minRarity: null });
+    updateParam({ genre: [], style: [], country: null, label: null, format: null, minRarity: null, yearFrom: null, yearTo: null });
     setShowStyles(false);
   };
 
@@ -278,6 +290,36 @@ export function AdvancedSearchFilters() {
               </option>
             ))}
           </select>
+        </div>
+
+        {/* Year range */}
+        <div className="flex flex-col gap-1 min-w-[100px]">
+          <label className="font-mono text-[10px] text-on-surface-variant uppercase tracking-widest">
+            Year from
+          </label>
+          <input
+            type="number"
+            value={activeYearFrom}
+            onChange={handleYearFromChange}
+            placeholder="1950"
+            min={1900}
+            max={2030}
+            className="bg-surface-container-low border border-outline-variant/20 rounded px-2 py-1 font-mono text-xs text-on-surface placeholder:text-on-surface-variant/40 focus:outline-none focus:border-primary/50 w-full"
+          />
+        </div>
+        <div className="flex flex-col gap-1 min-w-[100px]">
+          <label className="font-mono text-[10px] text-on-surface-variant uppercase tracking-widest">
+            Year to
+          </label>
+          <input
+            type="number"
+            value={activeYearTo}
+            onChange={handleYearToChange}
+            placeholder="2026"
+            min={1900}
+            max={2030}
+            className="bg-surface-container-low border border-outline-variant/20 rounded px-2 py-1 font-mono text-xs text-on-surface placeholder:text-on-surface-variant/40 focus:outline-none focus:border-primary/50 w-full"
+          />
         </div>
 
         {/* Min Rarity */}

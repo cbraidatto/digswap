@@ -29,6 +29,8 @@ interface BrowseGridProps {
 	format?: string | null;
 	minRarity?: number;
 	sort?: string;
+	yearFrom?: number | null;
+	yearTo?: number | null;
 }
 
 export function BrowseGrid({
@@ -41,13 +43,15 @@ export function BrowseGrid({
 	format = null,
 	minRarity = 0,
 	sort = "rarity",
+	yearFrom = null,
+	yearTo = null,
 }: BrowseGridProps) {
 	const [results, setResults] = useState<BrowseResult[]>([]);
 	const [hasQueried, setHasQueried] = useState(false);
 	const [isPending, startTransition] = useTransition();
 
 	const hasAnyFilter =
-		!!genre || !!decade || genres.length > 0 || styles.length > 0 || !!country || !!label || !!format || minRarity > 0;
+		!!genre || !!decade || genres.length > 0 || styles.length > 0 || !!country || !!label || !!format || minRarity > 0 || !!yearFrom || !!yearTo;
 
 	useEffect(() => {
 		if (!hasAnyFilter) {
@@ -57,11 +61,11 @@ export function BrowseGrid({
 		}
 
 		startTransition(async () => {
-			const data = await browseRecordsAction(genre, decade, 1, genres, country, format, minRarity, styles, label, sort);
+			const data = await browseRecordsAction(genre, decade, 1, genres, country, format, minRarity, styles, label, sort, yearFrom, yearTo);
 			setResults(data);
 			setHasQueried(true);
 		});
-	}, [genre, decade, genres, styles, country, label, format, minRarity, sort, hasAnyFilter]);
+	}, [genre, decade, genres, styles, country, label, format, minRarity, sort, yearFrom, yearTo, hasAnyFilter]);
 
 	// No filters selected: render nothing
 	if (!hasAnyFilter) {
@@ -113,11 +117,16 @@ export function BrowseGrid({
 							containerClassName="mb-3"
 						/>
 
-						{/* Title + Rarity */}
+						{/* Title + Rarity + Owned */}
 						<div className="flex flex-wrap items-center gap-2 mb-1">
 							<span className="font-heading font-semibold text-on-surface group-hover:text-primary transition-colors truncate text-sm">
 								{record.title}
 							</span>
+							{record.isOwned && (
+								<span className="text-[9px] font-mono px-1.5 py-0.5 rounded border bg-primary/10 text-primary border-primary/30">
+									IN COLLECTION
+								</span>
+							)}
 							{rarityTier && (
 								<span
 									className={`text-xs font-mono px-1.5 py-0.5 rounded border ${getRarityColors(rarityTier)}`}
