@@ -1,7 +1,7 @@
 import { describe, expect, it, vi } from "vitest";
 import { render, screen } from "@testing-library/react";
 
-const mockPathname = vi.fn(() => "/feed");
+const mockPathname = vi.fn(() => "/radar");
 vi.mock("next/navigation", () => ({
 	usePathname: () => mockPathname(),
 }));
@@ -19,27 +19,27 @@ import { BottomBar } from "@/components/shell/bottom-bar";
 describe("BottomBar", () => {
 	it("renders 4 tab links with correct labels", () => {
 		render(<BottomBar />);
-		expect(screen.getByText("Feed")).toBeInTheDocument();
-		expect(screen.getByText("Profile")).toBeInTheDocument();
+		expect(screen.getByText("Radar")).toBeInTheDocument();
 		expect(screen.getByText("Explore")).toBeInTheDocument();
-		expect(screen.getByText("Community")).toBeInTheDocument();
+		expect(screen.getByText("Trades")).toBeInTheDocument();
+		expect(screen.getByText("Profile")).toBeInTheDocument();
 	});
 
 	it("renders tab links with correct hrefs", () => {
 		render(<BottomBar />);
 		const links = screen.getAllByRole("link");
 		const hrefs = links.map((link) => link.getAttribute("href"));
-		expect(hrefs).toContain("/feed");
-		expect(hrefs).toContain("/perfil");
+		expect(hrefs).toContain("/radar");
 		expect(hrefs).toContain("/explorar");
-		expect(hrefs).toContain("/comunidade");
+		expect(hrefs).toContain("/trades");
+		expect(hrefs).toContain("/perfil");
 	});
 
 	it("marks active tab with aria-current=page", () => {
-		mockPathname.mockReturnValue("/feed");
+		mockPathname.mockReturnValue("/radar");
 		render(<BottomBar />);
-		const feedLink = screen.getByText("Feed").closest("a");
-		expect(feedLink).toHaveAttribute("aria-current", "page");
+		const radarLink = screen.getByText("Radar").closest("a");
+		expect(radarLink).toHaveAttribute("aria-current", "page");
 
 		const explorarLink = screen.getByText("Explore").closest("a");
 		expect(explorarLink).not.toHaveAttribute("aria-current");
@@ -51,8 +51,8 @@ describe("BottomBar", () => {
 		const explorarLink = screen.getByText("Explore").closest("a");
 		expect(explorarLink?.className).toContain("text-primary");
 
-		const feedLink = screen.getByText("Feed").closest("a");
-		expect(feedLink?.className).toContain("text-on-surface-variant");
+		const radarLink = screen.getByText("Radar").closest("a");
+		expect(radarLink?.className).toContain("text-on-surface-variant");
 	});
 
 	it("has nav element with aria-label", () => {
@@ -62,9 +62,9 @@ describe("BottomBar", () => {
 	});
 
 	it("detects active tab for deep links using startsWith", () => {
-		mockPathname.mockReturnValue("/feed/some-post/123");
+		mockPathname.mockReturnValue("/trades/some-id/123");
 		render(<BottomBar />);
-		const feedLink = screen.getByText("Feed").closest("a");
-		expect(feedLink).toHaveAttribute("aria-current", "page");
+		const tradesLink = screen.getByText("Trades").closest("a");
+		expect(tradesLink).toHaveAttribute("aria-current", "page");
 	});
 });

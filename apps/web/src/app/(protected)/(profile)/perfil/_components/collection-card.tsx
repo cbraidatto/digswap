@@ -1,7 +1,10 @@
 "use client";
 
+import { useTransition } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 import { Badge } from "@/components/ui/badge";
 import type { ReactNode } from "react";
 import type { CollectionItem } from "@/lib/collection/queries";
@@ -9,6 +12,7 @@ import { getRarityTier, getRarityBadgeVariant } from "@/lib/collection/rarity";
 import { ConditionEditor } from "./condition-editor";
 import { PlayButton } from "@/components/player/play-button";
 import { SpinningLogButton } from "@/components/engagement/spinning-log-button";
+import { removeRecordFromCollection } from "@/actions/collection";
 
 interface CollectionCardProps {
 	item: CollectionItem;
@@ -18,6 +22,21 @@ interface CollectionCardProps {
 
 export function CollectionCard({ item, isOwner, actionSlot }: CollectionCardProps) {
 	const tier = getRarityTier(item.rarityScore);
+	const router = useRouter();
+	const [isRemoving, startRemoveTransition] = useTransition();
+
+	function handleRemove() {
+		if (!confirm("Remove this record from your collection?")) return;
+		startRemoveTransition(async () => {
+			const result = await removeRecordFromCollection(item.id);
+			if (result.error) {
+				toast.error(result.error);
+			} else {
+				toast.success("Removed from collection");
+				router.refresh();
+			}
+		});
+	}
 
 	return (
 		<div className="group bg-surface-container-low rounded-lg overflow-hidden border border-outline-variant/10 transition-all hover:border-primary/20 hover:shadow-lg hover:shadow-primary/5">
@@ -90,6 +109,17 @@ export function CollectionCard({ item, isOwner, actionSlot }: CollectionCardProp
 						releaseId={item.releaseId}
 						releaseTitle={item.title}
 					/>
+				)}
+				{/* Remove — only visible to owner */}
+				{isOwner && (
+					<button
+						type="button"
+						onClick={handleRemove}
+						disabled={isRemoving}
+						className="mt-1 font-mono text-[10px] text-on-surface-variant/50 hover:text-destructive transition-colors disabled:opacity-50"
+					>
+						{isRemoving ? "Removing..." : "Remove"}
+					</button>
 				)}
 				{actionSlot}
 			</div>

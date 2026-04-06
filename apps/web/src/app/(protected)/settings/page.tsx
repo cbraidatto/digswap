@@ -7,6 +7,7 @@ import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { DiscogsSettings } from "@/components/discogs/discogs-settings";
 import { NotificationPreferences } from "./_components/notification-preferences";
+import { DeleteAccountSection } from "@/components/settings/delete-account-section";
 
 export const metadata: Metadata = {
 	title: "Settings — DigSwap",
@@ -84,6 +85,10 @@ export default async function SettingsPage({
 			<div className="border-t border-outline-variant/10" />
 
 			<NotificationPreferences />
+
+			<div className="border-t border-outline-variant/10" />
+
+			<DeleteAccountSection />
 		</div>
 	);
 }

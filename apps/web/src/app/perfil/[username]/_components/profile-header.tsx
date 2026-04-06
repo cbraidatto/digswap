@@ -3,6 +3,7 @@ import Image from "next/image";
 import type { UserRanking, UserBadge } from "@/lib/gamification/queries";
 import { TrustStrip } from "@/components/trust/trust-strip";
 import { FollowButton } from "./follow-button";
+import { ProposeTradeButton } from "@/components/trades/ProposeTradeButton";
 import { PremiumBadge } from "@/components/ui/PremiumBadge";
 
 interface ProfileHeaderProps {
@@ -130,6 +131,7 @@ export function ProfileHeader({
 								initialIsFollowing={isFollowing}
 								initialFollowerCount={followCounts.followerCount}
 							/>
+							<ProposeTradeButton providerId={profile.id} />
 							<Link
 								href={`/perfil/${profile.username}/compare`}
 								className="inline-flex items-center gap-2 border border-outline-variant text-on-surface-variant bg-transparent hover:bg-surface-container-high font-mono text-xs uppercase tracking-wider px-4 py-2 rounded-lg transition-colors h-11 md:h-8"

@@ -2,6 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { getOwnersByReleaseId, getOwnerCountByReleaseId } from "@/lib/release/queries";
 import { TrustStrip } from "@/components/trust/trust-strip";
+import { ProposeTradeButton } from "@/components/trades/ProposeTradeButton";
 
 interface OwnersSectionProps {
 	releaseId: string;
@@ -84,9 +85,16 @@ export async function OwnersSection({ releaseId }: OwnersSectionProps) {
 									</div>
 								</div>
 
-								{/* Trust rating */}
-								<div className="mt-2 overflow-hidden">
-									<TrustStrip userId={owner.userId} variant="compact" />
+								{/* Trust rating + trade button */}
+								<div className="mt-2 flex items-center justify-between gap-2">
+									<div className="overflow-hidden flex-1">
+										<TrustStrip userId={owner.userId} variant="compact" />
+									</div>
+									<ProposeTradeButton
+										providerId={owner.userId}
+										releaseId={releaseId}
+										compact
+									/>
 								</div>
 							</div>
 						))}

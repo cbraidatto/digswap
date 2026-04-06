@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import type { CrateItemRow as CrateItemRowType } from "@/lib/crates/types";
-import { moveToWantlist, moveToCollection } from "@/actions/crates";
+import { moveToWantlist, moveToCollection, removeCrateItem } from "@/actions/crates";
 import { CoverArt } from "@/components/ui/cover-art";
 
 interface CrateItemRowProps {
@@ -91,6 +91,27 @@ export function CrateItemRow({ item }: CrateItemRowProps) {
               className="font-mono text-xs px-2 py-1 rounded border border-outline-variant/20 text-on-surface-variant hover:bg-surface-container-high transition-colors disabled:opacity-50"
             >
               [→ COLLECTION]
+            </button>
+            <button
+              onClick={async () => {
+                setIsMoving(true);
+                try {
+                  const result = await removeCrateItem(item.id);
+                  if (result.success) {
+                    toast.success("Removed from crate");
+                    router.refresh();
+                  } else {
+                    toast.error(result.error ?? "Failed to remove");
+                  }
+                } finally {
+                  setIsMoving(false);
+                }
+              }}
+              disabled={isMoving}
+              className="font-mono text-xs px-1.5 py-1 rounded text-on-surface-variant/50 hover:text-destructive transition-colors disabled:opacity-50"
+              title="Remove from crate"
+            >
+              <span className="material-symbols-outlined text-sm">close</span>
             </button>
           </>
         )}
