@@ -22,6 +22,8 @@ export const collectionItems = pgTable(
     conditionGrade: varchar("condition_grade", { length: 10 }), // Mint/VG+/VG/G+/G/F/P
     notes: text("notes"),
     addedVia: varchar("added_via", { length: 20 }), // "discogs" or "manual"
+    openForTrade: integer("open_for_trade").default(0).notNull(), // 0 = no, 1 = yes
+    personalRating: integer("personal_rating"), // 1-5 star rating, null = unrated
     createdAt: timestamp("created_at", { withTimezone: true })
       .defaultNow()
       .notNull(),

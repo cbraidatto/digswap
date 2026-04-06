@@ -33,6 +33,8 @@ function makeItem(overrides: Partial<CollectionItem> = {}): CollectionItem {
 		coverImageUrl: null,
 		rarityScore: 1.5,
 		youtubeVideoId: null,
+		openForTrade: 0,
+		personalRating: null,
 		...overrides,
 	};
 }

@@ -12,7 +12,7 @@ import { getRarityTier, getRarityBadgeVariant } from "@/lib/collection/rarity";
 import { ConditionEditor } from "./condition-editor";
 import { PlayButton } from "@/components/player/play-button";
 import { SpinningLogButton } from "@/components/engagement/spinning-log-button";
-import { removeRecordFromCollection } from "@/actions/collection";
+import { removeRecordFromCollection, toggleOpenForTrade, setPersonalRating } from "@/actions/collection";
 import { RarityPill } from "@/components/ui/rarity-pill";
 import { RecordContextMenu } from "@/components/ui/record-context-menu";
 
@@ -114,6 +114,64 @@ export function CollectionCard({ item, isOwner, actionSlot }: CollectionCardProp
 						releaseTitle={item.title}
 					/>
 				)}
+				{/* Trade toggle + Rating — only visible to owner */}
+				{isOwner && (
+					<div className="flex items-center gap-2 mt-1.5">
+						{/* Open for Trade toggle */}
+						<button
+							type="button"
+							onClick={async () => {
+								const result = await toggleOpenForTrade(item.id, !item.openForTrade);
+								if (result.success) {
+									toast.success(item.openForTrade ? "Removed from trades" : "Open for trade!");
+									router.refresh();
+								}
+							}}
+							className={`font-mono text-[9px] px-1.5 py-0.5 rounded-full border transition-colors ${
+								item.openForTrade
+									? "bg-primary/10 text-primary border-primary/30"
+									: "text-on-surface-variant/40 border-outline-variant/20 hover:text-primary hover:border-primary/30"
+							}`}
+							title={item.openForTrade ? "Remove from trades" : "Mark as open for trade"}
+						>
+							<span className="material-symbols-outlined text-[12px] align-middle mr-0.5">swap_horiz</span>
+							{item.openForTrade ? "Trading" : "Trade"}
+						</button>
+
+						{/* Personal rating */}
+						<div className="flex items-center gap-0.5">
+							{[1, 2, 3, 4, 5].map((star) => (
+								<button
+									key={star}
+									type="button"
+									onClick={async () => {
+										const newRating = item.personalRating === star ? null : star;
+										const result = await setPersonalRating(item.id, newRating);
+										if (result.success) router.refresh();
+									}}
+									className={`transition-colors ${
+										star <= (item.personalRating ?? 0)
+											? "text-primary"
+											: "text-on-surface-variant/20 hover:text-primary/50"
+									}`}
+								>
+									<span className="material-symbols-outlined text-[12px]">
+										{star <= (item.personalRating ?? 0) ? "star" : "star_border"}
+									</span>
+								</button>
+							))}
+						</div>
+					</div>
+				)}
+
+				{/* Trade badge — visible to visitors on public profile */}
+				{!isOwner && item.openForTrade === 1 && (
+					<span className="inline-block mt-1.5 font-mono text-[9px] text-primary bg-primary/10 border border-primary/20 px-1.5 py-0.5 rounded-full">
+						<span className="material-symbols-outlined text-[10px] align-middle mr-0.5">swap_horiz</span>
+						Open for trade
+					</span>
+				)}
+
 				{/* Remove — only visible to owner */}
 				{isOwner && (
 					<button

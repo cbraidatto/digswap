@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import { NotificationBell } from "@/components/shell/notification-bell";
 import { ChatToggleButton } from "@/components/chat/chat-toggle-button";
 import { GlobalSearch } from "@/components/shell/global-search";
+import { BarcodeScanner } from "@/components/shell/barcode-scanner";
 
 const NAV_ITEMS = [
 	{ href: "/feed", label: "Feed", icon: "home" },
@@ -68,6 +69,7 @@ export function AppHeader({ userId }: AppHeaderProps) {
 
 				{/* ── Action icons ── */}
 				<div className="flex items-center gap-1">
+					<BarcodeScanner />
 					<Link
 						href="/como-usar"
 						aria-label="How to use DigSwap"

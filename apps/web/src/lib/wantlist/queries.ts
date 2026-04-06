@@ -19,6 +19,7 @@ export interface WantlistItem {
 	year: number | null;
 	coverImageUrl: string | null;
 	format: string | null;
+	huntingCount: number;
 }
 
 export async function getWantlistPage(
@@ -40,6 +41,12 @@ export async function getWantlistPage(
 			format: releases.format,
 			discogsId: releases.discogsId,
 			rarityScore: releases.rarityScore,
+			huntingCount: sql<number>`(
+				SELECT count(*) FROM wantlist_items wi2
+				WHERE wi2.release_id = ${wantlistItems.releaseId}
+				AND wi2.user_id != ${userId}
+				AND wi2.found_at IS NULL
+			)`.as("hunting_count"),
 		})
 		.from(wantlistItems)
 		.leftJoin(releases, eq(wantlistItems.releaseId, releases.id))
@@ -48,7 +55,7 @@ export async function getWantlistPage(
 		.limit(WANTLIST_PAGE_SIZE)
 		.offset((page - 1) * WANTLIST_PAGE_SIZE);
 
-	return rows as WantlistItem[];
+	return rows.map(r => ({ ...r, huntingCount: Number(r.huntingCount ?? 0) })) as WantlistItem[];
 }
 
 export async function getWantlistTotalCount(userId: string): Promise<number> {

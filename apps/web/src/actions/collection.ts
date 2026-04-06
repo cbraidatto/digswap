@@ -363,3 +363,77 @@ export async function removeRecordFromCollection(
 		return { error: "Failed to remove record. Please try again." };
 	}
 }
+
+/**
+ * Toggle the "open for trade" flag on a collection item.
+ */
+export async function toggleOpenForTrade(
+	collectionItemId: string,
+	openForTrade: boolean,
+): Promise<{ success?: boolean; error?: string }> {
+	try {
+		const supabase = await createClient();
+		const { data: { user } } = await supabase.auth.getUser();
+		if (!user) return { error: "Not authenticated" };
+
+		const { success: rlSuccess } = await safeLimit(apiRateLimit, user.id, true);
+		if (!rlSuccess) return { error: "Too many requests." };
+
+		const parsed = uuidSchema.safeParse(collectionItemId);
+		if (!parsed.success) return { error: "Invalid ID." };
+
+		const admin = createAdminClient();
+		const { data, error } = await admin
+			.from("collection_items")
+			.update({ open_for_trade: openForTrade ? 1 : 0, updated_at: new Date().toISOString() })
+			.eq("id", parsed.data)
+			.eq("user_id", user.id)
+			.select("id")
+			.maybeSingle();
+
+		if (error || !data) return { error: "Could not update." };
+		return { success: true };
+	} catch (err) {
+		console.error("[toggleOpenForTrade] error:", err);
+		return { error: "Failed to update. Please try again." };
+	}
+}
+
+/**
+ * Set a personal rating (1-5) on a collection item.
+ */
+export async function setPersonalRating(
+	collectionItemId: string,
+	rating: number | null,
+): Promise<{ success?: boolean; error?: string }> {
+	try {
+		const supabase = await createClient();
+		const { data: { user } } = await supabase.auth.getUser();
+		if (!user) return { error: "Not authenticated" };
+
+		const { success: rlSuccess } = await safeLimit(apiRateLimit, user.id, true);
+		if (!rlSuccess) return { error: "Too many requests." };
+
+		const parsed = uuidSchema.safeParse(collectionItemId);
+		if (!parsed.success) return { error: "Invalid ID." };
+
+		if (rating !== null && (rating < 1 || rating > 5 || !Number.isInteger(rating))) {
+			return { error: "Rating must be 1-5." };
+		}
+
+		const admin = createAdminClient();
+		const { data, error } = await admin
+			.from("collection_items")
+			.update({ personal_rating: rating, updated_at: new Date().toISOString() })
+			.eq("id", parsed.data)
+			.eq("user_id", user.id)
+			.select("id")
+			.maybeSingle();
+
+		if (error || !data) return { error: "Could not update." };
+		return { success: true };
+	} catch (err) {
+		console.error("[setPersonalRating] error:", err);
+		return { error: "Failed to update. Please try again." };
+	}
+}

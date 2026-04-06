@@ -10,6 +10,7 @@ import { OwnersSection } from "./_components/owners-section";
 import { WhoHasItSection } from "./_components/who-has-it-section";
 import { ReviewsSection } from "./_components/reviews-section";
 import { TracklistSection } from "./_components/tracklist-section";
+import { SimilarSection } from "./_components/similar-section";
 
 interface ReleasePageProps {
 	params: Promise<{ discogsId: string }>;
@@ -101,6 +102,8 @@ export default async function ReleasePage({ params }: ReleasePageProps) {
 			{release.discogsId && (
 				<WhoHasItSection discogsId={release.discogsId} />
 			)}
+
+			<SimilarSection releaseId={release.id} />
 
 			<ReviewsSection
 				releaseId={release.id}

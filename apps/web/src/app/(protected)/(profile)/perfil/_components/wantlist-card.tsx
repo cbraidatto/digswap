@@ -148,8 +148,14 @@ export function WantlistCard({ item, isOwner }: WantlistCardProps) {
 				<p className="text-xs text-on-surface-variant truncate">
 					{item.artist ?? "Unknown Artist"}
 				</p>
-				<div className="mt-1.5">
+				<div className="mt-1.5 flex items-center gap-2">
 					<RarityPill score={item.rarityScore} showScore={false} />
+					{item.huntingCount > 0 && (
+						<span className="font-mono text-[9px] text-secondary">
+							<span className="material-symbols-outlined text-[10px] align-middle mr-0.5">group</span>
+							{item.huntingCount} hunting
+						</span>
+					)}
 				</div>
 				{item.notes && (
 					<p className="mt-1.5 text-xs font-mono text-on-surface-variant/60 line-clamp-2 leading-relaxed">
