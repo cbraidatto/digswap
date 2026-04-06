@@ -40,6 +40,12 @@ export function AppHeader({ xp = 0, userId }: AppHeaderProps) {
 					Explore
 				</Link>
 				<Link
+					href="/trades"
+					className="font-mono text-xs uppercase tracking-[0.2em] text-on-surface-variant hover:text-on-surface transition-colors"
+				>
+					Trades
+				</Link>
+				<Link
 					href="/perfil"
 					className="font-mono text-xs uppercase tracking-[0.2em] text-on-surface-variant hover:text-on-surface transition-colors"
 				>
