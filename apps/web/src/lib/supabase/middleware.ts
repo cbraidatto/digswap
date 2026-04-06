@@ -134,6 +134,7 @@ export async function updateSession(request: NextRequest) {
 		"/wrapped",       // M-16: added — under (protected) layout
 		"/trades",        // M-16: added — under (protected) layout
 		"/notifications", // M-16: added — under (protected) layout
+		"/como-usar",
 	];
 	const isProtectedRoute = protectedPaths.some((path) => pathname.startsWith(path));
 	// /perfil is protected ONLY as exact path (own profile), not /perfil/[username] (public profile)

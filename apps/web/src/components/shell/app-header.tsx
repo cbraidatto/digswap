@@ -61,6 +61,13 @@ export function AppHeader({ xp = 0, userId }: AppHeaderProps) {
 						</span>
 					</div>
 				)}
+				<Link
+					href="/como-usar"
+					aria-label="Como usar o DigSwap"
+					className="p-2 rounded text-on-surface-variant hover:text-primary hover:bg-surface-container-high transition-colors"
+				>
+					<span className="material-symbols-outlined text-xl">help</span>
+				</Link>
 				<ChatToggleButton />
 				<NotificationBell userId={userId} />
 			</div>
