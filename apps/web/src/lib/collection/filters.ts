@@ -26,8 +26,9 @@ export const SORT_OPTIONS = [
 	{ value: "rarity", label: "Rarity" },
 	{ value: "date", label: "Date Added" },
 	{ value: "alpha", label: "A-Z" },
+	{ value: "rating", label: "Rating" },
 ] as const;
-export type SortOption = (typeof SORT_OPTIONS)[number]["value"];
+export type SortOption = "rarity" | "date" | "alpha" | "rating";
 
 /**
  * Returns the year range for a decade label (e.g. "80s" -> { start: 1980, end: 1990 }).
@@ -45,7 +46,8 @@ export const collectionFilterSchema = z.object({
 	genre: z.string().optional(),
 	decade: z.string().optional(),
 	format: z.string().optional(),
-	sort: z.enum(["rarity", "date", "alpha"]).default("rarity"),
+	sort: z.enum(["rarity", "date", "alpha", "rating"]).default("rarity"),
+	search: z.string().max(200).optional(),
 	page: z.coerce.number().int().min(1).default(1),
 });
 export type CollectionFilters = z.infer<typeof collectionFilterSchema>;

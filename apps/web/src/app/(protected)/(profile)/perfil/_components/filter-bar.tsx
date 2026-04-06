@@ -1,5 +1,6 @@
 "use client";
 
+import { useRef, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import {
@@ -31,6 +32,7 @@ function buildFilterUrl(
 	if (merged.decade) params.set("decade", merged.decade);
 	if (merged.format) params.set("format", merged.format);
 	if (merged.sort && merged.sort !== "rarity") params.set("sort", merged.sort);
+	if (merged.search) params.set("search", merged.search);
 
 	const qs = params.toString();
 	return qs ? `${basePath}?${qs}` : basePath;
@@ -43,6 +45,15 @@ export function FilterBar({
 	basePath,
 }: FilterBarProps) {
 	const router = useRouter();
+	const searchTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+	const handleSearchChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+		if (searchTimeoutRef.current) clearTimeout(searchTimeoutRef.current);
+		const value = e.target.value;
+		searchTimeoutRef.current = setTimeout(() => {
+			router.push(buildFilterUrl(basePath, currentFilters, { search: value || undefined }));
+		}, 400);
+	}, [router, basePath, currentFilters]);
 
 	const handleGenreChange = (value: string) => {
 		const genre = value === "__all__" ? undefined : value;
@@ -68,7 +79,19 @@ export function FilterBar({
 	};
 
 	return (
-		<div className="flex items-center gap-2 overflow-x-auto py-3 px-4 md:px-6">
+		<div className="flex items-center gap-2 overflow-x-auto py-3 flex-wrap">
+			{/* Search */}
+			<div className="flex items-center bg-surface-container-high/50 rounded-lg px-3 py-1.5 border border-outline-variant/10 focus-within:border-primary/40 transition-colors min-w-[180px]">
+				<span className="material-symbols-outlined text-[16px] text-on-surface-variant/40 mr-2">search</span>
+				<input
+					type="text"
+					defaultValue={currentFilters.search ?? ""}
+					onChange={handleSearchChange}
+					placeholder="Search title or artist..."
+					className="bg-transparent border-none outline-none font-mono text-xs text-on-surface placeholder:text-on-surface-variant/30 w-full"
+				/>
+			</div>
+
 			{/* Genre Filter */}
 			<DropdownMenu>
 				<DropdownMenuTrigger

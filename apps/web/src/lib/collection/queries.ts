@@ -1,5 +1,5 @@
 import { unstable_cache } from "next/cache";
-import { eq, desc, asc, and, gte, lt, sql } from "drizzle-orm";
+import { eq, desc, asc, and, gte, lt, sql, ilike, or } from "drizzle-orm";
 import { db } from "@/lib/db";
 import { collectionItems } from "@/lib/db/schema/collections";
 import { releases } from "@/lib/db/schema/releases";
@@ -53,6 +53,17 @@ function buildWhereConditions(userId: string, filters: CollectionFilters) {
 		conditions.push(eq(releases.format, filters.format));
 	}
 
+	if (filters.search) {
+		const sanitized = filters.search.replace(/[%_\\]/g, "\\$&");
+		const pattern = `%${sanitized}%`;
+		conditions.push(
+			or(
+				ilike(releases.title, pattern),
+				ilike(releases.artist, pattern),
+			)!,
+		);
+	}
+
 	return conditions;
 }
 
@@ -65,9 +76,10 @@ function buildOrderBy(sort: string) {
 			return desc(collectionItems.createdAt);
 		case "alpha":
 			return asc(releases.title);
+		case "rating":
+			return desc(sql`COALESCE(${collectionItems.personalRating}, 0)`);
 		case "rarity":
 		default:
-			// COALESCE puts null rarity scores last (sorted as -1)
 			return desc(sql`COALESCE(${releases.rarityScore}, -1)`);
 	}
 }
