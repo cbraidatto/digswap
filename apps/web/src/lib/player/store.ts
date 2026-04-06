@@ -28,6 +28,10 @@ interface PlayerState {
 	setCurrentTime: (time: number) => void;
 	setDuration: (duration: number) => void;
 	setEmbedError: (error: boolean) => void;
+	/** Incremented when a seek is requested — the provider watches this */
+	seekGeneration: number;
+	seekTo: number;
+	requestSeek: (time: number) => void;
 }
 
 export const usePlayerStore = create<PlayerState>((set, get) => ({
@@ -37,6 +41,8 @@ export const usePlayerStore = create<PlayerState>((set, get) => ({
 	currentTime: 0,
 	duration: 0,
 	embedError: false,
+	seekGeneration: 0,
+	seekTo: 0,
 
 	play: (track) => {
 		set({ currentTrack: track, isPlaying: true, embedError: false, currentTime: 0 });
@@ -60,7 +66,8 @@ export const usePlayerStore = create<PlayerState>((set, get) => ({
 
 	previous: () => {
 		// Restart current track (no history tracking for now)
-		set({ currentTime: 0 });
+		const { seekGeneration } = get();
+		set({ currentTime: 0, seekTo: 0, seekGeneration: seekGeneration + 1 });
 	},
 
 	addToQueue: (track) => {
@@ -83,4 +90,9 @@ export const usePlayerStore = create<PlayerState>((set, get) => ({
 	setCurrentTime: (time) => set({ currentTime: time }),
 	setDuration: (duration) => set({ duration }),
 	setEmbedError: (error) => set({ embedError: error }),
+
+	requestSeek: (time) => {
+		const { seekGeneration } = get();
+		set({ seekTo: time, seekGeneration: seekGeneration + 1, currentTime: time });
+	},
 }));

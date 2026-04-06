@@ -22,6 +22,8 @@ export function PlayerProvider() {
 		setDuration,
 		setEmbedError,
 		next,
+		seekGeneration,
+		seekTo,
 	} = usePlayerStore();
 
 	// Load YouTube API once on mount
@@ -47,7 +49,14 @@ export function PlayerProvider() {
 				playerRef.current = null;
 			}
 
-			playerRef.current = new YT.Player(containerRef.current, {
+			// YT.Player replaces the target element with an iframe.
+			// After destroy(), the original div is gone from the DOM.
+			// We must create a fresh div for the next player instance.
+			const playerDiv = document.createElement("div");
+			containerRef.current.innerHTML = "";
+			containerRef.current.appendChild(playerDiv);
+
+			playerRef.current = new YT.Player(playerDiv, {
 				videoId: currentTrack.videoId,
 				playerVars: {
 					autoplay: 1,
@@ -111,6 +120,15 @@ export function PlayerProvider() {
 			}
 		} catch { /* ignore */ }
 	}, [isPlaying]);
+
+	// Handle seek requests (e.g. "previous" restarts the track)
+	useEffect(() => {
+		if (!playerRef.current || seekGeneration === 0) return;
+		try {
+			playerRef.current.seekTo?.(seekTo, true);
+		} catch { /* ignore */ }
+	// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [seekGeneration]);
 
 	return (
 		// Hidden container — the actual YT iframe lives here, visually hidden

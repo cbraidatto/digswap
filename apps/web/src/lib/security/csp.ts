@@ -23,7 +23,7 @@ export function generateCspHeader(nonce: string, isDev: boolean): string {
 		`connect-src 'self' https://${supabaseHost} wss://${supabaseHost}`,
 		"media-src 'self'",
 		"worker-src 'self'",
-		"frame-src 'self' https://www.youtube-nocookie.com",
+		"frame-src 'self' https://www.youtube-nocookie.com https://www.youtube.com",
 		"object-src 'none'",
 		"base-uri 'self'",
 		"frame-ancestors 'none'",
