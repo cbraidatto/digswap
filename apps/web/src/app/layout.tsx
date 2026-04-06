@@ -69,6 +69,13 @@ export default async function RootLayout({
 				/>
 			</head>
 			<body className="font-sans antialiased">
+				{/* WCAG 2.4.1: Skip to main content link */}
+				<a
+					href="#main-content"
+					className="sr-only focus:not-sr-only focus:fixed focus:top-2 focus:left-2 focus:z-[100] focus:bg-primary focus:text-background focus:px-4 focus:py-2 focus:rounded focus:font-mono focus:text-xs"
+				>
+					Skip to content
+				</a>
 				<DesktopSessionSync />
 				<ThemeProvider>
 					<div className="grain">{children}</div>

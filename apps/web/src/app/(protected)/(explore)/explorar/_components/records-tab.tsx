@@ -19,6 +19,7 @@ export function RecordsTab() {
 	const urlCountry = searchParams.get("country") ?? null;
 	const urlLabel = searchParams.get("label") ?? null;
 	const urlFormat = searchParams.get("format") ?? null;
+	const urlSort = searchParams.get("sort") ?? "rarity";
 	const urlMinRarity = Number(searchParams.get("minRarity") ?? "0");
 	// Legacy single-genre and decade (kept for BrowseFilters)
 	const legacyGenre = searchParams.get("lgGenre") ?? null;
@@ -63,6 +64,7 @@ export function RecordsTab() {
 						label={urlLabel}
 						format={urlFormat}
 						minRarity={urlMinRarity}
+						sort={urlSort}
 					/>
 				</div>
 				<SuggestedSection />

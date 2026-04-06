@@ -27,6 +27,13 @@ const FORMAT_OPTIONS = [
   { label: "CD", value: "CD" },
 ] as const;
 
+const SORT_OPTIONS = [
+  { label: "Rarity", value: "rarity" },
+  { label: "Year", value: "year" },
+  { label: "A-Z", value: "alpha" },
+  { label: "Most Owned", value: "owners" },
+] as const;
+
 export function AdvancedSearchFilters() {
   const router = useRouter();
   const pathname = usePathname();
@@ -38,6 +45,7 @@ export function AdvancedSearchFilters() {
   const activeCountry = searchParams.get("country") ?? "";
   const activeLabel = searchParams.get("label") ?? "";
   const activeFormat = searchParams.get("format") ?? "";
+  const activeSort = searchParams.get("sort") ?? "rarity";
   const activeMinRarity = Number(searchParams.get("minRarity") ?? "0");
   const [showStyles, setShowStyles] = useState(false);
 
@@ -101,6 +109,10 @@ export function AdvancedSearchFilters() {
 
   const handleFormatChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     updateParam({ format: e.target.value });
+  };
+
+  const handleSortChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    updateParam({ sort: e.target.value === "rarity" ? null : e.target.value });
   };
 
   const handleMinRarityChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -243,6 +255,24 @@ export function AdvancedSearchFilters() {
             className="bg-surface-container-low border border-outline-variant/20 rounded px-2 py-1 font-mono text-xs text-on-surface focus:outline-none focus:border-primary/50"
           >
             {FORMAT_OPTIONS.map((opt) => (
+              <option key={opt.value} value={opt.value}>
+                {opt.label}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        {/* Sort */}
+        <div className="flex flex-col gap-1 min-w-[100px]">
+          <label className="font-mono text-[10px] text-on-surface-variant uppercase tracking-widest">
+            Sort by
+          </label>
+          <select
+            value={activeSort}
+            onChange={handleSortChange}
+            className="bg-surface-container-low border border-outline-variant/20 rounded px-2 py-1 font-mono text-xs text-on-surface focus:outline-none focus:border-primary/50"
+          >
+            {SORT_OPTIONS.map((opt) => (
               <option key={opt.value} value={opt.value}>
                 {opt.label}
               </option>

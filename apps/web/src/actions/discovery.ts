@@ -65,6 +65,7 @@ export async function browseRecordsAction(
 	minRarity = 0,
 	styles: string[] = [],
 	label: string | null = null,
+	sort = "rarity",
 ) {
 	try {
 		const parsed = browseRecordsSchema.safeParse({ genre, decade, page, genres, country, format, minRarity });
@@ -108,6 +109,7 @@ export async function browseRecordsAction(
 			parsed.data.minRarity,
 			styles,
 			label,
+			sort,
 		);
 	} catch (err) {
 		console.error("[browseRecordsAction] error:", err);

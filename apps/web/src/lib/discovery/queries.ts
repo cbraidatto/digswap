@@ -172,6 +172,7 @@ export async function browseRecords(
 	minRarity = 0,
 	styles: string[] = [],
 	label: string | null = null,
+	sort = "rarity",
 ): Promise<BrowseResult[]> {
 	// Build WHERE conditions
 	const conditions = [];
@@ -261,7 +262,12 @@ export async function browseRecords(
 			releases.rarityScore,
 			releases.coverImageUrl,
 		)
-		.orderBy(desc(sql`COALESCE(${releases.rarityScore}, -1)`))
+		.orderBy(
+			sort === "year" ? desc(sql`COALESCE(${releases.year}, 0)`)
+			: sort === "alpha" ? sql`${releases.title} ASC`
+			: sort === "owners" ? desc(sql`count(DISTINCT ${collectionItems.userId})`)
+			: desc(sql`COALESCE(${releases.rarityScore}, -1)`),
+		)
 		.limit(limit)
 		.offset(offset);
 

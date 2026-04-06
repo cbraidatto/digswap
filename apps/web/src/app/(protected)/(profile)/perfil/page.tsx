@@ -31,6 +31,7 @@ import { FilterBar } from "./_components/filter-bar";
 import { FollowList } from "./_components/follow-list";
 import { Pagination } from "./_components/pagination";
 import { AddRecordButton } from "./_components/add-record-button";
+import { ExportCollectionButton } from "./_components/export-collection-button";
 import { CoverBanner } from "./_components/cover-banner";
 import { EditProfileModal } from "./_components/edit-profile-modal";
 import { ShowcaseCards } from "./_components/showcase-cards";
@@ -479,7 +480,10 @@ export default async function PerfilPage({ searchParams }: PerfilPageProps) {
 							Your_Collection
 						</h2>
 					</div>
-					<AddRecordButton />
+					<div className="flex items-center gap-2">
+						<ExportCollectionButton />
+						<AddRecordButton />
+					</div>
 				</div>
 
 				{/* Filter Bar */}

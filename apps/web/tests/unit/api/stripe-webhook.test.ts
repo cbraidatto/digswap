@@ -87,6 +87,11 @@ vi.mock("@/lib/supabase/admin", () => ({
 	})),
 }));
 
+vi.mock("@/lib/rate-limit", () => ({
+	apiRateLimit: null,
+	safeLimit: vi.fn(async () => ({ success: true })),
+}));
+
 const { POST } = await import("@/app/api/stripe/webhook/route");
 
 function createRequest(body = "{}") {

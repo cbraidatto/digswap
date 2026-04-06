@@ -45,6 +45,7 @@ export function AppShell({ user, banner, children }: AppShellProps) {
 			<AppHeader displayName={user.displayName} avatarUrl={user.avatarUrl} xp={user.xp} userId={user.id} />
 			{banner}
 			<main
+				id="main-content"
 				className="pt-14"
 				style={{
 					// Extra bottom padding when player is active (adds ~56px for the player bar)
