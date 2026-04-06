@@ -63,6 +63,22 @@
   --color-inverse-surface: var(--inverse-surface);
   --color-inverse-on-surface: var(--inverse-on-surface);
 
+  /* Gem tier colors (fixed across all themes — brand consistency) */
+  --color-gem-quartz: var(--gem-quartz);
+  --color-gem-amethyst: var(--gem-amethyst);
+  --color-gem-emerald: var(--gem-emerald);
+  --color-gem-ruby: var(--gem-ruby);
+  --color-gem-sapphire: var(--gem-sapphire);
+  --color-gem-diamond: var(--gem-diamond);
+
+  /* Gem keyframe animation names */
+  --animate-gem-glow-purple: gem-glow-purple 1.5s ease-in-out infinite;
+  --animate-gem-shimmer-green: gem-shimmer-green 2s linear infinite;
+  --animate-gem-pulse-warm: gem-pulse-warm 1.2s ease-in-out infinite;
+  --animate-gem-glow-blue: gem-glow-blue 1.5s ease-in-out infinite;
+  --animate-gem-prismatic: gem-prismatic 4s linear infinite;
+  --animate-gem-rainbow-edge: gem-rainbow-edge 3s linear infinite;
+
   /* Border radius */
   --radius-sm: calc(var(--radius) * 0.5);
   --radius-md: var(--radius);
@@ -78,6 +94,14 @@
    =========================== */
 :root,
 [data-theme="ghost"] {
+  /* Gem tier colors (theme-independent, declared once in :root) */
+  --gem-quartz: #9CA3AF;
+  --gem-amethyst: #8B5CF6;
+  --gem-emerald: #10B981;
+  --gem-ruby: #EF4444;
+  --gem-sapphire: #3B82F6;
+  --gem-diamond: #F0F9FF;
+
   /* Core semantic */
   --background: #10141a;
   --foreground: #dfe2eb;
@@ -411,6 +435,71 @@
 }
 
 /* ===========================
+   Gem Economy Animations
+   =========================== */
+
+/* Ametista — subtle purple glow on hover */
+@keyframes gem-glow-purple {
+  0%, 100% { box-shadow: 0 0 4px oklch(0.55 0.22 290 / 0.2); }
+  50% { box-shadow: 0 0 10px oklch(0.55 0.22 290 / 0.4); }
+}
+
+/* Esmeralda — green shimmer on hover */
+@keyframes gem-shimmer-green {
+  0% { background-position: -200% center; }
+  100% { background-position: 200% center; }
+}
+
+/* Rubi — warm pulse on hover */
+@keyframes gem-pulse-warm {
+  0%, 100% { box-shadow: 0 0 4px oklch(0.60 0.22 25 / 0.3); }
+  50% { box-shadow: 0 0 14px oklch(0.60 0.22 25 / 0.6); }
+}
+
+/* Safira — blue glow on hover */
+@keyframes gem-glow-blue {
+  0%, 100% { box-shadow: 0 0 6px oklch(0.58 0.20 260 / 0.3); }
+  50% { box-shadow: 0 0 16px oklch(0.58 0.20 260 / 0.5); }
+}
+
+/* Safira/Diamante — sparkle particles */
+@keyframes gem-sparkle {
+  0%, 100% { opacity: 0; transform: scale(0) rotate(0deg); }
+  50% { opacity: 1; transform: scale(1) rotate(180deg); }
+}
+
+/* Diamante — prismatic refraction (always active) */
+@keyframes gem-prismatic {
+  0% { filter: hue-rotate(0deg) brightness(1.1); }
+  25% { filter: hue-rotate(90deg) brightness(1.2); }
+  50% { filter: hue-rotate(180deg) brightness(1.3); }
+  75% { filter: hue-rotate(270deg) brightness(1.2); }
+  100% { filter: hue-rotate(360deg) brightness(1.1); }
+}
+
+/* Diamante — rainbow edge glow (always active) */
+@keyframes gem-rainbow-edge {
+  0% { border-color: oklch(0.70 0.20 0); }
+  16% { border-color: oklch(0.70 0.20 60); }
+  33% { border-color: oklch(0.70 0.20 120); }
+  50% { border-color: oklch(0.70 0.20 180); }
+  66% { border-color: oklch(0.70 0.20 240); }
+  83% { border-color: oklch(0.70 0.20 300); }
+  100% { border-color: oklch(0.70 0.20 360); }
+}
+
+/* Esmeralda shimmer background helper */
+.animate-gem-shimmer-green {
+  background: linear-gradient(
+    90deg,
+    transparent 40%,
+    oklch(0.68 0.16 165 / 0.15) 50%,
+    transparent 60%
+  );
+  background-size: 200% 100%;
+}
+
+/* ===========================
    Accessibility: Reduced Motion
    =========================== */
 @media (prefers-reduced-motion: reduce) {
@@ -424,6 +513,25 @@
 
   .blink {
     animation: none;
+  }
+
+  /* Gem animations disabled under reduced motion */
+  .animate-gem-prismatic,
+  .animate-gem-rainbow-edge,
+  .animate-gem-glow-purple,
+  .animate-gem-shimmer-green,
+  .animate-gem-pulse-warm,
+  .animate-gem-glow-blue {
+    animation: none !important;
+  }
+
+  /* Diamante gets static styling under reduced motion */
+  .animate-gem-prismatic {
+    filter: none;
+  }
+
+  .animate-gem-rainbow-edge {
+    border-color: oklch(0.70 0.20 290);
   }
 
   *,
