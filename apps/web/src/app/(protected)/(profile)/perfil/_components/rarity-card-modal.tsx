@@ -16,15 +16,17 @@ interface RarityCardModalProps {
   appUrl: string;
   displayName?: string;
   totalRecords?: number;
+  gemScore?: number;
   avgRarity?: number;
   ogSig?: string;
 }
 
-export function RarityCardModal({ username, appUrl, displayName, totalRecords = 0, avgRarity = 0, ogSig }: RarityCardModalProps) {
+export function RarityCardModal({ username, appUrl, displayName, totalRecords = 0, gemScore = 0, avgRarity = 0, ogSig }: RarityCardModalProps) {
   const [open, setOpen] = useState(false);
   const params = new URLSearchParams({
     name: displayName ?? username,
     total: String(totalRecords),
+    gems: String(gemScore),
     avg: String(avgRarity),
     ...(ogSig ? { sig: ogSig } : {}),
   });
@@ -35,26 +37,26 @@ export function RarityCardModal({ username, appUrl, displayName, totalRecords = 
       <DialogTrigger
         className="font-mono text-xs text-on-surface-variant hover:text-primary transition-colors"
       >
-        GENERATE_RARITY_CARD
+        GENERATE_GEM_CARD
       </DialogTrigger>
       <DialogContent className="bg-surface-container border-outline-variant/20 sm:max-w-2xl">
         <DialogHeader>
           <DialogTitle className="font-mono text-xs text-primary tracking-[0.15em]">
-            [RARITY_SCORE_CARD]
+            [GEM_SCORE_CARD]
           </DialogTitle>
         </DialogHeader>
         <div className="space-y-4">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <Image
             src={cardUrl}
-            alt="Rarity Score Card"
+            alt="Gem Score Card"
             width={1200}
             height={630}
             unoptimized
             className="w-full rounded"
             style={{ aspectRatio: "1200/630" }}
           />
-          <ShareSurface url={cardUrl} label="SHARE_RARITY_CARD" />
+          <ShareSurface url={cardUrl} label="SHARE_GEM_CARD" />
         </div>
       </DialogContent>
     </Dialog>

@@ -176,12 +176,13 @@ export function AboutTab({
 							/>
 						</div>
 						<div className="border-t border-outline-variant/5 pt-4">
-							<h3 className="font-mono text-[10px] text-on-surface-variant uppercase tracking-widest mb-2">Rarity Card</h3>
+							<h3 className="font-mono text-[10px] text-on-surface-variant uppercase tracking-widest mb-2">Gem Card</h3>
 							<RarityCardModal
 								username={profile.username ?? ""}
 								appUrl={process.env.NEXT_PUBLIC_APP_URL ?? ""}
 								displayName={profile.displayName ?? undefined}
 								totalRecords={stats.collectionCount}
+								gemScore={totalGemScore}
 								avgRarity={stats.gemScore}
 								ogSig={signOgParams(profile.username ?? "", stats.collectionCount, totalGemScore, stats.gemScore)}
 							/>

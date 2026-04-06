@@ -231,13 +231,13 @@ export async function addRecordToCollection(
 			if (itemCount === 1) await awardBadge(user.id, "first_dig");
 			if (itemCount >= 100) await awardBadge(user.id, "century_club");
 
-			// Check rare_find: was the added release Ultra Rare? (rarityScore >= 2.0)
+			// Check rare_find: was the added release Safira or Diamante tier? (rarityScore >= 3.0)
 			const { data: releaseData } = await admin
 				.from("releases")
 				.select("rarity_score")
 				.eq("id", releaseId)
 				.single();
-			if (releaseData && releaseData.rarity_score >= 2.0) {
+			if (releaseData && releaseData.rarity_score >= 3.0) {
 				await awardBadge(user.id, "rare_find");
 			}
 		} catch {

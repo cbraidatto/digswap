@@ -247,10 +247,10 @@ export async function computeDiggerDna(
 				: 0;
 
 		let rarityProfile: string;
-		if (avgRarity >= 75) rarityProfile = "ultra_rare_hunter";
-		else if (avgRarity >= 50) rarityProfile = "deep_cutter";
-		else if (avgRarity >= 25) rarityProfile = "balanced_digger";
-		else rarityProfile = "mainstream_maven";
+		if (avgRarity >= 75) rarityProfile = "diamond_chaser";
+		else if (avgRarity >= 50) rarityProfile = "ruby_hunter";
+		else if (avgRarity >= 25) rarityProfile = "emerald_seeker";
+		else rarityProfile = "quartz_collector";
 
 		const result = {
 			topGenres,

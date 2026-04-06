@@ -271,12 +271,12 @@ export async function POST(request: NextRequest) {
 				// century_club: user has 100+ records
 				if (itemCount >= 100) await awardBadge(job.user_id, "century_club");
 
-				// rare_find: check if any imported record has rarityScore >= 2.0
+				// rare_find: check if any imported record is Safira or Diamante tier (rarityScore >= 3.0)
 				const { data: rareRecords } = await admin
 					.from("collection_items")
 					.select("release_id, releases!inner(rarity_score)")
 					.eq("user_id", job.user_id)
-					.gte("releases.rarity_score", 2.0)
+					.gte("releases.rarity_score", 3.0)
 					.limit(1);
 
 				if (rareRecords && rareRecords.length > 0) {

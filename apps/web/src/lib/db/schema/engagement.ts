@@ -115,7 +115,7 @@ export const diggerDna = pgTable(
 		topGenres: jsonb("top_genres").$type<{ name: string; percentage: number }[]>().notNull(),
 		topDecades: jsonb("top_decades").$type<{ decade: string; percentage: number }[]>().notNull(),
 		topCountries: jsonb("top_countries").$type<{ name: string; count: number }[]>().notNull(),
-		rarityProfile: varchar("rarity_profile", { length: 50 }).notNull(), // "deep_cutter" | "mainstream_maven" | "balanced_digger" | "ultra_rare_hunter"
+		rarityProfile: varchar("rarity_profile", { length: 50 }).notNull(), // "quartz_collector" | "emerald_seeker" | "ruby_hunter" | "diamond_chaser"
 		avgRarity: real("avg_rarity").default(0).notNull(),
 		totalRecords: integer("total_records").default(0).notNull(),
 		updatedAt: timestamp("updated_at", { withTimezone: true })

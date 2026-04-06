@@ -1,6 +1,16 @@
 import { createAdminClient } from "@/lib/supabase/admin";
 
 /**
+ * Badge Award Thresholds (for callers):
+ *
+ *   first_dig   - collection count >= 1
+ *   century_club - collection count >= 100
+ *   rare_find   - rarity_score >= 3.0 (Safira/Diamante gem tier)
+ *   crew_member - joined a community group
+ *   critic      - wrote first review
+ */
+
+/**
  * Awards a badge to a user by slug. Idempotent - duplicate awards are absorbed
  * by the unique constraint on user_badges and treated as a no-op.
  *
