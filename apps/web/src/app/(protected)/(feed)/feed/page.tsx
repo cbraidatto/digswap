@@ -13,11 +13,10 @@ import {
 	getPersonalFeed,
 } from "@/lib/social/queries";
 import { getExploreFeed } from "@/lib/social/explore-queries";
-import { ProgressBanner } from "./_components/progress-banner";
 import { FeedContainer } from "./_components/feed-container";
 import { RadarSection } from "./_components/radar-section";
 import { RadarEmptyState } from "./_components/radar-empty-state";
-import { BackButton } from "@/components/shell/back-button";
+import { FeedWelcomeBanner } from "./_components/feed-welcome-banner";
 
 export default async function FeedPage({
 	searchParams,
@@ -59,28 +58,27 @@ export default async function FeedPage({
 			? "personal"
 			: "global";
 
-	return (
-		<div className="flex min-h-[calc(100vh-56px)]">
-			<main className="flex-1 p-4 md:p-8 max-w-4xl mx-auto w-full">
-				<header className="mb-8">
-					<div className="flex items-center gap-4 mb-3">
-						<BackButton />
-					</div>
-					<h1 className="font-heading text-3xl font-extrabold text-on-surface mb-2 uppercase tracking-tight">
-						SIGNAL_BOARD
-					</h1>
-				</header>
+	// Show welcome banner only if onboarding not fully complete
+	const showWelcome = !progressState.discogsConnected || followCounts.followingCount < 3;
 
+	return (
+		<div className="min-h-[calc(100vh-56px)]">
+			<main className="max-w-3xl mx-auto px-4 md:px-6 py-6">
+				{/* Welcome / progress — only for new users */}
+				{showWelcome && (
+					<FeedWelcomeBanner
+						discogsConnected={progressState.discogsConnected}
+						followingCount={followCounts.followingCount}
+					/>
+				)}
+
+				{/* Radar — the hero section */}
 				{progressState.discogsConnected
 					? <RadarSection userId={user.id} />
 					: <RadarEmptyState />
 				}
 
-				<ProgressBanner
-					discogsConnected={progressState.discogsConnected}
-					followingCount={progressState.followingCount}
-				/>
-
+				{/* Feed */}
 				<FeedContainer
 					initialItems={initialItems}
 					initialMode={initialMode}

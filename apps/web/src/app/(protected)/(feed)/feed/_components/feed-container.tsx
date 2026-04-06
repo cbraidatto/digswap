@@ -18,6 +18,18 @@ interface FeedContainerProps {
 	followingCount: number;
 }
 
+function resolveSubMode(count: number): "personal" | "global" {
+	return count > 0 ? "personal" : "global";
+}
+
+const TABS = [
+	{ key: "following" as const, label: "Following", icon: "group" },
+	{ key: "global" as const, label: "Global", icon: "public" },
+	{ key: "explore" as const, label: "Discover", icon: "explore" },
+] as const;
+
+type TabKey = (typeof TABS)[number]["key"];
+
 export function FeedContainer({
 	initialItems,
 	initialMode,
@@ -25,11 +37,14 @@ export function FeedContainer({
 }: FeedContainerProps) {
 	const router = useRouter();
 
-	// "Feed" tab covers personal + global; "Explore" is a separate tab
-	const initialTopTab: "feed" | "explore" =
-		initialMode === "explore" ? "explore" : "feed";
+	const initialTab: TabKey =
+		initialMode === "explore"
+			? "explore"
+			: initialMode === "personal"
+				? "following"
+				: "global";
 
-	const [topTab, setTopTab] = useState<"feed" | "explore">(initialTopTab);
+	const [activeTab, setActiveTab] = useState<TabKey>(initialTab);
 	const [items, setItems] = useState<FeedItem[]>(initialItems);
 	const [cursor, setCursor] = useState<string | null>(
 		initialItems.length > 0
@@ -37,26 +52,15 @@ export function FeedContainer({
 			: null,
 	);
 	const [hasMore, setHasMore] = useState(initialItems.length >= 20);
-
-	// Feed sub-mode (personal vs global) — only relevant when topTab === "feed"
-	const initialSubMode: "personal" | "global" =
-		initialMode === "personal" || initialMode === "global"
-			? initialMode
-			: followCounts(followingCount);
-	const [subMode, setSubMode] = useState<"personal" | "global">(
-		initialSubMode,
-	);
-
 	const [isPending, startTransition] = useTransition();
 	const { ref: sentinelRef, inView } = useInView({ threshold: 0 });
 
-	// Helpers
-	function followCounts(count: number): "personal" | "global" {
-		return count > 0 ? "personal" : "global";
-	}
-
 	const currentMode: FeedMode =
-		topTab === "explore" ? "explore" : subMode;
+		activeTab === "explore"
+			? "explore"
+			: activeTab === "following"
+				? "personal"
+				: "global";
 
 	// Infinite scroll
 	useEffect(() => {
@@ -85,31 +89,23 @@ export function FeedContainer({
 		}
 	}, [inView, hasMore, isPending, cursor, currentMode]);
 
-	function switchTopTab(next: "feed" | "explore") {
-		if (next === topTab) return;
-		setTopTab(next);
+	function switchTab(tab: TabKey) {
+		if (tab === activeTab) return;
+		setActiveTab(tab);
 		setItems([]);
 		setCursor(null);
 		setHasMore(true);
 
-		// Update URL without full navigation
-		const url = next === "explore" ? "?tab=explore" : "?";
+		const url = tab === "explore" ? "?tab=explore" : "?";
 		router.replace(url);
 
-		// Log signal when switching to Explore (non-blocking)
-		if (next === "explore") {
-			import("@/actions/search-signals").then(({ logSearchSignal }) => {
-				void logSearchSignal([], []);
-			});
-		}
-
-		// Immediately load content for the new tab
 		startTransition(async () => {
 			let newItems: FeedItem[];
-			if (next === "explore") {
+			if (tab === "explore") {
 				newItems = await loadExploreFeed(null);
 			} else {
-				newItems = await loadMoreFeed(null, subMode);
+				const mode = tab === "following" ? "personal" : "global";
+				newItems = await loadMoreFeed(null, mode);
 			}
 			setItems(newItems);
 			setCursor(
@@ -121,116 +117,58 @@ export function FeedContainer({
 		});
 	}
 
-	function handleSubModeSwitch(newMode: "personal" | "global") {
-		if (newMode === subMode) return;
-		setSubMode(newMode);
-		setItems([]);
-		setCursor(null);
-		setHasMore(true);
-		startTransition(async () => {
-			const newItems = await loadMoreFeed(null, newMode);
-			setItems(newItems);
-			setCursor(
-				newItems.length > 0
-					? newItems[newItems.length - 1].createdAt
-					: null,
-			);
-			setHasMore(newItems.length >= 20);
-		});
-	}
-
-	const subtitle =
-		topTab === "explore"
-			? "// discover beyond your network"
-			: subMode === "global"
-				? "// ranked by rarity signal"
-				: "// signals from diggers you follow";
-
 	return (
-		<div>
-			{/* Top-level tab switcher: Feed | Explore */}
-			<div
-				role="tablist"
-				aria-label="Content tabs"
-				className="bg-surface-container-low p-1 rounded-lg flex items-center gap-1 mb-4"
-			>
-				<button
-					type="button"
-					role="tab"
-					aria-selected={topTab === "feed"}
-					onClick={() => switchTopTab("feed")}
-					className={
-						topTab === "feed"
-							? "bg-primary text-on-primary text-xs font-bold rounded px-3 py-1.5 font-mono"
-							: "text-on-surface-variant hover:text-on-surface text-xs font-bold px-3 py-1.5 font-mono"
-					}
-				>
-					Feed
-				</button>
-				<button
-					type="button"
-					role="tab"
-					aria-selected={topTab === "explore"}
-					onClick={() => switchTopTab("explore")}
-					className={
-						topTab === "explore"
-							? "bg-primary text-on-primary text-xs font-bold rounded px-3 py-1.5 font-mono"
-							: "text-on-surface-variant hover:text-on-surface text-xs font-bold px-3 py-1.5 font-mono"
-					}
-				>
-					Explore
-				</button>
+		<section>
+			{/* Section header */}
+			<div className="flex items-center justify-between mb-4">
+				<h2 className="font-heading text-lg font-bold text-on-surface">Activity</h2>
 			</div>
 
-			{/* Subtitle */}
-			<p className="font-mono text-sm text-on-surface-variant mb-6">
-				{subtitle}
-			</p>
-
-			{/* Feed sub-mode toggle — only visible on Feed tab when user follows someone */}
-			{topTab === "feed" && followingCount > 0 && (
-				<div
-					role="tablist"
-					className="bg-surface-container-low p-1 rounded-lg flex items-center gap-1 mb-6"
-				>
-					<button
-						type="button"
-						role="tab"
-						aria-selected={subMode === "global"}
-						onClick={() => handleSubModeSwitch("global")}
-						className={
-							subMode === "global"
-								? "bg-primary text-on-primary text-xs font-bold rounded px-3 py-1.5 font-mono"
-								: "text-on-surface-variant hover:text-on-surface text-xs font-bold px-3 py-1.5 font-mono"
-						}
-					>
-						Global
-					</button>
-					<button
-						type="button"
-						role="tab"
-						aria-selected={subMode === "personal"}
-						onClick={() => handleSubModeSwitch("personal")}
-						className={
-							subMode === "personal"
-								? "bg-primary text-on-primary text-xs font-bold rounded px-3 py-1.5 font-mono"
-								: "text-on-surface-variant hover:text-on-surface text-xs font-bold px-3 py-1.5 font-mono"
-						}
-					>
-						Following
-					</button>
-				</div>
-			)}
+			{/* Tab bar — unified single row */}
+			<div
+				role="tablist"
+				aria-label="Feed tabs"
+				className="flex items-center gap-1 mb-6 bg-surface-container-high/40 rounded-full p-1 w-fit"
+			>
+				{TABS.map((tab) => {
+					// Hide "Following" tab if user doesn't follow anyone
+					if (tab.key === "following" && followingCount === 0) return null;
+					const isActive = activeTab === tab.key;
+					return (
+						<button
+							key={tab.key}
+							type="button"
+							role="tab"
+							aria-selected={isActive}
+							onClick={() => switchTab(tab.key)}
+							className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-full font-mono text-[11px] uppercase tracking-wider transition-all duration-200 ${
+								isActive
+									? "bg-primary text-background font-semibold shadow-sm"
+									: "text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high/60"
+							}`}
+						>
+							<span
+								className="material-symbols-outlined text-[14px]"
+								style={isActive ? { fontVariationSettings: "'FILL' 1" } : undefined}
+							>
+								{tab.icon}
+							</span>
+							{tab.label}
+						</button>
+					);
+				})}
+			</div>
 
 			{/* Feed items */}
-			<div aria-live="polite" className="space-y-4">
+			<div aria-live="polite" className="space-y-3">
 				{items.map((item) =>
-					item.actionType === "added_record" ? (
+					item.actionType === "added_record" ||
+					item.actionType === "spinning_now" ? (
 						<FeedCard
 							key={item.id}
 							item={item}
 							contextReason={
-								topTab === "explore"
+								activeTab === "explore"
 									? ((item.contextReason as ContextReason | undefined) ?? null)
 									: undefined
 							}
@@ -240,80 +178,49 @@ export function FeedContainer({
 					) : item.actionType === "group_post" ||
 						item.actionType === "wrote_review" ? (
 						<GroupFeedCard key={item.id} item={item} />
-					) : null,
+					) : (
+						<FeedCard key={item.id} item={item} />
+					),
 				)}
 			</div>
 
-			{/* Empty states */}
+			{/* Empty state */}
 			{items.length === 0 && !isPending && !hasMore && (
-				<section className="bg-surface-container-low rounded-xl p-12 flex flex-col items-center justify-center text-center border border-outline-variant/10">
-					<span className="material-symbols-outlined text-primary text-5xl mb-6 opacity-60">
-						sensors_off
+				<div className="rounded-xl border border-dashed border-outline-variant/20 p-12 flex flex-col items-center text-center">
+					<span className="material-symbols-outlined text-3xl text-on-surface-variant/20 mb-3">
+						{activeTab === "explore" ? "travel_explore" : activeTab === "following" ? "group" : "public"}
 					</span>
-					{topTab === "explore" ? (
-						<>
-							<div className="font-mono text-sm text-primary mb-2">
-								&gt; explore_empty
-							</div>
-							<div className="font-mono text-xs text-on-surface-variant mb-6 max-w-sm leading-relaxed">
-								no new finds outside your network yet.
-								<br />
-								check back as more diggers log their records.
-							</div>
-							<div className="font-mono text-xs text-outline border border-outline-variant/20 px-4 py-2 rounded">
-								[SCANNING_BEYOND_NETWORK]
-							</div>
-						</>
-					) : subMode === "personal" ? (
-						<>
-							<div className="font-mono text-sm text-primary mb-2">
-								&gt; feed_empty
-							</div>
-							<div className="font-mono text-xs text-on-surface-variant mb-6 max-w-sm leading-relaxed">
-								the diggers you follow haven&apos;t added any records yet.
-								<br />
-								new finds will surface here as they dig.
-							</div>
-							<div className="font-mono text-xs text-outline border border-outline-variant/20 px-4 py-2 rounded">
-								[AWAITING_SIGNAL]
-							</div>
-						</>
-					) : (
-						<>
-							<div className="font-mono text-sm text-primary mb-2">
-								&gt; no signals yet
-							</div>
-							<div className="font-mono text-xs text-on-surface-variant mb-6 max-w-sm leading-relaxed">
-								follow diggers to see their finds, rips, and trades here.
-								<br />
-								the feed goes live once you connect.
-							</div>
-							<div className="font-mono text-xs text-outline border border-outline-variant/20 px-4 py-2 rounded">
-								[AWAITING_CONNECTION]
-							</div>
-						</>
-					)}
-				</section>
-			)}
-
-			{/* Loading skeletons */}
-			{isPending && (
-				<div className="space-y-4 mt-4">
-					<div className="bg-surface-container-low rounded-lg h-48 animate-pulse" />
-					<div className="bg-surface-container-low rounded-lg h-48 animate-pulse" />
-					<div className="bg-surface-container-low rounded-lg h-48 animate-pulse" />
+					<p className="font-mono text-xs text-on-surface-variant mb-1">
+						{activeTab === "following"
+							? "No activity from diggers you follow yet"
+							: activeTab === "explore"
+								? "No new discoveries outside your network"
+								: "No activity in the global feed yet"}
+					</p>
+					<p className="font-mono text-[10px] text-on-surface-variant/50">
+						New records will appear here as diggers add them
+					</p>
 				</div>
 			)}
 
-			{/* Sentinel for infinite scroll */}
+			{/* Loading */}
+			{isPending && (
+				<div className="space-y-3 mt-3">
+					{[1, 2, 3].map((i) => (
+						<div key={i} className="bg-surface-container-low rounded-xl h-32 animate-pulse border border-outline-variant/5" />
+					))}
+				</div>
+			)}
+
+			{/* Infinite scroll sentinel */}
 			<div ref={sentinelRef} className="h-10" aria-hidden="true" />
 
 			{/* End of feed */}
 			{!hasMore && items.length > 0 && (
-				<div className="font-mono text-xs text-outline text-center py-8">
-					[END_OF_FEED]
-				</div>
+				<p className="font-mono text-[10px] text-on-surface-variant/30 text-center py-6">
+					You&apos;re all caught up
+				</p>
 			)}
-		</div>
+		</section>
 	);
 }
