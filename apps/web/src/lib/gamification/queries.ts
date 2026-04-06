@@ -18,7 +18,7 @@ export interface LeaderboardEntry {
 }
 
 export interface UserRanking {
-	rarityScore: number;
+	gemScore: number;
 	contributionScore: number;
 	globalRank: number | null;
 	title: string | null;
@@ -124,7 +124,12 @@ export const getUserRanking = cache(async function getUserRanking(
 
 	if (rows.length === 0) return null;
 
-	return rows[0];
+	return {
+		gemScore: rows[0].rarityScore, // DB column is rarity_score but value is now gem-weighted
+		contributionScore: rows[0].contributionScore,
+		globalRank: rows[0].globalRank,
+		title: rows[0].title,
+	};
 });
 
 // ---------------------------------------------------------------------------

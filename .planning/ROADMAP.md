@@ -458,7 +458,7 @@ Plans:
 **Plans**: 5 plans
 Plans:
 - [x] 20-01-PLAN.md -- Gem constants, GemBadge component, CSS animations, and unit tests
-- [ ] 20-02-PLAN.md -- Ranking SQL migration, gamification constants, leaderboard queries
+- [x] 20-02-PLAN.md -- Ranking SQL migration, gamification constants, leaderboard queries
 - [ ] 20-03-PLAN.md -- Replace RarityPill with GemBadge across all consumer files + RankCard + LeaderboardRow
 - [ ] 20-04-PLAN.md -- GemVault profile component, gem distribution queries, tier change notifications, OG image update
 - [ ] 20-05-PLAN.md -- Badge awards, Digger DNA labels, RarityCardModal, visual verification checkpoint

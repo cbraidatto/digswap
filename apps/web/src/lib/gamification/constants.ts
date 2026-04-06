@@ -34,9 +34,9 @@ export const CONTRIBUTION_POINTS = {
  */
 export const RANK_TITLES = [
 	{ title: "Vinyl Rookie", minScore: 0 },
-	{ title: "Crate Digger", minScore: 51 },
-	{ title: "Wax Prophet", minScore: 201 },
-	{ title: "Record Archaeologist", minScore: 501 },
+	{ title: "Crate Digger", minScore: 501 },
+	{ title: "Wax Prophet", minScore: 2001 },
+	{ title: "Record Archaeologist", minScore: 5001 },
 ] as const;
 
 /**
@@ -57,14 +57,18 @@ export function getRankTitleFromScore(score: number): string {
 // ---------------------------------------------------------------------------
 
 /**
- * Computes the global score from rarity and contribution scores.
- * Formula: rarityScore * 0.7 + contributionScore * 0.3
+ * Computes the global score from gem-weighted rarity and contribution scores.
+ * Formula: gemScore * 0.7 + contributionScore * 0.3
+ *
+ * @param gemScore - Sum of gem weights for all records in user's collection
+ *   (Diamante=100, Safira=35, Esmeralda=20, Rubi=8, Ambar=3, Quartzo=1)
+ * @param contributionScore - Sum of community contribution points
  */
 export function computeGlobalScore(
-	rarityScore: number,
+	gemScore: number,
 	contributionScore: number,
 ): number {
-	return rarityScore * 0.7 + contributionScore * 0.3;
+	return gemScore * 0.7 + contributionScore * 0.3;
 }
 
 // ---------------------------------------------------------------------------
@@ -89,7 +93,7 @@ export const BADGE_DEFINITIONS = [
 	{
 		slug: "rare_find",
 		name: "RARE_FIND",
-		description: "Added an Ultra Rare record (rarity >= 2.0)",
+		description: "Added a Safira or Diamante gem to your collection",
 	},
 	{
 		slug: "critic",

@@ -188,9 +188,9 @@ describe("getGenreLeaderboard", () => {
 		expect(result).toEqual([]);
 	});
 
-	test("uses genre-specific rarity score, not global score", async () => {
-		// The genre leaderboard computes SUM(LN(1 + rarity_score)) per genre
-		// which differs from the global rarity score
+	test("uses genre-specific gem score, not global score", async () => {
+		// The genre leaderboard computes SUM(gem_weight CASE) per genre
+		// which differs from the global gem score
 		executeResult = [
 			{
 				userId: "u1",
