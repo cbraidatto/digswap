@@ -56,6 +56,8 @@ function getTypeIcon(type: string | null): { icon: string; className: string } {
 			return { icon: "trending_up", className: "text-on-surface-variant text-lg" };
 		case "new_badge":
 			return { icon: "military_tech", className: "text-on-surface-variant text-lg" };
+		case "gem_tier_change":
+			return { icon: "diamond", className: "text-primary text-lg" };
 		default:
 			return { icon: "notifications", className: "text-on-surface-variant text-lg" };
 	}

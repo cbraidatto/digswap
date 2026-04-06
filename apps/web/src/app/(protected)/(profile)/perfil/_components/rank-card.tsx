@@ -1,14 +1,14 @@
 interface RankCardProps {
 	title: string;
 	globalRank: number | null;
-	rarityScore: number;
+	gemScore: number;
 	contributionScore: number;
 }
 
 export function RankCard({
 	title,
 	globalRank,
-	rarityScore,
+	gemScore,
 	contributionScore,
 }: RankCardProps) {
 	return (
@@ -36,10 +36,10 @@ export function RankCard({
 				</div>
 				<div>
 					<div className="text-xl font-bold font-heading text-primary">
-						{rarityScore.toFixed(1)}
+						{gemScore.toLocaleString()}
 					</div>
 					<div className="font-mono text-[9px] text-on-surface-variant/50 uppercase tracking-widest">
-						Rarity
+						Gem Score
 					</div>
 				</div>
 				<div>

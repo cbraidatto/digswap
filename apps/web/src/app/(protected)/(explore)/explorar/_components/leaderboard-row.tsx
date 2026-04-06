@@ -48,7 +48,7 @@ export function LeaderboardRow({
 
 			{/* Score */}
 			<span className="font-mono text-sm text-primary tabular-nums text-right">
-				{score.toFixed(1)}pts
+				{score.toLocaleString()} gems
 			</span>
 		</li>
 	);

@@ -23,7 +23,7 @@ interface AboutTabProps {
 		collectionCount: number;
 		globalRank: number | null;
 		rankTitle: string;
-		rarityScore: number;
+		gemScore: number;
 		contributionScore: number;
 		totalTrades: number;
 	};
@@ -52,7 +52,7 @@ export function AboutTab({
 	recentlyAdded,
 	isOwner,
 }: AboutTabProps) {
-	const globalScore = stats.rarityScore * 0.7 + stats.contributionScore * 0.3;
+	const globalScore = stats.gemScore * 0.7 + stats.contributionScore * 0.3;
 
 	return (
 		<div className="space-y-8">
@@ -90,7 +90,7 @@ export function AboutTab({
 				<RankCard
 					title={stats.rankTitle}
 					globalRank={stats.globalRank}
-					rarityScore={stats.rarityScore}
+					gemScore={stats.gemScore}
 					contributionScore={stats.contributionScore}
 				/>
 				<div className="bg-surface-container-low rounded-xl p-4 border border-outline-variant/5">
@@ -169,8 +169,8 @@ export function AboutTab({
 								appUrl={process.env.NEXT_PUBLIC_APP_URL ?? ""}
 								displayName={profile.displayName ?? undefined}
 								totalRecords={stats.collectionCount}
-								avgRarity={stats.rarityScore}
-								ogSig={signOgParams(profile.username ?? "", stats.collectionCount, 0, stats.rarityScore)}
+								avgRarity={stats.gemScore}
+								ogSig={signOgParams(profile.username ?? "", stats.collectionCount, 0, stats.gemScore)}
 							/>
 						</div>
 					</div>

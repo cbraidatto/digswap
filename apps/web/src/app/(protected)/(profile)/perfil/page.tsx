@@ -227,7 +227,7 @@ export default async function PerfilPage({ searchParams }: PerfilPageProps) {
 								collectionCount: totalCount,
 								globalRank: ranking?.globalRank ?? null,
 								rankTitle: ranking?.title ?? "Vinyl Rookie",
-								rarityScore: ranking?.rarityScore ?? 0,
+								gemScore: ranking?.gemScore ?? 0,
 								contributionScore: ranking?.contributionScore ?? 0,
 								totalTrades: tradesTotal,
 							}}
