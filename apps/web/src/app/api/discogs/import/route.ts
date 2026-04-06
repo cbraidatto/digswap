@@ -8,10 +8,47 @@ import {
 import { broadcastProgress } from "@/lib/discogs/broadcast";
 import { checkWantlistMatches } from "@/lib/notifications/match";
 import { awardBadge } from "@/lib/gamification/badge-awards";
+import { detectGemTierChanges } from "@/lib/gems/notifications";
+import { getGemInfo } from "@/lib/gems/constants";
 import type { ImportJobType } from "@/lib/discogs/types";
 
 /** Vercel Pro timeout (10s on Hobby, 60s on Pro) */
 export const maxDuration = 60;
+
+/**
+ * Snapshot current rarity scores for a user's collection.
+ * Used for pre/post comparison to detect gem tier changes.
+ */
+async function snapshotGemScores(
+	admin: ReturnType<typeof createAdminClient>,
+	userId: string,
+): Promise<Map<string, { score: number; title: string; discogsId: number | null }>> {
+	const { data } = await admin
+		.from("collection_items")
+		.select("release_id, releases!inner(id, rarity_score, title, discogs_id)")
+		.eq("user_id", userId);
+
+	const map = new Map<string, { score: number; title: string; discogsId: number | null }>();
+	if (!data) return map;
+
+	for (const item of data) {
+		const release = item.releases as unknown as {
+			id: string;
+			rarity_score: number | null;
+			title: string | null;
+			discogs_id: number | null;
+		};
+		if (release) {
+			map.set(release.id, {
+				score: release.rarity_score ?? 0,
+				title: release.title ?? "Unknown",
+				discogsId: release.discogs_id,
+			});
+		}
+	}
+
+	return map;
+}
 
 /**
  * Import worker API route.
@@ -138,6 +175,32 @@ export async function POST(request: NextRequest) {
 			.eq("id", jobId);
 	}
 
+	// Pre-import snapshot: capture rarity scores before processing for gem tier change detection.
+	// Only take snapshot on the first page (current_page === 1) to avoid repeated queries.
+	// Stored in Redis with 2h TTL; retrieved on job completion for pre/post comparison.
+	if (currentPage === 1 && (job.type === "collection" || job.type === "sync")) {
+		try {
+			const redisUrl = process.env.UPSTASH_REDIS_REST_URL;
+			const redisToken = process.env.UPSTASH_REDIS_REST_TOKEN;
+			if (redisUrl && redisToken) {
+				const preSnapshot = await snapshotGemScores(admin, job.user_id);
+				if (preSnapshot.size > 0) {
+					const { Redis } = await import("@upstash/redis");
+					const redis = new Redis({ url: redisUrl, token: redisToken });
+					// Serialize snapshot as JSON object for Redis storage
+					const serialized: Record<string, { score: number; title: string; discogsId: number | null }> = {};
+					for (const [id, entry] of preSnapshot) {
+						serialized[id] = entry;
+					}
+					await redis.set(`gem-snapshot:${jobId}`, JSON.stringify(serialized), { ex: 7200 });
+				}
+			}
+		} catch (err) {
+			console.error("[import-worker] Pre-import snapshot failed:", err);
+			// Non-blocking: continue without snapshot
+		}
+	}
+
 	// 4. Process one page based on job type
 	let result: {
 		done: boolean;
@@ -222,6 +285,66 @@ export async function POST(request: NextRequest) {
 			} catch (err) {
 				// Non-blocking: badge check failure should not fail import completion
 				console.error("Post-import badge check failed:", err);
+			}
+		}
+
+		// Gem tier change detection (Phase 20, GEM-05)
+		// Compare pre-import snapshot (from Redis) with post-import scores.
+		// Creates gem_tier_change notifications for records that moved tiers.
+		if (job.type === "collection" || job.type === "sync") {
+			try {
+				const redisUrl = process.env.UPSTASH_REDIS_REST_URL;
+				const redisToken = process.env.UPSTASH_REDIS_REST_TOKEN;
+				if (redisUrl && redisToken) {
+					const { Redis } = await import("@upstash/redis");
+					const redis = new Redis({ url: redisUrl, token: redisToken });
+					const raw = await redis.get(`gem-snapshot:${jobId}`);
+					if (raw) {
+						// Clean up snapshot from Redis
+						await redis.del(`gem-snapshot:${jobId}`);
+
+						// Reconstruct pre-import map
+						const parsed = typeof raw === "string" ? JSON.parse(raw) : raw;
+						const preSnapshot = new Map<string, { score: number; title: string; discogsId: number | null }>();
+						for (const [id, entry] of Object.entries(parsed as Record<string, { score: number; title: string; discogsId: number | null }>)) {
+							preSnapshot.set(id, entry);
+						}
+
+						// Take post-import snapshot
+						const postSnapshot = await snapshotGemScores(admin, job.user_id);
+
+						// Detect tier changes
+						const changes = detectGemTierChanges(preSnapshot, postSnapshot);
+
+						// Create notifications (capped at 50 per sync)
+						const MAX_GEM_NOTIFICATIONS = 50;
+						const notifCount = Math.min(changes.length, MAX_GEM_NOTIFICATIONS);
+						for (let i = 0; i < notifCount; i++) {
+							const change = changes[i];
+							const isUpgrade = change.newWeight > change.oldWeight;
+							const oldInfo = getGemInfo(change.oldTier);
+							const newInfo = getGemInfo(change.newTier);
+							const weightDiff = Math.abs(change.newWeight - change.oldWeight);
+
+							await admin.from("notifications").insert({
+								user_id: job.user_id,
+								type: "gem_tier_change",
+								title: isUpgrade
+									? `"${change.releaseTitle}" subiu para ${newInfo.name}!`
+									: `"${change.releaseTitle}" caiu para ${newInfo.name}`,
+								body: `${oldInfo.name} \u2192 ${newInfo.name} (${isUpgrade ? "+" : "-"}${weightDiff} gem value)`,
+								link: change.discogsId ? `/release/${change.discogsId}` : null,
+							});
+						}
+
+						if (changes.length > 0) {
+							console.log(`[import-worker] ${changes.length} gem tier changes detected, ${notifCount} notifications created`);
+						}
+					}
+				}
+			} catch (err) {
+				// Non-blocking: gem notification failure should not fail import
+				console.error("[import-worker] Gem tier change detection failed:", err);
 			}
 		}
 

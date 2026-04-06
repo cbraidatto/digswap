@@ -183,7 +183,7 @@ export function AboutTab({
 								displayName={profile.displayName ?? undefined}
 								totalRecords={stats.collectionCount}
 								avgRarity={stats.gemScore}
-								ogSig={signOgParams(profile.username ?? "", stats.collectionCount, 0, stats.gemScore)}
+								ogSig={signOgParams(profile.username ?? "", stats.collectionCount, totalGemScore, stats.gemScore)}
 							/>
 						</div>
 					</div>
