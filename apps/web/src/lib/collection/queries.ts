@@ -82,31 +82,51 @@ export async function getCollectionPage(
 	const conditions = buildWhereConditions(userId, filters);
 	const orderBy = buildOrderBy(filters.sort);
 
-	const rows = await db
-		.select({
-			id: collectionItems.id,
-			conditionGrade: collectionItems.conditionGrade,
-			addedVia: collectionItems.addedVia,
-			createdAt: collectionItems.createdAt,
-			releaseId: releases.id,
-			discogsId: releases.discogsId,
-			title: releases.title,
-			artist: releases.artist,
-			year: releases.year,
-			genre: releases.genre,
-			format: releases.format,
-			coverImageUrl: releases.coverImageUrl,
-			rarityScore: releases.rarityScore,
-			youtubeVideoId: releases.youtubeVideoId,
-			openForTrade: collectionItems.openForTrade,
-			personalRating: collectionItems.personalRating,
-		})
-		.from(collectionItems)
-		.innerJoin(releases, eq(collectionItems.releaseId, releases.id))
-		.where(and(...conditions))
-		.orderBy(orderBy)
-		.limit(PAGE_SIZE)
-		.offset((filters.page - 1) * PAGE_SIZE);
+	// Base select fields (always available)
+	const baseFields = {
+		id: collectionItems.id,
+		conditionGrade: collectionItems.conditionGrade,
+		addedVia: collectionItems.addedVia,
+		createdAt: collectionItems.createdAt,
+		releaseId: releases.id,
+		discogsId: releases.discogsId,
+		title: releases.title,
+		artist: releases.artist,
+		year: releases.year,
+		genre: releases.genre,
+		format: releases.format,
+		coverImageUrl: releases.coverImageUrl,
+		rarityScore: releases.rarityScore,
+		youtubeVideoId: releases.youtubeVideoId,
+	};
+
+	// Try with new columns first, fall back without them if migration not applied
+	let rows: CollectionItem[];
+	try {
+		rows = await db
+			.select({
+				...baseFields,
+				openForTrade: collectionItems.openForTrade,
+				personalRating: collectionItems.personalRating,
+			})
+			.from(collectionItems)
+			.innerJoin(releases, eq(collectionItems.releaseId, releases.id))
+			.where(and(...conditions))
+			.orderBy(orderBy)
+			.limit(PAGE_SIZE)
+			.offset((filters.page - 1) * PAGE_SIZE);
+	} catch {
+		// Fallback: columns don't exist yet (migration pending)
+		const fallbackRows = await db
+			.select(baseFields)
+			.from(collectionItems)
+			.innerJoin(releases, eq(collectionItems.releaseId, releases.id))
+			.where(and(...conditions))
+			.orderBy(orderBy)
+			.limit(PAGE_SIZE)
+			.offset((filters.page - 1) * PAGE_SIZE);
+		rows = fallbackRows.map((r) => ({ ...r, openForTrade: 0, personalRating: null }));
+	}
 
 	return rows;
 }
