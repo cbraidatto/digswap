@@ -294,3 +294,57 @@ export async function updateConditionGrade(
 		return { error: "Failed to update condition grade. Please try again." };
 	}
 }
+
+/**
+ * Remove a record from the current user's collection.
+ * Includes IDOR prevention: only the owning user can delete.
+ */
+export async function removeRecordFromCollection(
+	collectionItemId: string,
+): Promise<{ success?: boolean; error?: string }> {
+	try {
+		const supabase = await createClient();
+		const {
+			data: { user },
+		} = await supabase.auth.getUser();
+
+		if (!user) {
+			return { error: "Not authenticated" };
+		}
+
+		const { success: rlSuccess } = await safeLimit(apiRateLimit, user.id, true);
+		if (!rlSuccess) {
+			return { error: "Too many requests. Please wait a moment." };
+		}
+
+		// Validate UUID format
+		const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+		if (!uuidRegex.test(collectionItemId)) {
+			return { error: "Invalid collection item ID." };
+		}
+
+		const admin = createAdminClient();
+
+		// Delete only if the item belongs to the current user (IDOR prevention)
+		const { data: deleted, error } = await admin
+			.from("collection_items")
+			.delete()
+			.eq("id", collectionItemId)
+			.eq("user_id", user.id)
+			.select("id")
+			.maybeSingle();
+
+		if (error) {
+			return { error: "Could not remove record from collection." };
+		}
+
+		if (!deleted) {
+			return { error: "Not found" };
+		}
+
+		return { success: true };
+	} catch (err) {
+		console.error("[removeRecordFromCollection] error:", err);
+		return { error: "Failed to remove record. Please try again." };
+	}
+}

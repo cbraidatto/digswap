@@ -2,10 +2,12 @@ import type { Metadata } from "next";
 import { notFound, redirect } from "next/navigation";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
-import { getTradeThread } from "@/lib/trades/messages";
+import { getTradeThread, getTradeParticipantContext } from "@/lib/trades/messages";
 import { deriveTradePresence } from "@/lib/trades/presence";
 import { markTradeThreadRead } from "@/actions/trade-messages";
 import { TradeDetailHeader } from "./_components/TradeDetailHeader";
+import { TradeActionButtons } from "./_components/TradeActionButtons";
+import { TradeReviewForm } from "./_components/TradeReviewForm";
 import { TradeMessageThread } from "./_components/TradeMessageThread";
 import { TradeMessageComposer } from "./_components/TradeMessageComposer";
 import { TradePresenceIndicator } from "./_components/TradePresenceIndicator";
@@ -29,11 +31,19 @@ export default async function TradeDetailPage({ params }: Props) {
 	if (!user) redirect("/signin");
 
 	let thread;
+	let participantContext;
 	try {
-		thread = await getTradeThread(id, user.id);
+		[thread, participantContext] = await Promise.all([
+			getTradeThread(id, user.id),
+			getTradeParticipantContext(id, user.id),
+		]);
 	} catch {
 		notFound();
 	}
+
+	if (!thread || !participantContext) notFound();
+
+	const isProvider = !participantContext.isRequester;
 
 	// Presence — best-effort, never block render
 	const presence = await deriveTradePresence(id, user.id).catch(() => null);
@@ -53,6 +63,15 @@ export default async function TradeDetailPage({ params }: Props) {
 			</Link>
 
 			<TradeDetailHeader thread={thread} />
+
+			{/* Trade action buttons (accept/decline/cancel) */}
+			<div className="mb-4">
+				<TradeActionButtons
+					tradeId={thread.tradeId}
+					status={thread.status}
+					isProvider={isProvider}
+				/>
+			</div>
 
 			{/* Presence indicator */}
 			{presence && (
@@ -77,6 +96,9 @@ export default async function TradeDetailPage({ params }: Props) {
 			</div>
 
 			<TradeMessageComposer tradeId={thread.tradeId} status={thread.status} />
+
+			{/* Trade review form — shown only for completed trades */}
+			<TradeReviewForm tradeId={thread.tradeId} status={thread.status} />
 		</div>
 	);
 }

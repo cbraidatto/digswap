@@ -30,7 +30,7 @@ export default async function FeedPage({
 	} = await supabase.auth.getUser();
 
 	if (!user) {
-		redirect("/login");
+		redirect("/signin");
 	}
 
 	const { tab } = await searchParams;

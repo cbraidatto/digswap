@@ -327,6 +327,41 @@ export async function markAsFound(
   }
 }
 
+export async function removeCrateItem(
+  crateItemId: string,
+): Promise<{ success: boolean; error?: string }> {
+  try {
+    const user = await getAuthUser();
+    if (!user) return { success: false, error: "Not authenticated" };
+
+    const parsed = crateItemIdSchema.safeParse({ crateItemId });
+    if (!parsed.success) {
+      return { success: false, error: "Invalid crate item id" };
+    }
+
+    // Get item to find crateId for revalidation before deletion
+    const [item] = await db
+      .select({ crateId: crateItems.crateId })
+      .from(crateItems)
+      .where(
+        and(eq(crateItems.id, crateItemId), eq(crateItems.userId, user.id)),
+      )
+      .limit(1);
+
+    if (!item) return { success: false, error: "Crate item not found or access denied" };
+
+    await db
+      .delete(crateItems)
+      .where(and(eq(crateItems.id, crateItemId), eq(crateItems.userId, user.id)));
+
+    revalidatePath(`/crates/${item.crateId}`);
+    return { success: true };
+  } catch (err) {
+    console.error("[removeCrateItem] error:", err);
+    return { success: false, error: "Failed to remove crate item. Please try again." };
+  }
+}
+
 // ---------------------------------------------------------------------------
 // Set mutations
 // ---------------------------------------------------------------------------
