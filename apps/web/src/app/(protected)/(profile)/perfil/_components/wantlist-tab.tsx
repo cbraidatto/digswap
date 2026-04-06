@@ -2,8 +2,10 @@
 
 import { useState, useMemo } from "react";
 import type { WantlistItem } from "@/lib/wantlist/queries";
+import { toast } from "sonner";
 import { WantlistGrid } from "./wantlist-grid";
 import { WantlistAddButton } from "./wantlist-add-button";
+import { exportWantlistCsv } from "@/actions/export";
 
 interface WantlistTabProps {
 	items: WantlistItem[];
@@ -45,6 +47,28 @@ export function WantlistTab({ items, total, pageSize, isOwner }: WantlistTabProp
 			<div className="flex items-center justify-between mb-4 flex-wrap gap-3">
 				<h2 className="font-heading text-lg font-bold text-on-surface">Wantlist</h2>
 				<div className="flex items-center gap-2">
+					{isOwner && (
+						<button
+							type="button"
+							onClick={async () => {
+								const result = await exportWantlistCsv();
+								if (result.error) { toast.error(result.error); return; }
+								if (!result.csv) return;
+								const blob = new Blob([result.csv], { type: "text/csv;charset=utf-8;" });
+								const url = URL.createObjectURL(blob);
+								const link = document.createElement("a");
+								link.href = url;
+								link.download = `digswap-wantlist-${new Date().toISOString().split("T")[0]}.csv`;
+								link.click();
+								URL.revokeObjectURL(url);
+								toast.success("Wantlist exported");
+							}}
+							title="Export wantlist as CSV"
+							className="p-2 rounded text-on-surface-variant hover:text-primary hover:bg-surface-container-high transition-colors"
+						>
+							<span className="material-symbols-outlined text-lg">download</span>
+						</button>
+					)}
 					{isOwner && <WantlistAddButton />}
 				</div>
 			</div>

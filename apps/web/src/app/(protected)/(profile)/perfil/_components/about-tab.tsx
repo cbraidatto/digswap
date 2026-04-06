@@ -36,6 +36,7 @@ interface AboutTabProps {
 	topGenres: { genre: string; count: number }[];
 	badges: UserBadge[];
 	heatmapData: Record<string, number>;
+	recentlyAdded: { title: string; artist: string; createdAt: string; discogsId: number | null }[];
 	isOwner: boolean;
 }
 
@@ -48,6 +49,7 @@ export function AboutTab({
 	topGenres,
 	badges,
 	heatmapData,
+	recentlyAdded,
 	isOwner,
 }: AboutTabProps) {
 	const globalScore = stats.rarityScore * 0.7 + stats.contributionScore * 0.3;
@@ -102,6 +104,35 @@ export function AboutTab({
 
 			{/* Collection heatmap */}
 			<CollectionHeatmap data={heatmapData} />
+
+			{/* Recently Added */}
+			{recentlyAdded.length > 0 && (
+				<div className="bg-surface-container-low rounded-xl p-5 border border-outline-variant/5">
+					<h3 className="font-mono text-[10px] text-on-surface-variant uppercase tracking-widest mb-3 flex items-center gap-1.5">
+						<span className="material-symbols-outlined text-[14px] text-primary">history</span>
+						Recently Added
+					</h3>
+					<div className="space-y-2">
+						{recentlyAdded.map((r, i) => (
+							<div key={`${r.title}-${i}`} className="flex items-center gap-3 font-mono text-xs">
+								<span className="text-on-surface-variant/30 text-[9px] w-16 flex-shrink-0">
+									{new Date(r.createdAt).toLocaleDateString("en-US", { month: "short", day: "numeric" })}
+								</span>
+								{r.discogsId ? (
+									<Link href={`/release/${r.discogsId}`} className="text-on-surface hover:text-primary transition-colors truncate">
+										{r.title}
+									</Link>
+								) : (
+									<span className="text-on-surface truncate">{r.title}</span>
+								)}
+								<span className="text-on-surface-variant/40 truncate flex-shrink-0">
+									{r.artist}
+								</span>
+							</div>
+						))}
+					</div>
+				</div>
+			)}
 
 			{/* Achievement shelf */}
 			<AchievementShelf earned={badges} />

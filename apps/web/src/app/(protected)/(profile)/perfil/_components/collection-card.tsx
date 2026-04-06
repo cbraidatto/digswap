@@ -9,7 +9,7 @@ import type { ReactNode } from "react";
 import type { CollectionItem } from "@/lib/collection/queries";
 import { getRarityTier } from "@/lib/collection/rarity";
 import { PlayButton } from "@/components/player/play-button";
-import { removeRecordFromCollection, toggleOpenForTrade, setPersonalRating } from "@/actions/collection";
+import { removeRecordFromCollection, toggleOpenForTrade, setPersonalRating, updateCollectionNotes } from "@/actions/collection";
 import { RarityPill } from "@/components/ui/rarity-pill";
 import { RecordContextMenu } from "@/components/ui/record-context-menu";
 
@@ -171,6 +171,13 @@ export function CollectionCard({ item, isOwner, actionSlot }: CollectionCardProp
 							</button>
 						</div>
 					</div>
+				)}
+
+				{/* Notes — compact, owner only */}
+				{isOwner && item.notes && (
+					<p className="font-mono text-[9px] text-on-surface-variant/40 truncate mt-1" title={item.notes}>
+						📝 {item.notes}
+					</p>
 				)}
 
 				{/* Visitor: trade badge */}

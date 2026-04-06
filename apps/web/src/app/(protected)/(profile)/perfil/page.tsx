@@ -118,6 +118,17 @@ export default async function PerfilPage({ searchParams }: PerfilPageProps) {
 		heatmapData[key] = (heatmapData[key] ?? 0) + 1;
 	}
 
+	// Recently added — last 10 records sorted by date
+	const recentlyAdded = [...items]
+		.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime())
+		.slice(0, 10)
+		.map((i) => ({
+			title: i.title,
+			artist: i.artist,
+			createdAt: i.createdAt.toISOString(),
+			discogsId: i.discogsId,
+		}));
+
 	return (
 		<div className="max-w-5xl mx-auto px-4 md:px-6 py-6">
 			{/* Hero header */}
@@ -233,6 +244,7 @@ export default async function PerfilPage({ searchParams }: PerfilPageProps) {
 							topGenres={topGenres}
 							badges={userBadgeData}
 							heatmapData={heatmapData}
+							recentlyAdded={recentlyAdded}
 							isOwner={true}
 						/>
 					),

@@ -1,4 +1,4 @@
-import { and, eq, desc } from "drizzle-orm";
+import { and, eq, desc, sql } from "drizzle-orm";
 import { db } from "@/lib/db";
 import { wantlistItems } from "@/lib/db/schema/wantlist";
 import { collectionItems } from "@/lib/db/schema/collections";
@@ -51,4 +51,39 @@ export async function getWantlistIntersections(
 		rarityScore: r.rarityScore,
 		coverArt: r.coverArt ?? null,
 	}));
+}
+
+/**
+ * Get compatibility stats between two users:
+ * - sharedRecords: records both users have in their collection
+ * - wantlistMatches: records user A wants that user B has (and vice versa)
+ */
+export async function getCompatibilityScore(
+	userA: string,
+	userB: string,
+): Promise<{ sharedRecords: number; wantlistMatches: number }> {
+	const [shared] = await db.execute(sql`
+		SELECT count(*)::int AS count FROM (
+			SELECT release_id FROM collection_items WHERE user_id = ${userA}
+			INTERSECT
+			SELECT release_id FROM collection_items WHERE user_id = ${userB}
+		) AS shared
+	`);
+
+	const [matches] = await db.execute(sql`
+		SELECT count(*)::int AS count FROM (
+			SELECT release_id FROM wantlist_items WHERE user_id = ${userA} AND found_at IS NULL
+			INTERSECT
+			SELECT release_id FROM collection_items WHERE user_id = ${userB}
+			UNION
+			SELECT release_id FROM wantlist_items WHERE user_id = ${userB} AND found_at IS NULL
+			INTERSECT
+			SELECT release_id FROM collection_items WHERE user_id = ${userA}
+		) AS matches
+	`);
+
+	return {
+		sharedRecords: Number((shared as unknown as { count: number }).count ?? 0),
+		wantlistMatches: Number((matches as unknown as { count: number }).count ?? 0),
+	};
 }

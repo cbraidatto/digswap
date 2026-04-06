@@ -15,7 +15,7 @@ import {
 } from "@/lib/collection/queries";
 import { getFollowCounts, checkIsFollowing } from "@/lib/social/queries";
 import { getUserRanking, getUserBadges } from "@/lib/gamification/queries";
-import { getWantlistIntersections } from "@/lib/wantlist/intersection-queries";
+import { getWantlistIntersections, getCompatibilityScore } from "@/lib/wantlist/intersection-queries";
 import { ProfileHeader } from "./_components/profile-header";
 import { ProfileCollectionSection } from "./_components/profile-collection-section";
 
@@ -90,10 +90,11 @@ export default async function PublicProfilePage({
 
 	const totalPages = Math.ceil(totalCount / PAGE_SIZE);
 
-	// Wantlist intersections — only for logged-in visitors viewing someone else's profile
-	const intersections = user
-		? await getWantlistIntersections(user.id, targetProfile.id)
-		: [];
+	// Wantlist intersections + compatibility — only for logged-in visitors
+	const [intersections, compatibility] = await Promise.all([
+		user ? getWantlistIntersections(user.id, targetProfile.id) : Promise.resolve([]),
+		user ? getCompatibilityScore(user.id, targetProfile.id) : Promise.resolve({ sharedRecords: 0, wantlistMatches: 0 }),
+	]);
 
 	return (
 		<div className="max-w-7xl mx-auto px-4 md:px-6 py-8">
@@ -117,6 +118,30 @@ export default async function PublicProfilePage({
 				badges={userBadgeData}
 				isAuthenticated={!!user}
 			/>
+
+			{/* Compatibility score — logged-in visitors */}
+			{user && (compatibility.sharedRecords > 0 || compatibility.wantlistMatches > 0) && (
+				<div className="mb-6 flex items-center gap-4 bg-surface-container-low/50 rounded-xl px-4 py-3 border border-outline-variant/5">
+					<span className="material-symbols-outlined text-[18px] text-secondary">compare_arrows</span>
+					<div className="flex items-center gap-3 font-mono text-xs">
+						{compatibility.sharedRecords > 0 && (
+							<span>
+								<span className="text-primary font-semibold">{compatibility.sharedRecords}</span>
+								<span className="text-on-surface-variant/50 ml-1">records in common</span>
+							</span>
+						)}
+						{compatibility.sharedRecords > 0 && compatibility.wantlistMatches > 0 && (
+							<span className="text-outline-variant/20">·</span>
+						)}
+						{compatibility.wantlistMatches > 0 && (
+							<span>
+								<span className="text-secondary font-semibold">{compatibility.wantlistMatches}</span>
+								<span className="text-on-surface-variant/50 ml-1">wantlist matches</span>
+							</span>
+						)}
+					</div>
+				</div>
+			)}
 
 			{/* Collection Section — client wrapper manages filter toggle state */}
 			<ProfileCollectionSection

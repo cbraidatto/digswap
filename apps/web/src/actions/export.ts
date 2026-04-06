@@ -3,6 +3,7 @@
 import { eq } from "drizzle-orm";
 import { db } from "@/lib/db";
 import { collectionItems } from "@/lib/db/schema/collections";
+import { wantlistItems } from "@/lib/db/schema/wantlist";
 import { releases } from "@/lib/db/schema/releases";
 import { requireUser } from "@/lib/auth/require-user";
 import { apiRateLimit, safeLimit } from "@/lib/rate-limit";
@@ -94,5 +95,58 @@ export async function exportCollectionCsv(): Promise<{
 	} catch (err) {
 		console.error("[exportCollectionCsv] error:", err);
 		return { error: "Failed to export collection." };
+	}
+}
+
+/**
+ * Export the current user's wantlist as a CSV string.
+ */
+export async function exportWantlistCsv(): Promise<{
+	csv?: string;
+	error?: string;
+}> {
+	try {
+		const user = await requireUser();
+
+		const { success: rlSuccess } = await safeLimit(apiRateLimit, user.id, true);
+		if (!rlSuccess) return { error: "Too many requests." };
+
+		const items = await db
+			.select({
+				title: releases.title,
+				artist: releases.artist,
+				year: releases.year,
+				genre: releases.genre,
+				format: releases.format,
+				label: releases.label,
+				discogsId: releases.discogsId,
+				rarityScore: releases.rarityScore,
+				createdAt: wantlistItems.createdAt,
+			})
+			.from(wantlistItems)
+			.innerJoin(releases, eq(wantlistItems.releaseId, releases.id))
+			.where(eq(wantlistItems.userId, user.id))
+			.orderBy(releases.title);
+
+		const headers = ["Title", "Artist", "Year", "Genre", "Format", "Label", "Discogs ID", "Rarity Score", "Date Added"];
+
+		function esc(v: string | null | undefined): string {
+			if (v == null) return "";
+			const s = String(v);
+			return s.includes(",") || s.includes('"') || s.includes("\n") ? `"${s.replace(/"/g, '""')}"` : s;
+		}
+
+		const rows = items.map((i) =>
+			[
+				esc(i.title), esc(i.artist), esc(i.year?.toString()), esc(i.genre?.join("; ")),
+				esc(i.format), esc(i.label), esc(i.discogsId?.toString()),
+				esc(i.rarityScore?.toFixed(2)), esc(i.createdAt.toISOString().split("T")[0]),
+			].join(","),
+		);
+
+		return { csv: [headers.join(","), ...rows].join("\n") };
+	} catch (err) {
+		console.error("[exportWantlistCsv] error:", err);
+		return { error: "Failed to export wantlist." };
 	}
 }

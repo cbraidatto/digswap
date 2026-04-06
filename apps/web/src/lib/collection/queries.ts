@@ -25,6 +25,7 @@ export interface CollectionItem {
 	coverImageUrl: string | null;
 	rarityScore: number | null;
 	youtubeVideoId: string | null;
+	notes: string | null;
 	openForTrade: number;
 	personalRating: number | null;
 }
@@ -111,6 +112,7 @@ export async function getCollectionPage(
 		coverImageUrl: releases.coverImageUrl,
 		rarityScore: releases.rarityScore,
 		youtubeVideoId: releases.youtubeVideoId,
+		notes: collectionItems.notes,
 	};
 
 	// Use base query without open_for_trade/personal_rating columns
@@ -127,6 +129,7 @@ export async function getCollectionPage(
 
 	const rows: CollectionItem[] = baseRows.map((r) => ({
 		...r,
+		notes: r.notes ?? null,
 		openForTrade: 0,
 		personalRating: null,
 	}));

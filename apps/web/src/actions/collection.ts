@@ -400,6 +400,43 @@ export async function toggleOpenForTrade(
 }
 
 /**
+ * Update notes on a collection item.
+ */
+export async function updateCollectionNotes(
+	collectionItemId: string,
+	notes: string | null,
+): Promise<{ success?: boolean; error?: string }> {
+	try {
+		const supabase = await createClient();
+		const { data: { user } } = await supabase.auth.getUser();
+		if (!user) return { error: "Not authenticated" };
+
+		const { success: rlSuccess } = await safeLimit(apiRateLimit, user.id, true);
+		if (!rlSuccess) return { error: "Too many requests." };
+
+		const parsed = uuidSchema.safeParse(collectionItemId);
+		if (!parsed.success) return { error: "Invalid ID." };
+
+		const trimmed = notes?.trim().slice(0, 500) ?? null;
+
+		const admin = createAdminClient();
+		const { data, error } = await admin
+			.from("collection_items")
+			.update({ notes: trimmed, updated_at: new Date().toISOString() })
+			.eq("id", parsed.data)
+			.eq("user_id", user.id)
+			.select("id")
+			.maybeSingle();
+
+		if (error || !data) return { error: "Could not update." };
+		return { success: true };
+	} catch (err) {
+		console.error("[updateCollectionNotes] error:", err);
+		return { error: "Failed to update. Please try again." };
+	}
+}
+
+/**
  * Set a personal rating (1-5) on a collection item.
  */
 export async function setPersonalRating(

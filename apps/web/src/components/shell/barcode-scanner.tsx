@@ -78,6 +78,7 @@ export function BarcodeScanner() {
 						const results = await globalSearchAction(code);
 
 						if (results.records.length > 0 && results.records[0].discogsId) {
+							toast.success(`Found: ${results.records[0].title}`);
 							router.push(`/release/${results.records[0].discogsId}`);
 							close();
 						} else {
