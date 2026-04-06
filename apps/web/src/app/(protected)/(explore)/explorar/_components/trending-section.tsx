@@ -5,7 +5,7 @@ import Link from "next/link";
 import { getTrendingAction } from "@/actions/discovery";
 import type { TrendingRecord } from "@/lib/discovery/queries";
 import { CoverArt } from "@/components/ui/cover-art";
-import { RarityPill } from "@/components/ui/rarity-pill";
+import { GemBadge } from "@/components/ui/gem-badge";
 import { RecordContextMenu } from "@/components/ui/record-context-menu";
 
 export function TrendingSection() {
@@ -81,7 +81,7 @@ export function TrendingSection() {
 									<span className="font-mono text-[9px] text-primary font-semibold">
 										+{record.addCount}
 									</span>
-									<RarityPill score={record.rarityScore} showScore={false} className="text-[8px] px-1.5" />
+									<GemBadge score={record.rarityScore} className="text-[8px] px-1.5" />
 								</div>
 							</div>
 						</div>

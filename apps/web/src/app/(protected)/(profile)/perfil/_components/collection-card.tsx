@@ -6,10 +6,10 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import type { CollectionItem } from "@/lib/collection/queries";
-import { getRarityTier } from "@/lib/collection/rarity";
+import { getGemTier } from "@/lib/gems/constants";
 import { PlayButton } from "@/components/player/play-button";
 import { removeRecordFromCollection, toggleOpenForTrade, setPersonalRating, updateCollectionNotes } from "@/actions/collection";
-import { RarityPill } from "@/components/ui/rarity-pill";
+import { GemBadge } from "@/components/ui/gem-badge";
 import { RecordContextMenu } from "@/components/ui/record-context-menu";
 
 interface CollectionCardProps {
@@ -18,7 +18,7 @@ interface CollectionCardProps {
 }
 
 export function CollectionCard({ item, isOwner }: CollectionCardProps) {
-	const tier = getRarityTier(item.rarityScore);
+	const tier = getGemTier(item.rarityScore);
 	const router = useRouter();
 	const [isRemoving, startRemoveTransition] = useTransition();
 
@@ -58,7 +58,7 @@ export function CollectionCard({ item, isOwner }: CollectionCardProps) {
 				{/* Rarity — always visible bottom-left */}
 				{tier && (
 					<div className="absolute bottom-2 left-2 z-10">
-						<RarityPill score={item.rarityScore} showScore={false} />
+						<GemBadge score={item.rarityScore} />
 					</div>
 				)}
 

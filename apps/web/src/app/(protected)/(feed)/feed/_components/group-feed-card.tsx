@@ -3,7 +3,7 @@
 import Link from "next/link";
 import type { FeedItem } from "@/lib/social/types";
 import { StarRating } from "@/components/ui/star-rating";
-import { RarityPill } from "@/components/ui/rarity-pill";
+import { GemBadge } from "@/components/ui/gem-badge";
 
 function formatRelativeTime(dateStr: string): string {
 	const diff = Date.now() - new Date(dateStr).getTime();
@@ -106,7 +106,7 @@ export function GroupFeedCard({ item }: { item: FeedItem }) {
 							· {item.releaseArtist}
 						</span>
 					)}
-					<RarityPill score={item.releaseRarityScore} showScore={false} />
+					<GemBadge score={item.releaseRarityScore} />
 				</div>
 			)}
 		</article>

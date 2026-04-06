@@ -5,7 +5,8 @@ import Image from "next/image";
 import type { FeedItem } from "@/lib/social/types";
 import { DigButton } from "@/components/engagement/dig-button";
 import { PlayButton } from "@/components/player/play-button";
-import { getRarityTier, type RarityTier } from "@/lib/collection/rarity";
+import { getGemTier } from "@/lib/gems/constants";
+import { GemBadge } from "@/components/ui/gem-badge";
 import { ContextLabel, type ContextReason } from "@/components/feed/context-label";
 
 function formatRelativeTime(dateStr: string): string {
@@ -20,15 +21,21 @@ function formatRelativeTime(dateStr: string): string {
 	return `${Math.floor(days / 7)}w`;
 }
 
-function getRarityStyle(tier: RarityTier) {
+function getGemStripColor(tier: string | null): string {
 	switch (tier) {
-		case "Ultra Rare":
-			return { bg: "bg-tertiary/10", text: "text-tertiary", border: "border-tertiary/20", strip: "bg-tertiary" };
-		case "Rare":
-			return { bg: "bg-secondary/10", text: "text-secondary", border: "border-secondary/20", strip: "bg-secondary" };
-		case "Common":
+		case "diamond":
+		case "sapphire":
+			return "bg-gem-sapphire";
+		case "ruby":
+			return "bg-gem-ruby";
+		case "emerald":
+			return "bg-gem-emerald";
+		case "amethyst":
+			return "bg-gem-amethyst";
+		case "quartz":
+			return "bg-gem-quartz";
 		default:
-			return { bg: "bg-primary/10", text: "text-primary", border: "border-primary/20", strip: "bg-primary" };
+			return "bg-primary";
 	}
 }
 
@@ -54,15 +61,15 @@ export function FeedCard({
 	digState?: { dug: boolean; digCount: number };
 	contextReason?: ContextReason;
 }) {
-	const tier = getRarityTier(item.releaseRarityScore);
-	const rarity = getRarityStyle(tier);
+	const tier = getGemTier(item.releaseRarityScore);
+	const stripColor = getGemStripColor(tier);
 	const action = getActionLabel(item.actionType);
 	const discogsId = item.metadata?.discogsId as number | undefined;
 
 	return (
 		<article className="bg-surface-container-low rounded-xl overflow-hidden border border-outline-variant/5 transition-all hover:border-outline-variant/15 hover:shadow-lg hover:shadow-black/5 group">
-			{/* Rarity accent strip */}
-			<div className={`h-0.5 w-full ${rarity.strip}`} />
+			{/* Gem accent strip */}
+			<div className={`h-0.5 w-full ${stripColor}`} />
 
 			<div className="p-4">
 				{/* User row */}
@@ -102,7 +109,7 @@ export function FeedCard({
 						</span>
 					</div>
 					{/* Action icon */}
-					<span className={`material-symbols-outlined text-[16px] ${rarity.text}`}>
+					<span className="material-symbols-outlined text-[16px] text-primary">
 						{action.icon}
 					</span>
 				</div>
@@ -168,11 +175,9 @@ export function FeedCard({
 							</div>
 						</div>
 
-						{/* Bottom row: rarity + actions */}
+						{/* Bottom row: gem badge + actions */}
 						<div className="flex items-center justify-between mt-2">
-							<span className={`font-mono text-[10px] font-semibold px-2 py-0.5 rounded-full border ${rarity.bg} ${rarity.text} ${rarity.border}`}>
-								{tier}{item.releaseRarityScore != null ? ` · ${item.releaseRarityScore.toFixed(1)}` : ""}
-							</span>
+							<GemBadge score={item.releaseRarityScore} />
 
 							<div className="flex items-center gap-1">
 								<DigButton

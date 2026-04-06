@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import type { WantlistItem } from "@/lib/wantlist/queries";
 import { markAsFound, removeFromWantlist } from "@/actions/wantlist";
-import { RarityPill } from "@/components/ui/rarity-pill";
+import { GemBadge } from "@/components/ui/gem-badge";
 import { RecordLink } from "@/components/ui/record-link";
 import { RecordContextMenu } from "@/components/ui/record-context-menu";
 
@@ -149,7 +149,7 @@ export function WantlistCard({ item, isOwner }: WantlistCardProps) {
 					{item.artist ?? "Unknown Artist"}
 				</p>
 				<div className="mt-1.5 flex items-center gap-2">
-					<RarityPill score={item.rarityScore} showScore={false} />
+					<GemBadge score={item.rarityScore} />
 					{item.huntingCount > 0 && (
 						<span className="font-mono text-[9px] text-secondary">
 							<span className="material-symbols-outlined text-[10px] align-middle mr-0.5">group</span>

@@ -3,18 +3,8 @@
 import { useState } from "react";
 import { CoverArt } from "@/components/ui/cover-art";
 import { RecordLink } from "@/components/ui/record-link";
-import { RarityPill } from "@/components/ui/rarity-pill";
+import { GemBadge } from "@/components/ui/gem-badge";
 import type { WantlistIntersection } from "@/lib/wantlist/intersection-queries";
-
-function getRarityLabel(score: number | null): {
-	label: string;
-	colorClass: string;
-} {
-	if (!score) return { label: "COMMON", colorClass: "text-on-surface-variant" };
-	if (score >= 80) return { label: "ULTRA_RARE", colorClass: "text-tertiary" };
-	if (score >= 50) return { label: "RARE", colorClass: "text-secondary" };
-	return { label: "COMMON", colorClass: "text-primary" };
-}
 
 interface WantlistMatchSectionProps {
 	intersections: WantlistIntersection[];
@@ -82,7 +72,7 @@ export function WantlistMatchSection({
 								<div className="font-mono text-[9px] text-on-surface group-hover:text-primary transition-colors leading-tight truncate">
 									{item.releaseTitle}
 								</div>
-								<RarityPill score={item.rarityScore} showScore={false} className="text-[8px]" />
+								<GemBadge score={item.rarityScore} className="text-[8px]" />
 							</RecordLink>
 						))}
 					{intersections.length > 6 && (
