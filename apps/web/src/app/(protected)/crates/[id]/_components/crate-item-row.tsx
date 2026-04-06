@@ -6,6 +6,7 @@ import { toast } from "sonner";
 import type { CrateItemRow as CrateItemRowType } from "@/lib/crates/types";
 import { moveToWantlist, moveToCollection, removeCrateItem } from "@/actions/crates";
 import { CoverArt } from "@/components/ui/cover-art";
+import { RecordLink } from "@/components/ui/record-link";
 
 interface CrateItemRowProps {
   item: CrateItemRowType;
@@ -60,9 +61,11 @@ export function CrateItemRow({ item }: CrateItemRowProps) {
 
       {/* Title + artist */}
       <div className="flex-1 min-w-0">
-        <p className="font-heading text-sm font-semibold text-on-surface truncate">
-          {item.title ?? "Unknown"}
-        </p>
+        <RecordLink discogsId={item.discogsId}>
+          <p className="font-heading text-sm font-semibold text-on-surface hover:text-primary transition-colors truncate">
+            {item.title ?? "Unknown"}
+          </p>
+        </RecordLink>
         {item.artist && (
           <p className="font-mono text-xs text-on-surface-variant truncate">
             {item.artist}

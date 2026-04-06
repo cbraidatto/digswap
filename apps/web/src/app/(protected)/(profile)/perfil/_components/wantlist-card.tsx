@@ -6,6 +6,9 @@ import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import type { WantlistItem } from "@/lib/wantlist/queries";
 import { markAsFound, removeFromWantlist } from "@/actions/wantlist";
+import { RarityPill } from "@/components/ui/rarity-pill";
+import { RecordLink } from "@/components/ui/record-link";
+import { RecordContextMenu } from "@/components/ui/record-context-menu";
 
 interface WantlistCardProps {
 	item: WantlistItem;
@@ -129,12 +132,25 @@ export function WantlistCard({ item, isOwner }: WantlistCardProps) {
 
 			{/* Info */}
 			<div className="p-3">
-				<h3 className="font-heading text-sm font-bold text-on-surface truncate">
-					{item.title ?? "Unknown"}
-				</h3>
+				<div className="flex items-start justify-between gap-1">
+					<RecordLink discogsId={item.discogsId}>
+						<h3 className="font-heading text-sm font-bold text-on-surface hover:text-primary transition-colors truncate">
+							{item.title ?? "Unknown"}
+						</h3>
+					</RecordLink>
+					<RecordContextMenu
+						discogsId={item.discogsId}
+						title={item.title}
+						artist={item.artist}
+						hideAdd
+					/>
+				</div>
 				<p className="text-xs text-on-surface-variant truncate">
 					{item.artist ?? "Unknown Artist"}
 				</p>
+				<div className="mt-1.5">
+					<RarityPill score={item.rarityScore} showScore={false} />
+				</div>
 				{item.notes && (
 					<p className="mt-1.5 text-xs font-mono text-on-surface-variant/60 line-clamp-2 leading-relaxed">
 						{item.notes}

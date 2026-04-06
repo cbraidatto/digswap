@@ -3,21 +3,11 @@
 import { useEffect, useState, useTransition } from "react";
 import { browseRecordsAction } from "@/actions/discovery";
 import type { BrowseResult } from "@/lib/discovery/queries";
-import { getRarityTier } from "@/lib/collection/rarity";
 import { CoverArt } from "@/components/ui/cover-art";
-
-function getRarityColors(tier: string | null): string {
-	switch (tier) {
-		case "Ultra Rare":
-			return "text-tertiary border-tertiary";
-		case "Rare":
-			return "text-secondary border-secondary";
-		case "Common":
-			return "text-on-surface-variant border-outline-variant";
-		default:
-			return "";
-	}
-}
+import { RarityPill } from "@/components/ui/rarity-pill";
+import { RecordLink } from "@/components/ui/record-link";
+import { RecordContextMenu } from "@/components/ui/record-context-menu";
+import { PlayOverlay } from "@/components/ui/play-overlay";
 
 interface BrowseGridProps {
 	genre: string | null;
@@ -67,88 +57,82 @@ export function BrowseGrid({
 		});
 	}, [genre, decade, genres, styles, country, label, format, minRarity, sort, yearFrom, yearTo, hasAnyFilter]);
 
-	// No filters selected: render nothing
-	if (!hasAnyFilter) {
-		return null;
-	}
+	if (!hasAnyFilter) return null;
 
-	// Loading state
 	if (isPending) {
 		return (
-			<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-				{Array.from({ length: 4 }).map((_, i) => (
-					<div
-						key={`skeleton-browse-${i}`}
-						className="skeleton-shimmer rounded-lg h-32"
-					/>
+			<div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
+				{Array.from({ length: 8 }).map((_, i) => (
+					<div key={`skeleton-browse-${i}`} className="bg-surface-container-low rounded-xl h-56 animate-pulse" />
 				))}
 			</div>
 		);
 	}
 
-	// Empty state after filter
 	if (hasQueried && results.length === 0) {
 		return (
-			<div className="text-center py-8">
-				<div className="font-mono text-xs text-on-surface-variant">
-					[NO_RECORDS_FOUND]
-				</div>
-				<div className="font-mono text-sm text-on-surface-variant mt-2">
-					No records match the selected filters. Try a different combination.
-				</div>
+			<div className="text-center py-12 border border-dashed border-outline-variant/20 rounded-xl">
+				<span className="material-symbols-outlined text-2xl text-on-surface-variant/20 block mb-2">search_off</span>
+				<p className="font-mono text-xs text-on-surface-variant">No records match the selected filters</p>
 			</div>
 		);
 	}
 
 	return (
-		<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-			{results.map((record) => {
-				const rarityTier = getRarityTier(record.rarityScore);
-				return (
-					<div
-						key={record.id}
-						className="bg-surface-container-low rounded-lg p-4 hover:bg-surface-container transition-colors cursor-pointer group"
-					>
-						{/* Album Art */}
+		<div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
+			{results.map((record) => (
+				<div
+					key={record.id}
+					className="bg-surface-container-low rounded-xl overflow-hidden border border-outline-variant/5 hover:border-outline-variant/15 hover:shadow-lg hover:shadow-black/5 transition-all group"
+				>
+					{/* Cover with play overlay */}
+					<RecordLink discogsId={record.discogsId} className="block relative aspect-square">
 						<CoverArt
 							src={record.coverImageUrl}
 							alt={record.title}
-							size="md"
-							containerClassName="mb-3"
+							size="full"
+							containerClassName="w-full h-full"
 						/>
+						<PlayOverlay
+							videoId={null}
+							title={record.title}
+							artist={record.artist}
+							coverUrl={record.coverImageUrl}
+						/>
+					</RecordLink>
 
-						{/* Title + Rarity + Owned */}
-						<div className="flex flex-wrap items-center gap-2 mb-1">
-							<span className="font-heading font-semibold text-on-surface group-hover:text-primary transition-colors truncate text-sm">
-								{record.title}
-							</span>
-							{record.isOwned && (
-								<span className="text-[9px] font-mono px-1.5 py-0.5 rounded border bg-primary/10 text-primary border-primary/30">
-									IN COLLECTION
-								</span>
-							)}
-							{rarityTier && (
-								<span
-									className={`text-xs font-mono px-1.5 py-0.5 rounded border ${getRarityColors(rarityTier)}`}
-								>
-									[{rarityTier.toUpperCase()}]
-								</span>
-							)}
+					{/* Info */}
+					<div className="p-3">
+						<div className="flex items-start justify-between gap-1">
+							<RecordLink discogsId={record.discogsId}>
+								<h3 className="font-heading text-xs font-bold text-on-surface group-hover:text-primary transition-colors line-clamp-1">
+									{record.title}
+								</h3>
+							</RecordLink>
+							<RecordContextMenu
+								discogsId={record.discogsId}
+								releaseId={record.id}
+								title={record.title}
+								artist={record.artist}
+							/>
 						</div>
-
-						{/* Artist */}
-						<div className="font-mono text-xs text-on-surface-variant truncate">
+						<p className="font-mono text-[10px] text-on-surface-variant truncate mt-0.5">
 							{record.artist}
+						</p>
+						<div className="flex items-center justify-between mt-2">
+							<RarityPill score={record.rarityScore} showScore={false} />
+							<span className="font-mono text-[9px] text-on-surface-variant/50">
+								{record.ownerCount} {record.ownerCount === 1 ? "owner" : "owners"}
+							</span>
 						</div>
-
-						{/* Owner Count */}
-						<div className="font-mono text-xs text-on-surface-variant mt-2">
-							{record.ownerCount}{" "}
-							{record.ownerCount === 1 ? "owner" : "owners"}
-						</div>
+						{record.isOwned && (
+							<span className="inline-block mt-1.5 font-mono text-[8px] text-primary bg-primary/10 border border-primary/20 px-1.5 py-0.5 rounded-full">
+								IN COLLECTION
+							</span>
+						)}
 					</div>
-				);
-			})}
+				</div>
+			))}
 		</div>
 	);
 }

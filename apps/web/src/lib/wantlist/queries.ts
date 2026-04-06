@@ -12,6 +12,8 @@ export interface WantlistItem {
 	foundAt: Date | null;
 	createdAt: Date;
 	releaseId: string | null;
+	discogsId: number | null;
+	rarityScore: number | null;
 	title: string;
 	artist: string;
 	year: number | null;
@@ -36,6 +38,8 @@ export async function getWantlistPage(
 			year: releases.year,
 			coverImageUrl: releases.coverImageUrl,
 			format: releases.format,
+			discogsId: releases.discogsId,
+			rarityScore: releases.rarityScore,
 		})
 		.from(wantlistItems)
 		.leftJoin(releases, eq(wantlistItems.releaseId, releases.id))

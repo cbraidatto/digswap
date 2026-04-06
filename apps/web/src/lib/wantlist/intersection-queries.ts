@@ -6,6 +6,7 @@ import { releases } from "@/lib/db/schema/releases";
 
 export interface WantlistIntersection {
 	releaseId: string;
+	discogsId: number | null;
 	releaseTitle: string;
 	releaseArtist: string;
 	rarityScore: number | null;
@@ -23,6 +24,7 @@ export async function getWantlistIntersections(
 	const results = await db
 		.select({
 			releaseId: releases.id,
+			discogsId: releases.discogsId,
 			releaseTitle: releases.title,
 			releaseArtist: releases.artist,
 			rarityScore: releases.rarityScore,
@@ -43,6 +45,7 @@ export async function getWantlistIntersections(
 
 	return results.map((r) => ({
 		releaseId: r.releaseId,
+		discogsId: r.discogsId,
 		releaseTitle: r.releaseTitle ?? "Unknown Title",
 		releaseArtist: r.releaseArtist ?? "",
 		rarityScore: r.rarityScore,

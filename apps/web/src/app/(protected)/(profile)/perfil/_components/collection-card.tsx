@@ -13,6 +13,8 @@ import { ConditionEditor } from "./condition-editor";
 import { PlayButton } from "@/components/player/play-button";
 import { SpinningLogButton } from "@/components/engagement/spinning-log-button";
 import { removeRecordFromCollection } from "@/actions/collection";
+import { RarityPill } from "@/components/ui/rarity-pill";
+import { RecordContextMenu } from "@/components/ui/record-context-menu";
 
 interface CollectionCardProps {
 	item: CollectionItem;
@@ -83,19 +85,21 @@ export function CollectionCard({ item, isOwner, actionSlot }: CollectionCardProp
 
 			{/* Info */}
 			<div className="p-3">
-				<h3 className="font-heading text-sm font-bold text-on-surface truncate">
-					{item.title}
-				</h3>
-				<p className="text-xs text-on-surface-variant truncate mb-1">{item.artist}</p>
-				{item.discogsId && (
-					<Link
-						href={`/release/${item.discogsId}`}
-						className="font-mono text-xs text-on-surface-variant hover:text-primary transition-colors inline-flex items-center gap-0.5 mb-1"
-					>
-						View release
-						<span className="material-symbols-outlined text-[12px]">arrow_forward</span>
+				<div className="flex items-start justify-between gap-1">
+					<Link href={item.discogsId ? `/release/${item.discogsId}` : "#"}>
+						<h3 className="font-heading text-sm font-bold text-on-surface hover:text-primary transition-colors truncate">
+							{item.title}
+						</h3>
 					</Link>
-				)}
+					<RecordContextMenu
+						discogsId={item.discogsId}
+						title={item.title}
+						artist={item.artist}
+						hideAdd
+						hideWantlist
+					/>
+				</div>
+				<p className="text-xs text-on-surface-variant truncate mb-1">{item.artist}</p>
 				{/* Condition editor — only visible to owner */}
 				{isOwner && (
 					<ConditionEditor

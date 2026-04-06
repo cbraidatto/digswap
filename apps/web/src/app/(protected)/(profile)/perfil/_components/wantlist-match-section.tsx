@@ -2,6 +2,8 @@
 
 import { useState } from "react";
 import { CoverArt } from "@/components/ui/cover-art";
+import { RecordLink } from "@/components/ui/record-link";
+import { RarityPill } from "@/components/ui/rarity-pill";
 import type { WantlistIntersection } from "@/lib/wantlist/intersection-queries";
 
 function getRarityLabel(score: number | null): {
@@ -67,10 +69,8 @@ export function WantlistMatchSection({
 					className="flex gap-3 overflow-x-auto pb-2"
 					style={{ scrollbarWidth: "thin" }}
 				>
-					{intersections.slice(0, 6).map((item) => {
-						const rarity = getRarityLabel(item.rarityScore);
-						return (
-							<div key={item.releaseId} className="flex-shrink-0 w-24 space-y-1">
+					{intersections.slice(0, 6).map((item) => (
+							<RecordLink key={item.releaseId} discogsId={item.discogsId} className="flex-shrink-0 w-24 space-y-1 group">
 								<CoverArt
 									src={item.coverArt}
 									alt={item.releaseTitle}
@@ -79,15 +79,12 @@ export function WantlistMatchSection({
 									containerClassName="w-24 h-24"
 									rounded="rounded"
 								/>
-								<div className="font-mono text-[9px] text-on-surface leading-tight truncate">
+								<div className="font-mono text-[9px] text-on-surface group-hover:text-primary transition-colors leading-tight truncate">
 									{item.releaseTitle}
 								</div>
-								<div className={`font-mono text-[8px] ${rarity.colorClass}`}>
-									[{rarity.label}]
-								</div>
-							</div>
-						);
-					})}
+								<RarityPill score={item.rarityScore} showScore={false} className="text-[8px]" />
+							</RecordLink>
+						))}
 					{intersections.length > 6 && (
 						<div className="flex-shrink-0 w-24 h-24 rounded bg-surface-container-high flex items-center justify-center">
 							<span className="font-mono text-xs text-on-surface-variant">
