@@ -293,7 +293,7 @@
 
 ### Tests
 
-- [ ] **TEST-01**: Todos os testes unitários passam (`vitest run` — 0 failures)
+- [x] **TEST-01**: Todos os testes unitários passam (`vitest run` — 0 failures)
 
 ### Quality
 
@@ -318,7 +318,7 @@ None — this is a focused fix milestone.
 | BUILD-01 | Phase 21: TypeScript Fix | Complete |
 | BUILD-02 | Phase 21: TypeScript Fix | Complete |
 | SEC-08 | Phase 22: Dependency Security | Complete |
-| TEST-01 | Phase 23: Test Fix | Pending |
+| TEST-01 | Phase 23: Test Fix | Complete |
 | QUAL-01 | Phase 24: Lint Cleanup | Pending |
 
 **Coverage:**

@@ -37,7 +37,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 
 - [x] **Phase 21: TypeScript Fix** - Fix all TypeScript errors blocking next build and tsc --noEmit (completed 2026-04-07)
 - [x] **Phase 22: Dependency Security** - Update Vite and dependencies to resolve HIGH/CRITICAL audit vulnerabilities (completed 2026-04-07)
-- [ ] **Phase 23: Test Fix** - Fix failing unit tests so vitest run passes with 0 failures
+- [x] **Phase 23: Test Fix** - Fix failing unit tests so vitest run passes with 0 failures (completed 2026-04-07)
 - [ ] **Phase 24: Lint Cleanup** - Normalize CRLF line endings to LF so lint passes cleanly
 
 ## Phase Details
@@ -479,7 +479,7 @@ Phases execute in numeric order: 1 → 20 (v1.0), then 21 → 24 (v1.1 Deploy Re
 |-------|----------------|--------|----------|
 | 21. TypeScript Fix | 1/1 | Complete    | 2026-04-07 |
 | 22. Dependency Security | 1/1 | Complete    | 2026-04-07 |
-| 23. Test Fix | 0/1 | Not started | - |
+| 23. Test Fix | 1/1 | Complete   | 2026-04-07 |
 | 24. Lint Cleanup | 0/1 | Not started | - |
 
 ### Phase 19: Security Hardening — Fix 74 audit vulnerabilities
