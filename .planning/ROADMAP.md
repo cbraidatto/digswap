@@ -36,8 +36,10 @@ Decimal phases appear between their surrounding integers in numeric order.
 ### v1.1 Deploy Readiness
 
 - [x] **Phase 21: TypeScript Fix** - Fix all TypeScript errors blocking next build and tsc --noEmit (completed 2026-04-07)
-- [x] **Phase 22: Dependency Security** - Update Vite and dependencies to resolve HIGH/CRITICAL audit vulnerabilities (completed 2026-04-07)
-- [x] **Phase 23: Test Fix** - Fix failing unit tests so vitest run passes with 0 failures (completed 2026-04-07)
+- [x] **Phase 22: Dependency Security** - Update Vite and dependencies to resolve HIGH/CRITICAL audit vulnerabilities
+ (completed 2026-04-07)
+- [x] **Phase 23: Test Fix** - Fix failing unit tests so vitest run passes with 0 failures
+ (completed 2026-04-07)
 - [ ] **Phase 24: Lint Cleanup** - Normalize CRLF line endings to LF so lint passes cleanly
 
 ## Phase Details
@@ -442,7 +444,10 @@ Plans:
 **Success Criteria** (what must be TRUE):
   1. All source files use LF line endings (no CRLF)
   2. Lint (`biome check`) passes with zero formatting errors related to line endings
-**Plans**: TBD
+**Plans**: 2 plans
+Plans:
+- [ ] 24-01-PLAN.md -- Normalize line endings to LF and auto-fix formatting/import/lint issues
+- [ ] 24-02-PLAN.md -- Fix manual a11y lint errors and add biome-ignore for safe patterns
 
 ## Progress
 
