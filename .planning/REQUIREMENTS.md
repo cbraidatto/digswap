@@ -279,5 +279,53 @@
 - Unmapped: 0
 
 ---
+
+## v1.1 Requirements — Deploy Readiness
+
+### Build
+
+- [ ] **BUILD-01**: Build (`next build`) completa sem erros TypeScript
+- [ ] **BUILD-02**: Typecheck (`tsc --noEmit`) passa com zero erros
+
+### Security
+
+- [ ] **SEC-08**: Zero vulnerabilidades HIGH/CRITICAL em `pnpm audit`
+
+### Tests
+
+- [ ] **TEST-01**: Todos os testes unitários passam (`vitest run` — 0 failures)
+
+### Quality
+
+- [ ] **QUAL-01**: Lint passa sem erros de formatação CRLF (line endings normalizados para LF)
+
+### Future Requirements
+
+None — this is a focused fix milestone.
+
+### Out of Scope
+
+- Feature development (belongs to v1.0 remaining phases or v2.0)
+- E2E test coverage (Playwright tests not in CI yet)
+- Analytics/monitoring setup
+- vercel.json configuration (defaults are sufficient for first deploy)
+- OG tags / metadata completion (cosmetic, not blocking)
+
+## v1.1 Traceability
+
+| Requirement | Phase | Status |
+|-------------|-------|--------|
+| BUILD-01 | Phase 21: TypeScript Fix | Pending |
+| BUILD-02 | Phase 21: TypeScript Fix | Pending |
+| SEC-08 | Phase 22: Dependency Security | Pending |
+| TEST-01 | Phase 23: Test Fix | Pending |
+| QUAL-01 | Phase 24: Lint Cleanup | Pending |
+
+**Coverage:**
+- v1.1 requirements: 5 total
+- Mapped to phases: 5
+- Unmapped: 0
+
+---
 *Requirements defined: 2026-03-25*
-*Last updated: 2026-04-02 after milestone M003 cleanup*
+*Last updated: 2026-04-06 — v1.1 Deploy Readiness requirements added*
