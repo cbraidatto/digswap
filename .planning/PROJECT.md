@@ -195,7 +195,7 @@ Feed and Profile have equal weight — both are primary entry points. Feed-first
 
 This document evolves at phase transitions and milestone boundaries.
 
-*Last updated: 2026-04-07 — Phase 22 (Dependency Security) complete — zero audit vulnerabilities*
+*Last updated: 2026-04-07 — Phase 23 (Test Fix) complete — all 646 tests passing*
 
 **After each phase transition** (via `/gsd:transition`):
 1. Requirements invalidated? → Move to Out of Scope with reason
