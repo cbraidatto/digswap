@@ -35,7 +35,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 
 ### v1.1 Deploy Readiness
 
-- [ ] **Phase 21: TypeScript Fix** - Fix all TypeScript errors blocking next build and tsc --noEmit
+- [x] **Phase 21: TypeScript Fix** - Fix all TypeScript errors blocking next build and tsc --noEmit (completed 2026-04-07)
 - [ ] **Phase 22: Dependency Security** - Update Vite and dependencies to resolve HIGH/CRITICAL audit vulnerabilities
 - [ ] **Phase 23: Test Fix** - Fix failing unit tests so vitest run passes with 0 failures
 - [ ] **Phase 24: Lint Cleanup** - Normalize CRLF line endings to LF so lint passes cleanly
@@ -413,7 +413,7 @@ Plans:
   2. `tsc --noEmit` passes with zero errors across the entire codebase
 **Plans**: 1 plan
 Plans:
-- [ ] 21-01-PLAN.md — Fix unsafe type casts in gem queries (double-cast through unknown)
+- [x] 21-01-PLAN.md — Fix unsafe type casts in gem queries (double-cast through unknown)
 
 ### Phase 22: Dependency Security
 **Goal**: Zero HIGH/CRITICAL vulnerabilities in dependency audit
@@ -475,7 +475,7 @@ Phases execute in numeric order: 1 → 20 (v1.0), then 21 → 24 (v1.1 Deploy Re
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|----------|
-| 21. TypeScript Fix | 0/1 | Not started | - |
+| 21. TypeScript Fix | 1/1 | Complete   | 2026-04-07 |
 | 22. Dependency Security | 0/1 | Not started | - |
 | 23. Test Fix | 0/1 | Not started | - |
 | 24. Lint Cleanup | 0/1 | Not started | - |

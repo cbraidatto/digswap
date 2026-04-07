@@ -2,15 +2,15 @@
 gsd_state_version: 1.0
 milestone: v1.1
 milestone_name: Deploy Readiness
-status: ready_to_plan
-stopped_at: null
-last_updated: "2026-04-06T22:00:00.000Z"
-last_activity: 2026-04-06 -- Roadmap created (Phases 21-24)
+status: verifying
+stopped_at: Completed 21-01-PLAN.md
+last_updated: "2026-04-07T01:08:23.545Z"
+last_activity: 2026-04-07
 progress:
-  total_phases: 4
-  completed_phases: 0
-  total_plans: 4
-  completed_plans: 0
+  total_phases: 25
+  completed_phases: 20
+  total_plans: 97
+  completed_plans: 95
   percent: 0
 ---
 
@@ -21,14 +21,14 @@ progress:
 See: .planning/PROJECT.md (updated 2026-04-06)
 
 **Core value:** A digger opens the app and immediately finds who has the record they've been hunting -- and sees where they stand in the community.
-**Current focus:** Milestone v1.1 — Deploy Readiness
+**Current focus:** Phase 21 — typescript-fix
 
 ## Current Position
 
-Phase: 21 of 24 (TypeScript Fix) -- ready to plan
-Plan: —
-Status: Ready to plan Phase 21
-Last activity: 2026-04-06 -- Roadmap created (Phases 21-24)
+Phase: 21 (typescript-fix) — EXECUTING
+Plan: 1 of 1
+Status: Phase complete — ready for verification
+Last activity: 2026-04-07
 
 Progress: [░░░░░░░░░░] 0%
 
@@ -103,6 +103,7 @@ Progress: [░░░░░░░░░░] 0%
 | Phase 19 P03 | 5min | 2 tasks | 3 files |
 | Phase 20 P01 | 3min | 1 tasks | 7 files |
 | Phase 20 P02 | 3min | 2 tasks | 6 files |
+| Phase 21 P01 | 1min | 1 tasks | 1 files |
 
 ## Accumulated Context
 
@@ -232,6 +233,7 @@ Recent decisions affecting current work:
 - [Phase 20]: Gem distribution computed at SQL query time via CASE expression -- no derived column on releases table
 - [Phase 20]: Reuse rarity_score DB column for gem scores — semantic rename at TypeScript layer only (UserRanking.gemScore)
 - [Phase 20]: RANK_TITLES recalibrated to 501/2001/5001 — typical 200-record collection scores ~1030 gem points
+- [Phase 21]: Used standard 'as unknown as T' double-cast pattern for raw SQL results from db.execute()
 
 ### Roadmap Evolution
 
@@ -259,6 +261,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-04-06T19:15:00.000Z
-Stopped at: Completed Wave 1 (20-01, 20-02)
+Last session: 2026-04-07T01:08:23.537Z
+Stopped at: Completed 21-01-PLAN.md
 Resume file: None

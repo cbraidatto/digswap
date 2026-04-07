@@ -284,8 +284,8 @@
 
 ### Build
 
-- [ ] **BUILD-01**: Build (`next build`) completa sem erros TypeScript
-- [ ] **BUILD-02**: Typecheck (`tsc --noEmit`) passa com zero erros
+- [x] **BUILD-01**: Build (`next build`) completa sem erros TypeScript
+- [x] **BUILD-02**: Typecheck (`tsc --noEmit`) passa com zero erros
 
 ### Security
 
@@ -315,8 +315,8 @@ None — this is a focused fix milestone.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| BUILD-01 | Phase 21: TypeScript Fix | Pending |
-| BUILD-02 | Phase 21: TypeScript Fix | Pending |
+| BUILD-01 | Phase 21: TypeScript Fix | Complete |
+| BUILD-02 | Phase 21: TypeScript Fix | Complete |
 | SEC-08 | Phase 22: Dependency Security | Pending |
 | TEST-01 | Phase 23: Test Fix | Pending |
 | QUAL-01 | Phase 24: Lint Cleanup | Pending |
