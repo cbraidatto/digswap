@@ -1,19 +1,6 @@
-import { describe, it, expect, vi } from "vitest";
+import { describe, it, expect } from "vitest";
 import { render, screen } from "@testing-library/react";
 import { GemBadge } from "@/components/ui/gem-badge";
-
-// Mock lucide-react icons
-vi.mock("lucide-react", () => ({
-  Hexagon: (props: Record<string, unknown>) => (
-    <svg data-testid="icon-hexagon" {...props} />
-  ),
-  Gem: (props: Record<string, unknown>) => (
-    <svg data-testid="icon-gem" {...props} />
-  ),
-  Diamond: (props: Record<string, unknown>) => (
-    <svg data-testid="icon-diamond" {...props} />
-  ),
-}));
 
 describe("GemBadge", () => {
   it("renders nothing when score is null", () => {
@@ -73,24 +60,24 @@ describe("GemBadge", () => {
     expect(badge.getAttribute("aria-label")).toContain("weight 100");
   });
 
-  it("uses Hexagon icon for quartz tier", () => {
+  it("uses quartz glyph for quartz tier", () => {
     render(<GemBadge score={0.1} />);
-    expect(screen.getByTestId("icon-hexagon")).toBeInTheDocument();
+    expect(screen.getByText("\u25C7")).toBeInTheDocument();
   });
 
-  it("uses Gem icon for amethyst tier", () => {
+  it("uses amethyst glyph for amethyst tier", () => {
     render(<GemBadge score={0.5} />);
-    expect(screen.getByTestId("icon-gem")).toBeInTheDocument();
+    expect(screen.getByText("\u2B21")).toBeInTheDocument();
   });
 
-  it("uses Diamond icon for sapphire tier", () => {
+  it("uses sapphire glyph for sapphire tier", () => {
     render(<GemBadge score={4.0} />);
-    expect(screen.getByTestId("icon-diamond")).toBeInTheDocument();
+    expect(screen.getByText("\u25C6")).toBeInTheDocument();
   });
 
-  it("uses Diamond icon for diamond tier", () => {
+  it("uses diamond glyph for diamond tier", () => {
     render(<GemBadge score={7.0} />);
-    expect(screen.getByTestId("icon-diamond")).toBeInTheDocument();
+    expect(screen.getByText("\u2756")).toBeInTheDocument();
   });
 
   it("applies animate-gem-prismatic class for diamond tier", () => {
