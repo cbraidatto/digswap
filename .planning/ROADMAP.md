@@ -422,7 +422,9 @@ Plans:
 **Success Criteria** (what must be TRUE):
   1. `pnpm audit` reports zero HIGH and zero CRITICAL vulnerabilities
   2. All Vite-related packages are updated to patched versions
-**Plans**: TBD
+**Plans**: 1 plan
+Plans:
+- [ ] 22-01-PLAN.md — Update vite/vitest/@vitejs/plugin-react to resolve 9 audit vulnerabilities
 
 ### Phase 23: Test Fix
 **Goal**: All unit tests pass with zero failures
