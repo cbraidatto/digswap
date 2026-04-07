@@ -41,7 +41,7 @@ export async function getGemDistribution(
   };
 
   // Fill in counts from query results
-  for (const row of rows as Array<{ gem_tier: string; count: string }>) {
+  for (const row of rows as unknown as Array<{ gem_tier: string; count: string }>) {
     const tier = row.gem_tier as GemTier;
     if (tier in distribution) {
       distribution[tier] = parseInt(row.count, 10) || 0;
@@ -75,7 +75,7 @@ export async function getGemScoreForUser(userId: string): Promise<number> {
     WHERE ci.user_id = ${userId}
   `);
 
-  const result = rows as Array<{ gem_score: string | null }>;
+  const result = rows as unknown as Array<{ gem_score: string | null }>;
   if (!result.length || !result[0].gem_score) return 0;
   return parseInt(result[0].gem_score, 10) || 0;
 }
