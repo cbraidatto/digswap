@@ -34,7 +34,7 @@ vi.mock("@upstash/redis", () => {
 			sharedStore.delete(key);
 		}
 
-		async eval(script: string, keys: string[], _args: unknown[]) {
+		async eval(_script: string, keys: string[], _args: unknown[]) {
 			// Simulate atomic GET+DEL Lua script used by handoff-store
 			const key = keys[0];
 			const value = sharedStore.get(key) ?? null;

@@ -1,10 +1,11 @@
 "use server";
 
+import { sql } from "drizzle-orm";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
-import { sql } from "drizzle-orm";
+import { extractSessionId } from "@/lib/auth/session-utils";
 import { db } from "@/lib/db";
-import { authRateLimit, resetRateLimit , safeLimit} from "@/lib/rate-limit";
+import { authRateLimit, resetRateLimit, safeLimit } from "@/lib/rate-limit";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
 import {
@@ -13,7 +14,6 @@ import {
 	signInSchema,
 	signUpSchema,
 } from "@/lib/validations/auth";
-import { extractSessionId } from "@/lib/auth/session-utils";
 
 /**
  * Generic auth error message per OWASP guidelines.
@@ -174,8 +174,7 @@ export async function signIn(formData: FormData): Promise<{
 				// allowlist check (which also extracts session_id from the JWT) will
 				// find a matching row.  Falling back to randomUUID() would make every
 				// session look "untracked" and either pass silently or block the user.
-				const sessionId =
-					extractSessionId(data.session.access_token) ?? crypto.randomUUID();
+				const sessionId = extractSessionId(data.session.access_token) ?? crypto.randomUUID();
 
 				// Insert new session record
 				await admin.from("user_sessions").insert({

@@ -128,7 +128,8 @@ describe("sendTradeMessage", () => {
 
 		const result = await sendTradeMessage(TRADE_ID, "Still there?");
 		expect(result.success).toBe(false);
-		if (!result.success) expect(result.error).toBe("Too many messages in a short period. Please wait a moment.");
+		if (!result.success)
+			expect(result.error).toBe("Too many messages in a short period. Please wait a moment.");
 		expect(insertValuesMock).not.toHaveBeenCalled();
 	});
 

@@ -1,4 +1,4 @@
-import { describe, test, expect, vi, beforeEach } from "vitest";
+import { beforeEach, describe, expect, test, vi } from "vitest";
 
 // Use vi.hoisted so these are available when vi.mock factory runs (hoisted above imports)
 const { mockGetRequestToken, mockGetAccessToken, mockRpc, mockFrom } = vi.hoisted(() => ({
@@ -24,12 +24,7 @@ vi.mock("@/lib/supabase/admin", () => ({
 	})),
 }));
 
-import {
-	getRequestToken,
-	getAccessToken,
-	storeTokens,
-	deleteTokens,
-} from "@/lib/discogs/oauth";
+import { deleteTokens, getAccessToken, getRequestToken, storeTokens } from "@/lib/discogs/oauth";
 
 describe("Discogs OAuth helpers", () => {
 	beforeEach(() => {
@@ -52,9 +47,7 @@ describe("Discogs OAuth helpers", () => {
 			tokenSecret: "req_secret_456",
 			authorizeUrl: "https://discogs.com/oauth/authorize?oauth_token=req_token_123",
 		});
-		expect(mockGetRequestToken).toHaveBeenCalledWith(
-			"http://localhost:3000/api/discogs/callback",
-		);
+		expect(mockGetRequestToken).toHaveBeenCalledWith("http://localhost:3000/api/discogs/callback");
 	});
 
 	test("getRequestToken throws when token is missing", async () => {
@@ -64,9 +57,9 @@ describe("Discogs OAuth helpers", () => {
 			authorizeUrl: "",
 		});
 
-		await expect(
-			getRequestToken("http://localhost:3000/api/discogs/callback"),
-		).rejects.toThrow("Failed to obtain request token from Discogs");
+		await expect(getRequestToken("http://localhost:3000/api/discogs/callback")).rejects.toThrow(
+			"Failed to obtain request token from Discogs",
+		);
 	});
 
 	test("getAccessToken exchanges verifier for access token", async () => {
@@ -81,11 +74,7 @@ describe("Discogs OAuth helpers", () => {
 			accessToken: "access_token_abc",
 			accessTokenSecret: "access_secret_def",
 		});
-		expect(mockGetAccessToken).toHaveBeenCalledWith(
-			"req_token",
-			"req_secret",
-			"verifier_code",
-		);
+		expect(mockGetAccessToken).toHaveBeenCalledWith("req_token", "req_secret", "verifier_code");
 	});
 
 	test("getAccessToken throws when access token is missing", async () => {
@@ -94,9 +83,9 @@ describe("Discogs OAuth helpers", () => {
 			accessTokenSecret: null,
 		});
 
-		await expect(
-			getAccessToken("req_token", "req_secret", "verifier_code"),
-		).rejects.toThrow("Failed to obtain access token from Discogs");
+		await expect(getAccessToken("req_token", "req_secret", "verifier_code")).rejects.toThrow(
+			"Failed to obtain access token from Discogs",
+		);
 	});
 
 	test("storeTokens stores in Vault via admin client RPC", async () => {

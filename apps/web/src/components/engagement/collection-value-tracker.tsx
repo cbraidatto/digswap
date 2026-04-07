@@ -23,9 +23,7 @@ export function CollectionValueTracker({
 	return (
 		<div className="bg-surface-container-low rounded-xl border border-outline-variant/10 p-5">
 			<div className="flex items-center gap-2 mb-4">
-				<span className="material-symbols-outlined text-xl text-primary">
-					insights
-				</span>
+				<span className="material-symbols-outlined text-xl text-primary">insights</span>
 				<h3 className="font-heading text-base font-semibold text-on-surface">
 					Collection overview
 				</h3>
@@ -33,9 +31,7 @@ export function CollectionValueTracker({
 
 			{/* Big number */}
 			<div className="text-center mb-5">
-				<div className="font-heading text-4xl font-extrabold text-on-surface">
-					{totalRecords}
-				</div>
+				<div className="font-heading text-4xl font-extrabold text-on-surface">{totalRecords}</div>
 				<div className="text-xs text-on-surface-variant">Total records</div>
 			</div>
 
@@ -85,12 +81,12 @@ export function CollectionValueTracker({
 			{/* Avg rarity */}
 			<div className="flex items-center justify-between p-3 rounded-lg bg-surface-container/50">
 				<span className="text-xs text-on-surface-variant">Average rarity score</span>
-				<span className={cn(
-					"font-heading text-base font-bold",
-					avgRarity >= 75 ? "text-tertiary" :
-					avgRarity >= 50 ? "text-secondary" :
-					"text-primary",
-				)}>
+				<span
+					className={cn(
+						"font-heading text-base font-bold",
+						avgRarity >= 75 ? "text-tertiary" : avgRarity >= 50 ? "text-secondary" : "text-primary",
+					)}
+				>
 					{avgRarity.toFixed(1)}
 				</span>
 			</div>

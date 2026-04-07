@@ -16,7 +16,7 @@
  * Expected: No HIGH or MEDIUM alerts. LOW/INFORMATIONAL alerts are acceptable.
  */
 
-import { describe, it, expect, vi, beforeEach } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 
 // ---------------------------------------------------------------------------
 // Mock: Supabase auth -- always unauthenticated
@@ -32,7 +32,9 @@ vi.mock("@/lib/supabase/server", () => ({
 			signInWithPassword: vi.fn().mockResolvedValue({ data: null, error: { message: "mock" } }),
 			mfa: {
 				enroll: vi.fn().mockResolvedValue({ data: null, error: { message: "mock" } }),
-				getAuthenticatorAssuranceLevel: vi.fn().mockResolvedValue({ data: { nextLevel: "aal1", currentLevel: "aal1" }, error: null }),
+				getAuthenticatorAssuranceLevel: vi
+					.fn()
+					.mockResolvedValue({ data: { nextLevel: "aal1", currentLevel: "aal1" }, error: null }),
 				challengeAndVerify: vi.fn().mockResolvedValue({ error: { message: "mock" } }),
 			},
 			resend: vi.fn().mockResolvedValue({ error: null }),
@@ -57,8 +59,18 @@ const mockFrom = vi.fn();
 function createQueryChain(result: { data?: unknown; error?: unknown }) {
 	const chain: Record<string, unknown> = {};
 	const methods = [
-		"select", "eq", "neq", "single", "maybeSingle", "insert",
-		"update", "delete", "in", "or", "order", "limit",
+		"select",
+		"eq",
+		"neq",
+		"single",
+		"maybeSingle",
+		"insert",
+		"update",
+		"delete",
+		"in",
+		"or",
+		"order",
+		"limit",
 	];
 	for (const method of methods) {
 		chain[method] = vi.fn().mockReturnValue(chain);
@@ -85,7 +97,7 @@ vi.mock("@/lib/rate-limit", () => ({
 	tradeRateLimit: null,
 	discogsRateLimit: null,
 	safeLimit: vi.fn().mockImplementation(async () => ({ success: true })),
-}));;
+}));
 
 // ---------------------------------------------------------------------------
 // Mock: DB (thenable Drizzle chain)
@@ -93,9 +105,20 @@ vi.mock("@/lib/rate-limit", () => ({
 vi.mock("@/lib/db", () => {
 	const chain: Record<string, unknown> = {};
 	const methods = [
-		"select", "from", "where", "orderBy", "limit", "innerJoin",
-		"leftJoin", "groupBy", "offset", "selectDistinctOn", "update", "set",
-		"delete", "execute",
+		"select",
+		"from",
+		"where",
+		"orderBy",
+		"limit",
+		"innerJoin",
+		"leftJoin",
+		"groupBy",
+		"offset",
+		"selectDistinctOn",
+		"update",
+		"set",
+		"delete",
+		"execute",
 	];
 	for (const method of methods) {
 		chain[method] = vi.fn().mockImplementation(() => chain);
@@ -123,33 +146,93 @@ vi.mock("@/lib/db", () => {
 // ---------------------------------------------------------------------------
 vi.mock("@/lib/db/schema/social", () => ({
 	follows: { id: "id", followerId: "follower_id", followingId: "following_id" },
-	activityFeed: { userId: "user_id", actionType: "action_type", targetType: "target_type", targetId: "target_id", metadata: "metadata" },
+	activityFeed: {
+		userId: "user_id",
+		actionType: "action_type",
+		targetType: "target_type",
+		targetId: "target_id",
+		metadata: "metadata",
+	},
 }));
 vi.mock("@/lib/db/schema/users", () => ({
-	profiles: { id: "id", username: "username", displayName: "display_name", avatarUrl: "avatar_url", updatedAt: "updated_at", onboardingCompleted: "onboarding_completed", holyGrailIds: "holy_grail_ids", coverUrl: "cover_url", coverPositionY: "cover_position_y" },
+	profiles: {
+		id: "id",
+		username: "username",
+		displayName: "display_name",
+		avatarUrl: "avatar_url",
+		updatedAt: "updated_at",
+		onboardingCompleted: "onboarding_completed",
+		holyGrailIds: "holy_grail_ids",
+		coverUrl: "cover_url",
+		coverPositionY: "cover_position_y",
+	},
 }));
 vi.mock("@/lib/db/schema/collections", () => ({
 	collectionItems: { userId: "user_id", releaseId: "release_id" },
 }));
 vi.mock("@/lib/db/schema/releases", () => ({
-	releases: { id: "id", title: "title", artist: "artist", year: "year", coverImageUrl: "cover_image_url" },
+	releases: {
+		id: "id",
+		title: "title",
+		artist: "artist",
+		year: "year",
+		coverImageUrl: "cover_image_url",
+	},
 }));
 vi.mock("@/lib/db/schema/groups", () => ({
 	groups: { id: "id", slug: "slug", name: "name", memberCount: "member_count" },
 	groupMembers: { id: "id", groupId: "group_id", userId: "user_id", role: "role" },
-	groupPosts: { id: "id", groupId: "group_id", userId: "user_id", content: "content", releaseId: "release_id", reviewId: "review_id" },
+	groupPosts: {
+		id: "id",
+		groupId: "group_id",
+		userId: "user_id",
+		content: "content",
+		releaseId: "release_id",
+		reviewId: "review_id",
+	},
 }));
 vi.mock("@/lib/db/schema/group-invites", () => ({
-	groupInvites: { id: "id", groupId: "group_id", token: "token", createdBy: "created_by", expiresAt: "expires_at" },
+	groupInvites: {
+		id: "id",
+		groupId: "group_id",
+		token: "token",
+		createdBy: "created_by",
+		expiresAt: "expires_at",
+	},
 }));
 vi.mock("@/lib/db/schema/reviews", () => ({
-	reviews: { id: "id", userId: "user_id", releaseId: "release_id", rating: "rating", title: "title", body: "body", isPressingSpecific: "is_pressing_specific", pressingDetails: "pressing_details", updatedAt: "updated_at" },
+	reviews: {
+		id: "id",
+		userId: "user_id",
+		releaseId: "release_id",
+		rating: "rating",
+		title: "title",
+		body: "body",
+		isPressingSpecific: "is_pressing_specific",
+		pressingDetails: "pressing_details",
+		updatedAt: "updated_at",
+	},
 }));
 vi.mock("@/lib/db/schema/leads", () => ({
-	leads: { userId: "user_id", targetType: "target_type", targetId: "target_id", note: "note", status: "status", updatedAt: "updated_at" },
+	leads: {
+		userId: "user_id",
+		targetType: "target_type",
+		targetId: "target_id",
+		note: "note",
+		status: "status",
+		updatedAt: "updated_at",
+	},
 }));
 vi.mock("@/lib/db/schema/sessions", () => ({
-	userSessions: { id: "id", userId: "user_id", sessionId: "session_id", deviceInfo: "device_info", ipAddress: "ip_address", createdAt: "created_at", lastSeenAt: "last_seen_at" },
+	userSessions: {
+		id: "id",
+		userId: "user_id",
+		sessionId: "session_id",
+		deviceInfo: "device_info",
+		ipAddress: "ip_address",
+		createdAt: "created_at",
+		lastSeenAt: "last_seen_at",
+	},
 	backupCodes: { id: "id", userId: "user_id", codeHash: "code_hash", used: "used" },
 }));
 vi.mock("@/lib/db/schema/wantlist", () => ({
@@ -173,12 +256,17 @@ vi.mock("@/lib/gamification/queries", () => ({
 }));
 vi.mock("@/lib/community/slugify", () => ({ slugify: vi.fn().mockReturnValue("test-slug") }));
 vi.mock("@/lib/community/queries", () => ({
-	getGroupPosts: vi.fn(), getGenreGroups: vi.fn(), getMemberGroups: vi.fn(),
-	getReviewsForRelease: vi.fn(), getReviewCountForRelease: vi.fn(),
+	getGroupPosts: vi.fn(),
+	getGenreGroups: vi.fn(),
+	getMemberGroups: vi.fn(),
+	getReviewsForRelease: vi.fn(),
+	getReviewCountForRelease: vi.fn(),
 }));
 vi.mock("@/lib/social/queries", () => ({
-	getGlobalFeed: vi.fn(), getPersonalFeed: vi.fn(),
-	getFollowers: vi.fn(), getFollowing: vi.fn(),
+	getGlobalFeed: vi.fn(),
+	getPersonalFeed: vi.fn(),
+	getFollowers: vi.fn(),
+	getFollowing: vi.fn(),
 }));
 vi.mock("@/lib/collection/filters", () => ({
 	CONDITION_GRADES: ["M", "NM", "VG+", "VG", "G+", "G", "F", "P"] as const,
@@ -196,7 +284,8 @@ vi.mock("@/lib/notifications/queries", () => ({
 	upsertPreferences: vi.fn().mockResolvedValue({}),
 }));
 vi.mock("@/lib/discogs/oauth", () => ({
-	getRequestToken: vi.fn(), deleteTokens: vi.fn(),
+	getRequestToken: vi.fn(),
+	deleteTokens: vi.fn(),
 }));
 vi.mock("@/lib/youtube/client", () => ({ searchYouTube: vi.fn() }));
 vi.mock("@/lib/discovery/queries", () => ({
@@ -216,16 +305,40 @@ vi.mock("@/lib/backup-codes", () => ({
 	consumeBackupCode: vi.fn().mockResolvedValue(false),
 }));
 vi.mock("@/lib/validations/auth", () => ({
-	signUpSchema: { safeParse: vi.fn().mockReturnValue({ success: true, data: { email: "a@b.com", password: "Test1234!" } }) },
-	signInSchema: { safeParse: vi.fn().mockReturnValue({ success: true, data: { email: "a@b.com", password: "Test1234!" } }) },
-	forgotPasswordSchema: { safeParse: vi.fn().mockReturnValue({ success: true, data: { email: "a@b.com" } }) },
-	resetPasswordSchema: { safeParse: vi.fn().mockReturnValue({ success: true, data: { password: "Test1234!", confirmPassword: "Test1234!" } }) },
+	signUpSchema: {
+		safeParse: vi
+			.fn()
+			.mockReturnValue({ success: true, data: { email: "a@b.com", password: "Test1234!" } }),
+	},
+	signInSchema: {
+		safeParse: vi
+			.fn()
+			.mockReturnValue({ success: true, data: { email: "a@b.com", password: "Test1234!" } }),
+	},
+	forgotPasswordSchema: {
+		safeParse: vi.fn().mockReturnValue({ success: true, data: { email: "a@b.com" } }),
+	},
+	resetPasswordSchema: {
+		safeParse: vi.fn().mockReturnValue({
+			success: true,
+			data: { password: "Test1234!", confirmPassword: "Test1234!" },
+		}),
+	},
 	totpSchema: { safeParse: vi.fn().mockReturnValue({ success: true, data: { code: "123456" } }) },
-	backupCodeSchema: { safeParse: vi.fn().mockReturnValue({ success: true, data: { code: "ABCD1234" } }) },
+	backupCodeSchema: {
+		safeParse: vi.fn().mockReturnValue({ success: true, data: { code: "ABCD1234" } }),
+	},
 }));
 vi.mock("@/lib/validations/community", () => ({
-	createPostSchema: { safeParse: vi.fn().mockReturnValue({ success: true, data: { content: "test", groupId: "g1" } }) },
-	createReviewSchema: { safeParse: vi.fn().mockReturnValue({ success: true, data: { releaseId: "r1", rating: 5, body: "great", groupId: "g1" } }) },
+	createPostSchema: {
+		safeParse: vi.fn().mockReturnValue({ success: true, data: { content: "test", groupId: "g1" } }),
+	},
+	createReviewSchema: {
+		safeParse: vi.fn().mockReturnValue({
+			success: true,
+			data: { releaseId: "r1", rating: 5, body: "great", groupId: "g1" },
+		}),
+	},
 }));
 vi.mock("@/lib/validations/profile", () => ({
 	updateProfileSchema: { safeParse: vi.fn().mockReturnValue({ success: true, data: {} }) },
@@ -238,22 +351,22 @@ vi.mock("@/lib/validations/common", async (importOriginal) => {
 	};
 });
 
+import { searchDiscogs } from "@/actions/collection";
 // ---------------------------------------------------------------------------
 // Import actions AFTER mocks
 // ---------------------------------------------------------------------------
 import { createGroupAction, joinGroupAction } from "@/actions/community";
-import { followUser, searchUsers } from "@/actions/social";
-import { searchRecordsAction } from "@/actions/discovery";
-import { updateShowcase, updateProfile as updateProfileAction } from "@/actions/profile";
-import { searchDiscogs } from "@/actions/collection";
 import { connectDiscogs, triggerSync } from "@/actions/discogs";
-import { saveLead, getLead } from "@/actions/leads";
-import { addToWantlist } from "@/actions/wantlist";
-import { markNotificationRead, getNotificationsAction } from "@/actions/notifications";
+import { searchRecordsAction } from "@/actions/discovery";
 import { loadGlobalLeaderboard } from "@/actions/gamification";
-import { updateProfile as onboardingUpdateProfile } from "@/actions/onboarding";
-import { getSessions, terminateSession } from "@/actions/sessions";
+import { getLead, saveLead } from "@/actions/leads";
 import { enrollTotp } from "@/actions/mfa";
+import { getNotificationsAction, markNotificationRead } from "@/actions/notifications";
+import { updateProfile as onboardingUpdateProfile } from "@/actions/onboarding";
+import { updateProfile as updateProfileAction, updateShowcase } from "@/actions/profile";
+import { getSessions, terminateSession } from "@/actions/sessions";
+import { followUser, searchUsers } from "@/actions/social";
+import { addToWantlist } from "@/actions/wantlist";
 
 // ---------------------------------------------------------------------------
 // Auth Bypass Prevention Tests
@@ -308,7 +421,9 @@ describe("Auth Bypass Prevention", () => {
 
 		it("should require authentication for updateProfile", async () => {
 			const result = await updateProfileAction({
-				displayName: "Test", username: "test", location: "NYC",
+				displayName: "Test",
+				username: "test",
+				location: "NYC",
 			});
 			expect(result).toHaveProperty("error");
 			expect(result.error).toMatch(/unauthenticated/i);

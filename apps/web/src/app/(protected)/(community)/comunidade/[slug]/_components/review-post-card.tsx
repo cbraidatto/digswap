@@ -1,6 +1,6 @@
 import Link from "next/link";
-import type { GroupPost } from "@/lib/community/queries";
 import { StarRating } from "@/components/ui/star-rating";
+import type { GroupPost } from "@/lib/community/queries";
 
 function formatRelativeTime(dateStr: string): string {
 	const diff = Date.now() - new Date(dateStr).getTime();
@@ -25,22 +25,16 @@ export function ReviewPostCard({ post }: { post: GroupPost }) {
 				>
 					{post.username}
 				</Link>
-				<span className="font-mono text-xs text-on-surface-variant">
-					&middot;
-				</span>
+				<span className="font-mono text-xs text-on-surface-variant">&middot;</span>
 				<span className="font-mono text-xs text-on-surface-variant">
 					{formatRelativeTime(post.createdAt)}
 				</span>
-				<span className="font-mono text-xs text-on-surface-variant">
-					&middot; review &middot;
-				</span>
+				<span className="font-mono text-xs text-on-surface-variant">&middot; review &middot;</span>
 			</div>
 
 			{/* Stars + record title */}
 			<div className="flex items-center gap-2 mb-2">
-				{post.reviewRating !== null && (
-					<StarRating rating={post.reviewRating} />
-				)}
+				{post.reviewRating !== null && <StarRating rating={post.reviewRating} />}
 				{post.releaseTitle && (
 					<span className="font-heading font-semibold text-sm text-on-surface">
 						{post.releaseArtist} - {post.releaseTitle}
@@ -56,9 +50,7 @@ export function ReviewPostCard({ post }: { post: GroupPost }) {
 			)}
 
 			{/* Review body */}
-			<p className="text-sm text-on-surface leading-relaxed">
-				{post.content}
-			</p>
+			<p className="text-sm text-on-surface leading-relaxed">{post.content}</p>
 		</div>
 	);
 }

@@ -1,11 +1,11 @@
 "use server";
 
-import { z } from "zod";
 import { ilike, or, sql } from "drizzle-orm";
+import { z } from "zod";
+import { requireUser } from "@/lib/auth/require-user";
 import { db } from "@/lib/db";
 import { releases } from "@/lib/db/schema/releases";
 import { profiles } from "@/lib/db/schema/users";
-import { requireUser } from "@/lib/auth/require-user";
 import { apiRateLimit, safeLimit } from "@/lib/rate-limit";
 import { sanitizeWildcards } from "@/lib/validations/common";
 
@@ -32,9 +32,7 @@ const searchSchema = z.string().trim().min(2).max(200);
  * Global search: queries records (title/artist) and users (username) in parallel.
  * Returns up to 5 records + 5 users for the dropdown.
  */
-export async function globalSearchAction(
-	query: string,
-): Promise<GlobalSearchResult> {
+export async function globalSearchAction(query: string): Promise<GlobalSearchResult> {
 	try {
 		const user = await requireUser();
 
@@ -69,12 +67,7 @@ export async function globalSearchAction(
 					avatarUrl: profiles.avatarUrl,
 				})
 				.from(profiles)
-				.where(
-					or(
-						ilike(profiles.username, pattern),
-						ilike(profiles.displayName, pattern),
-					),
-				)
+				.where(or(ilike(profiles.username, pattern), ilike(profiles.displayName, pattern)))
 				.limit(5),
 		]);
 

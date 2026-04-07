@@ -1,4 +1,4 @@
-import { describe, test, expect, vi, beforeEach } from "vitest";
+import { beforeEach, describe, expect, test, vi } from "vitest";
 
 // ---------------------------------------------------------------------------
 // Mock the community queries module directly (same pattern as review.test.ts)
@@ -11,10 +11,7 @@ vi.mock("@/lib/community/queries", () => ({
 // ---------------------------------------------------------------------------
 // Import after mocks
 // ---------------------------------------------------------------------------
-import {
-	getReviewsForRelease,
-	getReviewCountForRelease,
-} from "@/lib/community/queries";
+import { getReviewCountForRelease, getReviewsForRelease } from "@/lib/community/queries";
 
 describe("getReviewsForRelease (release page integration)", () => {
 	beforeEach(() => {

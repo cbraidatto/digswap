@@ -1,6 +1,6 @@
+import Link from "next/link";
 import { AuthCard } from "@/components/auth/auth-card";
 import { SignInForm } from "@/components/auth/sign-in-form";
-import Link from "next/link";
 
 export const metadata = {
 	title: "Welcome Back | DigSwap",
@@ -18,18 +18,11 @@ export default async function SignInPage({
 	return (
 		<AuthCard
 			title="Welcome Back"
-			subtitle={
-				oauthError
-					? `Could not connect to ${oauthError}. Please try again.`
-					: undefined
-			}
+			subtitle={oauthError ? `Could not connect to ${oauthError}. Please try again.` : undefined}
 			footer={
 				<p>
 					New to DigSwap?{" "}
-					<Link
-						href="/signup"
-						className="text-primary hover:underline"
-					>
+					<Link href="/signup" className="text-primary hover:underline">
 						Create an account
 					</Link>
 				</p>

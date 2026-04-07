@@ -1,10 +1,10 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import Image from "next/image";
+import { useEffect, useState } from "react";
+import { getConversationsAction, getFriendsAction } from "@/actions/chat";
+import type { ConversationPreview, Friend } from "@/lib/chat/queries";
 import { useChatStore } from "@/lib/chat/store";
-import { getFriendsAction, getConversationsAction } from "@/actions/chat";
-import type { Friend, ConversationPreview } from "@/lib/chat/queries";
 
 function formatRelativeTime(iso: string) {
 	const diff = Date.now() - new Date(iso).getTime();
@@ -60,12 +60,14 @@ export function ChatConversationList() {
 			}
 		}
 		load();
-		return () => { cancelled = true; };
+		return () => {
+			cancelled = true;
+		};
 	}, []);
 
 	// Friends without an existing conversation (for starting new chats)
 	const conversationFriendIds = new Set(conversations.map((c) => c.friendId));
-	const newFriends = friends.filter((f) => !conversationFriendIds.has(f.id));
+	const _newFriends = friends.filter((f) => !conversationFriendIds.has(f.id));
 
 	return (
 		<div className="flex flex-col h-full">
@@ -147,51 +149,49 @@ export function ChatConversationList() {
 							))}
 						</div>
 					)
+				) : /* Friends tab */
+				friends.length === 0 ? (
+					<div className="text-center py-12 px-4">
+						<span className="material-symbols-outlined text-3xl text-on-surface-variant/30 block mb-2">
+							group
+						</span>
+						<p className="font-mono text-xs text-on-surface-variant">No mutual followers yet</p>
+						<p className="font-mono text-[10px] text-on-surface-variant/50 mt-1">
+							Follow other diggers — when they follow back, they appear here
+						</p>
+					</div>
 				) : (
-					/* Friends tab */
-					friends.length === 0 ? (
-						<div className="text-center py-12 px-4">
-							<span className="material-symbols-outlined text-3xl text-on-surface-variant/30 block mb-2">
-								group
-							</span>
-							<p className="font-mono text-xs text-on-surface-variant">No mutual followers yet</p>
-							<p className="font-mono text-[10px] text-on-surface-variant/50 mt-1">
-								Follow other diggers — when they follow back, they appear here
-							</p>
-						</div>
-					) : (
-						<div className="divide-y divide-outline-variant/5">
-							{friends.map((friend) => (
-								<button
-									key={friend.id}
-									type="button"
-									onClick={() =>
-										openConversation(
-											friend.id,
-											friend.username ?? friend.displayName,
-											friend.avatarUrl,
-										)
-									}
-									className="w-full flex items-center gap-3 px-4 py-3 hover:bg-surface-container-high transition-colors text-left"
-								>
-									<Avatar url={friend.avatarUrl} name={friend.username} />
-									<div className="flex-1 min-w-0">
-										<span className="font-mono text-xs text-on-surface truncate block">
-											{friend.username ?? friend.displayName ?? "Digger"}
-										</span>
-										{friend.displayName && friend.username && (
-											<span className="font-mono text-[10px] text-on-surface-variant/50 truncate block">
-												{friend.displayName}
-											</span>
-										)}
-									</div>
-									<span className="material-symbols-outlined text-sm text-on-surface-variant/30">
-										chat
+					<div className="divide-y divide-outline-variant/5">
+						{friends.map((friend) => (
+							<button
+								key={friend.id}
+								type="button"
+								onClick={() =>
+									openConversation(
+										friend.id,
+										friend.username ?? friend.displayName,
+										friend.avatarUrl,
+									)
+								}
+								className="w-full flex items-center gap-3 px-4 py-3 hover:bg-surface-container-high transition-colors text-left"
+							>
+								<Avatar url={friend.avatarUrl} name={friend.username} />
+								<div className="flex-1 min-w-0">
+									<span className="font-mono text-xs text-on-surface truncate block">
+										{friend.username ?? friend.displayName ?? "Digger"}
 									</span>
-								</button>
-							))}
-						</div>
-					)
+									{friend.displayName && friend.username && (
+										<span className="font-mono text-[10px] text-on-surface-variant/50 truncate block">
+											{friend.displayName}
+										</span>
+									)}
+								</div>
+								<span className="material-symbols-outlined text-sm text-on-surface-variant/30">
+									chat
+								</span>
+							</button>
+						))}
+					</div>
 				)}
 			</div>
 		</div>

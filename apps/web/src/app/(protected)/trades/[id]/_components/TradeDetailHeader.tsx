@@ -4,15 +4,15 @@ import type { TradeThreadDetail } from "@/lib/trades/messages";
 const TERMINAL_STATUSES = new Set(["completed", "declined", "cancelled", "expired"]);
 
 const STATUS_CONFIG: Record<string, { label: string; dot: string; text: string }> = {
-	pending:     { label: "PENDING",     dot: "bg-muted-foreground",  text: "text-muted-foreground" },
-	lobby:       { label: "LOBBY",       dot: "bg-primary",  text: "text-primary" },
-	previewing:  { label: "PREVIEWING",  dot: "bg-primary",  text: "text-primary" },
-	accepted:    { label: "ACCEPTED",    dot: "bg-primary",  text: "text-primary" },
-	transferring:{ label: "TRANSFERRING",dot: "bg-secondary",  text: "text-secondary" },
-	completed:   { label: "COMPLETE",    dot: "bg-tertiary",  text: "text-tertiary" },
-	declined:    { label: "DECLINED",    dot: "bg-muted-foreground",  text: "text-muted-foreground" },
-	cancelled:   { label: "CANCELLED",   dot: "bg-muted-foreground",  text: "text-muted-foreground" },
-	expired:     { label: "EXPIRED",     dot: "bg-muted-foreground",  text: "text-muted-foreground" },
+	pending: { label: "PENDING", dot: "bg-muted-foreground", text: "text-muted-foreground" },
+	lobby: { label: "LOBBY", dot: "bg-primary", text: "text-primary" },
+	previewing: { label: "PREVIEWING", dot: "bg-primary", text: "text-primary" },
+	accepted: { label: "ACCEPTED", dot: "bg-primary", text: "text-primary" },
+	transferring: { label: "TRANSFERRING", dot: "bg-secondary", text: "text-secondary" },
+	completed: { label: "COMPLETE", dot: "bg-tertiary", text: "text-tertiary" },
+	declined: { label: "DECLINED", dot: "bg-muted-foreground", text: "text-muted-foreground" },
+	cancelled: { label: "CANCELLED", dot: "bg-muted-foreground", text: "text-muted-foreground" },
+	expired: { label: "EXPIRED", dot: "bg-muted-foreground", text: "text-muted-foreground" },
 };
 
 interface Props {

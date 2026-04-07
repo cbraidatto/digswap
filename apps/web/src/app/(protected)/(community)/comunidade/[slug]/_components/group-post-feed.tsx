@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useTransition, useCallback } from "react";
+import { useCallback, useEffect, useState, useTransition } from "react";
 import { useInView } from "react-intersection-observer";
 import { loadGroupPostsAction } from "@/actions/community";
 import type { GroupPost } from "@/lib/community/queries";
@@ -15,16 +15,14 @@ interface GroupPostFeedProps {
 export function GroupPostFeed({ groupId, initialPosts }: GroupPostFeedProps) {
 	const [posts, setPosts] = useState<GroupPost[]>(initialPosts);
 	const [cursor, setCursor] = useState<string | null>(
-		initialPosts.length > 0
-			? initialPosts[initialPosts.length - 1].createdAt
-			: null,
+		initialPosts.length > 0 ? initialPosts[initialPosts.length - 1].createdAt : null,
 	);
 	const [hasMore, setHasMore] = useState(initialPosts.length >= 20);
 	const [isPending, startTransition] = useTransition();
 	const { ref: sentinelRef, inView } = useInView({ threshold: 0 });
 
 	// Expose method to prepend new posts
-	const prependPost = useCallback((post: GroupPost) => {
+	const _prependPost = useCallback((post: GroupPost) => {
 		setPosts((prev) => [post, ...prev]);
 	}, []);
 
@@ -39,9 +37,7 @@ export function GroupPostFeed({ groupId, initialPosts }: GroupPostFeedProps) {
 				}
 				setPosts((prev) => {
 					const existingIds = new Set(prev.map((p) => p.id));
-					const deduplicated = newPosts.filter(
-						(p) => !existingIds.has(p.id),
-					);
+					const deduplicated = newPosts.filter((p) => !existingIds.has(p.id));
 					return [...prev, ...deduplicated];
 				});
 				setCursor(newPosts[newPosts.length - 1].createdAt);
@@ -72,9 +68,7 @@ export function GroupPostFeed({ groupId, initialPosts }: GroupPostFeedProps) {
 			<div role="list">
 				{posts.map((post, index) => (
 					<div key={post.id} role="listitem">
-						{index > 0 && (
-							<hr className="border-t border-outline-variant/10 my-0" />
-						)}
+						{index > 0 && <hr className="border-t border-outline-variant/10 my-0" />}
 						{post.reviewId !== null ? (
 							<ReviewPostCard post={post} />
 						) : (
@@ -103,22 +97,14 @@ export function GroupPostFeed({ groupId, initialPosts }: GroupPostFeedProps) {
 			{/* Load more sentinel */}
 			{hasMore && (
 				<div className="text-center py-4">
-					<span className="font-mono text-xs text-on-surface-variant">
-						[load more posts]
-					</span>
-					<div
-						ref={sentinelRef}
-						className="h-10"
-						aria-hidden="true"
-					/>
+					<span className="font-mono text-xs text-on-surface-variant">[load more posts]</span>
+					<div ref={sentinelRef} className="h-10" aria-hidden="true" />
 				</div>
 			)}
 
 			{/* End of feed */}
 			{!hasMore && posts.length > 0 && (
-				<div className="font-mono text-xs text-outline text-center py-8">
-					[END_OF_FEED]
-				</div>
+				<div className="font-mono text-xs text-outline text-center py-8">[END_OF_FEED]</div>
 			)}
 		</div>
 	);

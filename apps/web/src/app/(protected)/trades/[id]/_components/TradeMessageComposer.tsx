@@ -58,10 +58,7 @@ export function TradeMessageComposer({ tradeId, status }: Props) {
 	}
 
 	return (
-		<form
-			onSubmit={handleSubmit}
-			className="border-t border-outline-variant pt-4 mt-4"
-		>
+		<form onSubmit={handleSubmit} className="border-t border-outline-variant pt-4 mt-4">
 			<div className="relative">
 				<textarea
 					ref={textareaRef}
@@ -85,9 +82,7 @@ export function TradeMessageComposer({ tradeId, status }: Props) {
 				)}
 			</div>
 
-			{error && (
-				<p className="text-destructive font-mono text-xs mt-1.5">{error}</p>
-			)}
+			{error && <p className="text-destructive font-mono text-xs mt-1.5">{error}</p>}
 
 			<div className="flex justify-end mt-2">
 				<button

@@ -1,19 +1,18 @@
 "use client";
 
-import { useState } from "react";
-import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useRouter } from "next/navigation";
-import { toast } from "sonner";
 import { Loader2 } from "lucide-react";
 import Link from "next/link";
-
-import { signInSchema, type SignInInput } from "@/lib/validations/auth";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
+import { useForm } from "react-hook-form";
+import { toast } from "sonner";
 import { signIn } from "@/actions/auth";
+import { SocialLoginButtons } from "@/components/auth/social-login-buttons";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { SocialLoginButtons } from "@/components/auth/social-login-buttons";
+import { type SignInInput, signInSchema } from "@/lib/validations/auth";
 
 export function SignInForm() {
 	const router = useRouter();
@@ -40,16 +39,10 @@ export function SignInForm() {
 			const result = await signIn(formData);
 
 			if (!result.success) {
-				if (
-					result.error?.includes("Too many attempts") ||
-					result.error?.includes("wait")
-				) {
+				if (result.error?.includes("Too many attempts") || result.error?.includes("wait")) {
 					toast.error(result.error);
 				} else {
-					setFormError(
-						result.error ||
-							"Invalid email or password. Please try again.",
-					);
+					setFormError(result.error || "Invalid email or password. Please try again.");
 				}
 				return;
 			}
@@ -69,11 +62,7 @@ export function SignInForm() {
 
 	return (
 		<div className="space-y-6">
-			<form
-				onSubmit={handleSubmit(onSubmit)}
-				noValidate
-				className="space-y-4"
-			>
+			<form onSubmit={handleSubmit(onSubmit)} noValidate className="space-y-4">
 				{formError && (
 					<div
 						className="rounded-lg border border-destructive/50 bg-destructive/10 px-4 py-3 text-sm text-destructive"
@@ -96,11 +85,7 @@ export function SignInForm() {
 						{...register("email")}
 					/>
 					{errors.email && (
-						<p
-							id="email-error"
-							className="text-sm text-destructive"
-							role="alert"
-						>
+						<p id="email-error" className="text-sm text-destructive" role="alert">
 							{errors.email.message}
 						</p>
 					)}
@@ -109,10 +94,7 @@ export function SignInForm() {
 				<div className="space-y-2">
 					<div className="flex items-center justify-between">
 						<Label htmlFor="password">Password</Label>
-						<Link
-							href="/forgot-password"
-							className="text-sm text-primary hover:underline"
-						>
+						<Link href="/forgot-password" className="text-sm text-primary hover:underline">
 							Forgot your password?
 						</Link>
 					</div>
@@ -121,19 +103,13 @@ export function SignInForm() {
 						type="password"
 						placeholder="Enter your password"
 						autoComplete="current-password"
-						aria-describedby={
-							errors.password ? "password-error" : undefined
-						}
+						aria-describedby={errors.password ? "password-error" : undefined}
 						aria-invalid={!!errors.password}
 						className="h-11"
 						{...register("password")}
 					/>
 					{errors.password && (
-						<p
-							id="password-error"
-							className="text-sm text-destructive"
-							role="alert"
-						>
+						<p id="password-error" className="text-sm text-destructive" role="alert">
 							{errors.password.message}
 						</p>
 					)}
@@ -145,11 +121,7 @@ export function SignInForm() {
 					disabled={isSubmitting}
 					aria-busy={isSubmitting}
 				>
-					{isSubmitting ? (
-						<Loader2 className="size-4 animate-spin" />
-					) : (
-						"Sign In"
-					)}
+					{isSubmitting ? <Loader2 className="size-4 animate-spin" /> : "Sign In"}
 				</Button>
 			</form>
 

@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useCallback } from "react";
+import { useCallback, useRef } from "react";
 import type { GroupPost } from "@/lib/community/queries";
 import { GroupComposer } from "./group-composer";
 import { GroupPostFeed } from "./group-post-feed";
@@ -28,17 +28,10 @@ export function GroupContentSection({
 	return (
 		<>
 			{isMember && (
-				<GroupComposer
-					groupId={groupId}
-					groupName={groupName}
-					onPostCreated={handlePostCreated}
-				/>
+				<GroupComposer groupId={groupId} groupName={groupName} onPostCreated={handlePostCreated} />
 			)}
 
-			<GroupPostFeed
-				groupId={groupId}
-				initialPosts={initialPosts}
-			/>
+			<GroupPostFeed groupId={groupId} initialPosts={initialPosts} />
 		</>
 	);
 }

@@ -23,10 +23,7 @@ function getGroupType(category: string | null): string {
 	return isGenre ? "genre group" : "member group";
 }
 
-export function GroupDetailHeader({
-	group,
-	membership,
-}: GroupDetailHeaderProps) {
+export function GroupDetailHeader({ group, membership }: GroupDetailHeaderProps) {
 	const groupType = getGroupType(group.category);
 
 	return (
@@ -37,14 +34,11 @@ export function GroupDetailHeader({
 						{group.name}
 					</span>
 					<p className="font-mono text-xs text-on-surface-variant mt-1">
-						// {group.category ?? "general"} &middot; {groupType} &middot;{" "}
-						{group.memberCount}{" "}
+						// {group.category ?? "general"} &middot; {groupType} &middot; {group.memberCount}{" "}
 						{group.memberCount === 1 ? "member" : "members"}
 					</p>
 					{group.description && (
-						<p className="text-sm text-on-surface-variant mt-3">
-							{group.description}
-						</p>
+						<p className="text-sm text-on-surface-variant mt-3">{group.description}</p>
 					)}
 				</div>
 

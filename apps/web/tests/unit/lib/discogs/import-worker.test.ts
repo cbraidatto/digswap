@@ -1,13 +1,13 @@
-import { describe, test, expect, vi, beforeEach } from "vitest";
+import { beforeEach, describe, expect, test, vi } from "vitest";
 import { mockCollectionPage } from "../../../__mocks__/discogs";
 
 // -- Mocks --
 
-const mockSelect = vi.fn();
-const mockUpdate = vi.fn();
-const mockInsert = vi.fn();
-const mockUpsert = vi.fn();
-const mockDelete = vi.fn();
+const _mockSelect = vi.fn();
+const _mockUpdate = vi.fn();
+const _mockInsert = vi.fn();
+const _mockUpsert = vi.fn();
+const _mockDelete = vi.fn();
 
 function createChainedMock(resolveValue: unknown = { data: null, error: null }) {
 	const chain: Record<string, ReturnType<typeof vi.fn>> = {};
@@ -61,8 +61,8 @@ vi.mock("@/lib/discogs/broadcast", () => ({
 	broadcastProgress: (...args: unknown[]) => mockBroadcastProgress(...args),
 }));
 
-import { processImportPage } from "@/lib/discogs/import-worker";
 import { computeRarityScore } from "@/lib/discogs/client";
+import { processImportPage } from "@/lib/discogs/import-worker";
 
 describe("Import worker", () => {
 	const JOB_ID = "job-uuid-123";
@@ -87,7 +87,7 @@ describe("Import worker", () => {
 		};
 
 		const jobChain = createChainedMock({ data: jobData, error: null });
-		fromHandlers["import_jobs"] = jobChain;
+		fromHandlers.import_jobs = jobChain;
 		return jobChain;
 	}
 
@@ -111,12 +111,12 @@ describe("Import worker", () => {
 			}),
 		};
 		releasesChain.upsert = vi.fn().mockReturnValue(upsertSelectChain);
-		fromHandlers["releases"] = releasesChain;
+		fromHandlers.releases = releasesChain;
 
 		// Collection items: upsert (ON CONFLICT DO NOTHING)
 		const collectionChain = createChainedMock({ data: null, error: null });
 		collectionChain.upsert = vi.fn().mockResolvedValue({ error: null });
-		fromHandlers["collection_items"] = collectionChain;
+		fromHandlers.collection_items = collectionChain;
 	}
 
 	test("processImportPage with 1 page returns done: true", async () => {
@@ -185,7 +185,10 @@ describe("Import worker", () => {
 	});
 
 	test("processImportPage with job not found returns done", async () => {
-		fromHandlers["import_jobs"] = createChainedMock({ data: null, error: { message: "not found" } });
+		fromHandlers.import_jobs = createChainedMock({
+			data: null,
+			error: { message: "not found" },
+		});
 
 		const result = await processImportPage(JOB_ID);
 

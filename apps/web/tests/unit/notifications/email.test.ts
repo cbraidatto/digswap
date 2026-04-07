@@ -1,4 +1,4 @@
-import { describe, test, expect, vi, beforeEach } from "vitest";
+import { beforeEach, describe, expect, test, vi } from "vitest";
 
 // Use vi.hoisted to declare mocks that will be used inside vi.mock factories
 const mockSend = vi.hoisted(() => vi.fn());
@@ -22,18 +22,11 @@ describe("sendWantlistMatchEmail", () => {
 	});
 
 	test("calls resend.emails.send with correct subject", async () => {
-		await sendWantlistMatchEmail(
-			"user@example.com",
-			"Kind of Blue",
-			"Miles Davis",
-			"jazzhound",
-		);
+		await sendWantlistMatchEmail("user@example.com", "Kind of Blue", "Miles Davis", "jazzhound");
 
 		expect(mockSend).toHaveBeenCalledTimes(1);
 		const callArgs = mockSend.mock.calls[0][0];
-		expect(callArgs.subject).toBe(
-			"Someone has a record from your wantlist",
-		);
+		expect(callArgs.subject).toBe("Someone has a record from your wantlist");
 		expect(callArgs.to).toBe("user@example.com");
 	});
 
@@ -41,12 +34,7 @@ describe("sendWantlistMatchEmail", () => {
 		mockSend.mockRejectedValue(new Error("API rate limited"));
 
 		await expect(
-			sendWantlistMatchEmail(
-				"user@example.com",
-				"Kind of Blue",
-				"Miles Davis",
-				"jazzhound",
-			),
+			sendWantlistMatchEmail("user@example.com", "Kind of Blue", "Miles Davis", "jazzhound"),
 		).resolves.toBeUndefined();
 	});
 

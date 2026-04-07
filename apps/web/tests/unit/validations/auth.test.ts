@@ -1,11 +1,11 @@
-import { describe, it, expect } from "vitest";
+import { describe, expect, it } from "vitest";
 import {
-	signUpSchema,
-	signInSchema,
+	backupCodeSchema,
 	forgotPasswordSchema,
 	resetPasswordSchema,
+	signInSchema,
+	signUpSchema,
 	totpSchema,
-	backupCodeSchema,
 } from "@/lib/validations/auth";
 
 describe("signUpSchema", () => {

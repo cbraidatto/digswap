@@ -1,9 +1,9 @@
 "use client";
 
-import { useRef, useState, useCallback } from "react";
-import { useRouter } from "next/navigation";
 import Image from "next/image";
-import { uploadCoverImage, saveCoverPosition } from "@/actions/profile";
+import { useRouter } from "next/navigation";
+import { useCallback, useRef, useState } from "react";
+import { saveCoverPosition, uploadCoverImage } from "@/actions/profile";
 
 interface CoverBannerProps {
 	initialCoverUrl: string | null;
@@ -11,11 +11,7 @@ interface CoverBannerProps {
 	isOwner: boolean;
 }
 
-export function CoverBanner({
-	initialCoverUrl,
-	initialPositionY,
-	isOwner,
-}: CoverBannerProps) {
+export function CoverBanner({ initialCoverUrl, initialPositionY, isOwner }: CoverBannerProps) {
 	const [coverUrl, setCoverUrl] = useState<string | null>(initialCoverUrl);
 	const [positionY, setPositionY] = useState(initialPositionY);
 	const [isRepositioning, setIsRepositioning] = useState(false);
@@ -166,9 +162,7 @@ export function CoverBanner({
 						onClick={() => fileInputRef.current?.click()}
 						className="absolute bottom-3 right-3 flex items-center gap-1.5 font-mono text-xs uppercase tracking-[0.15em] px-3 py-1.5 rounded bg-black/60 text-white border border-white/20 opacity-0 group-hover:opacity-100 transition-opacity hover:bg-black/80"
 					>
-						<span className="material-symbols-outlined text-sm leading-none">
-							photo_camera
-						</span>
+						<span className="material-symbols-outlined text-sm leading-none">photo_camera</span>
 						edit cover
 					</button>
 				)}

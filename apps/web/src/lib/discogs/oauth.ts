@@ -6,10 +6,7 @@ import { createAdminClient } from "@/lib/supabase/admin";
  * Centralizes credential access to avoid duplication.
  */
 function createOAuthClient(): DiscogsOAuth {
-	return new DiscogsOAuth(
-		process.env.DISCOGS_CONSUMER_KEY!,
-		process.env.DISCOGS_CONSUMER_SECRET!,
-	);
+	return new DiscogsOAuth(process.env.DISCOGS_CONSUMER_KEY!, process.env.DISCOGS_CONSUMER_SECRET!);
 }
 
 /**
@@ -97,18 +94,13 @@ export async function storeTokens(
 	});
 
 	if (!vaultTokenError) {
-		const { error: vaultSecretError } = await admin.rpc(
-			"vault_create_secret",
-			{
-				secret: accessTokenSecret,
-				name: `discogs_secret:${userId}`,
-			},
-		);
+		const { error: vaultSecretError } = await admin.rpc("vault_create_secret", {
+			secret: accessTokenSecret,
+			name: `discogs_secret:${userId}`,
+		});
 
 		if (!vaultSecretError) {
-			console.info(
-				`[Discogs OAuth] Tokens stored in Vault for user ${userId}`,
-			);
+			console.info(`[Discogs OAuth] Tokens stored in Vault for user ${userId}`);
 			return;
 		}
 
@@ -133,9 +125,7 @@ export async function storeTokens(
 		throw new Error(`Failed to store Discogs tokens: ${tableError.message}`);
 	}
 
-	console.info(
-		`[Discogs OAuth] Tokens stored in fallback table for user ${userId}`,
-	);
+	console.info(`[Discogs OAuth] Tokens stored in fallback table for user ${userId}`);
 }
 
 /**

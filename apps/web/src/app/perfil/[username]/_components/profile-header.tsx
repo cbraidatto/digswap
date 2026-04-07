@@ -1,10 +1,10 @@
-import Link from "next/link";
 import Image from "next/image";
-import type { UserRanking, UserBadge } from "@/lib/gamification/queries";
-import { TrustStrip } from "@/components/trust/trust-strip";
-import { FollowButton } from "./follow-button";
+import Link from "next/link";
 import { ProposeTradeButton } from "@/components/trades/ProposeTradeButton";
+import { TrustStrip } from "@/components/trust/trust-strip";
 import { PremiumBadge } from "@/components/ui/PremiumBadge";
+import type { UserBadge, UserRanking } from "@/lib/gamification/queries";
+import { FollowButton } from "./follow-button";
 
 interface ProfileHeaderProps {
 	profile: {
@@ -35,8 +35,7 @@ export function ProfileHeader({
 }: ProfileHeaderProps) {
 	const displayName = (profile.displayName || "DIGGER").toUpperCase();
 	const isPremium =
-		profile.subscriptionTier === "premium_monthly" ||
-		profile.subscriptionTier === "premium_annual";
+		profile.subscriptionTier === "premium_monthly" || profile.subscriptionTier === "premium_annual";
 	const memberYear = new Date(profile.createdAt).getFullYear();
 
 	return (
@@ -69,9 +68,7 @@ export function ProfileHeader({
 						{isPremium && <PremiumBadge />}
 					</div>
 					{profile.username && (
-						<p className="text-sm font-mono text-on-surface-variant">
-							@{profile.username}
-						</p>
+						<p className="text-sm font-mono text-on-surface-variant">@{profile.username}</p>
 					)}
 					{/* Rank + Badges */}
 					<p className="font-mono text-xs mt-1 flex flex-wrap items-center gap-1.5">
@@ -101,9 +98,7 @@ export function ProfileHeader({
 					</div>
 
 					{profile.bio && (
-						<p className="text-sm text-on-surface-variant mt-1 max-w-md">
-							{profile.bio}
-						</p>
+						<p className="text-sm text-on-surface-variant mt-1 max-w-md">{profile.bio}</p>
 					)}
 					<p className="text-xs font-mono text-on-surface-variant mt-2">
 						Member since {memberYear} / Vinyl Network
@@ -136,9 +131,7 @@ export function ProfileHeader({
 								href={`/perfil/${profile.username}/compare`}
 								className="inline-flex items-center gap-2 border border-outline-variant text-on-surface-variant bg-transparent hover:bg-surface-container-high font-mono text-xs uppercase tracking-wider px-4 py-2 rounded-lg transition-colors h-11 md:h-8"
 							>
-								<span className="material-symbols-outlined text-[16px]">
-									compare_arrows
-								</span>
+								<span className="material-symbols-outlined text-[16px]">compare_arrows</span>
 								COMPARE COLLECTION
 							</Link>
 						</div>

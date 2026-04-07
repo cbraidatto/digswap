@@ -1,5 +1,5 @@
-import { createClient } from "@/lib/supabase/server";
 import type { User } from "@supabase/supabase-js";
+import { createClient } from "@/lib/supabase/server";
 
 /**
  * Centralized auth guard for server actions.

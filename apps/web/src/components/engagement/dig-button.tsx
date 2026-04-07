@@ -1,8 +1,8 @@
 "use client";
 
-import { useState, useOptimistic, useTransition } from "react";
+import { useOptimistic, useState, useTransition } from "react";
 import { toggleDig } from "@/actions/engagement";
-import { usePlayerStore, type PlayerTrack } from "@/lib/player/store";
+import { type PlayerTrack, usePlayerStore } from "@/lib/player/store";
 import { cn } from "@/lib/utils";
 
 interface DigButtonProps {
@@ -62,10 +62,12 @@ export function DigButton({ feedItemId, initialDug, initialCount, track }: DigBu
 			</span>
 			<span>Dig!</span>
 			{digCount > 0 && (
-				<span className={cn(
-					"text-xs",
-					optimisticDug ? "text-primary/70" : "text-on-surface-variant/60",
-				)}>
+				<span
+					className={cn(
+						"text-xs",
+						optimisticDug ? "text-primary/70" : "text-on-surface-variant/60",
+					)}
+				>
 					{digCount}
 				</span>
 			)}

@@ -1,14 +1,16 @@
 import { eq } from "drizzle-orm";
 import Link from "next/link";
-import { AppShell } from "@/components/shell/app-shell";
 import { ImportBanner } from "@/components/discogs/import-banner";
+import { AppShell } from "@/components/shell/app-shell";
 import { db } from "@/lib/db";
 import { profiles } from "@/lib/db/schema/users";
 import { createClient } from "@/lib/supabase/server";
 
 export default async function PerfilLayout({ children }: { children: React.ReactNode }) {
 	const supabase = await createClient();
-	const { data: { user } } = await supabase.auth.getUser();
+	const {
+		data: { user },
+	} = await supabase.auth.getUser();
 	// NO redirect — public route
 
 	if (user) {
@@ -36,8 +38,15 @@ export default async function PerfilLayout({ children }: { children: React.React
 			<div className="border-b border-outline-variant/20 px-4 py-2 flex items-center justify-between">
 				<span className="font-mono text-xs text-primary tracking-[0.2em]">DIGSWAP_v1.0.0</span>
 				<div className="flex gap-4">
-					<Link href="/signin" className="font-mono text-xs text-on-surface-variant hover:text-primary transition-colors">Sign in</Link>
-					<Link href="/signup" className="font-mono text-xs text-primary">Start digging &rarr;</Link>
+					<Link
+						href="/signin"
+						className="font-mono text-xs text-on-surface-variant hover:text-primary transition-colors"
+					>
+						Sign in
+					</Link>
+					<Link href="/signup" className="font-mono text-xs text-primary">
+						Start digging &rarr;
+					</Link>
 				</div>
 			</div>
 			{children}

@@ -1,11 +1,11 @@
 "use client";
 
-import { useState, useMemo } from "react";
-import type { WantlistItem } from "@/lib/wantlist/queries";
+import { useMemo, useState } from "react";
 import { toast } from "sonner";
-import { WantlistGrid } from "./wantlist-grid";
-import { WantlistAddButton } from "./wantlist-add-button";
 import { exportWantlistCsv } from "@/actions/export";
+import type { WantlistItem } from "@/lib/wantlist/queries";
+import { WantlistAddButton } from "./wantlist-add-button";
+import { WantlistGrid } from "./wantlist-grid";
 
 interface WantlistTabProps {
 	items: WantlistItem[];
@@ -25,9 +25,7 @@ export function WantlistTab({ items, total, pageSize, isOwner }: WantlistTabProp
 		if (search.trim().length >= 2) {
 			const q = search.toLowerCase();
 			result = result.filter(
-				(i) =>
-					(i.title?.toLowerCase().includes(q)) ||
-					(i.artist?.toLowerCase().includes(q)),
+				(i) => i.title?.toLowerCase().includes(q) || i.artist?.toLowerCase().includes(q),
 			);
 		}
 
@@ -52,7 +50,10 @@ export function WantlistTab({ items, total, pageSize, isOwner }: WantlistTabProp
 							type="button"
 							onClick={async () => {
 								const result = await exportWantlistCsv();
-								if (result.error) { toast.error(result.error); return; }
+								if (result.error) {
+									toast.error(result.error);
+									return;
+								}
 								if (!result.csv) return;
 								const blob = new Blob([result.csv], { type: "text/csv;charset=utf-8;" });
 								const url = URL.createObjectURL(blob);
@@ -76,7 +77,9 @@ export function WantlistTab({ items, total, pageSize, isOwner }: WantlistTabProp
 			{/* Search + sort */}
 			<div className="flex items-center gap-2 mb-4 flex-wrap">
 				<div className="flex items-center bg-surface-container-high/50 rounded-lg px-3 py-1.5 border border-outline-variant/10 focus-within:border-primary/40 transition-colors min-w-[180px]">
-					<span className="material-symbols-outlined text-[16px] text-on-surface-variant/40 mr-2">search</span>
+					<span className="material-symbols-outlined text-[16px] text-on-surface-variant/40 mr-2">
+						search
+					</span>
 					<input
 						type="text"
 						value={search}

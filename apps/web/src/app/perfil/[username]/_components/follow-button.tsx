@@ -48,9 +48,7 @@ export function FollowButton({
 			disabled={isPending}
 			aria-pressed={optimistic.isFollowing}
 			aria-label={
-				optimistic.isFollowing
-					? `Unfollow ${targetUsername}`
-					: `Follow ${targetUsername}`
+				optimistic.isFollowing ? `Unfollow ${targetUsername}` : `Follow ${targetUsername}`
 			}
 			className={`group inline-flex items-center gap-2 font-mono text-xs uppercase tracking-wider px-4 py-2 rounded-lg transition-all h-11 md:h-8 ${
 				isPending ? "opacity-50 pointer-events-none" : ""
@@ -73,9 +71,7 @@ export function FollowButton({
 				</>
 			) : (
 				<>
-					<span className="material-symbols-outlined text-[16px]">
-						person_add
-					</span>
+					<span className="material-symbols-outlined text-[16px]">person_add</span>
 					<span>FOLLOW</span>
 				</>
 			)}

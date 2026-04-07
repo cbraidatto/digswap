@@ -24,18 +24,14 @@ export function GroupPostCard({ post }: { post: GroupPost }) {
 				>
 					{post.username}
 				</Link>
-				<span className="font-mono text-xs text-on-surface-variant">
-					&middot;
-				</span>
+				<span className="font-mono text-xs text-on-surface-variant">&middot;</span>
 				<span className="font-mono text-xs text-on-surface-variant">
 					{formatRelativeTime(post.createdAt)}
 				</span>
 			</div>
 
 			{/* Post body */}
-			<p className="text-sm text-on-surface leading-relaxed">
-				{post.content}
-			</p>
+			<p className="text-sm text-on-surface leading-relaxed">{post.content}</p>
 
 			{/* Linked record */}
 			{post.releaseId && (
@@ -47,7 +43,8 @@ export function GroupPostCard({ post }: { post: GroupPost }) {
 							{(post.releaseLabel || post.releaseYear || post.releaseFormat) && (
 								<>
 									{" "}
-									[{[post.releaseLabel, post.releaseYear, post.releaseFormat]
+									[
+									{[post.releaseLabel, post.releaseYear, post.releaseFormat]
 										.filter(Boolean)
 										.join(", ")}
 									]

@@ -3,7 +3,7 @@
 import { eq } from "drizzle-orm";
 import { db } from "@/lib/db";
 import { profiles } from "@/lib/db/schema/users";
-import { apiRateLimit , safeLimit} from "@/lib/rate-limit";
+import { apiRateLimit, safeLimit } from "@/lib/rate-limit";
 import { createClient } from "@/lib/supabase/server";
 import { onboardingProfileSchema, skipToStepSchema } from "@/lib/validations/onboarding";
 
@@ -34,7 +34,10 @@ export async function updateProfile(
 	const avatarUrl = formData.get("avatar_url") as string | null;
 
 	// Validate with Zod
-	const parsed = onboardingProfileSchema.safeParse({ display_name: displayName, avatar_url: avatarUrl });
+	const parsed = onboardingProfileSchema.safeParse({
+		display_name: displayName,
+		avatar_url: avatarUrl,
+	});
 	if (!parsed.success) {
 		return { success: false, error: parsed.error.issues[0]?.message ?? "Invalid input" };
 	}
@@ -44,7 +47,7 @@ export async function updateProfile(
 			.update(profiles)
 			.set({
 				displayName: parsed.data.display_name.trim(),
-				...(parsed.data.avatar_url && parsed.data.avatar_url.trim() ? { avatarUrl: parsed.data.avatar_url.trim() } : {}),
+				...(parsed.data.avatar_url?.trim() ? { avatarUrl: parsed.data.avatar_url.trim() } : {}),
 				updatedAt: new Date(),
 			})
 			.where(eq(profiles.id, user.id));
@@ -104,7 +107,9 @@ export async function completeOnboarding(): Promise<{
  * Skip to next step -- a no-op server action that returns the next step number.
  * Used to track progress without requiring database writes for skipped steps.
  */
-export async function skipToStep(step: number): Promise<{ success: boolean; nextStep: number; error?: string }> {
+export async function skipToStep(
+	step: number,
+): Promise<{ success: boolean; nextStep: number; error?: string }> {
 	try {
 		const parsed = skipToStepSchema.safeParse({ step });
 		if (!parsed.success) {
@@ -113,7 +118,9 @@ export async function skipToStep(step: number): Promise<{ success: boolean; next
 
 		// Auth check — prevent unauthenticated access to onboarding state
 		const supabase = await createClient();
-		const { data: { user } } = await supabase.auth.getUser();
+		const {
+			data: { user },
+		} = await supabase.auth.getUser();
 		if (!user) {
 			return { success: false, nextStep: step, error: "Not authenticated" };
 		}

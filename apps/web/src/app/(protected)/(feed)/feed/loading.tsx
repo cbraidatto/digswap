@@ -13,7 +13,10 @@ export default function FeedLoading() {
 					<SkeletonLine className="h-4 w-32 mb-3" />
 					<div className="flex gap-3 overflow-hidden">
 						{Array.from({ length: 4 }).map((_, i) => (
-							<div key={i} className="w-20 h-20 rounded-full bg-surface-container-high animate-pulse flex-shrink-0" />
+							<div
+								key={i}
+								className="w-20 h-20 rounded-full bg-surface-container-high animate-pulse flex-shrink-0"
+							/>
 						))}
 					</div>
 				</div>

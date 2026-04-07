@@ -1,17 +1,17 @@
 "use client";
 
-import { useState, useEffect } from "react";
 import { useSearchParams } from "next/navigation";
-import { SearchSection } from "./_components/search-section";
-import { RecordsTab } from "./_components/records-tab";
-import { RankingsTab } from "./_components/rankings-tab";
+import { useEffect, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
+import { RankingsTab } from "./_components/rankings-tab";
+import { RecordsTab } from "./_components/records-tab";
+import { SearchSection } from "./_components/search-section";
+
 type Tab = "diggers" | "records";
 
 export default function ExplorarPage() {
 	const searchParams = useSearchParams();
-	const initialTab: Tab =
-		searchParams.get("tab") === "records" ? "records" : "diggers";
+	const initialTab: Tab = searchParams.get("tab") === "records" ? "records" : "diggers";
 	const [activeTab, setActiveTab] = useState<Tab>(initialTab);
 	const [currentUserId, setCurrentUserId] = useState<string>("");
 
@@ -26,20 +26,14 @@ export default function ExplorarPage() {
 
 	// Update URL when tab changes
 	useEffect(() => {
-		const url =
-			activeTab === "diggers"
-				? "/explorar"
-				: `/explorar?tab=${activeTab}`;
+		const url = activeTab === "diggers" ? "/explorar" : `/explorar?tab=${activeTab}`;
 		window.history.replaceState(null, "", url);
 	}, [activeTab]);
 
 	return (
 		<div className="min-h-[calc(100vh-56px)] flex flex-col">
 			{/* Tab Bar */}
-			<div
-				className="w-full border-b border-outline-variant/10"
-				role="tablist"
-			>
+			<div className="w-full border-b border-outline-variant/10" role="tablist">
 				<div className="px-6 flex gap-6">
 					<button
 						type="button"

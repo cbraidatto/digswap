@@ -1,9 +1,9 @@
-import { describe, test, expect } from "vitest";
+import { describe, expect, test } from "vitest";
 import {
-	getDecadeRange,
+	CONDITION_GRADES,
 	collectionFilterSchema,
 	DECADES,
-	CONDITION_GRADES,
+	getDecadeRange,
 	SORT_OPTIONS,
 } from "@/lib/collection/filters";
 
@@ -30,8 +30,8 @@ describe("getDecadeRange", () => {
 		for (const d of DECADES) {
 			const range = getDecadeRange(d.label);
 			expect(range).not.toBeNull();
-			expect(range!.start).toBe(d.startYear);
-			expect(range!.end).toBe(d.startYear + 10);
+			expect(range?.start).toBe(d.startYear);
+			expect(range?.end).toBe(d.startYear + 10);
 		}
 	});
 });

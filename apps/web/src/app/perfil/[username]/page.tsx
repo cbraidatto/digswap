@@ -1,32 +1,33 @@
-import type { Metadata } from "next";
 import { eq } from "drizzle-orm";
-import { notFound, redirect } from "next/navigation";
+import type { Metadata } from "next";
 import Link from "next/link";
-import { db } from "@/lib/db";
-import { profiles } from "@/lib/db/schema/users";
-import { createClient } from "@/lib/supabase/server";
+import { notFound, redirect } from "next/navigation";
 import { collectionFilterSchema } from "@/lib/collection/filters";
 import {
-	getCollectionPage,
 	getCollectionCount,
-	getUniqueGenres,
+	getCollectionPage,
 	getUniqueFormats,
+	getUniqueGenres,
 	PAGE_SIZE,
 } from "@/lib/collection/queries";
-import { getFollowCounts, checkIsFollowing } from "@/lib/social/queries";
-import { getUserRanking, getUserBadges } from "@/lib/gamification/queries";
-import { getWantlistIntersections, getCompatibilityScore } from "@/lib/wantlist/intersection-queries";
-import { ProfileHeader } from "./_components/profile-header";
+import { db } from "@/lib/db";
+import { profiles } from "@/lib/db/schema/users";
+import { getUserBadges, getUserRanking } from "@/lib/gamification/queries";
+import { checkIsFollowing, getFollowCounts } from "@/lib/social/queries";
+import { createClient } from "@/lib/supabase/server";
+import {
+	getCompatibilityScore,
+	getWantlistIntersections,
+} from "@/lib/wantlist/intersection-queries";
 import { ProfileCollectionSection } from "./_components/profile-collection-section";
+import { ProfileHeader } from "./_components/profile-header";
 
 interface PublicProfileProps {
 	params: Promise<{ username: string }>;
 	searchParams: Promise<Record<string, string | string[] | undefined>>;
 }
 
-export async function generateMetadata({
-	params,
-}: PublicProfileProps): Promise<Metadata> {
+export async function generateMetadata({ params }: PublicProfileProps): Promise<Metadata> {
 	const { username } = await params;
 	return {
 		title: `${username} — DigSwap`,
@@ -34,10 +35,7 @@ export async function generateMetadata({
 	};
 }
 
-export default async function PublicProfilePage({
-	params,
-	searchParams,
-}: PublicProfileProps) {
+export default async function PublicProfilePage({ params, searchParams }: PublicProfileProps) {
 	const { username } = await params;
 
 	// Optional auth — no redirect on null
@@ -93,7 +91,9 @@ export default async function PublicProfilePage({
 	// Wantlist intersections + compatibility — only for logged-in visitors
 	const [intersections, compatibility] = await Promise.all([
 		user ? getWantlistIntersections(user.id, targetProfile.id) : Promise.resolve([]),
-		user ? getCompatibilityScore(user.id, targetProfile.id) : Promise.resolve({ sharedRecords: 0, wantlistMatches: 0 }),
+		user
+			? getCompatibilityScore(user.id, targetProfile.id)
+			: Promise.resolve({ sharedRecords: 0, wantlistMatches: 0 }),
 	]);
 
 	return (
@@ -102,9 +102,13 @@ export default async function PublicProfilePage({
 			{!user && (
 				<div className="mb-6 p-4 bg-surface-container-low border border-outline-variant/20 rounded font-mono text-xs">
 					<span className="text-tertiary">[VISITOR]</span>
-					<span className="text-on-surface-variant">{" "}// </span>
-					<span className="text-on-surface">Create an account to follow this digger and initiate trades.</span>
-					<Link href="/signup" className="ml-3 text-primary hover:underline">Start digging &rarr;</Link>
+					<span className="text-on-surface-variant"> // </span>
+					<span className="text-on-surface">
+						Create an account to follow this digger and initiate trades.
+					</span>
+					<Link href="/signup" className="ml-3 text-primary hover:underline">
+						Start digging &rarr;
+					</Link>
 				</div>
 			)}
 
@@ -122,7 +126,9 @@ export default async function PublicProfilePage({
 			{/* Compatibility score — logged-in visitors */}
 			{user && (compatibility.sharedRecords > 0 || compatibility.wantlistMatches > 0) && (
 				<div className="mb-6 flex items-center gap-4 bg-surface-container-low/50 rounded-xl px-4 py-3 border border-outline-variant/5">
-					<span className="material-symbols-outlined text-[18px] text-secondary">compare_arrows</span>
+					<span className="material-symbols-outlined text-[18px] text-secondary">
+						compare_arrows
+					</span>
 					<div className="flex items-center gap-3 font-mono text-xs">
 						{compatibility.sharedRecords > 0 && (
 							<span>
@@ -135,7 +141,9 @@ export default async function PublicProfilePage({
 						)}
 						{compatibility.wantlistMatches > 0 && (
 							<span>
-								<span className="text-secondary font-semibold">{compatibility.wantlistMatches}</span>
+								<span className="text-secondary font-semibold">
+									{compatibility.wantlistMatches}
+								</span>
 								<span className="text-on-surface-variant/50 ml-1">wantlist matches</span>
 							</span>
 						)}

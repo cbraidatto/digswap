@@ -1,7 +1,7 @@
 "use client";
 
-import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
+import { useState, useTransition } from "react";
 import { initiateTradeAction } from "@/actions/trades";
 
 interface ProposeTradeButtonProps {
@@ -52,9 +52,7 @@ export function ProposeTradeButton({
 					</span>
 				</button>
 				{error && (
-					<span className="font-mono text-[9px] text-destructive block mt-0.5">
-						{error}
-					</span>
+					<span className="font-mono text-[9px] text-destructive block mt-0.5">{error}</span>
 				)}
 			</>
 		);
@@ -71,9 +69,7 @@ export function ProposeTradeButton({
 				<span className="material-symbols-outlined text-[16px]">swap_horiz</span>
 				{isPending ? "..." : "PROPOSE TRADE"}
 			</button>
-			{error && (
-				<p className="font-mono text-xs text-destructive mt-1">{error}</p>
-			)}
+			{error && <p className="font-mono text-xs text-destructive mt-1">{error}</p>}
 		</div>
 	);
 }

@@ -1,4 +1,4 @@
-import { describe, test, expect, vi, beforeEach } from "vitest";
+import { beforeEach, describe, expect, test, vi } from "vitest";
 
 // -- Mock Supabase server client --
 const mockGetUser = vi.fn();
@@ -9,7 +9,7 @@ vi.mock("@/lib/supabase/server", () => ({
 			getUser: () => mockGetUser(),
 		},
 	}),
-}))
+}));
 vi.mock("@/lib/rate-limit", () => ({
 	authRateLimit: null,
 	resetRateLimit: null,
@@ -19,7 +19,6 @@ vi.mock("@/lib/rate-limit", () => ({
 	discogsRateLimit: null,
 	safeLimit: vi.fn().mockImplementation(async () => ({ success: true })),
 }));
-;
 
 // -- Chainable admin mock --
 function createChainedMock(resolveValue: unknown = { data: null, error: null }) {
@@ -75,7 +74,7 @@ describe("updateConditionGrade", () => {
 	test("updates condition grade on own collection item", async () => {
 		// Update succeeds: returns the updated row
 		const collectionChain = createChainedMock({ data: { id: "item-1" }, error: null });
-		fromHandlers["collection_items"] = collectionChain;
+		fromHandlers.collection_items = collectionChain;
 
 		const result = await updateConditionGrade("item-1", "VG+");
 
@@ -94,7 +93,7 @@ describe("updateConditionGrade", () => {
 	test("rejects update on another user's item (IDOR prevention)", async () => {
 		// The .eq("user_id", user.id) filter means update returns no rows
 		const collectionChain = createChainedMock({ data: null, error: null });
-		fromHandlers["collection_items"] = collectionChain;
+		fromHandlers.collection_items = collectionChain;
 
 		const result = await updateConditionGrade("someone-else-item", "VG+");
 
@@ -106,7 +105,7 @@ describe("updateConditionGrade", () => {
 			data: null,
 			error: { message: "DB error" },
 		});
-		fromHandlers["collection_items"] = collectionChain;
+		fromHandlers.collection_items = collectionChain;
 
 		const result = await updateConditionGrade("item-1", "Mint");
 
@@ -130,7 +129,7 @@ describe("updateConditionGrade", () => {
 			// Reset mocks for each iteration
 			fromHandlers = {};
 			const collectionChain = createChainedMock({ data: { id: "item-1" }, error: null });
-			fromHandlers["collection_items"] = collectionChain;
+			fromHandlers.collection_items = collectionChain;
 
 			const result = await updateConditionGrade("item-1", grade);
 			expect(result).toEqual({ success: true });

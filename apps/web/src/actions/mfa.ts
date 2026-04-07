@@ -5,7 +5,7 @@ import { consumeBackupCode, generateBackupCodes, storeBackupCodes } from "@/lib/
 import { db } from "@/lib/db";
 import { backupCodes } from "@/lib/db/schema/sessions";
 import { profiles } from "@/lib/db/schema/users";
-import { totpRateLimit , safeLimit} from "@/lib/rate-limit";
+import { safeLimit, totpRateLimit } from "@/lib/rate-limit";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
 import { backupCodeSchema, totpSchema } from "@/lib/validations/auth";

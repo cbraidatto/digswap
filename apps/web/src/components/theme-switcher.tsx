@@ -21,12 +21,17 @@ export function ThemeSwitcher() {
 				<>
 					<div className="fixed inset-0 z-40" onClick={() => setOpen(false)} />
 					<div className="absolute right-0 top-8 z-50 bg-surface-container border border-outline/20 rounded-lg p-3 flex flex-col gap-2 min-w-[160px] shadow-xl">
-						<p className="font-mono text-[9px] uppercase tracking-[0.2em] text-outline mb-1">Theme</p>
+						<p className="font-mono text-[9px] uppercase tracking-[0.2em] text-outline mb-1">
+							Theme
+						</p>
 						{THEMES.map((t) => (
 							<button
 								key={t.id}
 								type="button"
-								onClick={() => { setTheme(t.id); setOpen(false); }}
+								onClick={() => {
+									setTheme(t.id);
+									setOpen(false);
+								}}
 								className={`flex items-center gap-2.5 px-2 py-1.5 rounded transition-colors hover:bg-surface-container-high text-left ${
 									theme === t.id ? "bg-surface-container-high" : ""
 								}`}

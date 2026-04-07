@@ -1,9 +1,9 @@
-import { eq, and, sql, desc, lt } from "drizzle-orm";
+import { and, desc, eq, lt, sql } from "drizzle-orm";
 import { db } from "@/lib/db";
-import { follows, activityFeed } from "@/lib/db/schema/social";
 import { groupMembers } from "@/lib/db/schema/groups";
-import { profiles } from "@/lib/db/schema/users";
 import { releases } from "@/lib/db/schema/releases";
+import { activityFeed, follows } from "@/lib/db/schema/social";
+import { profiles } from "@/lib/db/schema/users";
 import type { FeedItem } from "@/lib/social/types";
 
 export type FollowUser = {
@@ -13,10 +13,7 @@ export type FollowUser = {
 	avatarUrl: string | null;
 };
 
-export async function getGlobalFeed(
-	cursor: string | null,
-	limit = 20,
-): Promise<FeedItem[]> {
+export async function getGlobalFeed(cursor: string | null, limit = 20): Promise<FeedItem[]> {
 	const query = db
 		.select({
 			id: activityFeed.id,
@@ -40,25 +37,15 @@ export async function getGlobalFeed(
 		.from(activityFeed)
 		.leftJoin(profiles, eq(activityFeed.userId, profiles.id))
 		.leftJoin(releases, eq(activityFeed.targetId, releases.id))
-		.where(
-			cursor
-				? and(lt(activityFeed.createdAt, new Date(cursor)))
-				: undefined,
-		)
-		.orderBy(
-			desc(sql`COALESCE(${releases.rarityScore}, -1)`),
-			desc(activityFeed.createdAt),
-		)
+		.where(cursor ? and(lt(activityFeed.createdAt, new Date(cursor))) : undefined)
+		.orderBy(desc(sql`COALESCE(${releases.rarityScore}, -1)`), desc(activityFeed.createdAt))
 		.limit(limit);
 
 	const rows = await query;
 
 	return rows.map((row) => ({
 		...row,
-		createdAt:
-			row.createdAt instanceof Date
-				? row.createdAt.toISOString()
-				: String(row.createdAt),
+		createdAt: row.createdAt instanceof Date ? row.createdAt.toISOString() : String(row.createdAt),
 		metadata: row.metadata as Record<string, unknown> | null,
 	}));
 }
@@ -109,10 +96,7 @@ export async function getPersonalFeed(
 
 	return rows.map((row) => ({
 		...row,
-		createdAt:
-			row.createdAt instanceof Date
-				? row.createdAt.toISOString()
-				: String(row.createdAt),
+		createdAt: row.createdAt instanceof Date ? row.createdAt.toISOString() : String(row.createdAt),
 		metadata: row.metadata as Record<string, unknown> | null,
 	}));
 }
@@ -136,11 +120,7 @@ export async function getFollowCounts(
 	};
 }
 
-export async function getFollowers(
-	userId: string,
-	limit = 20,
-	offset = 0,
-): Promise<FollowUser[]> {
+export async function getFollowers(userId: string, limit = 20, offset = 0): Promise<FollowUser[]> {
 	const rows = await db
 		.select({
 			id: profiles.id,
@@ -158,11 +138,7 @@ export async function getFollowers(
 	return rows;
 }
 
-export async function getFollowing(
-	userId: string,
-	limit = 20,
-	offset = 0,
-): Promise<FollowUser[]> {
+export async function getFollowing(userId: string, limit = 20, offset = 0): Promise<FollowUser[]> {
 	const rows = await db
 		.select({
 			id: profiles.id,
@@ -187,12 +163,7 @@ export async function checkIsFollowing(
 	const rows = await db
 		.select({ id: follows.id })
 		.from(follows)
-		.where(
-			and(
-				eq(follows.followerId, currentUserId),
-				eq(follows.followingId, targetUserId),
-			),
-		);
+		.where(and(eq(follows.followerId, currentUserId), eq(follows.followingId, targetUserId)));
 
 	return rows.length > 0;
 }

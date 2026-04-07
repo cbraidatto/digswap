@@ -1,16 +1,1 @@
-[
-  {
-    "id": "7bc1c37c",
-    "label": "next-dev",
-    "command": "cd \"C:/Users/INTEL/Desktop/Get Shit DOne\" && pnpm dev",
-    "cwd": "C:\\Users\\INTEL\\Desktop\\Get Shit DOne",
-    "ownerSessionFile": "C:\\Users\\INTEL\\.gsd\\sessions\\--C--Users-INTEL-Desktop-Get Shit DOne--\\2026-04-06T01-34-22-336Z_53ea9375-90f8-4691-9beb-0bed29409d9f.jsonl",
-    "persistAcrossSessions": false,
-    "startedAt": 1775453665375,
-    "processType": "server",
-    "group": null,
-    "readyPattern": null,
-    "readyPort": 3000,
-    "pid": 13356
-  }
-]
+[]

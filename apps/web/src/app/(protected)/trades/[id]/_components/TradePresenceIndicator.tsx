@@ -8,10 +8,18 @@ const STATE_CONFIG: Record<
 	TradePresenceState,
 	{ label: string; dotClass: string; textClass: string }
 > = {
-	both_online:       { label: "Both online",         dotClass: "bg-tertiary",  textClass: "text-tertiary" },
-	me_only:           { label: "Desktop active",       dotClass: "bg-primary",  textClass: "text-primary" },
-	counterparty_only: { label: "Counterparty online",  dotClass: "bg-secondary",  textClass: "text-secondary" },
-	neither:           { label: "Offline",              dotClass: "bg-muted-foreground",  textClass: "text-muted-foreground" },
+	both_online: { label: "Both online", dotClass: "bg-tertiary", textClass: "text-tertiary" },
+	me_only: { label: "Desktop active", dotClass: "bg-primary", textClass: "text-primary" },
+	counterparty_only: {
+		label: "Counterparty online",
+		dotClass: "bg-secondary",
+		textClass: "text-secondary",
+	},
+	neither: {
+		label: "Offline",
+		dotClass: "bg-muted-foreground",
+		textClass: "text-muted-foreground",
+	},
 };
 
 interface PresenceRow {
@@ -20,7 +28,11 @@ interface PresenceRow {
 	user_id: string;
 }
 
-function deriveStateFromRows(rows: PresenceRow[], userId: string, counterpartyId: string): TradePresenceState {
+function deriveStateFromRows(
+	rows: PresenceRow[],
+	userId: string,
+	counterpartyId: string,
+): TradePresenceState {
 	const me = rows.find((r) => r.user_id === userId);
 	const other = rows.find((r) => r.user_id === counterpartyId);
 	const meOnline = Boolean(me?.is_active);

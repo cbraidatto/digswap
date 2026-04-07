@@ -1,4 +1,4 @@
-import { describe, test, expect, beforeEach } from "vitest";
+import { beforeEach, describe, expect, test } from "vitest";
 import { usePlayerStore } from "@/lib/player/store";
 
 // Reset store between tests
@@ -14,7 +14,12 @@ beforeEach(() => {
 });
 
 const trackA = { videoId: "yt-aaa", title: "Kind of Blue", artist: "Miles Davis", coverUrl: null };
-const trackB = { videoId: "yt-bbb", title: "A Love Supreme", artist: "John Coltrane", coverUrl: null };
+const trackB = {
+	videoId: "yt-bbb",
+	title: "A Love Supreme",
+	artist: "John Coltrane",
+	coverUrl: null,
+};
 const trackC = { videoId: "yt-ccc", title: "Blue Train", artist: "John Coltrane", coverUrl: null };
 
 describe("usePlayerStore — play/pause/resume", () => {

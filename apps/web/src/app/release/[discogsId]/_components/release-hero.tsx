@@ -1,6 +1,6 @@
 import Image from "next/image";
 import { Badge } from "@/components/ui/badge";
-import { GemBadge } from "@/components/ui/gem-badge";
+import { getRarityBadgeVariant, getRarityTier } from "@/lib/collection/rarity";
 
 interface ReleaseHeroProps {
 	release: {
@@ -21,6 +21,9 @@ interface ReleaseHeroProps {
 }
 
 export function ReleaseHero({ release }: ReleaseHeroProps) {
+	const rarityTier = getRarityTier(release.rarityScore);
+	const rarityVariant = getRarityBadgeVariant(rarityTier);
+
 	// Build metadata fragments — only show non-null fields
 	const metaParts = [
 		release.year ? String(release.year) : null,
@@ -58,9 +61,7 @@ export function ReleaseHero({ release }: ReleaseHeroProps) {
 
 				{/* Metadata row */}
 				{metaParts.length > 0 && (
-					<p className="font-mono text-xs text-on-surface-variant">
-						{metaParts.join(" / ")}
-					</p>
+					<p className="font-mono text-xs text-on-surface-variant">{metaParts.join(" / ")}</p>
 				)}
 
 				{/* Genre chips */}
@@ -74,10 +75,14 @@ export function ReleaseHero({ release }: ReleaseHeroProps) {
 					</div>
 				)}
 
-				{/* Gem badge */}
-				<div>
-					<GemBadge score={release.rarityScore} showScore={true} />
-				</div>
+				{/* Rarity badge */}
+				{rarityTier && (
+					<div>
+						<Badge variant={rarityVariant} className="text-xs">
+							{rarityTier.toUpperCase()}
+						</Badge>
+					</div>
+				)}
 
 				{/* Discogs stats */}
 				<p className="font-mono text-xs text-on-surface-variant">

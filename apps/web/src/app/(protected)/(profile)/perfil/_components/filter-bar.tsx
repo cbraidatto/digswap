@@ -1,7 +1,7 @@
 "use client";
 
-import { useRef, useCallback } from "react";
 import { useRouter } from "next/navigation";
+import { useCallback, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import {
 	DropdownMenu,
@@ -11,7 +11,7 @@ import {
 	DropdownMenuSeparator,
 	DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { DECADES, SORT_OPTIONS, type CollectionFilters } from "@/lib/collection/filters";
+import { type CollectionFilters, DECADES, SORT_OPTIONS } from "@/lib/collection/filters";
 
 interface FilterBarProps {
 	genres: string[];
@@ -38,22 +38,20 @@ function buildFilterUrl(
 	return qs ? `${basePath}?${qs}` : basePath;
 }
 
-export function FilterBar({
-	genres,
-	formats,
-	currentFilters,
-	basePath,
-}: FilterBarProps) {
+export function FilterBar({ genres, formats, currentFilters, basePath }: FilterBarProps) {
 	const router = useRouter();
 	const searchTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-	const handleSearchChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-		if (searchTimeoutRef.current) clearTimeout(searchTimeoutRef.current);
-		const value = e.target.value;
-		searchTimeoutRef.current = setTimeout(() => {
-			router.push(buildFilterUrl(basePath, currentFilters, { search: value || undefined }));
-		}, 400);
-	}, [router, basePath, currentFilters]);
+	const handleSearchChange = useCallback(
+		(e: React.ChangeEvent<HTMLInputElement>) => {
+			if (searchTimeoutRef.current) clearTimeout(searchTimeoutRef.current);
+			const value = e.target.value;
+			searchTimeoutRef.current = setTimeout(() => {
+				router.push(buildFilterUrl(basePath, currentFilters, { search: value || undefined }));
+			}, 400);
+		},
+		[router, basePath, currentFilters],
+	);
 
 	const handleGenreChange = (value: string) => {
 		const genre = value === "__all__" ? undefined : value;
@@ -82,7 +80,9 @@ export function FilterBar({
 		<div className="flex items-center gap-2 overflow-x-auto py-3 flex-wrap">
 			{/* Search */}
 			<div className="flex items-center bg-surface-container-high/50 rounded-lg px-3 py-1.5 border border-outline-variant/10 focus-within:border-primary/40 transition-colors min-w-[180px]">
-				<span className="material-symbols-outlined text-[16px] text-on-surface-variant/40 mr-2">search</span>
+				<span className="material-symbols-outlined text-[16px] text-on-surface-variant/40 mr-2">
+					search
+				</span>
 				<input
 					type="text"
 					defaultValue={currentFilters.search ?? ""}
@@ -100,9 +100,7 @@ export function FilterBar({
 							variant="outline"
 							size="sm"
 							className={`font-mono text-xs uppercase tracking-wider ${
-								currentFilters.genre
-									? "bg-primary/10 border-primary/30"
-									: ""
+								currentFilters.genre ? "bg-primary/10 border-primary/30" : ""
 							}`}
 						/>
 					}
@@ -114,9 +112,7 @@ export function FilterBar({
 						value={currentFilters.genre ?? "__all__"}
 						onValueChange={handleGenreChange}
 					>
-						<DropdownMenuRadioItem value="__all__">
-							All Genres
-						</DropdownMenuRadioItem>
+						<DropdownMenuRadioItem value="__all__">All Genres</DropdownMenuRadioItem>
 						<DropdownMenuSeparator />
 						{genres.map((genre) => (
 							<DropdownMenuRadioItem key={genre} value={genre}>
@@ -135,9 +131,7 @@ export function FilterBar({
 							variant="outline"
 							size="sm"
 							className={`font-mono text-xs uppercase tracking-wider ${
-								currentFilters.decade
-									? "bg-primary/10 border-primary/30"
-									: ""
+								currentFilters.decade ? "bg-primary/10 border-primary/30" : ""
 							}`}
 						/>
 					}
@@ -149,9 +143,7 @@ export function FilterBar({
 						value={currentFilters.decade ?? "__all__"}
 						onValueChange={handleDecadeChange}
 					>
-						<DropdownMenuRadioItem value="__all__">
-							All Decades
-						</DropdownMenuRadioItem>
+						<DropdownMenuRadioItem value="__all__">All Decades</DropdownMenuRadioItem>
 						<DropdownMenuSeparator />
 						{DECADES.map((d) => (
 							<DropdownMenuRadioItem key={d.label} value={d.label}>
@@ -170,9 +162,7 @@ export function FilterBar({
 							variant="outline"
 							size="sm"
 							className={`font-mono text-xs uppercase tracking-wider ${
-								currentFilters.format
-									? "bg-primary/10 border-primary/30"
-									: ""
+								currentFilters.format ? "bg-primary/10 border-primary/30" : ""
 							}`}
 						/>
 					}
@@ -184,9 +174,7 @@ export function FilterBar({
 						value={currentFilters.format ?? "__all__"}
 						onValueChange={handleFormatChange}
 					>
-						<DropdownMenuRadioItem value="__all__">
-							All Formats
-						</DropdownMenuRadioItem>
+						<DropdownMenuRadioItem value="__all__">All Formats</DropdownMenuRadioItem>
 						<DropdownMenuSeparator />
 						{formats.map((format) => (
 							<DropdownMenuRadioItem key={format} value={format}>
@@ -205,9 +193,7 @@ export function FilterBar({
 							variant="outline"
 							size="sm"
 							className={`font-mono text-xs uppercase tracking-wider ${
-								currentFilters.sort !== "rarity"
-									? "bg-primary/10 border-primary/30"
-									: ""
+								currentFilters.sort !== "rarity" ? "bg-primary/10 border-primary/30" : ""
 							}`}
 						/>
 					}
@@ -215,10 +201,7 @@ export function FilterBar({
 					Sort: {SORT_OPTIONS.find((o) => o.value === currentFilters.sort)?.label ?? "Rarity"}
 				</DropdownMenuTrigger>
 				<DropdownMenuContent>
-					<DropdownMenuRadioGroup
-						value={currentFilters.sort}
-						onValueChange={handleSortChange}
-					>
+					<DropdownMenuRadioGroup value={currentFilters.sort} onValueChange={handleSortChange}>
 						{SORT_OPTIONS.map((option) => (
 							<DropdownMenuRadioItem key={option.value} value={option.value}>
 								{option.label}

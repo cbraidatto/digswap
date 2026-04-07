@@ -78,9 +78,7 @@ test.describe("Pricing page — unauthenticated visitor", () => {
 test.describe("Pricing page — page structure", () => {
 	test("page heading is visible", async ({ page }) => {
 		await page.goto("/pricing");
-		await expect(
-			page.getByRole("heading", { name: /Choose your dig level/i }),
-		).toBeVisible();
+		await expect(page.getByRole("heading", { name: /Choose your dig level/i })).toBeVisible();
 	});
 
 	test("PRICING section label is visible", async ({ page }) => {

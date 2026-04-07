@@ -7,11 +7,7 @@ interface PaginationProps {
 	searchParams: Record<string, string>;
 }
 
-function buildPageUrl(
-	baseUrl: string,
-	searchParams: Record<string, string>,
-	page: number,
-): string {
+function buildPageUrl(baseUrl: string, searchParams: Record<string, string>, page: number): string {
 	const params = new URLSearchParams(searchParams);
 	if (page <= 1) {
 		params.delete("page");
@@ -22,12 +18,7 @@ function buildPageUrl(
 	return qs ? `${baseUrl}?${qs}` : baseUrl;
 }
 
-export function Pagination({
-	currentPage,
-	totalPages,
-	baseUrl,
-	searchParams,
-}: PaginationProps) {
+export function Pagination({ currentPage, totalPages, baseUrl, searchParams }: PaginationProps) {
 	const hasPrevious = currentPage > 1;
 	const hasNext = currentPage < totalPages;
 

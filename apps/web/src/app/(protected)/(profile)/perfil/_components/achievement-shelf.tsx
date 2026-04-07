@@ -56,9 +56,7 @@ export function AchievementShelf({ earned }: AchievementShelfProps) {
 							</div>
 							<span
 								className={`font-mono text-[8px] text-center leading-tight transition-colors ${
-									isEarned
-										? "text-on-surface-variant"
-										: "text-on-surface-variant/15"
+									isEarned ? "text-on-surface-variant" : "text-on-surface-variant/15"
 								}`}
 							>
 								{badge.name}

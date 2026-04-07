@@ -1,4 +1,4 @@
-import { describe, test, expect, vi, beforeEach } from "vitest";
+import { beforeEach, describe, expect, test, vi } from "vitest";
 
 // -- Mocks --
 
@@ -74,7 +74,7 @@ describe("Delta sync", () => {
 			},
 			error: null,
 		});
-		fromHandlers["import_jobs"] = jobChain;
+		fromHandlers.import_jobs = jobChain;
 
 		// All records are recent (would be new in a sync)
 		const recentDate = new Date(2025, 11, 1).toISOString();
@@ -115,12 +115,12 @@ describe("Delta sync", () => {
 				}),
 			}),
 		});
-		fromHandlers["releases"] = releasesChain;
+		fromHandlers.releases = releasesChain;
 
 		// Collection items -- no existing
 		const collectionChain = createChainedMock({ data: null, error: null });
 		collectionChain.insert = vi.fn().mockResolvedValue({ error: null });
-		fromHandlers["collection_items"] = collectionChain;
+		fromHandlers.collection_items = collectionChain;
 
 		const result = await processImportPage(JOB_ID);
 
@@ -143,7 +143,7 @@ describe("Delta sync", () => {
 			},
 			error: null,
 		});
-		fromHandlers["import_jobs"] = jobChain;
+		fromHandlers.import_jobs = jobChain;
 
 		mockGetIdentity.mockResolvedValue({
 			data: { username: "syncuser", id: 99 },
@@ -181,11 +181,11 @@ describe("Delta sync", () => {
 				}),
 			}),
 		});
-		fromHandlers["releases"] = releasesChain;
+		fromHandlers.releases = releasesChain;
 
 		const collectionChain = createChainedMock({ data: null, error: null });
 		collectionChain.insert = vi.fn().mockResolvedValue({ error: null });
-		fromHandlers["collection_items"] = collectionChain;
+		fromHandlers.collection_items = collectionChain;
 
 		const result = await processImportPage(JOB_ID);
 
@@ -209,7 +209,7 @@ describe("Delta sync", () => {
 			},
 			error: null,
 		});
-		fromHandlers["import_jobs"] = jobChain;
+		fromHandlers.import_jobs = jobChain;
 
 		const result = await processImportPage(JOB_ID);
 

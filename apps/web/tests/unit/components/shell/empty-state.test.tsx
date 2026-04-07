@@ -1,20 +1,16 @@
-import { describe, expect, it } from "vitest";
 import { render, screen } from "@testing-library/react";
 import { Disc3 } from "lucide-react";
+import { describe, expect, it } from "vitest";
 import { EmptyState } from "@/components/shell/empty-state";
 
 describe("EmptyState", () => {
 	it("renders heading text", () => {
-		render(
-			<EmptyState icon={Disc3} heading="Test Heading" body="Test body" />,
-		);
+		render(<EmptyState icon={Disc3} heading="Test Heading" body="Test body" />);
 		expect(screen.getByText("Test Heading")).toBeInTheDocument();
 	});
 
 	it("renders body text", () => {
-		render(
-			<EmptyState icon={Disc3} heading="Test Heading" body="Test body" />,
-		);
+		render(<EmptyState icon={Disc3} heading="Test Heading" body="Test body" />);
 		expect(screen.getByText("Test body")).toBeInTheDocument();
 	});
 

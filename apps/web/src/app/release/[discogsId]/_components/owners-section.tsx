@@ -1,8 +1,8 @@
 import Image from "next/image";
 import Link from "next/link";
-import { getOwnersByReleaseId, getOwnerCountByReleaseId } from "@/lib/release/queries";
-import { TrustStrip } from "@/components/trust/trust-strip";
 import { ProposeTradeButton } from "@/components/trades/ProposeTradeButton";
+import { TrustStrip } from "@/components/trust/trust-strip";
+import { getOwnerCountByReleaseId, getOwnersByReleaseId } from "@/lib/release/queries";
 
 interface OwnersSectionProps {
 	releaseId: string;
@@ -90,11 +90,7 @@ export async function OwnersSection({ releaseId }: OwnersSectionProps) {
 									<div className="overflow-hidden flex-1">
 										<TrustStrip userId={owner.userId} variant="compact" />
 									</div>
-									<ProposeTradeButton
-										providerId={owner.userId}
-										releaseId={releaseId}
-										compact
-									/>
+									<ProposeTradeButton providerId={owner.userId} releaseId={releaseId} compact />
 								</div>
 							</div>
 						))}

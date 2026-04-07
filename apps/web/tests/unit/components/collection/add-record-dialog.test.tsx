@@ -1,5 +1,5 @@
-import { describe, test, expect, vi, beforeEach, afterEach } from "vitest";
-import { render, screen, fireEvent, act, waitFor } from "@testing-library/react";
+import { act, fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
 
 // -- Mock server actions --
 const mockSearchDiscogs = vi.fn();
@@ -7,8 +7,7 @@ const mockAddRecordToCollection = vi.fn();
 
 vi.mock("@/actions/collection", () => ({
 	searchDiscogs: (...args: unknown[]) => mockSearchDiscogs(...args),
-	addRecordToCollection: (...args: unknown[]) =>
-		mockAddRecordToCollection(...args),
+	addRecordToCollection: (...args: unknown[]) => mockAddRecordToCollection(...args),
 }));
 
 // -- Mock next/navigation --
@@ -55,9 +54,7 @@ describe("AddRecordDialog", () => {
 	test("renders search input when open", () => {
 		render(<AddRecordDialog open={true} onOpenChange={vi.fn()} />);
 
-		expect(
-			screen.getByPlaceholderText("Search by title or artist..."),
-		).toBeInTheDocument();
+		expect(screen.getByPlaceholderText("Search by title or artist...")).toBeInTheDocument();
 	});
 
 	test("calls searchDiscogs after typing with debounce", async () => {

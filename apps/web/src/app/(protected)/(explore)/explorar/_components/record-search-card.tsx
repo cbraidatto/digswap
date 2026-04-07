@@ -1,20 +1,34 @@
 "use client";
 
-import { useState, useEffect } from "react";
 import Link from "next/link";
-import type { SearchResult } from "@/lib/discovery/queries";
-import { GemBadge } from "@/components/ui/gem-badge";
+import { useEffect, useState } from "react";
 import { getReviewCountAction } from "@/actions/community";
 import { AddToCrateButton } from "@/components/crates/add-to-crate-button";
 import { CoverArt } from "@/components/ui/cover-art";
+import { getRarityTier } from "@/lib/collection/rarity";
+import type { SearchResult } from "@/lib/discovery/queries";
 import { OwnersList } from "./owners-list";
 import { ReviewsPanel } from "./reviews-panel";
+
+function getRarityColors(tier: string | null): string {
+	switch (tier) {
+		case "Ultra Rare":
+			return "text-tertiary border-tertiary";
+		case "Rare":
+			return "text-secondary border-secondary";
+		case "Common":
+			return "text-on-surface-variant border-outline-variant";
+		default:
+			return "";
+	}
+}
 
 interface RecordSearchCardProps {
 	release: SearchResult;
 }
 
 export function RecordSearchCard({ release }: RecordSearchCardProps) {
+	const rarityTier = getRarityTier(release.rarityScore);
 	const [isReviewsExpanded, setIsReviewsExpanded] = useState(false);
 	const [reviewCount, setReviewCount] = useState<number | null>(null);
 
@@ -26,11 +40,7 @@ export function RecordSearchCard({ release }: RecordSearchCardProps) {
 		<div>
 			<div className="bg-surface-container-low rounded-lg p-4 flex gap-4 hover:bg-surface-container transition-colors cursor-pointer group">
 				{/* Album Art */}
-				<CoverArt
-					src={release.coverImageUrl}
-					alt={release.title}
-					size="md"
-				/>
+				<CoverArt src={release.coverImageUrl} alt={release.title} size="md" />
 
 				{/* Info */}
 				<div className="flex-1 min-w-0">
@@ -38,7 +48,13 @@ export function RecordSearchCard({ release }: RecordSearchCardProps) {
 						<span className="font-heading font-semibold text-on-surface group-hover:text-primary transition-colors truncate text-sm">
 							{release.title}
 						</span>
-						<GemBadge score={release.rarityScore} />
+						{rarityTier && (
+							<span
+								className={`text-xs font-mono px-1.5 py-0.5 rounded border ${getRarityColors(rarityTier)}`}
+							>
+								[{rarityTier.toUpperCase()}]
+							</span>
+						)}
 					</div>
 					<div className="flex flex-wrap items-center gap-3 text-xs text-on-surface-variant font-mono">
 						<span>{release.artist}</span>
@@ -84,8 +100,7 @@ export function RecordSearchCard({ release }: RecordSearchCardProps) {
 				{/* Owner Count */}
 				<div className="flex flex-col items-end gap-1 flex-shrink-0">
 					<span className="text-xs font-mono text-on-surface-variant">
-						{release.ownerCount}{" "}
-						{release.ownerCount === 1 ? "owner" : "owners"}
+						{release.ownerCount} {release.ownerCount === 1 ? "owner" : "owners"}
 					</span>
 				</div>
 			</div>
@@ -111,10 +126,7 @@ export function RecordSearchCard({ release }: RecordSearchCardProps) {
 
 			{/* Reviews Panel */}
 			<div id={`reviews-panel-${release.id}`}>
-				<ReviewsPanel
-					releaseId={release.id}
-					isExpanded={isReviewsExpanded}
-				/>
+				<ReviewsPanel releaseId={release.id} isExpanded={isReviewsExpanded} />
 			</div>
 		</div>
 	);

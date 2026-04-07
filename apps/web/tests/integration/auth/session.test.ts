@@ -1,4 +1,4 @@
-import { describe, it, expect, vi } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 
 /**
  * Session management integration test stubs.
@@ -60,16 +60,11 @@ describe("Session Management", () => {
 			];
 
 			// Sort by createdAt ascending (oldest first)
-			sessions.sort(
-				(a, b) => a.createdAt.getTime() - b.createdAt.getTime(),
-			);
+			sessions.sort((a, b) => a.createdAt.getTime() - b.createdAt.getTime());
 
 			// If count >= MAX_SESSIONS, find sessions to remove
 			if (sessions.length >= MAX_SESSIONS) {
-				const sessionsToRemove = sessions.slice(
-					0,
-					sessions.length - MAX_SESSIONS + 1,
-				);
+				const sessionsToRemove = sessions.slice(0, sessions.length - MAX_SESSIONS + 1);
 				// With 4 sessions and MAX=3, we should remove 2 (keep room for new)
 				expect(sessionsToRemove).toHaveLength(2);
 				expect(sessionsToRemove[0].id).toBe("1"); // oldest first
@@ -101,16 +96,11 @@ describe("Session Management", () => {
 				{ id: "3", createdAt: new Date("2024-01-03") },
 			];
 
-			sessions.sort(
-				(a, b) => a.createdAt.getTime() - b.createdAt.getTime(),
-			);
+			sessions.sort((a, b) => a.createdAt.getTime() - b.createdAt.getTime());
 
 			// At limit -- need to remove 1 to make room for new session
 			if (sessions.length >= MAX_SESSIONS) {
-				const sessionsToRemove = sessions.slice(
-					0,
-					sessions.length - MAX_SESSIONS + 1,
-				);
+				const sessionsToRemove = sessions.slice(0, sessions.length - MAX_SESSIONS + 1);
 				expect(sessionsToRemove).toHaveLength(1);
 				expect(sessionsToRemove[0].id).toBe("1"); // oldest
 			}

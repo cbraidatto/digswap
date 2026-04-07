@@ -47,7 +47,7 @@ export function DnaRadarChart({ genres }: DnaRadarChartProps) {
 		return polarToCartesian(angle, r);
 	});
 
-	const polygonPath = points.map((p, i) => `${i === 0 ? "M" : "L"}${p[0]},${p[1]}`).join(" ") + "Z";
+	const polygonPath = `${points.map((p, i) => `${i === 0 ? "M" : "L"}${p[0]},${p[1]}`).join(" ")}Z`;
 
 	return (
 		<div className="bg-surface-container-low rounded-xl p-5 border border-outline-variant/5">
@@ -63,7 +63,7 @@ export function DnaRadarChart({ genres }: DnaRadarChartProps) {
 					{Array.from({ length: LEVELS }).map((_, i) => {
 						const r = (RADIUS / LEVELS) * (i + 1);
 						const ringPoints = top.map((_, j) => polarToCartesian(j * angleStep, r));
-						const ringPath = ringPoints.map((p, j) => `${j === 0 ? "M" : "L"}${p[0]},${p[1]}`).join(" ") + "Z";
+						const ringPath = `${ringPoints.map((p, j) => `${j === 0 ? "M" : "L"}${p[0]},${p[1]}`).join(" ")}Z`;
 						return (
 							<path
 								key={i}
@@ -105,13 +105,7 @@ export function DnaRadarChart({ genres }: DnaRadarChartProps) {
 
 					{/* Data points */}
 					{points.map((p, i) => (
-						<circle
-							key={`point-${i}`}
-							cx={p[0]}
-							cy={p[1]}
-							r={3}
-							fill="var(--primary)"
-						/>
+						<circle key={`point-${i}`} cx={p[0]} cy={p[1]} r={3} fill="var(--primary)" />
 					))}
 
 					{/* Labels */}
@@ -129,7 +123,7 @@ export function DnaRadarChart({ genres }: DnaRadarChartProps) {
 								fillOpacity={0.5}
 								fontSize={8}
 							>
-								{g.genre.length > 10 ? g.genre.slice(0, 10) + "…" : g.genre}
+								{g.genre.length > 10 ? `${g.genre.slice(0, 10)}…` : g.genre}
 							</text>
 						);
 					})}
@@ -142,12 +136,22 @@ export function DnaRadarChart({ genres }: DnaRadarChartProps) {
 						const color = GENRE_COLORS[g.genre] ?? "var(--primary)";
 						return (
 							<div key={g.genre} className="flex items-center gap-2">
-								<div className="w-2 h-2 rounded-full flex-shrink-0" style={{ backgroundColor: color }} />
-								<span className="font-mono text-[10px] text-on-surface flex-1 truncate">{g.genre}</span>
+								<div
+									className="w-2 h-2 rounded-full flex-shrink-0"
+									style={{ backgroundColor: color }}
+								/>
+								<span className="font-mono text-[10px] text-on-surface flex-1 truncate">
+									{g.genre}
+								</span>
 								<div className="w-16 h-1 bg-surface-container-high rounded-full overflow-hidden">
-									<div className="h-full rounded-full" style={{ width: `${pct}%`, backgroundColor: color }} />
+									<div
+										className="h-full rounded-full"
+										style={{ width: `${pct}%`, backgroundColor: color }}
+									/>
 								</div>
-								<span className="font-mono text-[9px] text-on-surface-variant/50 w-8 text-right">{g.count}</span>
+								<span className="font-mono text-[9px] text-on-surface-variant/50 w-8 text-right">
+									{g.count}
+								</span>
 							</div>
 						);
 					})}

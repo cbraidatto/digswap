@@ -1,9 +1,5 @@
 export function SkeletonLine({ className = "" }: { className?: string }) {
-	return (
-		<div
-			className={`bg-surface-container-high rounded animate-pulse ${className}`}
-		/>
-	);
+	return <div className={`bg-surface-container-high rounded animate-pulse ${className}`} />;
 }
 
 export function SkeletonDisc({ size = "md" }: { size?: "sm" | "md" | "lg" }) {

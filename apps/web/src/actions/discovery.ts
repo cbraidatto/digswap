@@ -1,16 +1,16 @@
 "use server";
 
-import { createClient } from "@/lib/supabase/server";
-import { apiRateLimit , safeLimit} from "@/lib/rate-limit";
+import { logSearchSignal } from "@/actions/search-signals";
 import {
-	searchRecords,
 	browseRecords,
 	getSuggestedRecords,
 	getTrendingRecords,
+	searchRecords,
 	type TrendingRecord,
 } from "@/lib/discovery/queries";
-import { searchRecordsSchema, browseRecordsSchema } from "@/lib/validations/discovery";
-import { logSearchSignal } from "@/actions/search-signals";
+import { apiRateLimit, safeLimit } from "@/lib/rate-limit";
+import { createClient } from "@/lib/supabase/server";
+import { browseRecordsSchema, searchRecordsSchema } from "@/lib/validations/discovery";
 
 const PAGE_SIZE = 20;
 
@@ -72,7 +72,15 @@ export async function browseRecordsAction(
 	yearTo: number | null = null,
 ) {
 	try {
-		const parsed = browseRecordsSchema.safeParse({ genre, decade, page, genres, country, format, minRarity });
+		const parsed = browseRecordsSchema.safeParse({
+			genre,
+			decade,
+			page,
+			genres,
+			country,
+			format,
+			minRarity,
+		});
 		if (!parsed.success) {
 			return [];
 		}
@@ -94,10 +102,7 @@ export async function browseRecordsAction(
 		const offset = (parsed.data.page - 1) * PAGE_SIZE;
 
 		// Log search signals when genre filters are active
-		const allGenres = [
-			...(parsed.data.genre ? [parsed.data.genre] : []),
-			...parsed.data.genres,
-		];
+		const allGenres = [...(parsed.data.genre ? [parsed.data.genre] : []), ...parsed.data.genres];
 		if (allGenres.length > 0) {
 			void logSearchSignal([], allGenres);
 		}

@@ -1,8 +1,8 @@
 "use client";
 
-import { useState } from "react";
-import Link from "next/link";
 import Image from "next/image";
+import Link from "next/link";
+import { useState } from "react";
 import type { RecordOwner } from "@/lib/discovery/queries";
 
 interface OwnersListProps {
@@ -26,10 +26,7 @@ export function OwnersList({ owners }: OwnersListProps) {
 	return (
 		<div className="pl-16 py-1 space-y-1">
 			{visibleOwners.map((owner) => (
-				<div
-					key={owner.userId}
-					className="flex items-center gap-2 h-8"
-				>
+				<div key={owner.userId} className="flex items-center gap-2 h-8">
 					{/* Avatar */}
 					<div className="w-6 h-6 rounded bg-surface-container-high flex items-center justify-center flex-shrink-0 overflow-hidden">
 						{owner.avatarUrl ? (
@@ -57,9 +54,7 @@ export function OwnersList({ owners }: OwnersListProps) {
 							{owner.username}
 						</Link>
 					) : (
-						<span className="font-mono text-xs text-on-surface-variant">
-							unknown
-						</span>
+						<span className="font-mono text-xs text-on-surface-variant">unknown</span>
 					)}
 
 					{/* Condition Badge */}

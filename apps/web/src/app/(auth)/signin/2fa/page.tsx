@@ -1,7 +1,7 @@
 import { redirect } from "next/navigation";
-import { createClient } from "@/lib/supabase/server";
 import { AuthCard } from "@/components/auth/auth-card";
 import { TotpChallenge } from "@/components/auth/totp-challenge";
+import { createClient } from "@/lib/supabase/server";
 
 export const metadata = {
 	title: "Two-Factor Authentication | DigSwap",

@@ -1,11 +1,16 @@
 "use server";
 
-import { createClient } from "@/lib/supabase/server";
+import { computeRarityScore, createDiscogsClient } from "@/lib/discogs/client";
+import { apiRateLimit, safeLimit } from "@/lib/rate-limit";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { createDiscogsClient, computeRarityScore } from "@/lib/discogs/client";
-import { apiRateLimit , safeLimit} from "@/lib/rate-limit";
+import { createClient } from "@/lib/supabase/server";
+import {
+	addFromYouTubeSchema,
+	addToWantlistSchema,
+	wantlistItemIdSchema,
+} from "@/lib/validations/wantlist";
 import { searchYouTube } from "@/lib/youtube/client";
-import { addToWantlistSchema, wantlistItemIdSchema, addFromYouTubeSchema } from "@/lib/validations/wantlist";
+
 export { searchYouTube };
 
 export async function addToWantlist(
@@ -92,14 +97,12 @@ export async function addToWantlist(
 
 		if (duplicate) return { error: "Already on your wantlist" };
 
-		const { error: wantError } = await admin
-			.from("wantlist_items")
-			.insert({
-				user_id: user.id,
-				release_id: releaseId,
-				added_via: "manual",
-				created_at: new Date().toISOString(),
-			});
+		const { error: wantError } = await admin.from("wantlist_items").insert({
+			user_id: user.id,
+			release_id: releaseId,
+			added_via: "manual",
+			created_at: new Date().toISOString(),
+		});
 
 		if (wantError) {
 			// 23505 = unique_violation — concurrent duplicate
@@ -201,15 +204,13 @@ export async function markAsFound(
 				.maybeSingle();
 
 			if (!duplicate) {
-				const { error: collectionError } = await admin
-					.from("collection_items")
-					.insert({
-						user_id: user.id,
-						release_id: item.release_id,
-						added_via: "wantlist",
-						created_at: new Date().toISOString(),
-						updated_at: new Date().toISOString(),
-					});
+				const { error: collectionError } = await admin.from("collection_items").insert({
+					user_id: user.id,
+					release_id: item.release_id,
+					added_via: "wantlist",
+					created_at: new Date().toISOString(),
+					updated_at: new Date().toISOString(),
+				});
 
 				if (collectionError) {
 					console.error("Failed to add to collection:", collectionError);
@@ -301,14 +302,12 @@ export async function addToWantlistFromYouTube(
 
 		if (duplicate) return { error: "Already on your wantlist" };
 
-		const { error: wantError } = await admin
-			.from("wantlist_items")
-			.insert({
-				user_id: user.id,
-				release_id: releaseId,
-				added_via: "youtube",
-				created_at: new Date().toISOString(),
-			});
+		const { error: wantError } = await admin.from("wantlist_items").insert({
+			user_id: user.id,
+			release_id: releaseId,
+			added_via: "youtube",
+			created_at: new Date().toISOString(),
+		});
 
 		if (wantError) {
 			if (wantError.code === "23505") return { error: "Already on your wantlist" };

@@ -1,8 +1,8 @@
-import type { ReactNode } from "react";
 import Image from "next/image";
+import type { ReactNode } from "react";
+import { PlayButton } from "@/components/player/play-button";
 import type { CollectionItem } from "@/lib/collection/queries";
 import { CollectionCard } from "./collection-card";
-import { PlayButton } from "@/components/player/play-button";
 
 export type ViewMode = "grid" | "list";
 
@@ -33,20 +33,15 @@ export function CollectionGrid({
 		return (
 			<div className="bg-surface-container-low rounded-xl p-12 flex flex-col items-center gap-4 text-center border border-outline-variant/10">
 				<div className="w-16 h-16 bg-surface-container-high rounded-full flex items-center justify-center">
-					<span className="material-symbols-outlined text-primary text-3xl">
-						album
-					</span>
+					<span className="material-symbols-outlined text-primary text-3xl">album</span>
 				</div>
 				<div>
 					<div className="text-xs font-mono text-primary uppercase tracking-widest mb-2">
 						EMPTY_REPOSITORY
 					</div>
-					<h3 className="text-lg font-bold font-heading text-on-surface mb-2">
-						No records found
-					</h3>
+					<h3 className="text-lg font-bold font-heading text-on-surface mb-2">No records found</h3>
 					<p className="text-sm text-on-surface-variant font-sans max-w-sm">
-						Connect Discogs or add records manually to start building your
-						collection.
+						Connect Discogs or add records manually to start building your collection.
 					</p>
 				</div>
 			</div>
@@ -109,11 +104,7 @@ export function CollectionGrid({
 	return (
 		<div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
 			{displayItems.map((item) => (
-				<CollectionCard
-					key={item.id}
-					item={item}
-					isOwner={isOwner}
-				/>
+				<CollectionCard key={item.id} item={item} isOwner={isOwner} />
 			))}
 		</div>
 	);

@@ -17,12 +17,13 @@ interface StepIndicatorProps {
  *
  * Per UI-SPEC: Step indicator dots shown immediately (no skeleton).
  */
-export function StepIndicator({
-	currentStep,
-	totalSteps = 3,
-}: StepIndicatorProps) {
+export function StepIndicator({ currentStep, totalSteps = 3 }: StepIndicatorProps) {
 	return (
-		<div className="flex items-center justify-center gap-3" role="navigation" aria-label="Onboarding progress">
+		<div
+			className="flex items-center justify-center gap-3"
+			role="navigation"
+			aria-label="Onboarding progress"
+		>
 			{Array.from({ length: totalSteps }, (_, i) => {
 				const step = i + 1;
 				const isCompleted = step < currentStep;
@@ -33,13 +34,9 @@ export function StepIndicator({
 						<div
 							className={cn(
 								"flex size-8 items-center justify-center rounded-full border-2 transition-colors",
-								isCompleted &&
-									"border-primary bg-transparent text-primary",
-								isCurrent &&
-									"border-primary bg-primary text-primary-foreground",
-								!isCompleted &&
-									!isCurrent &&
-									"border-muted-foreground/30 text-muted-foreground/30",
+								isCompleted && "border-primary bg-transparent text-primary",
+								isCurrent && "border-primary bg-primary text-primary-foreground",
+								!isCompleted && !isCurrent && "border-muted-foreground/30 text-muted-foreground/30",
 							)}
 							aria-current={isCurrent ? "step" : undefined}
 							aria-label={`Step ${step}${isCompleted ? " (completed)" : isCurrent ? " (current)" : ""}`}
@@ -54,9 +51,7 @@ export function StepIndicator({
 							<div
 								className={cn(
 									"h-0.5 w-8 transition-colors",
-									step < currentStep
-										? "bg-primary"
-										: "bg-muted-foreground/30",
+									step < currentStep ? "bg-primary" : "bg-muted-foreground/30",
 								)}
 							/>
 						)}

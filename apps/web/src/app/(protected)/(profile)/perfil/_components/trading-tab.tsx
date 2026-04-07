@@ -18,13 +18,17 @@ export function TradingTab({ openForTradeItems, activeTradeCount }: TradingTabPr
 						<h3 className="font-mono text-xs text-on-surface-variant uppercase tracking-widest">
 							Open for trade
 						</h3>
-						<span className="font-mono text-[10px] text-primary/60">{openForTradeItems.length}</span>
+						<span className="font-mono text-[10px] text-primary/60">
+							{openForTradeItems.length}
+						</span>
 					</div>
 				</div>
 
 				{openForTradeItems.length === 0 ? (
 					<div className="rounded-xl border border-dashed border-outline-variant/20 p-10 text-center">
-						<span className="material-symbols-outlined text-2xl text-on-surface-variant/15 block mb-2">swap_horiz</span>
+						<span className="material-symbols-outlined text-2xl text-on-surface-variant/15 block mb-2">
+							swap_horiz
+						</span>
 						<p className="font-mono text-xs text-on-surface-variant/50">
 							No records marked for trade yet
 						</p>

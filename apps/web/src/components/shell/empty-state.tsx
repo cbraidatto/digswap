@@ -19,8 +19,8 @@ export function EmptyState({ icon: Icon, heading, body, action }: EmptyStateProp
 			</div>
 			<h2 className="font-heading text-lg font-semibold text-foreground">{heading}</h2>
 			<p className="mt-2 max-w-[320px] text-sm text-muted-foreground leading-relaxed">{body}</p>
-			{action && (
-				action.href ? (
+			{action &&
+				(action.href ? (
 					<a
 						href={action.href}
 						className="mt-5 inline-flex items-center gap-1.5 text-sm font-medium text-primary hover:text-primary/80 transition-colors"
@@ -36,8 +36,7 @@ export function EmptyState({ icon: Icon, heading, body, action }: EmptyStateProp
 					>
 						{action.label}
 					</button>
-				) : null
-			)}
+				) : null)}
 		</div>
 	);
 }

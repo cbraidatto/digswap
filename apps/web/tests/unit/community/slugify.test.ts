@@ -1,4 +1,4 @@
-import { describe, it, expect } from "vitest";
+import { describe, expect, it } from "vitest";
 import { slugify } from "@/lib/community/slugify";
 
 describe("slugify", () => {
@@ -15,9 +15,7 @@ describe("slugify", () => {
 	});
 
 	it("trims leading/trailing whitespace", () => {
-		expect(slugify("  Blue Note Originals SP  ")).toBe(
-			"blue-note-originals-sp",
-		);
+		expect(slugify("  Blue Note Originals SP  ")).toBe("blue-note-originals-sp");
 	});
 
 	it("removes all non-alphanumeric except hyphens", () => {

@@ -1,17 +1,16 @@
 "use client";
 
-import { useState, useTransition } from "react";
-import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Loader2, Mail } from "lucide-react";
 import Link from "next/link";
+import { useState, useTransition } from "react";
+import { useForm } from "react-hook-form";
 import { toast } from "sonner";
-
+import { forgotPassword } from "@/actions/auth";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { forgotPasswordSchema, type ForgotPasswordInput } from "@/lib/validations/auth";
-import { forgotPassword } from "@/actions/auth";
+import { type ForgotPasswordInput, forgotPasswordSchema } from "@/lib/validations/auth";
 
 /**
  * Forgot password form component.
@@ -63,10 +62,7 @@ export function ForgotPasswordForm() {
 					<p className="text-sm text-muted-foreground">{successMessage}</p>
 				</div>
 				<div className="text-center">
-					<Link
-						href="/signin"
-						className="text-sm text-primary underline-offset-4 hover:underline"
-					>
+					<Link href="/signin" className="text-sm text-primary underline-offset-4 hover:underline">
 						Back to Sign In
 					</Link>
 				</div>
@@ -95,25 +91,12 @@ export function ForgotPasswordForm() {
 				)}
 			</div>
 
-			<Button
-				type="submit"
-				className="w-full"
-				size="lg"
-				disabled={isPending}
-				aria-busy={isPending}
-			>
-				{isPending ? (
-					<Loader2 className="size-4 animate-spin" />
-				) : (
-					"Send Reset Link"
-				)}
+			<Button type="submit" className="w-full" size="lg" disabled={isPending} aria-busy={isPending}>
+				{isPending ? <Loader2 className="size-4 animate-spin" /> : "Send Reset Link"}
 			</Button>
 
 			<div className="text-center">
-				<Link
-					href="/signin"
-					className="text-sm text-primary underline-offset-4 hover:underline"
-				>
+				<Link href="/signin" className="text-sm text-primary underline-offset-4 hover:underline">
 					Back to Sign In
 				</Link>
 			</div>

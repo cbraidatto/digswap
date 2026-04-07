@@ -1,7 +1,7 @@
-import { eq, desc, sql, isNull, and } from "drizzle-orm";
+import { and, desc, eq, isNull, sql } from "drizzle-orm";
 import { db } from "@/lib/db";
-import { wantlistItems } from "@/lib/db/schema/wantlist";
 import { releases } from "@/lib/db/schema/releases";
+import { wantlistItems } from "@/lib/db/schema/wantlist";
 
 export const WANTLIST_PAGE_SIZE = 24;
 
@@ -22,10 +22,7 @@ export interface WantlistItem {
 	huntingCount: number;
 }
 
-export async function getWantlistPage(
-	userId: string,
-	page = 1,
-): Promise<WantlistItem[]> {
+export async function getWantlistPage(userId: string, page = 1): Promise<WantlistItem[]> {
 	const rows = await db
 		.select({
 			id: wantlistItems.id,
@@ -55,7 +52,7 @@ export async function getWantlistPage(
 		.limit(WANTLIST_PAGE_SIZE)
 		.offset((page - 1) * WANTLIST_PAGE_SIZE);
 
-	return rows.map(r => ({ ...r, huntingCount: Number(r.huntingCount ?? 0) })) as WantlistItem[];
+	return rows.map((r) => ({ ...r, huntingCount: Number(r.huntingCount ?? 0) })) as WantlistItem[];
 }
 
 export async function getWantlistTotalCount(userId: string): Promise<number> {

@@ -1,20 +1,17 @@
 "use client";
 
+import { zodResolver } from "@hookform/resolvers/zod";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { z } from "zod";
-import Link from "next/link";
 
 import { createGroupAction } from "@/actions/community";
 
 const groupSchema = z.object({
-	name: z
-		.string()
-		.min(1, "GROUP_NAME_REQUIRED")
-		.max(80, "NAME_TOO_LONG (max 80 chars)"),
+	name: z.string().min(1, "GROUP_NAME_REQUIRED").max(80, "NAME_TOO_LONG (max 80 chars)"),
 	description: z.string().optional(),
 	category: z.string().optional(),
 	visibility: z.enum(["public", "private"]),
@@ -59,9 +56,7 @@ export function GroupCreateForm() {
 			toast("Group created.");
 			router.push(`/comunidade/${result.slug}`);
 		} catch (err) {
-			toast.error(
-				err instanceof Error ? err.message : "Failed to create group.",
-			);
+			toast.error(err instanceof Error ? err.message : "Failed to create group.");
 		} finally {
 			setIsSubmitting(false);
 		}
@@ -90,15 +85,11 @@ export function GroupCreateForm() {
 				/>
 				<div className="flex items-center justify-between mt-1">
 					{errors.name ? (
-						<span className="font-mono text-xs text-destructive">
-							{errors.name.message}
-						</span>
+						<span className="font-mono text-xs text-destructive">{errors.name.message}</span>
 					) : (
 						<span />
 					)}
-					<span className="font-mono text-xs text-on-surface-variant">
-						{nameValue.length}/80
-					</span>
+					<span className="font-mono text-xs text-on-surface-variant">{nameValue.length}/80</span>
 				</div>
 			</div>
 

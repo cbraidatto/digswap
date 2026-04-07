@@ -1,16 +1,16 @@
 import type { Metadata } from "next";
-import { notFound, redirect } from "next/navigation";
 import Link from "next/link";
-import { createClient } from "@/lib/supabase/server";
-import { getTradeThread, getTradeParticipantContext } from "@/lib/trades/messages";
-import { deriveTradePresence } from "@/lib/trades/presence";
+import { notFound, redirect } from "next/navigation";
 import { markTradeThreadRead } from "@/actions/trade-messages";
-import { TradeDetailHeader } from "./_components/TradeDetailHeader";
+import { createClient } from "@/lib/supabase/server";
+import { getTradeParticipantContext, getTradeThread } from "@/lib/trades/messages";
+import { deriveTradePresence } from "@/lib/trades/presence";
 import { TradeActionButtons } from "./_components/TradeActionButtons";
-import { TradeReviewForm } from "./_components/TradeReviewForm";
-import { TradeMessageThread } from "./_components/TradeMessageThread";
+import { TradeDetailHeader } from "./_components/TradeDetailHeader";
 import { TradeMessageComposer } from "./_components/TradeMessageComposer";
+import { TradeMessageThread } from "./_components/TradeMessageThread";
 import { TradePresenceIndicator } from "./_components/TradePresenceIndicator";
+import { TradeReviewForm } from "./_components/TradeReviewForm";
 
 export const metadata: Metadata = {
 	title: "Trade — DigSwap",

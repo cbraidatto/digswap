@@ -1,6 +1,6 @@
-import { describe, test, expect, vi, beforeEach } from "vitest";
-import { render, screen, waitFor, act } from "@testing-library/react";
+import { act, render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
+import { beforeEach, describe, expect, test, vi } from "vitest";
 
 // ---------------------------------------------------------------------------
 // Mock @/components/ui/popover — base-ui Popover doesn't work in jsdom.
@@ -33,12 +33,7 @@ vi.mock("@/components/ui/popover", () => {
 					children,
 				),
 			),
-		PopoverTrigger: ({
-			children,
-		}: {
-			children: React.ReactNode;
-			render?: React.ReactElement;
-		}) => {
+		PopoverTrigger: ({ children }: { children: React.ReactNode; render?: React.ReactElement }) => {
 			const { onOpenChange } = useContext(Ctx);
 			return React.createElement(
 				"div",
@@ -54,18 +49,8 @@ vi.mock("@/components/ui/popover", () => {
 				children,
 			);
 		},
-		PopoverContent: ({
-			children,
-			className,
-		}: {
-			children: React.ReactNode;
-			className?: string;
-		}) =>
-			React.createElement(
-				"div",
-				{ "data-testid": "popover-content", className },
-				children,
-			),
+		PopoverContent: ({ children, className }: { children: React.ReactNode; className?: string }) =>
+			React.createElement("div", { "data-testid": "popover-content", className }, children),
 	};
 });
 
@@ -134,10 +119,7 @@ describe("AddToCratePopover", () => {
 	});
 
 	test("when getUserCratesAction resolves with 2 crates, renders 2 crate name buttons", async () => {
-		const crates = [
-			makeCrate("crate-1", "Sabado Dig", 3),
-			makeCrate("crate-2", "Jazz Finds", 7),
-		];
+		const crates = [makeCrate("crate-1", "Sabado Dig", 3), makeCrate("crate-2", "Jazz Finds", 7)];
 		mockGetUserCratesAction.mockResolvedValue({ success: true, data: crates });
 
 		render(
@@ -174,9 +156,7 @@ describe("AddToCratePopover", () => {
 		});
 
 		await waitFor(() => {
-			expect(
-				screen.getByPlaceholderText("Crate name..."),
-			).toBeInTheDocument();
+			expect(screen.getByPlaceholderText("Crate name...")).toBeInTheDocument();
 		});
 	});
 
@@ -208,8 +188,6 @@ describe("AddToCratePopover", () => {
 			await userEvent.click(crateButton);
 		});
 
-		expect(mockAddToCrate).toHaveBeenCalledWith(
-			expect.objectContaining({ crateId: "crate-abc" }),
-		);
+		expect(mockAddToCrate).toHaveBeenCalledWith(expect.objectContaining({ crateId: "crate-abc" }));
 	});
 });

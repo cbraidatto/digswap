@@ -1,6 +1,7 @@
 "use client";
 
-import { useState, useRef, useCallback, useEffect } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { searchRecordsAction } from "@/actions/discovery";
 import {
 	Dialog,
 	DialogContent,
@@ -8,7 +9,6 @@ import {
 	DialogTitle,
 	DialogTrigger,
 } from "@/components/ui/dialog";
-import { searchRecordsAction } from "@/actions/discovery";
 
 interface SelectedRecord {
 	id: string;
@@ -38,10 +38,7 @@ interface RecordSearchInlineProps {
 	children: React.ReactNode;
 }
 
-export function RecordSearchInline({
-	onSelect,
-	children,
-}: RecordSearchInlineProps) {
+export function RecordSearchInline({ onSelect, children }: RecordSearchInlineProps) {
 	const [open, setOpen] = useState(false);
 	const [term, setTerm] = useState("");
 	const [results, setResults] = useState<SearchResultItem[]>([]);
@@ -122,15 +119,11 @@ export function RecordSearchInline({
 				{/* Results */}
 				<div className="max-h-60 overflow-y-auto mt-2">
 					{isSearching && (
-						<div className="font-mono text-xs text-on-surface-variant py-2">
-							Searching...
-						</div>
+						<div className="font-mono text-xs text-on-surface-variant py-2">Searching...</div>
 					)}
 
 					{!isSearching && results.length === 0 && term.length >= 2 && (
-						<div className="font-mono text-xs text-on-surface-variant py-2">
-							No records found.
-						</div>
+						<div className="font-mono text-xs text-on-surface-variant py-2">No records found.</div>
 					)}
 
 					{results.map((result) => (

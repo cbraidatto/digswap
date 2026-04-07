@@ -129,12 +129,8 @@ vi.mock("@/lib/db/schema/releases", () => ({
 	releases: { id: "id" },
 }));
 
-const {
-	acceptTradeAction,
-	declineTradeAction,
-	cancelTradeAction,
-	submitTradeReviewAction,
-} = await import("@/actions/trades");
+const { acceptTradeAction, declineTradeAction, cancelTradeAction, submitTradeReviewAction } =
+	await import("@/actions/trades");
 
 // ---------------------------------------------------------------------------
 // Helpers

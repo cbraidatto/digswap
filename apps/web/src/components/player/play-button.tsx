@@ -1,6 +1,6 @@
 "use client";
 
-import { usePlayerStore, type PlayerTrack } from "@/lib/player/store";
+import { type PlayerTrack, usePlayerStore } from "@/lib/player/store";
 import { cn } from "@/lib/utils";
 
 interface PlayButtonProps {
@@ -12,7 +12,14 @@ interface PlayButtonProps {
 	className?: string;
 }
 
-export function PlayButton({ videoId, title, artist, coverUrl, size = "md", className }: PlayButtonProps) {
+export function PlayButton({
+	videoId,
+	title,
+	artist,
+	coverUrl,
+	size = "md",
+	className,
+}: PlayButtonProps) {
 	const { play, pause, currentTrack, isPlaying } = usePlayerStore();
 
 	// Don't render if no YouTube video

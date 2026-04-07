@@ -37,9 +37,7 @@ export function TracklistSection({ tracklist }: TracklistSectionProps) {
 						</span>
 
 						{/* Title */}
-						<span className="font-mono text-xs text-on-surface flex-1 truncate">
-							{track.title}
-						</span>
+						<span className="font-mono text-xs text-on-surface flex-1 truncate">{track.title}</span>
 
 						{/* Duration */}
 						{track.duration && (

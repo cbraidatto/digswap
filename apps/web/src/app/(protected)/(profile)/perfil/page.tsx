@@ -1,5 +1,5 @@
+import { and, count, eq, inArray, or } from "drizzle-orm";
 import type { Metadata } from "next";
-import { and, count, eq, gte, inArray, isNotNull, or } from "drizzle-orm";
 import { redirect } from "next/navigation";
 
 export const metadata: Metadata = {
@@ -7,38 +7,33 @@ export const metadata: Metadata = {
 	description: "View and manage your vinyl record collection.",
 };
 
-import { db } from "@/lib/db";
-import { collectionItems } from "@/lib/db/schema/collections";
-import { releases } from "@/lib/db/schema/releases";
-import { tradeRequests } from "@/lib/db/schema/trades";
-import { wantlistItems } from "@/lib/db/schema/wantlist";
-import { profiles } from "@/lib/db/schema/users";
-import { createClient } from "@/lib/supabase/server";
 import { collectionFilterSchema } from "@/lib/collection/filters";
 import {
-	getCollectionPage,
 	getCollectionCount,
-	getUniqueGenres,
-	getUniqueFormats,
+	getCollectionPage,
 	getTopGenres,
+	getUniqueFormats,
+	getUniqueGenres,
 	PAGE_SIZE,
 } from "@/lib/collection/queries";
+import { db } from "@/lib/db";
+import { releases } from "@/lib/db/schema/releases";
+import { tradeRequests } from "@/lib/db/schema/trades";
+import { profiles } from "@/lib/db/schema/users";
+import { getUserBadges, getUserRanking } from "@/lib/gamification/queries";
 import { getFollowCounts } from "@/lib/social/queries";
+import { createClient } from "@/lib/supabase/server";
 import { getWantlistPage, getWantlistTotalCount, WANTLIST_PAGE_SIZE } from "@/lib/wantlist/queries";
-import { getUserRanking, getUserBadges } from "@/lib/gamification/queries";
-import { getGemDistribution, getGemScoreForUser } from "@/lib/gems/queries";
-import { signOgParams } from "@/lib/og/sign";
-
-// Components
-import { ProfileHero } from "./_components/profile-hero";
-import { ProfileTabs, type ProfileTab } from "./_components/profile-tabs";
 import { AboutTab } from "./_components/about-tab";
-import { TradingTab } from "./_components/trading-tab";
+import { AddRecordButton } from "./_components/add-record-button";
 import { CollectionSectionClient } from "./_components/collection-section-client";
+import { ExportCollectionButton } from "./_components/export-collection-button";
 import { FilterBar } from "./_components/filter-bar";
 import { Pagination } from "./_components/pagination";
-import { AddRecordButton } from "./_components/add-record-button";
-import { ExportCollectionButton } from "./_components/export-collection-button";
+// Components
+import { ProfileHero } from "./_components/profile-hero";
+import { type ProfileTab, ProfileTabs } from "./_components/profile-tabs";
+import { TradingTab } from "./_components/trading-tab";
 import { WantlistTab } from "./_components/wantlist-tab";
 
 interface PerfilPageProps {
@@ -47,7 +42,9 @@ interface PerfilPageProps {
 
 export default async function PerfilPage({ searchParams }: PerfilPageProps) {
 	const supabase = await createClient();
-	const { data: { user } } = await supabase.auth.getUser();
+	const {
+		data: { user },
+	} = await supabase.auth.getUser();
 	if (!user) redirect("/signin");
 
 	const rawSearchParams = await searchParams;
@@ -55,15 +52,11 @@ export default async function PerfilPage({ searchParams }: PerfilPageProps) {
 	const activeTab = (rawSearchParams.tab as ProfileTab) || "collection";
 
 	// Fetch profile
-	const [profile] = await db
-		.select()
-		.from(profiles)
-		.where(eq(profiles.id, user.id))
-		.limit(1);
+	const [profile] = await db.select().from(profiles).where(eq(profiles.id, user.id)).limit(1);
 
 	if (!profile) redirect("/onboarding");
 
-	const weekAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
+	const _weekAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
 
 	// Showcase release IDs
 	const showcaseIds = [
@@ -74,10 +67,19 @@ export default async function PerfilPage({ searchParams }: PerfilPageProps) {
 
 	// Parallel data fetch
 	const [
-		items, totalCount, genres, formats, followCounts, topGenres,
-		showcaseReleases, wantlistData, wantlistTotal, ranking, userBadgeData,
-		[{ tradesTotal }], [{ activeTradeCount }],
-		gemDistribution, gemScore,
+		items,
+		totalCount,
+		genres,
+		formats,
+		followCounts,
+		topGenres,
+		showcaseReleases,
+		wantlistData,
+		wantlistTotal,
+		ranking,
+		userBadgeData,
+		[{ tradesTotal }],
+		[{ activeTradeCount }],
 	] = await Promise.all([
 		getCollectionPage(user.id, filters),
 		getCollectionCount(user.id, filters),
@@ -86,31 +88,48 @@ export default async function PerfilPage({ searchParams }: PerfilPageProps) {
 		getFollowCounts(user.id),
 		getTopGenres(user.id),
 		showcaseIds.length > 0
-			? db.select({ id: releases.id, discogsId: releases.discogsId, title: releases.title, artist: releases.artist, year: releases.year, coverImageUrl: releases.coverImageUrl })
-				.from(releases).where(inArray(releases.id, showcaseIds))
+			? db
+					.select({
+						id: releases.id,
+						discogsId: releases.discogsId,
+						title: releases.title,
+						artist: releases.artist,
+						year: releases.year,
+						coverImageUrl: releases.coverImageUrl,
+					})
+					.from(releases)
+					.where(inArray(releases.id, showcaseIds))
 			: Promise.resolve([]),
 		getWantlistPage(user.id, 1),
 		getWantlistTotalCount(user.id),
 		getUserRanking(user.id),
 		getUserBadges(user.id),
-		db.select({ tradesTotal: count() })
+		db
+			.select({ tradesTotal: count() })
 			.from(tradeRequests)
 			.where(or(eq(tradeRequests.requesterId, user.id), eq(tradeRequests.providerId, user.id))),
-		db.select({ activeTradeCount: count() })
+		db
+			.select({ activeTradeCount: count() })
 			.from(tradeRequests)
-			.where(and(
-				or(eq(tradeRequests.requesterId, user.id), eq(tradeRequests.providerId, user.id)),
-				eq(tradeRequests.status, "pending"),
-			)),
-		getGemDistribution(user.id),
-		getGemScoreForUser(user.id),
+			.where(
+				and(
+					or(eq(tradeRequests.requesterId, user.id), eq(tradeRequests.providerId, user.id)),
+					eq(tradeRequests.status, "pending"),
+				),
+			),
 	]);
 
 	const totalPages = Math.ceil(totalCount / PAGE_SIZE);
 	const releaseById = Object.fromEntries(showcaseReleases.map((r) => [r.id, r]));
-	const showcaseSearching = profile.showcaseSearchingId ? (releaseById[profile.showcaseSearchingId] ?? null) : null;
-	const showcaseRarest = profile.showcaseRarestId ? (releaseById[profile.showcaseRarestId] ?? null) : null;
-	const showcaseFavorite = profile.showcaseFavoriteId ? (releaseById[profile.showcaseFavoriteId] ?? null) : null;
+	const showcaseSearching = profile.showcaseSearchingId
+		? (releaseById[profile.showcaseSearchingId] ?? null)
+		: null;
+	const showcaseRarest = profile.showcaseRarestId
+		? (releaseById[profile.showcaseRarestId] ?? null)
+		: null;
+	const showcaseFavorite = profile.showcaseFavoriteId
+		? (releaseById[profile.showcaseFavoriteId] ?? null)
+		: null;
 
 	// Open for trade items (for Trading tab)
 	const openForTradeItems = items.filter((i) => i.openForTrade === 1);
@@ -212,10 +231,7 @@ export default async function PerfilPage({ searchParams }: PerfilPageProps) {
 
 					/* ── Trading Tab ── */
 					trading: (
-						<TradingTab
-							openForTradeItems={openForTradeItems}
-							activeTradeCount={activeTradeCount}
-						/>
+						<TradingTab openForTradeItems={openForTradeItems} activeTradeCount={activeTradeCount} />
 					),
 
 					/* ── About Tab ── */
@@ -247,8 +263,6 @@ export default async function PerfilPage({ searchParams }: PerfilPageProps) {
 							}))}
 							topGenres={topGenres}
 							badges={userBadgeData}
-							gemDistribution={gemDistribution}
-							totalGemScore={gemScore}
 							heatmapData={heatmapData}
 							recentlyAdded={recentlyAdded}
 							isOwner={true}

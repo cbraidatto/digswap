@@ -97,9 +97,7 @@ export function FeedShowcase() {
 				<span className="font-mono text-xs uppercase tracking-[0.2em] text-on-surface-variant">
 					featured
 				</span>
-				<span className="font-mono text-xs text-outline">
-					// feed showcase
-				</span>
+				<span className="font-mono text-xs text-outline">// feed showcase</span>
 			</div>
 
 			{/* Edge fade mask */}
@@ -133,7 +131,10 @@ export function FeedShowcase() {
 							>
 								{/* Ghost Protocol placeholder — icon on dark surface */}
 								<div className="absolute inset-0 flex items-center justify-center opacity-10">
-									<span className="material-symbols-outlined text-on-surface" style={{ fontSize: "96px" }}>
+									<span
+										className="material-symbols-outlined text-on-surface"
+										style={{ fontSize: "96px" }}
+									>
 										{item.icon}
 									</span>
 								</div>
@@ -168,9 +169,7 @@ export function FeedShowcase() {
 									<h3 className="font-heading text-white font-bold text-lg leading-tight mb-1">
 										{item.title}
 									</h3>
-									<p className="font-mono text-white/45 text-xs leading-relaxed">
-										{item.subtitle}
-									</p>
+									<p className="font-mono text-white/45 text-xs leading-relaxed">{item.subtitle}</p>
 								</div>
 							</div>
 						))}

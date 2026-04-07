@@ -1,35 +1,34 @@
 ---
 gsd_state_version: 1.0
-milestone: v1.0
-milestone_name: milestone
-status: verifying
-stopped_at: Completed 20-04-PLAN.md
-last_updated: "2026-04-06T19:38:45.310Z"
-last_activity: 2026-04-06
+milestone: v1.1
+milestone_name: Deploy Readiness
+status: planning
+stopped_at: null
+last_updated: "2026-04-06T22:00:00.000Z"
+last_activity: 2026-04-06 -- Milestone v1.1 started
 progress:
-  total_phases: 21
-  completed_phases: 19
-  total_plans: 96
-  completed_plans: 94
-  percent: 98
+  total_phases: 0
+  completed_phases: 0
+  total_plans: 0
+  completed_plans: 0
+  percent: 0
 ---
 
 # Project State
 
 ## Project Reference
 
-See: .planning/PROJECT.md (updated 2026-03-25)
+See: .planning/PROJECT.md (updated 2026-04-06)
 
 **Core value:** A digger opens the app and immediately finds who has the record they've been hunting -- and sees where they stand in the community.
-**Current focus:** Phase 19 — security-hardening-fix-74-audit-vulnerabilities
+**Current focus:** Milestone v1.1 — Deploy Readiness
 
 ## Current Position
 
-Phase: 19 (security-hardening-fix-74-audit-vulnerabilities) — EXECUTING
-Plan: 3 of 3
-Next: Phase 17 — Desktop Trade Runtime (Electron app)
-Status: Phase complete — ready for verification
-Last activity: 2026-04-06
+Phase: Not started (defining requirements)
+Plan: —
+Status: Defining requirements
+Last activity: 2026-04-06 — Milestone v1.1 started
 
 Progress: [█████████░] 98%
 
@@ -104,8 +103,6 @@ Progress: [█████████░] 98%
 | Phase 19 P03 | 5min | 2 tasks | 3 files |
 | Phase 20 P01 | 3min | 1 tasks | 7 files |
 | Phase 20 P02 | 3min | 2 tasks | 6 files |
-| Phase 20 P03 | 7min | 2 tasks | 17 files |
-| Phase 20 P04 | 10min | 2 tasks | 8 files |
 
 ## Accumulated Context
 
@@ -235,9 +232,6 @@ Recent decisions affecting current work:
 - [Phase 20]: Gem distribution computed at SQL query time via CASE expression -- no derived column on releases table
 - [Phase 20]: Reuse rarity_score DB column for gem scores — semantic rename at TypeScript layer only (UserRanking.gemScore)
 - [Phase 20]: RANK_TITLES recalibrated to 501/2001/5001 — typical 200-record collection scores ~1030 gem points
-- [Phase 20]: Feed card accent strip mapped to gem tier colors via getGemStripColor helper
-- [Phase 20]: Pre-import snapshot stored in Upstash Redis (7200s TTL) to bridge serverless self-invocation gap for gem tier change detection
-- [Phase 20]: detectGemTierChanges is pure function in notifications.ts; route.ts owns orchestration (snapshot queries, Redis, notification inserts)
 
 ### Roadmap Evolution
 
@@ -265,6 +259,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-04-06T19:38:45.304Z
-Stopped at: Completed 20-04-PLAN.md
+Last session: 2026-04-06T19:15:00.000Z
+Stopped at: Completed Wave 1 (20-01, 20-02)
 Resume file: None

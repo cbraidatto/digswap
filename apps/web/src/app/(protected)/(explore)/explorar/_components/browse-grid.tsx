@@ -2,12 +2,12 @@
 
 import { useEffect, useState, useTransition } from "react";
 import { browseRecordsAction } from "@/actions/discovery";
-import type { BrowseResult } from "@/lib/discovery/queries";
 import { CoverArt } from "@/components/ui/cover-art";
-import { GemBadge } from "@/components/ui/gem-badge";
-import { RecordLink } from "@/components/ui/record-link";
-import { RecordContextMenu } from "@/components/ui/record-context-menu";
 import { PlayOverlay } from "@/components/ui/play-overlay";
+import { RarityPill } from "@/components/ui/rarity-pill";
+import { RecordContextMenu } from "@/components/ui/record-context-menu";
+import { RecordLink } from "@/components/ui/record-link";
+import type { BrowseResult } from "@/lib/discovery/queries";
 
 interface BrowseGridProps {
 	genre: string | null;
@@ -41,7 +41,16 @@ export function BrowseGrid({
 	const [isPending, startTransition] = useTransition();
 
 	const hasAnyFilter =
-		!!genre || !!decade || genres.length > 0 || styles.length > 0 || !!country || !!label || !!format || minRarity > 0 || !!yearFrom || !!yearTo;
+		!!genre ||
+		!!decade ||
+		genres.length > 0 ||
+		styles.length > 0 ||
+		!!country ||
+		!!label ||
+		!!format ||
+		minRarity > 0 ||
+		!!yearFrom ||
+		!!yearTo;
 
 	useEffect(() => {
 		if (!hasAnyFilter) {
@@ -51,11 +60,37 @@ export function BrowseGrid({
 		}
 
 		startTransition(async () => {
-			const data = await browseRecordsAction(genre, decade, 1, genres, country, format, minRarity, styles, label, sort, yearFrom, yearTo);
+			const data = await browseRecordsAction(
+				genre,
+				decade,
+				1,
+				genres,
+				country,
+				format,
+				minRarity,
+				styles,
+				label,
+				sort,
+				yearFrom,
+				yearTo,
+			);
 			setResults(data);
 			setHasQueried(true);
 		});
-	}, [genre, decade, genres, styles, country, label, format, minRarity, sort, yearFrom, yearTo, hasAnyFilter]);
+	}, [
+		genre,
+		decade,
+		genres,
+		styles,
+		country,
+		label,
+		format,
+		minRarity,
+		sort,
+		yearFrom,
+		yearTo,
+		hasAnyFilter,
+	]);
 
 	if (!hasAnyFilter) return null;
 
@@ -63,7 +98,10 @@ export function BrowseGrid({
 		return (
 			<div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
 				{Array.from({ length: 8 }).map((_, i) => (
-					<div key={`skeleton-browse-${i}`} className="bg-surface-container-low rounded-xl h-56 animate-pulse" />
+					<div
+						key={`skeleton-browse-${i}`}
+						className="bg-surface-container-low rounded-xl h-56 animate-pulse"
+					/>
 				))}
 			</div>
 		);
@@ -72,8 +110,12 @@ export function BrowseGrid({
 	if (hasQueried && results.length === 0) {
 		return (
 			<div className="text-center py-12 border border-dashed border-outline-variant/20 rounded-xl">
-				<span className="material-symbols-outlined text-2xl text-on-surface-variant/20 block mb-2">search_off</span>
-				<p className="font-mono text-xs text-on-surface-variant">No records match the selected filters</p>
+				<span className="material-symbols-outlined text-2xl text-on-surface-variant/20 block mb-2">
+					search_off
+				</span>
+				<p className="font-mono text-xs text-on-surface-variant">
+					No records match the selected filters
+				</p>
 			</div>
 		);
 	}
@@ -86,7 +128,10 @@ export function BrowseGrid({
 					className="bg-surface-container-low rounded-xl overflow-hidden border border-outline-variant/5 hover:border-outline-variant/15 hover:shadow-lg hover:shadow-black/5 transition-all group"
 				>
 					{/* Cover with play overlay */}
-					<RecordLink discogsId={record.discogsId} className="block relative aspect-square group/cover">
+					<RecordLink
+						discogsId={record.discogsId}
+						className="block relative aspect-square group/cover"
+					>
 						<CoverArt
 							src={record.coverImageUrl}
 							alt={record.title}
@@ -120,7 +165,7 @@ export function BrowseGrid({
 							{record.artist}
 						</p>
 						<div className="flex items-center justify-between mt-2">
-							<GemBadge score={record.rarityScore} />
+							<RarityPill score={record.rarityScore} showScore={false} />
 							<span className="font-mono text-[9px] text-on-surface-variant/50">
 								{record.ownerCount} {record.ownerCount === 1 ? "owner" : "owners"}
 							</span>

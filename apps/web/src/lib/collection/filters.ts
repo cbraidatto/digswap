@@ -1,14 +1,6 @@
 import { z } from "zod";
 
-export const CONDITION_GRADES = [
-	"Mint",
-	"VG+",
-	"VG",
-	"G+",
-	"G",
-	"F",
-	"P",
-] as const;
+export const CONDITION_GRADES = ["Mint", "VG+", "VG", "G+", "G", "F", "P"] as const;
 export type ConditionGrade = (typeof CONDITION_GRADES)[number];
 
 export const DECADES = [
@@ -34,9 +26,7 @@ export type SortOption = "rarity" | "date" | "alpha" | "rating";
  * Returns the year range for a decade label (e.g. "80s" -> { start: 1980, end: 1990 }).
  * Returns null for unrecognized labels.
  */
-export function getDecadeRange(
-	decade: string,
-): { start: number; end: number } | null {
+export function getDecadeRange(decade: string): { start: number; end: number } | null {
 	const entry = DECADES.find((d) => d.label === decade);
 	if (!entry) return null;
 	return { start: entry.startYear, end: entry.startYear + 10 };

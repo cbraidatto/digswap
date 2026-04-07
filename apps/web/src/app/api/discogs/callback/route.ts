@@ -1,10 +1,10 @@
+import { DiscogsClient } from "@lionralfs/discogs-client";
 import { cookies } from "next/headers";
 import { type NextRequest, NextResponse } from "next/server";
-import { DiscogsClient } from "@lionralfs/discogs-client";
-import { createClient } from "@/lib/supabase/server";
-import { createAdminClient } from "@/lib/supabase/admin";
 import { getAccessToken, storeTokens } from "@/lib/discogs/oauth";
 import { authRateLimit, safeLimit } from "@/lib/rate-limit";
+import { createAdminClient } from "@/lib/supabase/admin";
+import { createClient } from "@/lib/supabase/server";
 
 /**
  * Discogs OAuth 1.0a callback handler.
@@ -59,6 +59,18 @@ export async function GET(request: NextRequest) {
 			token: string;
 			tokenSecret: string;
 		};
+
+		// SECURITY: Validate the oauth_token from the callback matches the one we stored.
+		// This prevents CSRF attacks where an attacker substitutes their own request token
+		// in the callback URL. In OAuth 1.0a, the provider returns the same request token
+		// we sent — if it doesn't match our cookie, the flow was tampered with.
+		if (oauthToken !== token) {
+			console.error("[discogs-oauth] Token mismatch: callback token does not match cookie token");
+			cookieStore.delete("discogs_oauth");
+			return NextResponse.redirect(
+				`${siteUrl}/settings?error=${encodeURIComponent("OAuth token mismatch. Please try connecting again.")}`,
+			);
+		}
 
 		// Clear the OAuth cookie
 		cookieStore.delete("discogs_oauth");

@@ -1,23 +1,21 @@
 "use server";
 
 import { requireUser } from "@/lib/auth/require-user";
-import { apiRateLimit , safeLimit} from "@/lib/rate-limit";
 import {
-	getGlobalLeaderboard,
 	getGenreLeaderboard,
-	getLeaderboardCount,
 	getGenreLeaderboardCount,
+	getGlobalLeaderboard,
+	getLeaderboardCount,
 	type LeaderboardEntry,
 } from "@/lib/gamification/queries";
-import { leaderboardPageSchema, genreLeaderboardSchema } from "@/lib/validations/gamification";
+import { apiRateLimit, safeLimit } from "@/lib/rate-limit";
+import { genreLeaderboardSchema, leaderboardPageSchema } from "@/lib/validations/gamification";
 
 // ---------------------------------------------------------------------------
 // Leaderboard server actions
 // ---------------------------------------------------------------------------
 
-export async function loadGlobalLeaderboard(
-	page?: number,
-): Promise<LeaderboardEntry[]> {
+export async function loadGlobalLeaderboard(page?: number): Promise<LeaderboardEntry[]> {
 	try {
 		const parsed = leaderboardPageSchema.safeParse({ page });
 		if (!parsed.success) {
@@ -78,9 +76,7 @@ export async function loadLeaderboardCount(): Promise<number> {
 	}
 }
 
-export async function loadGenreLeaderboardCount(
-	genre: string,
-): Promise<number> {
+export async function loadGenreLeaderboardCount(genre: string): Promise<number> {
 	try {
 		const parsed = genreLeaderboardSchema.safeParse({ genre });
 		if (!parsed.success) {

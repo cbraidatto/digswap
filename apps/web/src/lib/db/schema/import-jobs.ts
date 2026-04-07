@@ -1,18 +1,6 @@
-import {
-	pgTable,
-	uuid,
-	varchar,
-	text,
-	timestamp,
-	integer,
-} from "drizzle-orm/pg-core";
-import { pgPolicy } from "drizzle-orm/pg-core";
 import { sql } from "drizzle-orm";
-import {
-	authenticatedRole,
-	authUid,
-	supabaseAuthAdminRole,
-} from "drizzle-orm/supabase";
+import { integer, pgPolicy, pgTable, text, timestamp, uuid, varchar } from "drizzle-orm/pg-core";
+import { authenticatedRole, authUid, supabaseAuthAdminRole } from "drizzle-orm/supabase";
 
 export const importJobs = pgTable(
 	"import_jobs",
@@ -30,9 +18,7 @@ export const importJobs = pgTable(
 		errorMessage: text("error_message"),
 		startedAt: timestamp("started_at", { withTimezone: true }),
 		completedAt: timestamp("completed_at", { withTimezone: true }),
-		createdAt: timestamp("created_at", { withTimezone: true })
-			.defaultNow()
-			.notNull(),
+		createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
 	},
 	(table) => [
 		pgPolicy("import_jobs_select_own", {

@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 
 // Mock the database module -- backup-codes.ts imports db and schema
 vi.mock("@/lib/db", () => ({
@@ -94,9 +94,7 @@ describe("Backup Codes", () => {
 
 	describe("verifyBackupCode", () => {
 		it("returns true for a correct code", async () => {
-			const { hashBackupCode, verifyBackupCode } = await import(
-				"@/lib/backup-codes"
-			);
+			const { hashBackupCode, verifyBackupCode } = await import("@/lib/backup-codes");
 			const code = "ABCD5678";
 			const hash = await hashBackupCode(code);
 			const result = await verifyBackupCode(code, hash);
@@ -104,18 +102,14 @@ describe("Backup Codes", () => {
 		});
 
 		it("returns false for an incorrect code", async () => {
-			const { hashBackupCode, verifyBackupCode } = await import(
-				"@/lib/backup-codes"
-			);
+			const { hashBackupCode, verifyBackupCode } = await import("@/lib/backup-codes");
 			const hash = await hashBackupCode("CORRECT1");
 			const result = await verifyBackupCode("WRONGCODE", hash);
 			expect(result).toBe(false);
 		});
 
 		it("is case-insensitive (codes work regardless of case)", async () => {
-			const { hashBackupCode, verifyBackupCode } = await import(
-				"@/lib/backup-codes"
-			);
+			const { hashBackupCode, verifyBackupCode } = await import("@/lib/backup-codes");
 			const code = "ABCD5678";
 			const hash = await hashBackupCode(code);
 

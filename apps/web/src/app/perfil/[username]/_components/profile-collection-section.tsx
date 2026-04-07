@@ -1,13 +1,13 @@
 "use client";
 
 import { useState } from "react";
-import { WantlistMatchSection } from "@/app/(protected)/(profile)/perfil/_components/wantlist-match-section";
 import { CollectionGrid } from "@/app/(protected)/(profile)/perfil/_components/collection-grid";
 import { FilterBar } from "@/app/(protected)/(profile)/perfil/_components/filter-bar";
 import { Pagination } from "@/app/(protected)/(profile)/perfil/_components/pagination";
-import type { WantlistIntersection } from "@/lib/wantlist/intersection-queries";
-import type { CollectionItem } from "@/lib/collection/queries";
+import { WantlistMatchSection } from "@/app/(protected)/(profile)/perfil/_components/wantlist-match-section";
 import type { CollectionFilters } from "@/lib/collection/filters";
+import type { CollectionItem } from "@/lib/collection/queries";
+import type { WantlistIntersection } from "@/lib/wantlist/intersection-queries";
 
 interface ProfileCollectionSectionProps {
 	items: CollectionItem[];
@@ -47,10 +47,7 @@ export function ProfileCollectionSection({
 
 			{/* Wantlist match section — only rendered when intersections > 0 (logged-in visitors only) */}
 			{intersections.length > 0 && (
-				<WantlistMatchSection
-					intersections={intersections}
-					onFilterChange={setFilterIds}
-				/>
+				<WantlistMatchSection intersections={intersections} onFilterChange={setFilterIds} />
 			)}
 
 			{/* Filter bar */}
@@ -62,11 +59,7 @@ export function ProfileCollectionSection({
 			/>
 
 			{/* Collection grid with optional match filter */}
-			<CollectionGrid
-				items={items}
-				isOwner={false}
-				filterToIds={filterIds ?? undefined}
-			/>
+			<CollectionGrid items={items} isOwner={false} filterToIds={filterIds ?? undefined} />
 
 			{/* Pagination — hidden when match filter is active */}
 			{!filterIds && totalPages > 1 && (

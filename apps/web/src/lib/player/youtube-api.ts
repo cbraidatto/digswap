@@ -22,7 +22,8 @@ export function loadYouTubeAPI(): Promise<void> {
 	if (ytApiPromise) return ytApiPromise;
 
 	ytApiPromise = new Promise((resolve, reject) => {
-		const existing = (window as Window & { onYouTubeIframeAPIReady?: () => void }).onYouTubeIframeAPIReady;
+		const existing = (window as Window & { onYouTubeIframeAPIReady?: () => void })
+			.onYouTubeIframeAPIReady;
 
 		(window as Window & { onYouTubeIframeAPIReady?: () => void }).onYouTubeIframeAPIReady = () => {
 			existing?.();

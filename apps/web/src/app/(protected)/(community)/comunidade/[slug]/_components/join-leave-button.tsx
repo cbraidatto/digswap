@@ -1,8 +1,8 @@
 "use client";
 
 import { useState, useTransition } from "react";
-import { joinGroupAction, leaveGroupAction } from "@/actions/community";
 import { toast } from "sonner";
+import { joinGroupAction, leaveGroupAction } from "@/actions/community";
 
 interface JoinLeaveButtonProps {
 	groupId: string;
@@ -22,8 +22,7 @@ export function JoinLeaveButton({
 	memberCount: memberCountInitial,
 }: JoinLeaveButtonProps) {
 	const [isMemberLocal, setIsMemberLocal] = useState(isMemberInitial);
-	const [memberCountLocal, setMemberCountLocal] =
-		useState(memberCountInitial);
+	const [_memberCountLocal, setMemberCountLocal] = useState(memberCountInitial);
 	const [showLeaveConfirm, setShowLeaveConfirm] = useState(false);
 	const [isHovered, setIsHovered] = useState(false);
 	const [isPending, startTransition] = useTransition();
@@ -85,9 +84,7 @@ export function JoinLeaveButton({
 	if (showLeaveConfirm) {
 		return (
 			<div className="flex items-center gap-2 whitespace-nowrap">
-				<span className="font-mono text-xs text-on-surface-variant">
-					Leave {groupName}?
-				</span>
+				<span className="font-mono text-xs text-on-surface-variant">Leave {groupName}?</span>
 				<button
 					type="button"
 					onClick={handleLeaveConfirm}

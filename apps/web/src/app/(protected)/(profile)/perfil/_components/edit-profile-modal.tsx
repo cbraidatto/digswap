@@ -1,22 +1,22 @@
 "use client";
 
-import { useRef, useState, useTransition } from "react";
-import { useRouter } from "next/navigation";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
+import { useRef, useState, useTransition } from "react";
 import { updateProfile, uploadAvatar } from "@/actions/profile";
 
 interface EditProfileModalProps {
 	initial: {
-		displayName?:  string | null;
-		username?:     string | null;
-		location?:     string | null;
-		bio?:          string | null;
-		youtubeUrl?:    string | null;
-		instagramUrl?:  string | null;
+		displayName?: string | null;
+		username?: string | null;
+		location?: string | null;
+		bio?: string | null;
+		youtubeUrl?: string | null;
+		instagramUrl?: string | null;
 		soundcloudUrl?: string | null;
-		discogsUrl?:    string | null;
-		beatportUrl?:   string | null;
-		avatarUrl?:     string | null;
+		discogsUrl?: string | null;
+		beatportUrl?: string | null;
+		avatarUrl?: string | null;
 	};
 }
 
@@ -27,11 +27,11 @@ export function EditProfileModal({ initial }: EditProfileModalProps) {
 	const [username, setUsername] = useState<string>(initial.username ?? "");
 	const [location, setLocation] = useState<string>(initial.location ?? "");
 	const [bio, setBio] = useState<string>(initial.bio ?? "");
-	const [youtubeUrl,    setYoutubeUrl]    = useState<string>(initial.youtubeUrl    ?? "");
-	const [instagramUrl,  setInstagramUrl]  = useState<string>(initial.instagramUrl  ?? "");
+	const [youtubeUrl, setYoutubeUrl] = useState<string>(initial.youtubeUrl ?? "");
+	const [instagramUrl, setInstagramUrl] = useState<string>(initial.instagramUrl ?? "");
 	const [soundcloudUrl, setSoundcloudUrl] = useState<string>(initial.soundcloudUrl ?? "");
-	const [discogsUrl,    setDiscogsUrl]    = useState<string>(initial.discogsUrl    ?? "");
-	const [beatportUrl,   setBeatportUrl]   = useState<string>(initial.beatportUrl   ?? "");
+	const [discogsUrl, setDiscogsUrl] = useState<string>(initial.discogsUrl ?? "");
+	const [beatportUrl, setBeatportUrl] = useState<string>(initial.beatportUrl ?? "");
 	const [avatarUrl, setAvatarUrl] = useState<string | null>(initial.avatarUrl ?? null);
 	const [isUploadingAvatar, setIsUploadingAvatar] = useState(false);
 	const [error, setError] = useState<string | null>(null);
@@ -43,11 +43,11 @@ export function EditProfileModal({ initial }: EditProfileModalProps) {
 		setUsername(initial.username ?? "");
 		setLocation(initial.location ?? "");
 		setBio(initial.bio ?? "");
-		setYoutubeUrl(initial.youtubeUrl       ?? "");
-		setInstagramUrl(initial.instagramUrl   ?? "");
+		setYoutubeUrl(initial.youtubeUrl ?? "");
+		setInstagramUrl(initial.instagramUrl ?? "");
 		setSoundcloudUrl(initial.soundcloudUrl ?? "");
-		setDiscogsUrl(initial.discogsUrl       ?? "");
-		setBeatportUrl(initial.beatportUrl     ?? "");
+		setDiscogsUrl(initial.discogsUrl ?? "");
+		setBeatportUrl(initial.beatportUrl ?? "");
 		setAvatarUrl(initial.avatarUrl ?? null);
 		setError(null);
 		setOpen(true);
@@ -73,8 +73,15 @@ export function EditProfileModal({ initial }: EditProfileModalProps) {
 		setError(null);
 		startTransition(async () => {
 			const result = await updateProfile({
-				displayName, username, location, bio,
-				youtubeUrl, instagramUrl, soundcloudUrl, discogsUrl, beatportUrl,
+				displayName,
+				username,
+				location,
+				bio,
+				youtubeUrl,
+				instagramUrl,
+				soundcloudUrl,
+				discogsUrl,
+				beatportUrl,
 			});
 			if ("error" in result) {
 				setError(result.error ?? "Failed to update profile.");
@@ -114,13 +121,26 @@ export function EditProfileModal({ initial }: EditProfileModalProps) {
 						</div>
 
 						{/* Fields */}
-						<div className="px-6 py-6 space-y-5 overflow-y-auto max-h-[60vh]" style={{ scrollbarWidth: "thin", scrollbarColor: "rgba(255,255,255,0.1) transparent" }}>
+						<div
+							className="px-6 py-6 space-y-5 overflow-y-auto max-h-[60vh]"
+							style={{
+								scrollbarWidth: "thin",
+								scrollbarColor: "rgba(255,255,255,0.1) transparent",
+							}}
+						>
 							{/* Avatar */}
 							<div className="flex items-center gap-4">
 								<div className="relative group flex-shrink-0">
 									<div className="w-16 h-16 rounded border-2 border-primary/20 overflow-hidden bg-surface-container-high flex items-center justify-center">
 										{avatarUrl ? (
-											<Image src={avatarUrl} alt="Avatar" width={64} height={64} unoptimized className="w-full h-full object-cover" />
+											<Image
+												src={avatarUrl}
+												alt="Avatar"
+												width={64}
+												height={64}
+												unoptimized
+												className="w-full h-full object-cover"
+											/>
 										) : (
 											<span className="text-2xl font-mono font-bold text-primary">
 												{(displayName || "D").charAt(0).toUpperCase()}
@@ -134,9 +154,13 @@ export function EditProfileModal({ initial }: EditProfileModalProps) {
 										className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity rounded flex items-center justify-center disabled:cursor-wait"
 									>
 										{isUploadingAvatar ? (
-											<span className="material-symbols-outlined text-white text-base animate-spin">progress_activity</span>
+											<span className="material-symbols-outlined text-white text-base animate-spin">
+												progress_activity
+											</span>
 										) : (
-											<span className="material-symbols-outlined text-white text-base">photo_camera</span>
+											<span className="material-symbols-outlined text-white text-base">
+												photo_camera
+											</span>
 										)}
 									</button>
 									<input
@@ -148,8 +172,12 @@ export function EditProfileModal({ initial }: EditProfileModalProps) {
 									/>
 								</div>
 								<div>
-									<p className="font-mono text-xs uppercase tracking-[0.2em] text-on-surface-variant">Avatar</p>
-									<p className="font-mono text-[9px] text-outline mt-0.5">Max 2MB · JPG, PNG, WebP</p>
+									<p className="font-mono text-xs uppercase tracking-[0.2em] text-on-surface-variant">
+										Avatar
+									</p>
+									<p className="font-mono text-[9px] text-outline mt-0.5">
+										Max 2MB · JPG, PNG, WebP
+									</p>
 								</div>
 							</div>
 
@@ -174,17 +202,23 @@ export function EditProfileModal({ initial }: EditProfileModalProps) {
 									Username
 								</label>
 								<div className="relative">
-									<span className="absolute left-3 top-1/2 -translate-y-1/2 font-mono text-sm text-on-surface-variant">@</span>
+									<span className="absolute left-3 top-1/2 -translate-y-1/2 font-mono text-sm text-on-surface-variant">
+										@
+									</span>
 									<input
 										type="text"
 										value={username}
-										onChange={(e) => setUsername(e.target.value.toLowerCase().replace(/[^a-z0-9_]/g, ""))}
+										onChange={(e) =>
+											setUsername(e.target.value.toLowerCase().replace(/[^a-z0-9_]/g, ""))
+										}
 										maxLength={30}
 										className="w-full bg-surface-container-lowest border border-outline/20 rounded pl-7 pr-3 py-2 font-mono text-sm text-on-surface focus:outline-none focus:border-primary/50 transition-colors"
 										placeholder="username"
 									/>
 								</div>
-								<p className="font-mono text-[9px] text-outline mt-1">letters, numbers and _ only</p>
+								<p className="font-mono text-[9px] text-outline mt-1">
+									letters, numbers and _ only
+								</p>
 							</div>
 
 							{/* Location */}
@@ -215,7 +249,9 @@ export function EditProfileModal({ initial }: EditProfileModalProps) {
 									className="w-full bg-surface-container-lowest border border-outline/20 rounded px-3 py-2 font-mono text-sm text-on-surface focus:outline-none focus:border-primary/50 transition-colors resize-none"
 									placeholder="Tell the crate about yourself..."
 								/>
-								<p className="font-mono text-[9px] text-outline mt-1 text-right">{bio.length} / 300</p>
+								<p className="font-mono text-[9px] text-outline mt-1 text-right">
+									{bio.length} / 300
+								</p>
 							</div>
 
 							{/* Social Links */}
@@ -224,15 +260,44 @@ export function EditProfileModal({ initial }: EditProfileModalProps) {
 									Social Links
 								</p>
 								<div className="space-y-3">
-									{([
-										{ label: "YouTube",    value: youtubeUrl,    set: setYoutubeUrl,    placeholder: "https://youtube.com/@channel" },
-										{ label: "Instagram",  value: instagramUrl,  set: setInstagramUrl,  placeholder: "https://instagram.com/username" },
-										{ label: "SoundCloud", value: soundcloudUrl, set: setSoundcloudUrl, placeholder: "https://soundcloud.com/username" },
-										{ label: "Discogs",    value: discogsUrl,    set: setDiscogsUrl,    placeholder: "https://www.discogs.com/user/username" },
-										{ label: "Beatport",   value: beatportUrl,   set: setBeatportUrl,   placeholder: "https://www.beatport.com/artist/..." },
-									] as const).map(({ label, value, set, placeholder }) => (
+									{(
+										[
+											{
+												label: "YouTube",
+												value: youtubeUrl,
+												set: setYoutubeUrl,
+												placeholder: "https://youtube.com/@channel",
+											},
+											{
+												label: "Instagram",
+												value: instagramUrl,
+												set: setInstagramUrl,
+												placeholder: "https://instagram.com/username",
+											},
+											{
+												label: "SoundCloud",
+												value: soundcloudUrl,
+												set: setSoundcloudUrl,
+												placeholder: "https://soundcloud.com/username",
+											},
+											{
+												label: "Discogs",
+												value: discogsUrl,
+												set: setDiscogsUrl,
+												placeholder: "https://www.discogs.com/user/username",
+											},
+											{
+												label: "Beatport",
+												value: beatportUrl,
+												set: setBeatportUrl,
+												placeholder: "https://www.beatport.com/artist/...",
+											},
+										] as const
+									).map(({ label, value, set, placeholder }) => (
 										<div key={label} className="flex items-center gap-3">
-											<span className="font-mono text-xs text-on-surface-variant w-20 flex-shrink-0">{label}</span>
+											<span className="font-mono text-xs text-on-surface-variant w-20 flex-shrink-0">
+												{label}
+											</span>
 											<input
 												type="url"
 												value={value}
@@ -245,9 +310,7 @@ export function EditProfileModal({ initial }: EditProfileModalProps) {
 								</div>
 							</div>
 
-						{error && (
-								<p className="font-mono text-xs text-red-400">{error}</p>
-							)}
+							{error && <p className="font-mono text-xs text-red-400">{error}</p>}
 						</div>
 
 						{/* Footer */}

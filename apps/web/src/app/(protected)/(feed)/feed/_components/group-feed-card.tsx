@@ -1,9 +1,9 @@
 "use client";
 
 import Link from "next/link";
-import type { FeedItem } from "@/lib/social/types";
+import { RarityPill } from "@/components/ui/rarity-pill";
 import { StarRating } from "@/components/ui/star-rating";
-import { GemBadge } from "@/components/ui/gem-badge";
+import type { FeedItem } from "@/lib/social/types";
 
 function formatRelativeTime(dateStr: string): string {
 	const diff = Date.now() - new Date(dateStr).getTime();
@@ -17,18 +17,12 @@ function formatRelativeTime(dateStr: string): string {
 }
 
 export function GroupFeedCard({ item }: { item: FeedItem }) {
-	const groupName =
-		(item.metadata?.groupName as string) ?? "a group";
-	const groupSlug =
-		(item.metadata?.groupSlug as string) ?? "";
-	const rating =
-		typeof item.metadata?.rating === "number" ? item.metadata.rating : null;
-	const content =
-		(item.metadata?.content as string) ?? "";
-	const releaseId =
-		(item.metadata?.releaseId as string) ?? null;
-	const linkedTitle =
-		item.releaseTitle ?? (item.metadata?.releaseTitle as string) ?? null;
+	const groupName = (item.metadata?.groupName as string) ?? "a group";
+	const groupSlug = (item.metadata?.groupSlug as string) ?? "";
+	const rating = typeof item.metadata?.rating === "number" ? item.metadata.rating : null;
+	const content = (item.metadata?.content as string) ?? "";
+	const _releaseId = (item.metadata?.releaseId as string) ?? null;
+	const linkedTitle = item.releaseTitle ?? (item.metadata?.releaseTitle as string) ?? null;
 
 	return (
 		<article className="bg-surface-container-low rounded-lg overflow-hidden border border-outline-variant/10">
@@ -38,9 +32,7 @@ export function GroupFeedCard({ item }: { item: FeedItem }) {
 			{/* Header row */}
 			<div className="px-4 pt-3 pb-2">
 				<div className="flex items-center gap-1.5">
-					<span className="font-mono text-xs text-primary">
-						&gt;
-					</span>
+					<span className="font-mono text-xs text-primary">&gt;</span>
 					<Link
 						href={`/perfil/${item.username}`}
 						className="font-mono text-xs text-on-surface hover:text-primary transition-colors"
@@ -79,9 +71,7 @@ export function GroupFeedCard({ item }: { item: FeedItem }) {
 			{/* Post body */}
 			{content && (
 				<div className="px-4 pb-2">
-					<p className="text-sm text-on-surface leading-relaxed line-clamp-2">
-						{content}
-					</p>
+					<p className="text-sm text-on-surface leading-relaxed line-clamp-2">{content}</p>
 					{groupSlug && (
 						<Link
 							href={`/comunidade/${groupSlug}`}
@@ -97,16 +87,16 @@ export function GroupFeedCard({ item }: { item: FeedItem }) {
 			{linkedTitle && (
 				<div className="px-4 pb-3 flex items-center gap-2">
 					<span className="font-mono text-xs text-on-surface-variant">{"\u2514"}</span>
-					<span className="material-symbols-outlined text-[14px] text-on-surface-variant/50">album</span>
-					<span className="font-mono text-xs text-on-surface">
-						{linkedTitle}
+					<span className="material-symbols-outlined text-[14px] text-on-surface-variant/50">
+						album
 					</span>
+					<span className="font-mono text-xs text-on-surface">{linkedTitle}</span>
 					{item.releaseArtist && (
 						<span className="font-mono text-[10px] text-on-surface-variant">
 							· {item.releaseArtist}
 						</span>
 					)}
-					<GemBadge score={item.releaseRarityScore} />
+					<RarityPill score={item.releaseRarityScore} showScore={false} />
 				</div>
 			)}
 		</article>

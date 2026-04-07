@@ -1,4 +1,4 @@
-import { describe, test, expect, vi, beforeEach } from "vitest";
+import { beforeEach, describe, expect, test, vi } from "vitest";
 
 // -- Mock admin client --
 function createChainedMock(resolveValue: unknown = { data: null, error: null }) {
@@ -14,16 +14,18 @@ function createChainedMock(resolveValue: unknown = { data: null, error: null }) 
 
 vi.mock("@/lib/supabase/admin", () => ({
 	createAdminClient: vi.fn(() => ({
-		from: vi.fn(() => createChainedMock({
-			data: {
-				id: "job-123",
-				user_id: "user-123",
-				type: "collection",
-				status: "completed",
-				current_page: 1,
-			},
-			error: null,
-		})),
+		from: vi.fn(() =>
+			createChainedMock({
+				data: {
+					id: "job-123",
+					user_id: "user-123",
+					type: "collection",
+					status: "completed",
+					current_page: 1,
+				},
+				error: null,
+			}),
+		),
 	})),
 }));
 
@@ -50,10 +52,7 @@ describe("Import API route integration", () => {
 		process.env.NEXT_PUBLIC_SITE_URL = "http://localhost:3000";
 	});
 
-	function createRequest(
-		body: Record<string, unknown>,
-		authToken?: string,
-	) {
+	function createRequest(body: Record<string, unknown>, authToken?: string) {
 		const headers = new Headers();
 		headers.set("Content-Type", "application/json");
 		if (authToken) {

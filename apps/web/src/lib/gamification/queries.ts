@@ -1,7 +1,7 @@
+import { asc, eq, sql } from "drizzle-orm";
 import { cache } from "react";
-import { eq, asc, sql } from "drizzle-orm";
 import { db } from "@/lib/db";
-import { userRankings, badges, userBadges } from "@/lib/db/schema/gamification";
+import { badges, userBadges, userRankings } from "@/lib/db/schema/gamification";
 import { profiles } from "@/lib/db/schema/users";
 
 // ---------------------------------------------------------------------------
@@ -35,10 +35,7 @@ export interface UserBadge {
 // Global Leaderboard
 // ---------------------------------------------------------------------------
 
-export async function getGlobalLeaderboard(
-	page = 1,
-	pageSize = 50,
-): Promise<LeaderboardEntry[]> {
+export async function getGlobalLeaderboard(page = 1, pageSize = 50): Promise<LeaderboardEntry[]> {
 	const offset = (page - 1) * pageSize;
 
 	const rows = await db
@@ -48,8 +45,7 @@ export async function getGlobalLeaderboard(
 			displayName: profiles.displayName,
 			globalRank: userRankings.globalRank,
 			title: userRankings.title,
-			globalScore:
-				sql<number>`${userRankings.rarityScore} * 0.7 + ${userRankings.contributionScore} * 0.3`,
+			globalScore: sql<number>`${userRankings.rarityScore} * 0.7 + ${userRankings.contributionScore} * 0.3`,
 		})
 		.from(userRankings)
 		.innerJoin(profiles, eq(userRankings.userId, profiles.id))
@@ -157,16 +153,12 @@ export async function getUserBadges(userId: string): Promise<UserBadge[]> {
 // ---------------------------------------------------------------------------
 
 export async function getLeaderboardCount(): Promise<number> {
-	const result = await db
-		.select({ count: sql<number>`count(*)` })
-		.from(userRankings);
+	const result = await db.select({ count: sql<number>`count(*)` }).from(userRankings);
 
 	return Number(result[0]?.count ?? 0);
 }
 
-export async function getGenreLeaderboardCount(
-	genre: string,
-): Promise<number> {
+export async function getGenreLeaderboardCount(genre: string): Promise<number> {
 	// Count from the materialized view — O(1) index lookup instead of full scan
 	const result = await db.execute(sql`
 		SELECT COUNT(*) AS count

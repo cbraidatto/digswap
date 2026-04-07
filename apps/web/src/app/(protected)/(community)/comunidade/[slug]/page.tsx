@@ -1,12 +1,8 @@
 import type { Metadata } from "next";
-import { redirect } from "next/navigation";
 import Link from "next/link";
+import { redirect } from "next/navigation";
+import { getGroupBySlug, getGroupMembershipState, getGroupPosts } from "@/lib/community/queries";
 import { createClient } from "@/lib/supabase/server";
-import {
-	getGroupBySlug,
-	getGroupMembershipState,
-	getGroupPosts,
-} from "@/lib/community/queries";
 import { GroupDetailHeader } from "./_components/group-detail-header";
 import { InviteControls } from "./_components/invite-controls";
 
@@ -14,13 +10,10 @@ export const metadata: Metadata = {
 	title: "Group — DigSwap",
 	description: "A community group on DigSwap where vinyl diggers share finds and discuss records.",
 };
+
 import { GroupContentSection } from "./_components/group-content-section";
 
-export default async function GroupDetailPage({
-	params,
-}: {
-	params: Promise<{ slug: string }>;
-}) {
+export default async function GroupDetailPage({ params }: { params: Promise<{ slug: string }> }) {
 	const { slug } = await params;
 
 	const supabase = await createClient();
@@ -62,16 +55,13 @@ export default async function GroupDetailPage({
 	const initialPosts = canViewPosts ? await getGroupPosts(group.id) : [];
 
 	const isAdmin = membership.role === "admin";
-	const isPrivateAndNotMember =
-		group.visibility === "private" && !membership.isMember;
+	const isPrivateAndNotMember = group.visibility === "private" && !membership.isMember;
 
 	return (
 		<div className="max-w-4xl mx-auto px-4 md:px-8 py-8">
 			<GroupDetailHeader group={group} membership={membership} />
 
-			{isAdmin && (
-				<InviteControls groupId={group.id} groupSlug={group.slug} />
-			)}
+			{isAdmin && <InviteControls groupId={group.id} groupSlug={group.slug} />}
 
 			{isPrivateAndNotMember ? (
 				<div className="flex flex-col items-center justify-center py-16 text-center">

@@ -1,10 +1,10 @@
 "use server";
 
 import { cookies } from "next/headers";
-import { createClient } from "@/lib/supabase/server";
+import { deleteTokens, getRequestToken } from "@/lib/discogs/oauth";
+import { discogsRateLimit, safeLimit } from "@/lib/rate-limit";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { getRequestToken, deleteTokens } from "@/lib/discogs/oauth";
-import { discogsRateLimit , safeLimit} from "@/lib/rate-limit";
+import { createClient } from "@/lib/supabase/server";
 
 /**
  * Initiate Discogs OAuth 1.0a connection flow.
@@ -40,24 +40,19 @@ export async function connectDiscogs(): Promise<{ url: string } | { error: strin
 		const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
 		const callbackUrl = `${siteUrl}/api/discogs/callback`;
 
-		const { token, tokenSecret, authorizeUrl } =
-			await getRequestToken(callbackUrl);
+		const { token, tokenSecret, authorizeUrl } = await getRequestToken(callbackUrl);
 
 		// Store request token in httpOnly cookie for the callback.
 		// sameSite: "lax" allows the cookie to survive the redirect back from Discogs.
 		// maxAge: 600 (10 minutes) prevents stale tokens from lingering.
 		const cookieStore = await cookies();
-		cookieStore.set(
-			"discogs_oauth",
-			JSON.stringify({ token, tokenSecret }),
-			{
-				httpOnly: true,
-				secure: process.env.NODE_ENV === "production",
-				sameSite: "lax",
-				maxAge: 600,
-				path: "/",
-			},
-		);
+		cookieStore.set("discogs_oauth", JSON.stringify({ token, tokenSecret }), {
+			httpOnly: true,
+			secure: process.env.NODE_ENV === "production",
+			sameSite: "lax",
+			maxAge: 600,
+			path: "/",
+		});
 
 		return { url: authorizeUrl };
 	} catch (err) {
@@ -127,8 +122,7 @@ export async function triggerSync(): Promise<{
 		}
 
 		// Trigger import worker (fire-and-forget)
-		const siteUrl =
-			process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
+		const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
 		fetch(`${siteUrl}/api/discogs/import`, {
 			method: "POST",
 			headers: {
@@ -191,18 +185,10 @@ export async function disconnectDiscogs(): Promise<{
 			.in("status", ["pending", "processing"]);
 
 		// 2. Delete collection items sourced from Discogs
-		await admin
-			.from("collection_items")
-			.delete()
-			.eq("user_id", user.id)
-			.eq("added_via", "discogs");
+		await admin.from("collection_items").delete().eq("user_id", user.id).eq("added_via", "discogs");
 
 		// 3. Delete wantlist items sourced from Discogs
-		await admin
-			.from("wantlist_items")
-			.delete()
-			.eq("user_id", user.id)
-			.eq("added_via", "discogs");
+		await admin.from("wantlist_items").delete().eq("user_id", user.id).eq("added_via", "discogs");
 
 		// 4. Clear profile Discogs fields
 		await admin
@@ -271,17 +257,9 @@ export async function triggerReimport(): Promise<{
 		}
 
 		// Delete existing Discogs-sourced items (clean slate)
-		await admin
-			.from("collection_items")
-			.delete()
-			.eq("user_id", user.id)
-			.eq("added_via", "discogs");
+		await admin.from("collection_items").delete().eq("user_id", user.id).eq("added_via", "discogs");
 
-		await admin
-			.from("wantlist_items")
-			.delete()
-			.eq("user_id", user.id)
-			.eq("added_via", "discogs");
+		await admin.from("wantlist_items").delete().eq("user_id", user.id).eq("added_via", "discogs");
 
 		// Create fresh collection import job
 		const { data: job } = await admin
@@ -299,8 +277,7 @@ export async function triggerReimport(): Promise<{
 			.single();
 
 		if (job) {
-			const siteUrl =
-				process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
+			const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
 			fetch(`${siteUrl}/api/discogs/import`, {
 				method: "POST",
 				headers: {

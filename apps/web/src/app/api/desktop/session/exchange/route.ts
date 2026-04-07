@@ -1,7 +1,7 @@
-import { NextRequest, NextResponse } from "next/server";
-import { createAdminClient } from "@/lib/supabase/admin";
+import { type NextRequest, NextResponse } from "next/server";
 import { consumeHandoffCode } from "@/lib/desktop/handoff-store";
 import { authRateLimit, safeLimit } from "@/lib/rate-limit";
+import { createAdminClient } from "@/lib/supabase/admin";
 
 /**
  * POST /api/desktop/session/exchange

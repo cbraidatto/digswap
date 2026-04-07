@@ -1,7 +1,7 @@
 "use client";
 
-import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
+import { useState, useTransition } from "react";
 import type { SubscriptionPlan } from "@/lib/stripe";
 
 const MONTHLY_PRICE = "$9.90";
@@ -36,8 +36,7 @@ export function PricingCards({ currentPlan, monthlyPriceId, annualPriceId }: Pro
 	const [isPending, startTransition] = useTransition();
 	const router = useRouter();
 
-	const isPremium =
-		currentPlan === "premium_monthly" || currentPlan === "premium_annual";
+	const isPremium = currentPlan === "premium_monthly" || currentPlan === "premium_annual";
 
 	async function handleUpgrade() {
 		startTransition(async () => {

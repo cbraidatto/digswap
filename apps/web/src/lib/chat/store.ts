@@ -22,9 +22,21 @@ export const useChatStore = create<ChatState>((set) => ({
 	activeFriendAvatarUrl: null,
 
 	open: () => set({ isOpen: true }),
-	close: () => set({ isOpen: false, activeFriendId: null, activeFriendUsername: null, activeFriendAvatarUrl: null }),
+	close: () =>
+		set({
+			isOpen: false,
+			activeFriendId: null,
+			activeFriendUsername: null,
+			activeFriendAvatarUrl: null,
+		}),
 	toggle: () => set((s) => ({ isOpen: !s.isOpen })),
 	openConversation: (friendId, username, avatarUrl) =>
-		set({ isOpen: true, activeFriendId: friendId, activeFriendUsername: username, activeFriendAvatarUrl: avatarUrl }),
-	backToList: () => set({ activeFriendId: null, activeFriendUsername: null, activeFriendAvatarUrl: null }),
+		set({
+			isOpen: true,
+			activeFriendId: friendId,
+			activeFriendUsername: username,
+			activeFriendAvatarUrl: avatarUrl,
+		}),
+	backToList: () =>
+		set({ activeFriendId: null, activeFriendUsername: null, activeFriendAvatarUrl: null }),
 }));

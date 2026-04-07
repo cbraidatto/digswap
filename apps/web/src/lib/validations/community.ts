@@ -17,7 +17,11 @@ export const createReviewSchema = z.object({
 });
 
 export const createGroupSchema = z.object({
-	name: z.string().min(1, "Group name is required.").max(80, "Group name must be 80 characters or fewer.").trim(),
+	name: z
+		.string()
+		.min(1, "Group name is required.")
+		.max(80, "Group name must be 80 characters or fewer.")
+		.trim(),
 	description: z.string().max(500).trim().optional(),
 	category: z.string().max(100).trim().optional(),
 	visibility: z.enum(["public", "private"]).default("public"),

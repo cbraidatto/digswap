@@ -60,20 +60,13 @@ export function CoverArt({
 				<Image
 					src={src}
 					alt={alt}
-					{...(fill
-						? { fill: true }
-						: { width: resolvedWidth, height: resolvedHeight })}
+					{...(fill ? { fill: true } : { width: resolvedWidth, height: resolvedHeight })}
 					className={cn("object-cover", rounded, className)}
 					sizes={fill ? "(max-width: 640px) 100vw, 300px" : undefined}
 					unoptimized={isExternalNonConfigured(src)}
 				/>
 			) : (
-				<span
-					className={cn(
-						"material-symbols-outlined text-on-surface-variant/30",
-						s.icon,
-					)}
-				>
+				<span className={cn("material-symbols-outlined text-on-surface-variant/30", s.icon)}>
 					{fallbackIcon}
 				</span>
 			)}
@@ -83,12 +76,18 @@ export function CoverArt({
 
 function defaultPixel(size: CoverSize): number {
 	switch (size) {
-		case "xs": return 32;
-		case "sm": return 40;
-		case "md": return 48;
-		case "lg": return 80;
-		case "xl": return 120;
-		case "full": return 300;
+		case "xs":
+			return 32;
+		case "sm":
+			return 40;
+		case "md":
+			return 48;
+		case "lg":
+			return 80;
+		case "xl":
+			return 120;
+		case "full":
+			return 300;
 	}
 }
 

@@ -1,7 +1,7 @@
-import { describe, it, expect } from "vitest";
-import { uuidSchema, sanitizeWildcards, urlSchema } from "@/lib/validations/common";
+import { describe, expect, it } from "vitest";
+import { sanitizeWildcards, urlSchema, uuidSchema } from "@/lib/validations/common";
 import { createPostSchema, createReviewSchema } from "@/lib/validations/community";
-import { updateProfileSchema, showcaseSearchSchema } from "@/lib/validations/profile";
+import { showcaseSearchSchema, updateProfileSchema } from "@/lib/validations/profile";
 
 describe("Input Validation", () => {
 	// -------------------------------------------------------------------
@@ -79,7 +79,7 @@ describe("Input Validation", () => {
 		});
 
 		it("rejects a string exceeding 500 chars", () => {
-			const longUrl = "https://example.com/" + "a".repeat(500);
+			const longUrl = `https://example.com/${"a".repeat(500)}`;
 			const result = urlSchema.safeParse(longUrl);
 			expect(result.success).toBe(false);
 		});

@@ -1,12 +1,8 @@
 "use client";
 
-import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
-import {
-	acceptTradeAction,
-	declineTradeAction,
-	cancelTradeAction,
-} from "@/actions/trades";
+import { useState, useTransition } from "react";
+import { acceptTradeAction, cancelTradeAction, declineTradeAction } from "@/actions/trades";
 
 interface Props {
 	tradeId: string;
@@ -76,9 +72,7 @@ export function TradeActionButtons({ tradeId, status, isProvider }: Props) {
 				)}
 			</div>
 
-			{error && (
-				<p className="font-mono text-xs text-destructive">{error}</p>
-			)}
+			{error && <p className="font-mono text-xs text-destructive">{error}</p>}
 		</div>
 	);
 }

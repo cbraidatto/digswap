@@ -1,4 +1,4 @@
-import { describe, test, expect, vi, beforeEach } from "vitest";
+import { beforeEach, describe, expect, test, vi } from "vitest";
 
 // -- Mock drizzle-orm functions --
 const mockDesc = vi.fn((col: unknown) => ({ direction: "desc", column: col }));
@@ -23,7 +23,7 @@ vi.mock("drizzle-orm", () => ({
 		},
 		{ raw: vi.fn() },
 	),
-}))
+}));
 vi.mock("@/lib/rate-limit", () => ({
 	authRateLimit: null,
 	resetRateLimit: null,
@@ -33,10 +33,9 @@ vi.mock("@/lib/rate-limit", () => ({
 	discogsRateLimit: null,
 	safeLimit: vi.fn().mockImplementation(async () => ({ success: true })),
 }));
-;
 
 // -- Mock db chain using a factory to avoid hoisting issues --
-let capturedOrderBy: unknown = null;
+let _capturedOrderBy: unknown = null;
 
 vi.mock("@/lib/db", () => {
 	const chain = {
@@ -45,7 +44,7 @@ vi.mock("@/lib/db", () => {
 		innerJoin: vi.fn().mockReturnThis(),
 		where: vi.fn().mockReturnThis(),
 		orderBy: vi.fn(function (this: typeof chain, val: unknown) {
-			capturedOrderBy = val;
+			_capturedOrderBy = val;
 			return chain;
 		}),
 		limit: vi.fn().mockReturnThis(),
@@ -86,7 +85,7 @@ import { db } from "@/lib/db";
 describe("collection sorting", () => {
 	beforeEach(() => {
 		vi.clearAllMocks();
-		capturedOrderBy = null;
+		_capturedOrderBy = null;
 		mockSqlCalls.length = 0;
 	});
 

@@ -1,17 +1,17 @@
+import { sql } from "drizzle-orm";
 import {
+	index,
+	integer,
+	jsonb,
+	pgPolicy,
 	pgTable,
-	uuid,
+	real,
+	text,
 	timestamp,
 	unique,
-	integer,
+	uuid,
 	varchar,
-	text,
-	real,
-	jsonb,
-	index,
 } from "drizzle-orm/pg-core";
-import { pgPolicy } from "drizzle-orm/pg-core";
-import { sql } from "drizzle-orm";
 import { authenticatedRole, authUid } from "drizzle-orm/supabase";
 
 // ── "Dig!" reactions on feed items ─────────────────────────
@@ -21,9 +21,7 @@ export const digs = pgTable(
 		id: uuid("id").defaultRandom().primaryKey(),
 		userId: uuid("user_id").notNull(),
 		feedItemId: uuid("feed_item_id").notNull(),
-		createdAt: timestamp("created_at", { withTimezone: true })
-			.defaultNow()
-			.notNull(),
+		createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
 	},
 	(table) => [
 		unique("digs_user_feed_item").on(table.userId, table.feedItemId),
@@ -56,9 +54,7 @@ export const challenges = pgTable(
 		criteria: jsonb("criteria").notNull(), // { genre: "Jazz", count: 5 } or { decade: "1970", count: 3 }
 		startsAt: timestamp("starts_at", { withTimezone: true }).notNull(),
 		endsAt: timestamp("ends_at", { withTimezone: true }).notNull(),
-		createdAt: timestamp("created_at", { withTimezone: true })
-			.defaultNow()
-			.notNull(),
+		createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
 	},
 	() => [
 		pgPolicy("challenges_select_all", {
@@ -77,15 +73,10 @@ export const challengeEntries = pgTable(
 		userId: uuid("user_id").notNull(),
 		progress: integer("progress").default(0).notNull(),
 		completedAt: timestamp("completed_at", { withTimezone: true }),
-		joinedAt: timestamp("joined_at", { withTimezone: true })
-			.defaultNow()
-			.notNull(),
+		joinedAt: timestamp("joined_at", { withTimezone: true }).defaultNow().notNull(),
 	},
 	(table) => [
-		unique("challenge_entries_user_challenge").on(
-			table.userId,
-			table.challengeId,
-		),
+		unique("challenge_entries_user_challenge").on(table.userId, table.challengeId),
 		pgPolicy("challenge_entries_select_all", {
 			for: "select",
 			to: authenticatedRole,
@@ -118,9 +109,7 @@ export const diggerDna = pgTable(
 		rarityProfile: varchar("rarity_profile", { length: 50 }).notNull(), // "quartz_collector" | "emerald_seeker" | "ruby_hunter" | "diamond_chaser"
 		avgRarity: real("avg_rarity").default(0).notNull(),
 		totalRecords: integer("total_records").default(0).notNull(),
-		updatedAt: timestamp("updated_at", { withTimezone: true })
-			.defaultNow()
-			.notNull(),
+		updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow().notNull(),
 	},
 	(table) => [
 		pgPolicy("digger_dna_select_all", {

@@ -1,4 +1,4 @@
-import { describe, test, expect, vi, beforeEach } from "vitest";
+import { beforeEach, describe, expect, test, vi } from "vitest";
 
 // The new getCollectionComparison runs 3 DB queries via Promise.all.
 // Each query returns the already-computed result from the DB JOIN.
@@ -76,13 +76,31 @@ describe("getCollectionComparison", () => {
 		// The new implementation runs 3 queries in Promise.all:
 		// query 1 → inCommon, query 2 → uniqueToMe, query 3 → uniqueToThem
 		const inCommonRows = [
-			{ releaseId: "rel-2", discogsId: 200, title: "A Love Supreme", artist: "John Coltrane", rarityScore: 1.8 },
+			{
+				releaseId: "rel-2",
+				discogsId: 200,
+				title: "A Love Supreme",
+				artist: "John Coltrane",
+				rarityScore: 1.8,
+			},
 		];
 		const uniqueToMeRows = [
-			{ releaseId: "rel-1", discogsId: 100, title: "Kind of Blue", artist: "Miles Davis", rarityScore: 2.5 },
+			{
+				releaseId: "rel-1",
+				discogsId: 100,
+				title: "Kind of Blue",
+				artist: "Miles Davis",
+				rarityScore: 2.5,
+			},
 		];
 		const uniqueToThemRows = [
-			{ releaseId: "rel-3", discogsId: 300, title: "Blue Train", artist: "John Coltrane", rarityScore: 1.2 },
+			{
+				releaseId: "rel-3",
+				discogsId: 300,
+				title: "Blue Train",
+				artist: "John Coltrane",
+				rarityScore: 1.2,
+			},
 		];
 
 		let callCount = 0;
@@ -110,16 +128,28 @@ describe("getCollectionComparison", () => {
 
 	test("returns empty arrays when no overlap", async () => {
 		const uniqueToMeRows = [
-			{ releaseId: "rel-1", discogsId: 100, title: "Kind of Blue", artist: "Miles Davis", rarityScore: 2.5 },
+			{
+				releaseId: "rel-1",
+				discogsId: 100,
+				title: "Kind of Blue",
+				artist: "Miles Davis",
+				rarityScore: 2.5,
+			},
 		];
 		const uniqueToThemRows = [
-			{ releaseId: "rel-3", discogsId: 300, title: "Blue Train", artist: "John Coltrane", rarityScore: 1.2 },
+			{
+				releaseId: "rel-3",
+				discogsId: 300,
+				title: "Blue Train",
+				artist: "John Coltrane",
+				rarityScore: 1.2,
+			},
 		];
 
 		let callCount = 0;
 		mockSelect.mockImplementation(() => {
 			callCount++;
-			if (callCount === 1) return createSelectChain([]);           // inCommon
+			if (callCount === 1) return createSelectChain([]); // inCommon
 			if (callCount === 2) return createSelectChain(uniqueToMeRows);
 			return createSelectChain(uniqueToThemRows);
 		});

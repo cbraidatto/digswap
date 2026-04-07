@@ -1,14 +1,9 @@
-import { describe, test, expect, vi, beforeEach } from "vitest";
+import { beforeEach, describe, expect, test, vi } from "vitest";
 
 // ---------------------------------------------------------------------------
 // Hoisted mocks (vi.mock factories are hoisted, so we use vi.hoisted)
 // ---------------------------------------------------------------------------
-const {
-	mockGetUser,
-	mockUpdate,
-	mockRateLimitFn,
-	mockFetch,
-} = vi.hoisted(() => ({
+const { mockGetUser, mockUpdate, mockRateLimitFn, mockFetch } = vi.hoisted(() => ({
 	mockGetUser: vi.fn(),
 	mockUpdate: vi.fn(),
 	mockRateLimitFn: vi.fn(),

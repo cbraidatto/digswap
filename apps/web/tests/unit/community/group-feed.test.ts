@@ -1,4 +1,4 @@
-import { describe, test, expect, vi, beforeEach } from "vitest";
+import { beforeEach, describe, expect, test, vi } from "vitest";
 
 // ---------------------------------------------------------------------------
 // DB mock with thenable chain (project pattern)
@@ -33,7 +33,7 @@ vi.mock("@/lib/db", () => {
 	};
 
 	return { db: chain };
-})
+});
 vi.mock("@/lib/rate-limit", () => ({
 	authRateLimit: null,
 	resetRateLimit: null,
@@ -43,7 +43,6 @@ vi.mock("@/lib/rate-limit", () => ({
 	discogsRateLimit: null,
 	safeLimit: vi.fn().mockImplementation(async () => ({ success: true })),
 }));
-;
 
 // ---------------------------------------------------------------------------
 // Schema mocks
@@ -223,10 +222,7 @@ describe("getGroupPosts", () => {
 			],
 		];
 
-		const posts = await getGroupPosts(
-			"group-1",
-			"2026-03-26T10:00:00Z",
-		);
+		const posts = await getGroupPosts("group-1", "2026-03-26T10:00:00Z");
 
 		expect(posts).toHaveLength(1);
 		expect(posts[0].id).toBe("post-3");
@@ -325,8 +321,6 @@ describe("getGroupPosts", () => {
 		expect(posts[0].reviewId).toBe("review-1");
 		expect(posts[0].reviewRating).toBe(5);
 		expect(posts[0].reviewIsPressingSpecific).toBe(true);
-		expect(posts[0].reviewPressingDetails).toBe(
-			"Original 1959 mono pressing",
-		);
+		expect(posts[0].reviewPressingDetails).toBe("Original 1959 mono pressing");
 	});
 });

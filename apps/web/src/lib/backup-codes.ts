@@ -1,6 +1,6 @@
 import { randomBytes } from "node:crypto";
 import bcrypt from "bcryptjs";
-import { eq, and } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
 import { db } from "@/lib/db";
 import { backupCodes } from "@/lib/db/schema/sessions";
 
@@ -40,10 +40,7 @@ export async function hashBackupCode(code: string): Promise<string> {
  * Compare a plaintext backup code against a bcrypt hash.
  * Returns true if the code matches.
  */
-export async function verifyBackupCode(
-	code: string,
-	hash: string,
-): Promise<boolean> {
+export async function verifyBackupCode(code: string, hash: string): Promise<boolean> {
 	return bcrypt.compare(code.toUpperCase().trim(), hash);
 }
 
@@ -53,10 +50,7 @@ export async function verifyBackupCode(
  * Per STATE.md decision: codes use invalidation (used=true) not deletion for audit trail,
  * but on re-enrollment we mark all old unused codes as used before inserting new ones.
  */
-export async function storeBackupCodes(
-	userId: string,
-	codes: string[],
-): Promise<void> {
+export async function storeBackupCodes(userId: string, codes: string[]): Promise<void> {
 	// Mark all existing unused codes as consumed (audit trail preserved)
 	await db
 		.update(backupCodes)

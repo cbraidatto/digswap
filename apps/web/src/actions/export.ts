@@ -1,11 +1,11 @@
 "use server";
 
 import { eq } from "drizzle-orm";
+import { requireUser } from "@/lib/auth/require-user";
 import { db } from "@/lib/db";
 import { collectionItems } from "@/lib/db/schema/collections";
-import { wantlistItems } from "@/lib/db/schema/wantlist";
 import { releases } from "@/lib/db/schema/releases";
-import { requireUser } from "@/lib/auth/require-user";
+import { wantlistItems } from "@/lib/db/schema/wantlist";
 import { apiRateLimit, safeLimit } from "@/lib/rate-limit";
 
 /**
@@ -128,19 +128,37 @@ export async function exportWantlistCsv(): Promise<{
 			.where(eq(wantlistItems.userId, user.id))
 			.orderBy(releases.title);
 
-		const headers = ["Title", "Artist", "Year", "Genre", "Format", "Label", "Discogs ID", "Rarity Score", "Date Added"];
+		const headers = [
+			"Title",
+			"Artist",
+			"Year",
+			"Genre",
+			"Format",
+			"Label",
+			"Discogs ID",
+			"Rarity Score",
+			"Date Added",
+		];
 
 		function esc(v: string | null | undefined): string {
 			if (v == null) return "";
 			const s = String(v);
-			return s.includes(",") || s.includes('"') || s.includes("\n") ? `"${s.replace(/"/g, '""')}"` : s;
+			return s.includes(",") || s.includes('"') || s.includes("\n")
+				? `"${s.replace(/"/g, '""')}"`
+				: s;
 		}
 
 		const rows = items.map((i) =>
 			[
-				esc(i.title), esc(i.artist), esc(i.year?.toString()), esc(i.genre?.join("; ")),
-				esc(i.format), esc(i.label), esc(i.discogsId?.toString()),
-				esc(i.rarityScore?.toFixed(2)), esc(i.createdAt.toISOString().split("T")[0]),
+				esc(i.title),
+				esc(i.artist),
+				esc(i.year?.toString()),
+				esc(i.genre?.join("; ")),
+				esc(i.format),
+				esc(i.label),
+				esc(i.discogsId?.toString()),
+				esc(i.rarityScore?.toFixed(2)),
+				esc(i.createdAt.toISOString().split("T")[0]),
 			].join(","),
 		);
 

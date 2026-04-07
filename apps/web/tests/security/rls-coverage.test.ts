@@ -1,6 +1,6 @@
-import { describe, it, expect } from "vitest";
-import { readFileSync } from "fs";
-import { join } from "path";
+import { readFileSync } from "node:fs";
+import { join } from "node:path";
+import { describe, expect, it } from "vitest";
 
 const SCHEMA_DIR = join(process.cwd(), "src/lib/db/schema");
 const ACTIONS_DIR = join(process.cwd(), "src/actions");
@@ -22,20 +22,20 @@ describe("RLS Policy Coverage", () => {
 	 * Maps table name -> schema file that defines it.
 	 */
 	const RLS_TABLES: Record<string, { file: string; policyPrefix: string }> = {
-		profiles:         { file: "users.ts",         policyPrefix: "profiles_" },
-		collections:      { file: "collections.ts",   policyPrefix: "collection_items_" },
-		wantlist_items:   { file: "wantlist.ts",      policyPrefix: "wantlist_items_" },
-		follows:          { file: "social.ts",        policyPrefix: "follows_" },
-		activity_feed:    { file: "social.ts",        policyPrefix: "activity_feed_" },
-		community_groups: { file: "groups.ts",        policyPrefix: "groups_" },
-		group_members:    { file: "groups.ts",        policyPrefix: "group_members_" },
-		group_posts:      { file: "groups.ts",        policyPrefix: "group_posts_" },
-		reviews:          { file: "reviews.ts",       policyPrefix: "reviews_" },
-		trade_requests:   { file: "trades.ts",        policyPrefix: "trade_requests_" },
-		trade_reviews:    { file: "trades.ts",        policyPrefix: "trade_reviews_" },
-		user_badges:      { file: "gamification.ts",  policyPrefix: "user_badges_" },
-		user_rankings:    { file: "gamification.ts",  policyPrefix: "user_rankings_" },
-		leads:            { file: "leads.ts",         policyPrefix: "" },
+		profiles: { file: "users.ts", policyPrefix: "profiles_" },
+		collections: { file: "collections.ts", policyPrefix: "collection_items_" },
+		wantlist_items: { file: "wantlist.ts", policyPrefix: "wantlist_items_" },
+		follows: { file: "social.ts", policyPrefix: "follows_" },
+		activity_feed: { file: "social.ts", policyPrefix: "activity_feed_" },
+		community_groups: { file: "groups.ts", policyPrefix: "groups_" },
+		group_members: { file: "groups.ts", policyPrefix: "group_members_" },
+		group_posts: { file: "groups.ts", policyPrefix: "group_posts_" },
+		reviews: { file: "reviews.ts", policyPrefix: "reviews_" },
+		trade_requests: { file: "trades.ts", policyPrefix: "trade_requests_" },
+		trade_reviews: { file: "trades.ts", policyPrefix: "trade_reviews_" },
+		user_badges: { file: "gamification.ts", policyPrefix: "user_badges_" },
+		user_rankings: { file: "gamification.ts", policyPrefix: "user_rankings_" },
+		leads: { file: "leads.ts", policyPrefix: "" },
 	};
 
 	describe("Schema-level RLS verification", () => {
@@ -68,7 +68,10 @@ describe("RLS Policy Coverage", () => {
 			for (const [tableName, { file, policyPrefix }] of Object.entries(RLS_TABLES)) {
 				if (tableName === "leads") continue; // handled separately
 				const content = readFile(join(SCHEMA_DIR, file));
-				if (content.includes(`${policyPrefix}select`) || content.includes(`${policyPrefix}insert`)) {
+				if (
+					content.includes(`${policyPrefix}select`) ||
+					content.includes(`${policyPrefix}insert`)
+				) {
 					tablesWithSelect.push(tableName);
 				}
 			}
@@ -207,10 +210,20 @@ describe("RLS Policy Coverage", () => {
 	describe("Server Action Security Audit", () => {
 		const actionFiles = [
 			// trades.ts split into trade-messages.ts / trade-presence.ts — desktop-side
-			"community.ts", "social.ts", "discovery.ts",
-			"profile.ts", "collection.ts", "discogs.ts", "leads.ts",
-			"wantlist.ts", "notifications.ts", "gamification.ts",
-			"onboarding.ts", "sessions.ts", "auth.ts", "mfa.ts",
+			"community.ts",
+			"social.ts",
+			"discovery.ts",
+			"profile.ts",
+			"collection.ts",
+			"discogs.ts",
+			"leads.ts",
+			"wantlist.ts",
+			"notifications.ts",
+			"gamification.ts",
+			"onboarding.ts",
+			"sessions.ts",
+			"auth.ts",
+			"mfa.ts",
 		];
 
 		for (const file of actionFiles) {
@@ -223,9 +236,7 @@ describe("RLS Policy Coverage", () => {
 						expect(content).toContain("signInWithPassword");
 						return;
 					}
-					const hasAuthCheck =
-						content.includes("getUser") ||
-						content.includes("requireUser");
+					const hasAuthCheck = content.includes("getUser") || content.includes("requireUser");
 					expect(hasAuthCheck).toBe(true);
 				});
 
@@ -243,11 +254,17 @@ describe("RLS Policy Coverage", () => {
 
 		describe("Zod validation on user-input-accepting actions", () => {
 			const filesWithUserInput = [
-				{ file: "auth.ts",       patterns: ["signUpSchema", "signInSchema", "forgotPasswordSchema", "resetPasswordSchema"] },
-				{ file: "community.ts",  patterns: ["createPostSchema", "createReviewSchema"] },
-				{ file: "mfa.ts",        patterns: ["totpSchema", "backupCodeSchema"] },
-				{ file: "profile.ts",    patterns: ["updateProfileSchema"] },
-				{ file: "onboarding.ts", patterns: ["validateDisplayName", "onboardingProfileSchema", "safeParse"] },
+				{
+					file: "auth.ts",
+					patterns: ["signUpSchema", "signInSchema", "forgotPasswordSchema", "resetPasswordSchema"],
+				},
+				{ file: "community.ts", patterns: ["createPostSchema", "createReviewSchema"] },
+				{ file: "mfa.ts", patterns: ["totpSchema", "backupCodeSchema"] },
+				{ file: "profile.ts", patterns: ["updateProfileSchema"] },
+				{
+					file: "onboarding.ts",
+					patterns: ["validateDisplayName", "onboardingProfileSchema", "safeParse"],
+				},
 			];
 
 			for (const { file, patterns } of filesWithUserInput) {

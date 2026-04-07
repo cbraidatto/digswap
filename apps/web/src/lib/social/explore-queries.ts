@@ -1,10 +1,10 @@
-import { eq, sql, desc, and, gt } from "drizzle-orm";
+import { and, desc, eq, gt, sql } from "drizzle-orm";
 import { db } from "@/lib/db";
-import { follows, activityFeed } from "@/lib/db/schema/social";
-import { profiles } from "@/lib/db/schema/users";
-import { releases } from "@/lib/db/schema/releases";
 import { diggerDna } from "@/lib/db/schema/engagement";
+import { releases } from "@/lib/db/schema/releases";
 import { searchSignals } from "@/lib/db/schema/search-signals";
+import { activityFeed, follows } from "@/lib/db/schema/social";
+import { profiles } from "@/lib/db/schema/users";
 import type { FeedItem } from "@/lib/social/types";
 
 export async function getExploreFeed(
@@ -25,10 +25,7 @@ export async function getExploreFeed(
 			.select({ genres: searchSignals.genres, strength: searchSignals.strength })
 			.from(searchSignals)
 			.where(
-				and(
-					eq(searchSignals.userId, userId),
-					gt(searchSignals.lastReinforcedAt, sevenDaysAgo),
-				),
+				and(eq(searchSignals.userId, userId), gt(searchSignals.lastReinforcedAt, sevenDaysAgo)),
 			)
 			.limit(1),
 		db
@@ -68,9 +65,7 @@ export async function getExploreFeed(
 			)`
 			: null;
 
-	const cursorExpr = cursor
-		? sql`${activityFeed.createdAt} < ${new Date(cursor)}`
-		: null;
+	const cursorExpr = cursor ? sql`${activityFeed.createdAt} < ${new Date(cursor)}` : null;
 
 	// Build combined where expression
 	let whereExpr = excludeExpr;
@@ -105,29 +100,22 @@ export async function getExploreFeed(
 		.leftJoin(profiles, eq(activityFeed.userId, profiles.id))
 		.leftJoin(releases, eq(activityFeed.targetId, releases.id))
 		.where(whereExpr)
-		.orderBy(
-			desc(sql`COALESCE(${releases.rarityScore}, -1)`),
-			desc(activityFeed.createdAt),
-		)
+		.orderBy(desc(sql`COALESCE(${releases.rarityScore}, -1)`), desc(activityFeed.createdAt))
 		.limit(limit);
 
 	return rows.map((row) => {
 		const rowGenres: string[] = row.releaseGenre ?? [];
 		const hasSignalMatch =
 			signalGenres.length > 0 && rowGenres.some((g) => signalGenres.includes(g));
-		const hasDnaMatch =
-			dnaGenres.length > 0 && rowGenres.some((g) => dnaGenres.includes(g));
+		const hasDnaMatch = dnaGenres.length > 0 && rowGenres.some((g) => dnaGenres.includes(g));
 
-		const contextReason: "dna_match" | "trending" = hasSignalMatch || hasDnaMatch
-			? "dna_match"
-			: "trending";
+		const contextReason: "dna_match" | "trending" =
+			hasSignalMatch || hasDnaMatch ? "dna_match" : "trending";
 
 		return {
 			...row,
 			createdAt:
-				row.createdAt instanceof Date
-					? row.createdAt.toISOString()
-					: String(row.createdAt),
+				row.createdAt instanceof Date ? row.createdAt.toISOString() : String(row.createdAt),
 			metadata: row.metadata as Record<string, unknown> | null,
 			contextReason,
 		};

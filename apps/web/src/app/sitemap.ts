@@ -1,8 +1,8 @@
+import { isNotNull, sql } from "drizzle-orm";
 import type { MetadataRoute } from "next";
 import { db } from "@/lib/db";
-import { profiles } from "@/lib/db/schema/users";
 import { releases } from "@/lib/db/schema/releases";
-import { eq, isNotNull, sql } from "drizzle-orm";
+import { profiles } from "@/lib/db/schema/users";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 	const baseUrl = process.env.NEXT_PUBLIC_APP_URL ?? "https://digswap.com";
@@ -38,9 +38,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 				updatedAt: profiles.updatedAt,
 			})
 			.from(profiles)
-			.where(
-				sql`${profiles.username} IS NOT NULL AND ${profiles.onboardingCompleted} = true`,
-			)
+			.where(sql`${profiles.username} IS NOT NULL AND ${profiles.onboardingCompleted} = true`)
 			.limit(5000);
 
 		profilePages = publicProfiles

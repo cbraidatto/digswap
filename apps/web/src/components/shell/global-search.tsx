@@ -1,9 +1,9 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState, useTransition } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { globalSearchAction, type GlobalSearchResult } from "@/actions/search";
+import { useCallback, useEffect, useRef, useState, useTransition } from "react";
+import { type GlobalSearchResult, globalSearchAction } from "@/actions/search";
 
 export function GlobalSearch() {
 	const [query, setQuery] = useState("");
@@ -85,7 +85,11 @@ export function GlobalSearch() {
 				{query && !isPending && (
 					<button
 						type="button"
-						onClick={() => { setQuery(""); setResults(null); setIsOpen(false); }}
+						onClick={() => {
+							setQuery("");
+							setResults(null);
+							setIsOpen(false);
+						}}
 						className="text-on-surface-variant/40 hover:text-on-surface-variant ml-2 flex-shrink-0"
 					>
 						<span className="material-symbols-outlined text-[16px]">close</span>
@@ -133,13 +137,16 @@ export function GlobalSearch() {
 										/>
 									) : (
 										<div className="w-9 h-9 rounded bg-surface-container-high flex items-center justify-center flex-shrink-0">
-											<span className="material-symbols-outlined text-base text-on-surface-variant/30">album</span>
+											<span className="material-symbols-outlined text-base text-on-surface-variant/30">
+												album
+											</span>
 										</div>
 									)}
 									<div className="min-w-0 flex-1">
 										<p className="font-mono text-xs text-on-surface truncate">{record.title}</p>
 										<p className="font-mono text-[10px] text-on-surface-variant/60 truncate">
-											{record.artist}{record.year ? ` · ${record.year}` : ""}
+											{record.artist}
+											{record.year ? ` · ${record.year}` : ""}
 										</p>
 									</div>
 									<span className="material-symbols-outlined text-[14px] text-on-surface-variant/20 flex-shrink-0">
@@ -191,7 +198,9 @@ export function GlobalSearch() {
 											{user.username ?? user.displayName ?? "Digger"}
 										</p>
 										{user.displayName && user.username && (
-											<p className="font-mono text-[10px] text-on-surface-variant/60 truncate">{user.displayName}</p>
+											<p className="font-mono text-[10px] text-on-surface-variant/60 truncate">
+												{user.displayName}
+											</p>
 										)}
 									</div>
 									<span className="material-symbols-outlined text-[14px] text-on-surface-variant/20 flex-shrink-0">

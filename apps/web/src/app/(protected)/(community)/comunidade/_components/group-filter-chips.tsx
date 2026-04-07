@@ -6,16 +6,10 @@ interface GroupFilterChipsProps {
 	onGenreChange: (genre: string | null) => void;
 }
 
-export function GroupFilterChips({
-	genres,
-	activeGenre,
-	onGenreChange,
-}: GroupFilterChipsProps) {
+export function GroupFilterChips({ genres, activeGenre, onGenreChange }: GroupFilterChipsProps) {
 	return (
 		<div className="flex items-start gap-2 flex-wrap">
-			<span className="font-mono text-xs text-on-surface-variant py-1">
-				Genre:
-			</span>
+			<span className="font-mono text-xs text-on-surface-variant py-1">Genre:</span>
 			<button
 				type="button"
 				onClick={() => onGenreChange(null)}
@@ -32,9 +26,7 @@ export function GroupFilterChips({
 				<button
 					key={genre}
 					type="button"
-					onClick={() =>
-						onGenreChange(activeGenre === genre ? null : genre)
-					}
+					onClick={() => onGenreChange(activeGenre === genre ? null : genre)}
 					aria-pressed={activeGenre === genre}
 					className={`font-mono text-xs px-2 py-1 rounded transition-colors ${
 						activeGenre === genre

@@ -10,7 +10,10 @@ export default function TradesLoading() {
 
 			<div className="flex flex-col gap-2">
 				{Array.from({ length: 5 }).map((_, i) => (
-					<div key={i} className="bg-surface-container-lowest border border-outline-variant rounded p-4">
+					<div
+						key={i}
+						className="bg-surface-container-lowest border border-outline-variant rounded p-4"
+					>
 						<div className="flex items-start justify-between gap-3 mb-2">
 							<div className="flex items-center gap-2">
 								<div className="w-7 h-7 rounded-full bg-surface-container-high animate-pulse" />

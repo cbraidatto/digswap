@@ -1,6 +1,6 @@
-import { createClient } from "@/lib/supabase/server";
 import { NextResponse } from "next/server";
 import { authRateLimit, safeLimit } from "@/lib/rate-limit";
+import { createClient } from "@/lib/supabase/server";
 
 /**
  * Validates a redirect path to prevent open redirect attacks.

@@ -1,13 +1,5 @@
-import {
-	pgTable,
-	uuid,
-	text,
-	real,
-	timestamp,
-	index,
-} from "drizzle-orm/pg-core";
-import { pgPolicy } from "drizzle-orm/pg-core";
 import { sql } from "drizzle-orm";
+import { index, pgPolicy, pgTable, real, text, timestamp, uuid } from "drizzle-orm/pg-core";
 import { authenticatedRole, authUid } from "drizzle-orm/supabase";
 
 export const searchSignals = pgTable(
@@ -21,9 +13,7 @@ export const searchSignals = pgTable(
 		lastReinforcedAt: timestamp("last_reinforced_at", { withTimezone: true })
 			.defaultNow()
 			.notNull(),
-		createdAt: timestamp("created_at", { withTimezone: true })
-			.defaultNow()
-			.notNull(),
+		createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
 	},
 	(table) => [
 		index("search_signals_user_id_idx").on(table.userId),

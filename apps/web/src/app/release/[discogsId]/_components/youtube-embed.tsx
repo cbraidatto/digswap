@@ -9,7 +9,11 @@ interface YouTubeEmbedProps {
 	isAuthenticated: boolean;
 }
 
-export function YouTubeEmbed({ videoId: initialVideoId, releaseId, isAuthenticated }: YouTubeEmbedProps) {
+export function YouTubeEmbed({
+	videoId: initialVideoId,
+	releaseId,
+	isAuthenticated,
+}: YouTubeEmbedProps) {
 	const [videoId, setVideoId] = useState<string | null>(initialVideoId);
 	const [isPending, setIsPending] = useState(false);
 	const [searchDone, setSearchDone] = useState(false);

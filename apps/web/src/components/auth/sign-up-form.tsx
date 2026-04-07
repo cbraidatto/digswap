@@ -1,18 +1,17 @@
 "use client";
 
+import { zodResolver } from "@hookform/resolvers/zod";
+import { Loader2 } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useRouter } from "next/navigation";
 import { toast } from "sonner";
-import { Loader2 } from "lucide-react";
-
-import { signUpSchema, type SignUpInput } from "@/lib/validations/auth";
 import { signUp } from "@/actions/auth";
+import { SocialLoginButtons } from "@/components/auth/social-login-buttons";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { SocialLoginButtons } from "@/components/auth/social-login-buttons";
+import { type SignUpInput, signUpSchema } from "@/lib/validations/auth";
 
 export function SignUpForm() {
 	const router = useRouter();
@@ -38,10 +37,7 @@ export function SignUpForm() {
 			const result = await signUp(formData);
 
 			if (!result.success) {
-				if (
-					result.error?.includes("Too many attempts") ||
-					result.error?.includes("wait")
-				) {
+				if (result.error?.includes("Too many attempts") || result.error?.includes("wait")) {
 					toast.error(result.error);
 				} else {
 					toast.error(result.error || "Something went wrong. Please try again.");
@@ -49,9 +45,7 @@ export function SignUpForm() {
 				return;
 			}
 
-			router.push(
-				`/verify-email?email=${encodeURIComponent(data.email)}`,
-			);
+			router.push(`/verify-email?email=${encodeURIComponent(data.email)}`);
 		} catch {
 			toast.error("Something went wrong. Please try again.");
 		} finally {
@@ -61,11 +55,7 @@ export function SignUpForm() {
 
 	return (
 		<div className="space-y-6">
-			<form
-				onSubmit={handleSubmit(onSubmit)}
-				noValidate
-				className="space-y-4"
-			>
+			<form onSubmit={handleSubmit(onSubmit)} noValidate className="space-y-4">
 				<div className="space-y-2">
 					<Label htmlFor="email">Email</Label>
 					<Input
@@ -79,11 +69,7 @@ export function SignUpForm() {
 						{...register("email")}
 					/>
 					{errors.email && (
-						<p
-							id="email-error"
-							className="text-sm text-destructive"
-							role="alert"
-						>
+						<p id="email-error" className="text-sm text-destructive" role="alert">
 							{errors.email.message}
 						</p>
 					)}
@@ -96,19 +82,13 @@ export function SignUpForm() {
 						type="password"
 						placeholder="Create a password"
 						autoComplete="new-password"
-						aria-describedby={
-							errors.password ? "password-error" : undefined
-						}
+						aria-describedby={errors.password ? "password-error" : undefined}
 						aria-invalid={!!errors.password}
 						className="h-11"
 						{...register("password")}
 					/>
 					{errors.password && (
-						<p
-							id="password-error"
-							className="text-sm text-destructive"
-							role="alert"
-						>
+						<p id="password-error" className="text-sm text-destructive" role="alert">
 							{errors.password.message}
 						</p>
 					)}
@@ -121,21 +101,13 @@ export function SignUpForm() {
 						type="password"
 						placeholder="Confirm your password"
 						autoComplete="new-password"
-						aria-describedby={
-							errors.confirmPassword
-								? "confirmPassword-error"
-								: undefined
-						}
+						aria-describedby={errors.confirmPassword ? "confirmPassword-error" : undefined}
 						aria-invalid={!!errors.confirmPassword}
 						className="h-11"
 						{...register("confirmPassword")}
 					/>
 					{errors.confirmPassword && (
-						<p
-							id="confirmPassword-error"
-							className="text-sm text-destructive"
-							role="alert"
-						>
+						<p id="confirmPassword-error" className="text-sm text-destructive" role="alert">
 							{errors.confirmPassword.message}
 						</p>
 					)}
@@ -147,11 +119,7 @@ export function SignUpForm() {
 					disabled={isSubmitting}
 					aria-busy={isSubmitting}
 				>
-					{isSubmitting ? (
-						<Loader2 className="size-4 animate-spin" />
-					) : (
-						"Create Account"
-					)}
+					{isSubmitting ? <Loader2 className="size-4 animate-spin" /> : "Create Account"}
 				</Button>
 			</form>
 

@@ -1,4 +1,4 @@
-import { describe, test, expect, vi, beforeEach } from "vitest";
+import { beforeEach, describe, expect, test, vi } from "vitest";
 
 // ---------------------------------------------------------------------------
 // DB mock with thenable chain (project pattern)
@@ -85,15 +85,15 @@ vi.mock("drizzle-orm", () => ({
 	count: vi.fn(),
 }));
 
+import { db } from "@/lib/db";
 // ---------------------------------------------------------------------------
 // Import after mocks
 // ---------------------------------------------------------------------------
 import {
-	getGlobalLeaderboard,
 	getGenreLeaderboard,
+	getGlobalLeaderboard,
 	getUserBadges,
 } from "@/lib/gamification/queries";
-import { db } from "@/lib/db";
 
 describe("getGlobalLeaderboard", () => {
 	beforeEach(() => {

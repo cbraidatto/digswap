@@ -1,10 +1,10 @@
 "use client";
 
 import { useState, useTransition } from "react";
+import { toast } from "sonner";
 import { createPostAction, createReviewAction } from "@/actions/community";
 import type { GroupPost } from "@/lib/community/queries";
 import { RecordSearchInline } from "./record-search-inline";
-import { toast } from "sonner";
 
 interface LinkedRecord {
 	id: string;
@@ -21,11 +21,7 @@ interface GroupComposerProps {
 	onPostCreated?: (post: GroupPost) => void;
 }
 
-export function GroupComposer({
-	groupId,
-	groupName,
-	onPostCreated,
-}: GroupComposerProps) {
+export function GroupComposer({ groupId, groupName, onPostCreated }: GroupComposerProps) {
 	const [content, setContent] = useState("");
 	const [linkedRecord, setLinkedRecord] = useState<LinkedRecord | null>(null);
 	const [isReviewMode, setIsReviewMode] = useState(false);
@@ -144,9 +140,7 @@ export function GroupComposer({
 						))}
 					</div>
 					{errors.rating && (
-						<span className="font-mono text-xs text-destructive mt-1 block">
-							{errors.rating}
-						</span>
+						<span className="font-mono text-xs text-destructive mt-1 block">{errors.rating}</span>
 					)}
 				</div>
 			)}
@@ -166,9 +160,7 @@ export function GroupComposer({
 				className="bg-surface-container-low border border-outline-variant/20 rounded p-3 w-full resize-none min-h-[80px] text-sm text-on-surface placeholder:text-on-surface-variant/50 outline-none focus:border-primary transition-colors"
 			/>
 			{errors.content && (
-				<span className="font-mono text-xs text-destructive mt-1 block">
-					{errors.content}
-				</span>
+				<span className="font-mono text-xs text-destructive mt-1 block">{errors.content}</span>
 			)}
 
 			{/* Linked record display */}
@@ -197,9 +189,7 @@ export function GroupComposer({
 				</div>
 			)}
 			{isReviewMode && errors.record && (
-				<span className="font-mono text-xs text-destructive mt-1 block">
-					{errors.record}
-				</span>
+				<span className="font-mono text-xs text-destructive mt-1 block">{errors.record}</span>
 			)}
 
 			{/* Button row */}
@@ -239,11 +229,7 @@ export function GroupComposer({
 					disabled={!content.trim() || isSubmitting}
 					className="font-mono text-xs bg-primary text-primary-foreground px-4 py-1 rounded hover:bg-primary/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
 				>
-					{isSubmitting
-						? "posting..."
-						: isReviewMode
-							? "[Post Review]"
-							: "[Post]"}
+					{isSubmitting ? "posting..." : isReviewMode ? "[Post Review]" : "[Post]"}
 				</button>
 			</div>
 		</div>

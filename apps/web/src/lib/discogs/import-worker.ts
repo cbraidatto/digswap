@@ -1,6 +1,6 @@
 import { createAdminClient } from "@/lib/supabase/admin";
-import { createDiscogsClient, computeRarityScore } from "./client";
 import { broadcastProgress } from "./broadcast";
+import { computeRarityScore, createDiscogsClient } from "./client";
 import type { ImportJobStatus, ImportJobType } from "./types";
 
 /** Max pages to process before marking job as failed (safety limit: 20,000+ items) */
@@ -63,10 +63,7 @@ async function upsertRelease(
 		.single();
 
 	if (upsertError || !releaseRow) {
-		console.error(
-			`Release upsert failed for discogs_id ${info.id}:`,
-			upsertError,
-		);
+		console.error(`Release upsert failed for discogs_id ${info.id}:`, upsertError);
 		return null;
 	}
 
@@ -116,8 +113,7 @@ export async function processImportPage(jobId: string): Promise<PageResult> {
 			.from("import_jobs")
 			.update({
 				status: "failed" as ImportJobStatus,
-				error_message:
-					"Collection exceeds maximum import size (20,000+ items)",
+				error_message: "Collection exceeds maximum import size (20,000+ items)",
 				completed_at: new Date().toISOString(),
 			})
 			.eq("id", jobId);
@@ -143,15 +139,12 @@ export async function processImportPage(jobId: string): Promise<PageResult> {
 		const username = identity.data.username;
 
 		// Fetch one page of collection (folder 0 = all items)
-		const response = await client
-			.user()
-			.collection()
-			.getReleases(username, 0, {
-				page: currentPage,
-				per_page: 100,
-				sort: "added",
-				sort_order: "desc",
-			});
+		const response = await client.user().collection().getReleases(username, 0, {
+			page: currentPage,
+			per_page: 100,
+			sort: "added",
+			sort_order: "desc",
+		});
 
 		const releases = response.data.releases ?? [];
 		const pagination = response.data.pagination;
@@ -213,8 +206,7 @@ export async function processImportPage(jobId: string): Promise<PageResult> {
 			type: job.type as ImportJobType,
 		};
 	} catch (error) {
-		const errorMessage =
-			error instanceof Error ? error.message : "Unknown error";
+		const errorMessage = error instanceof Error ? error.message : "Unknown error";
 		console.error(`Import page processing failed for job ${jobId}:`, error);
 
 		// Mark job as failed
@@ -282,8 +274,7 @@ export async function processWantlistPage(jobId: string): Promise<PageResult> {
 			.from("import_jobs")
 			.update({
 				status: "failed" as ImportJobStatus,
-				error_message:
-					"Wantlist exceeds maximum import size (20,000+ items)",
+				error_message: "Wantlist exceeds maximum import size (20,000+ items)",
 				completed_at: new Date().toISOString(),
 			})
 			.eq("id", jobId);
@@ -377,12 +368,8 @@ export async function processWantlistPage(jobId: string): Promise<PageResult> {
 			type: job.type as ImportJobType,
 		};
 	} catch (error) {
-		const errorMessage =
-			error instanceof Error ? error.message : "Unknown error";
-		console.error(
-			`Wantlist page processing failed for job ${jobId}:`,
-			error,
-		);
+		const errorMessage = error instanceof Error ? error.message : "Unknown error";
+		console.error(`Wantlist page processing failed for job ${jobId}:`, error);
 
 		// Mark job as failed
 		await admin

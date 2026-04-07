@@ -1,12 +1,14 @@
 "use client";
 
-import { useTransition } from "react";
 import { Loader2 } from "lucide-react";
-import { toast } from "sonner";
 import { useRouter } from "next/navigation";
-
-import { Button } from "@/components/ui/button";
+import { useTransition } from "react";
+import { toast } from "sonner";
+import { connectDiscogs, triggerSync } from "@/actions/discogs";
+import { DisconnectDialog } from "@/components/discogs/disconnect-dialog";
+import { ReimportDialog } from "@/components/discogs/reimport-dialog";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import {
 	Card,
 	CardAction,
@@ -16,9 +18,6 @@ import {
 	CardTitle,
 } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
-import { connectDiscogs, triggerSync } from "@/actions/discogs";
-import { DisconnectDialog } from "@/components/discogs/disconnect-dialog";
-import { ReimportDialog } from "@/components/discogs/reimport-dialog";
 
 interface DiscogsSettingsProps {
 	discogsConnected: boolean;
@@ -85,16 +84,10 @@ export function DiscogsSettings({
 			<Card>
 				<CardHeader>
 					<CardTitle>Discogs</CardTitle>
-					<CardDescription>
-						Connect your Discogs account to import your collection.
-					</CardDescription>
+					<CardDescription>Connect your Discogs account to import your collection.</CardDescription>
 				</CardHeader>
 				<CardContent>
-					<Button
-						className="h-11 w-full"
-						onClick={handleConnect}
-						disabled={isConnecting}
-					>
+					<Button className="h-11 w-full" onClick={handleConnect} disabled={isConnecting}>
 						{isConnecting ? (
 							<>
 								<Loader2 className="mr-2 size-4 animate-spin" />
@@ -127,18 +120,11 @@ export function DiscogsSettings({
 			</CardHeader>
 			<CardContent className="space-y-4">
 				<div className="space-y-1">
-					<p className="text-base text-foreground">
-						@{discogsUsername}
-					</p>
-					<p className="text-sm text-muted-foreground">
-						Last synced: {formattedLastSynced}
-					</p>
+					<p className="text-base text-foreground">@{discogsUsername}</p>
+					<p className="text-sm text-muted-foreground">Last synced: {formattedLastSynced}</p>
 				</div>
 
-				<Button
-					onClick={handleSync}
-					disabled={isSyncing}
-				>
+				<Button onClick={handleSync} disabled={isSyncing}>
 					{isSyncing ? (
 						<>
 							<Loader2 className="mr-2 size-4 animate-spin" />

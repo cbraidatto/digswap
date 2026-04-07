@@ -1,7 +1,7 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import { globalSearchAction } from "@/actions/search";
 
@@ -95,7 +95,7 @@ export function BarcodeScanner() {
 			};
 
 			animFrameRef.current = requestAnimationFrame(scan);
-		} catch (err) {
+		} catch (_err) {
 			setError("Camera access denied. Please allow camera access to scan barcodes.");
 			setScanning(false);
 		}
@@ -133,12 +133,7 @@ export function BarcodeScanner() {
 
 					{/* Video feed */}
 					<div className="relative w-full max-w-sm aspect-square rounded-xl overflow-hidden border-2 border-primary/30">
-						<video
-							ref={videoRef}
-							className="w-full h-full object-cover"
-							playsInline
-							muted
-						/>
+						<video ref={videoRef} className="w-full h-full object-cover" playsInline muted />
 						{/* Scanning overlay */}
 						{scanning && (
 							<div className="absolute inset-0 flex items-center justify-center">
@@ -153,7 +148,10 @@ export function BarcodeScanner() {
 							<p className="font-mono text-xs text-destructive">{error}</p>
 							<button
 								type="button"
-								onClick={() => { setError(null); startScanning(); }}
+								onClick={() => {
+									setError(null);
+									startScanning();
+								}}
 								className="font-mono text-xs text-primary mt-2 hover:underline"
 							>
 								Try again
@@ -163,9 +161,7 @@ export function BarcodeScanner() {
 
 					{/* Status */}
 					{scanning && (
-						<p className="mt-4 font-mono text-xs text-primary animate-pulse">
-							Scanning...
-						</p>
+						<p className="mt-4 font-mono text-xs text-primary animate-pulse">Scanning...</p>
 					)}
 				</div>
 			)}

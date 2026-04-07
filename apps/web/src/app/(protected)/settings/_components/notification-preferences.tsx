@@ -1,10 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import {
-	getPreferencesAction,
-	updatePreferencesAction,
-} from "@/actions/notifications";
+import { getPreferencesAction, updatePreferencesAction } from "@/actions/notifications";
 import { cn } from "@/lib/utils";
 
 interface PreferencesState {
@@ -19,7 +16,7 @@ interface PreferencesState {
 }
 
 // Map from camelCase field names to snake_case DB column names
-function toSnakeCase(field: string): string {
+function _toSnakeCase(field: string): string {
 	const map: Record<string, string> = {
 		wantlistMatchInapp: "wantlist_match_inapp",
 		wantlistMatchEmail: "wantlist_match_email",
@@ -87,9 +84,7 @@ const PREFERENCE_GROUPS = [
 ];
 
 export function NotificationPreferences() {
-	const [preferences, setPreferences] = useState<PreferencesState | null>(
-		null,
-	);
+	const [preferences, setPreferences] = useState<PreferencesState | null>(null);
 	const [loading, setLoading] = useState(true);
 
 	useEffect(() => {
@@ -132,9 +127,7 @@ export function NotificationPreferences() {
 	if (loading) {
 		return (
 			<div className="space-y-4">
-				<h2 className="font-heading text-xl font-semibold">
-					Notification Preferences
-				</h2>
+				<h2 className="font-heading text-xl font-semibold">Notification Preferences</h2>
 				{[1, 2, 3, 4].map((i) => (
 					<div key={i} className="space-y-2 animate-pulse">
 						<div className="h-4 w-32 rounded bg-surface-container-high" />
@@ -143,9 +136,7 @@ export function NotificationPreferences() {
 							<div className="h-4 w-20 rounded bg-surface-container-high" />
 							<div className="h-4 w-16 rounded bg-surface-container-high" />
 						</div>
-						{i < 4 && (
-							<div className="border-t border-outline-variant/10 my-4" />
-						)}
+						{i < 4 && <div className="border-t border-outline-variant/10 my-4" />}
 					</div>
 				))}
 			</div>
@@ -155,9 +146,7 @@ export function NotificationPreferences() {
 	if (!preferences) {
 		return (
 			<div className="space-y-4">
-				<h2 className="font-heading text-xl font-semibold">
-					Notification Preferences
-				</h2>
+				<h2 className="font-heading text-xl font-semibold">Notification Preferences</h2>
 				<p className="font-mono text-xs text-on-surface-variant">
 					Could not load preferences. Try refreshing the page.
 				</p>
@@ -167,26 +156,20 @@ export function NotificationPreferences() {
 
 	return (
 		<div className="space-y-4">
-			<h2 className="font-heading text-xl font-semibold">
-				Notification Preferences
-			</h2>
+			<h2 className="font-heading text-xl font-semibold">Notification Preferences</h2>
 
 			{PREFERENCE_GROUPS.map((group, index) => (
 				<div key={group.key}>
 					<div className="space-y-2">
 						<div className="flex items-center justify-between">
-							<span className="text-sm font-semibold text-on-surface">
-								{group.title}
-							</span>
+							<span className="text-sm font-semibold text-on-surface">{group.title}</span>
 							{group.phaseBadge && (
 								<span className="font-mono text-xs font-semibold uppercase bg-surface-container-high text-on-surface-variant px-2 py-1 rounded border border-outline-variant/20">
 									[{group.phaseBadge}]
 								</span>
 							)}
 						</div>
-						<p className="text-sm text-on-surface-variant">
-							{group.description}
-						</p>
+						<p className="text-sm text-on-surface-variant">{group.description}</p>
 						<div className="flex items-center gap-4">
 							<label
 								className={cn(
@@ -200,13 +183,9 @@ export function NotificationPreferences() {
 									checked={preferences[group.inappField]}
 									disabled={!group.enabled}
 									aria-disabled={!group.enabled}
-									onChange={(e) =>
-										handleToggle(group.inappField, e.target.checked)
-									}
+									onChange={(e) => handleToggle(group.inappField, e.target.checked)}
 								/>
-								<span className="font-mono text-xs text-on-surface-variant">
-									In-app
-								</span>
+								<span className="font-mono text-xs text-on-surface-variant">In-app</span>
 							</label>
 							{group.emailField && (
 								<label
@@ -221,13 +200,9 @@ export function NotificationPreferences() {
 										checked={preferences[group.emailField]}
 										disabled={!group.enabled}
 										aria-disabled={!group.enabled}
-										onChange={(e) =>
-											handleToggle(group.emailField!, e.target.checked)
-										}
+										onChange={(e) => handleToggle(group.emailField!, e.target.checked)}
 									/>
-									<span className="font-mono text-xs text-on-surface-variant">
-										Email
-									</span>
+									<span className="font-mono text-xs text-on-surface-variant">Email</span>
 								</label>
 							)}
 						</div>

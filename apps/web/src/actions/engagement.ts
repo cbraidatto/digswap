@@ -1,15 +1,15 @@
 "use server";
 
-import { db } from "@/lib/db";
-import { requireUser } from "@/lib/auth/require-user";
-import { digs, diggerDna } from "@/lib/db/schema/engagement";
-import { listeningLogs } from "@/lib/db/schema/listening-logs";
-import { activityFeed } from "@/lib/db/schema/social";
-import { collectionItems } from "@/lib/db/schema/collections";
-import { releases } from "@/lib/db/schema/releases";
-import { eq, and, sql, count } from "drizzle-orm";
-import { apiRateLimit , safeLimit} from "@/lib/rate-limit";
+import { and, count, eq, sql } from "drizzle-orm";
 import { z } from "zod";
+import { requireUser } from "@/lib/auth/require-user";
+import { db } from "@/lib/db";
+import { collectionItems } from "@/lib/db/schema/collections";
+import { diggerDna, digs } from "@/lib/db/schema/engagement";
+import { listeningLogs } from "@/lib/db/schema/listening-logs";
+import { releases } from "@/lib/db/schema/releases";
+import { activityFeed } from "@/lib/db/schema/social";
+import { apiRateLimit, safeLimit } from "@/lib/rate-limit";
 
 // ── Validation schemas ─────────────────────────────────────
 const feedItemIdSchema = z.object({
@@ -45,22 +45,12 @@ export async function toggleDig(
 			const existing = await tx
 				.select({ id: digs.id })
 				.from(digs)
-				.where(
-					and(
-						eq(digs.userId, user.id),
-						eq(digs.feedItemId, parsed.data.feedItemId),
-					),
-				);
+				.where(and(eq(digs.userId, user.id), eq(digs.feedItemId, parsed.data.feedItemId)));
 
 			if (existing.length > 0) {
 				await tx
 					.delete(digs)
-					.where(
-						and(
-							eq(digs.userId, user.id),
-							eq(digs.feedItemId, parsed.data.feedItemId),
-						),
-					);
+					.where(and(eq(digs.userId, user.id), eq(digs.feedItemId, parsed.data.feedItemId)));
 			} else {
 				await tx.insert(digs).values({
 					userId: user.id,
@@ -103,12 +93,7 @@ export async function getDigState(
 		const userDigs = await db
 			.select({ feedItemId: digs.feedItemId })
 			.from(digs)
-			.where(
-				and(
-					eq(digs.userId, user.id),
-					sql`${digs.feedItemId} = ANY(${feedItemIds})`,
-				),
-			);
+			.where(and(eq(digs.userId, user.id), sql`${digs.feedItemId} = ANY(${feedItemIds})`));
 
 		const userDigSet = new Set(userDigs.map((d) => d.feedItemId));
 
@@ -140,9 +125,7 @@ export async function getDigState(
 }
 
 // ── Digger DNA computation ─────────────────────────────────
-export async function computeDiggerDna(
-	userId?: string,
-): Promise<{
+export async function computeDiggerDna(userId?: string): Promise<{
 	topGenres: { name: string; percentage: number }[];
 	topDecades: { decade: string; percentage: number }[];
 	topCountries: { name: string; count: number }[];
@@ -194,10 +177,7 @@ export async function computeDiggerDna(
 				genreCounts.set(g, (genreCounts.get(g) ?? 0) + 1);
 			}
 		}
-		const totalGenreEntries = Array.from(genreCounts.values()).reduce(
-			(a, b) => a + b,
-			0,
-		);
+		const totalGenreEntries = Array.from(genreCounts.values()).reduce((a, b) => a + b, 0);
 		const topGenres = Array.from(genreCounts.entries())
 			.sort((a, b) => b[1] - a[1])
 			.slice(0, 5)
@@ -226,10 +206,7 @@ export async function computeDiggerDna(
 		const countryCounts = new Map<string, number>();
 		for (const item of items) {
 			if (item.country) {
-				countryCounts.set(
-					item.country,
-					(countryCounts.get(item.country) ?? 0) + 1,
-				);
+				countryCounts.set(item.country, (countryCounts.get(item.country) ?? 0) + 1);
 			}
 		}
 		const topCountries = Array.from(countryCounts.entries())
@@ -238,13 +215,9 @@ export async function computeDiggerDna(
 			.map(([name, cnt]) => ({ name, count: cnt }));
 
 		// ─── Rarity profile
-		const rarityScores = items
-			.map((i) => i.rarityScore)
-			.filter((s): s is number => s !== null);
+		const rarityScores = items.map((i) => i.rarityScore).filter((s): s is number => s !== null);
 		const avgRarity =
-			rarityScores.length > 0
-				? rarityScores.reduce((a, b) => a + b, 0) / rarityScores.length
-				: 0;
+			rarityScores.length > 0 ? rarityScores.reduce((a, b) => a + b, 0) / rarityScores.length : 0;
 
 		let rarityProfile: string;
 		if (avgRarity >= 75) rarityProfile = "diamond_chaser";

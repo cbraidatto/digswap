@@ -1,12 +1,12 @@
 "use server";
 
+import { and, count, eq, gte, sql } from "drizzle-orm";
 import { db } from "@/lib/db";
 import { collectionItems } from "@/lib/db/schema/collections";
 import { releases } from "@/lib/db/schema/releases";
 import { reviews } from "@/lib/db/schema/reviews";
 import { follows } from "@/lib/db/schema/social";
 import { createClient } from "@/lib/supabase/server";
-import { eq, and, sql, gte, count } from "drizzle-orm";
 
 interface WrappedStats {
 	year: number;
@@ -26,7 +26,9 @@ export async function generateWrapped(userId: string, year?: number): Promise<Wr
 		// authenticated user's ID. Server Actions are RPC endpoints — any
 		// authenticated user could supply another user's UUID without this check.
 		const supabase = await createClient();
-		const { data: { user } } = await supabase.auth.getUser();
+		const {
+			data: { user },
+		} = await supabase.auth.getUser();
 		if (!user) return null;
 		if (user.id !== userId) return null; // reject mismatched caller
 		const targetYear = year ?? new Date().getFullYear();

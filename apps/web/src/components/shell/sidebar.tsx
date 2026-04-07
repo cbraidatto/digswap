@@ -36,9 +36,8 @@ export function Sidebar({ displayName, rank = "Digger", subscriptionTier }: Side
 							<span className="text-on-surface-variant text-xs font-mono uppercase tracking-widest">
 								{rank}
 							</span>
-							{(subscriptionTier === "premium_monthly" || subscriptionTier === "premium_annual") && (
-								<PremiumBadge />
-							)}
+							{(subscriptionTier === "premium_monthly" ||
+								subscriptionTier === "premium_annual") && <PremiumBadge />}
 						</div>
 					</div>
 				</div>
@@ -76,7 +75,6 @@ export function Sidebar({ displayName, rank = "Digger", subscriptionTier }: Side
 						})}
 					</div>
 				</div>
-
 			</nav>
 
 			<div className="p-4 border-t border-outline-variant/10 flex gap-4">

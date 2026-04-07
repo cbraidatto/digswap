@@ -6,7 +6,6 @@ function getStyle(tier: RarityTier) {
 			return "bg-tertiary/10 text-tertiary border-tertiary/25";
 		case "Rare":
 			return "bg-secondary/10 text-secondary border-secondary/25";
-		case "Common":
 		default:
 			return "bg-primary/10 text-primary border-primary/25";
 	}
@@ -28,9 +27,7 @@ export function RarityPill({ score, showScore = true, className = "" }: RarityPi
 			className={`inline-flex items-center gap-1 font-mono text-[10px] font-semibold px-2 py-0.5 rounded-full border whitespace-nowrap ${getStyle(tier)} ${className}`}
 		>
 			{tier}
-			{showScore && score != null && (
-				<span className="opacity-70">· {score.toFixed(1)}</span>
-			)}
+			{showScore && score != null && <span className="opacity-70">· {score.toFixed(1)}</span>}
 		</span>
 	);
 }

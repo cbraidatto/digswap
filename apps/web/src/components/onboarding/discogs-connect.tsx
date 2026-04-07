@@ -1,11 +1,10 @@
 "use client";
 
-import { useTransition } from "react";
 import { Disc3, Loader2 } from "lucide-react";
+import { useTransition } from "react";
 import { toast } from "sonner";
-
-import { Button } from "@/components/ui/button";
 import { connectDiscogs } from "@/actions/discogs";
+import { Button } from "@/components/ui/button";
 
 /**
  * Onboarding Step 3: Discogs connection.
@@ -39,17 +38,13 @@ export function DiscogsConnect({ onSkip }: { onSkip?: () => void }) {
 					<Disc3 className="size-8 text-primary" />
 				</div>
 				<p className="text-center text-sm text-muted-foreground">
-					Link your Discogs account to import your collection and wantlist.
-					Your library powers the Radar.
+					Link your Discogs account to import your collection and wantlist. Your library powers the
+					Radar.
 				</p>
 			</div>
 
 			<div className="space-y-3">
-				<Button
-					className="h-11 w-full"
-					onClick={handleConnect}
-					disabled={isPending}
-				>
+				<Button className="h-11 w-full" onClick={handleConnect} disabled={isPending}>
 					{isPending ? (
 						<>
 							<Loader2 className="mr-2 size-4 animate-spin" />
@@ -71,7 +66,8 @@ export function DiscogsConnect({ onSkip }: { onSkip?: () => void }) {
 				)}
 
 				<p className="font-mono text-xs text-on-surface-variant text-center mt-2">
-					<span className="text-tertiary">[OPTIONAL]</span> // Connect Discogs to activate the Radar. Without Discogs, the Radar is blind.
+					<span className="text-tertiary">[OPTIONAL]</span> // Connect Discogs to activate the
+					Radar. Without Discogs, the Radar is blind.
 				</p>
 			</div>
 		</div>

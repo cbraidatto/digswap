@@ -1,13 +1,12 @@
 "use client";
 
-import Link from "next/link";
 import Image from "next/image";
-import type { FeedItem } from "@/lib/social/types";
+import Link from "next/link";
 import { DigButton } from "@/components/engagement/dig-button";
-import { PlayButton } from "@/components/player/play-button";
-import { getGemTier } from "@/lib/gems/constants";
-import { GemBadge } from "@/components/ui/gem-badge";
 import { ContextLabel, type ContextReason } from "@/components/feed/context-label";
+import { PlayButton } from "@/components/player/play-button";
+import { getRarityTier, type RarityTier } from "@/lib/collection/rarity";
+import type { FeedItem } from "@/lib/social/types";
 
 function formatRelativeTime(dateStr: string): string {
 	const diff = Date.now() - new Date(dateStr).getTime();
@@ -21,21 +20,29 @@ function formatRelativeTime(dateStr: string): string {
 	return `${Math.floor(days / 7)}w`;
 }
 
-function getGemStripColor(tier: string | null): string {
+function getRarityStyle(tier: RarityTier) {
 	switch (tier) {
-		case "diamond":
-		case "sapphire":
-			return "bg-gem-sapphire";
-		case "ruby":
-			return "bg-gem-ruby";
-		case "emerald":
-			return "bg-gem-emerald";
-		case "amethyst":
-			return "bg-gem-amethyst";
-		case "quartz":
-			return "bg-gem-quartz";
+		case "Ultra Rare":
+			return {
+				bg: "bg-tertiary/10",
+				text: "text-tertiary",
+				border: "border-tertiary/20",
+				strip: "bg-tertiary",
+			};
+		case "Rare":
+			return {
+				bg: "bg-secondary/10",
+				text: "text-secondary",
+				border: "border-secondary/20",
+				strip: "bg-secondary",
+			};
 		default:
-			return "bg-primary";
+			return {
+				bg: "bg-primary/10",
+				text: "text-primary",
+				border: "border-primary/20",
+				strip: "bg-primary",
+			};
 	}
 }
 
@@ -61,15 +68,15 @@ export function FeedCard({
 	digState?: { dug: boolean; digCount: number };
 	contextReason?: ContextReason;
 }) {
-	const tier = getGemTier(item.releaseRarityScore);
-	const stripColor = getGemStripColor(tier);
+	const tier = getRarityTier(item.releaseRarityScore);
+	const rarity = getRarityStyle(tier);
 	const action = getActionLabel(item.actionType);
 	const discogsId = item.metadata?.discogsId as number | undefined;
 
 	return (
 		<article className="bg-surface-container-low rounded-xl overflow-hidden border border-outline-variant/5 transition-all hover:border-outline-variant/15 hover:shadow-lg hover:shadow-black/5 group">
-			{/* Gem accent strip */}
-			<div className={`h-0.5 w-full ${stripColor}`} />
+			{/* Rarity accent strip */}
+			<div className={`h-0.5 w-full ${rarity.strip}`} />
 
 			<div className="p-4">
 				{/* User row */}
@@ -109,7 +116,7 @@ export function FeedCard({
 						</span>
 					</div>
 					{/* Action icon */}
-					<span className="material-symbols-outlined text-[16px] text-primary">
+					<span className={`material-symbols-outlined text-[16px] ${rarity.text}`}>
 						{action.icon}
 					</span>
 				</div>
@@ -132,7 +139,9 @@ export function FeedCard({
 							/>
 						) : (
 							<div className="w-[88px] h-[88px] rounded-lg bg-surface-container-high flex items-center justify-center shadow-md shadow-black/10">
-								<span className="material-symbols-outlined text-3xl text-on-surface-variant/20">album</span>
+								<span className="material-symbols-outlined text-3xl text-on-surface-variant/20">
+									album
+								</span>
 							</div>
 						)}
 						{/* Play overlay on hover */}
@@ -175,21 +184,30 @@ export function FeedCard({
 							</div>
 						</div>
 
-						{/* Bottom row: gem badge + actions */}
+						{/* Bottom row: rarity + actions */}
 						<div className="flex items-center justify-between mt-2">
-							<GemBadge score={item.releaseRarityScore} />
+							<span
+								className={`font-mono text-[10px] font-semibold px-2 py-0.5 rounded-full border ${rarity.bg} ${rarity.text} ${rarity.border}`}
+							>
+								{tier}
+								{item.releaseRarityScore != null ? ` · ${item.releaseRarityScore.toFixed(1)}` : ""}
+							</span>
 
 							<div className="flex items-center gap-1">
 								<DigButton
 									feedItemId={item.id}
 									initialDug={digState?.dug ?? false}
 									initialCount={digState?.digCount ?? 0}
-									track={item.releaseYoutubeVideoId ? {
-										videoId: item.releaseYoutubeVideoId,
-										title: item.releaseTitle ?? "Unknown",
-										artist: item.releaseArtist ?? "Unknown",
-										coverUrl: item.releaseCoverUrl ?? null,
-									} : undefined}
+									track={
+										item.releaseYoutubeVideoId
+											? {
+													videoId: item.releaseYoutubeVideoId,
+													title: item.releaseTitle ?? "Unknown",
+													artist: item.releaseArtist ?? "Unknown",
+													coverUrl: item.releaseCoverUrl ?? null,
+												}
+											: undefined
+									}
 								/>
 							</div>
 						</div>

@@ -19,7 +19,10 @@ export default function RadarLoading() {
 				{/* Match list skeleton */}
 				<div className="space-y-2">
 					{Array.from({ length: 8 }).map((_, i) => (
-						<div key={i} className="flex items-center gap-3 p-3 bg-surface-container-low border border-outline-variant/10 rounded">
+						<div
+							key={i}
+							className="flex items-center gap-3 p-3 bg-surface-container-low border border-outline-variant/10 rounded"
+						>
 							<div className="w-8 h-8 rounded-full bg-surface-container-high animate-pulse" />
 							<div className="flex-1 space-y-1.5">
 								<SkeletonLine className="h-3 w-24" />

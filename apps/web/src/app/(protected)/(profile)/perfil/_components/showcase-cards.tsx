@@ -1,14 +1,9 @@
 "use client";
 
-import { useCallback, useRef, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
+import { useCallback, useRef, useState, useTransition } from "react";
+import { type ShowcaseSlot, searchCollectionForShowcase, updateShowcase } from "@/actions/profile";
 import { CoverArt } from "@/components/ui/cover-art";
-import {
-	searchCollectionForShowcase,
-	updateShowcase,
-	type ShowcaseSlot,
-} from "@/actions/profile";
-import { RecordLink } from "@/components/ui/record-link";
 
 interface ShowcaseRelease {
 	id: string;
@@ -21,15 +16,33 @@ interface ShowcaseRelease {
 
 interface ShowcaseCardsProps {
 	searching: ShowcaseRelease | null;
-	rarest:    ShowcaseRelease | null;
-	favorite:  ShowcaseRelease | null;
-	isOwner:   boolean;
+	rarest: ShowcaseRelease | null;
+	favorite: ShowcaseRelease | null;
+	isOwner: boolean;
 }
 
-const SLOT_META: Record<ShowcaseSlot, { label: string; icon: string; color: string; accent: string }> = {
-	searching: { label: "Searching For",    icon: "travel_explore", color: "text-primary",   accent: "border-primary/30" },
-	rarest:    { label: "Rarest Gem",        icon: "diamond",        color: "text-secondary", accent: "border-secondary/30" },
-	favorite:  { label: "All-Time Favorite", icon: "favorite",       color: "text-tertiary",  accent: "border-tertiary/30" },
+const SLOT_META: Record<
+	ShowcaseSlot,
+	{ label: string; icon: string; color: string; accent: string }
+> = {
+	searching: {
+		label: "Searching For",
+		icon: "travel_explore",
+		color: "text-primary",
+		accent: "border-primary/30",
+	},
+	rarest: {
+		label: "Rarest Gem",
+		icon: "diamond",
+		color: "text-secondary",
+		accent: "border-secondary/30",
+	},
+	favorite: {
+		label: "All-Time Favorite",
+		icon: "favorite",
+		color: "text-tertiary",
+		accent: "border-tertiary/30",
+	},
 };
 
 // ─── Single card ─────────────────────────────────────────────────────────────
@@ -48,7 +61,10 @@ function ShowcaseCard({
 	const meta = SLOT_META[slot];
 
 	return (
-		<div className="group relative flex flex-col rounded-lg overflow-hidden border border-outline/[0.08] bg-surface-container-high transition-transform duration-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-primary/10" style={{ perspective: "800px" }}>
+		<div
+			className="group relative flex flex-col rounded-lg overflow-hidden border border-outline/[0.08] bg-surface-container-high transition-transform duration-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-primary/10"
+			style={{ perspective: "800px" }}
+		>
 			{/* Cover — fixed height */}
 			<div className="relative h-36 w-full overflow-hidden bg-surface-container flex-shrink-0">
 				<CoverArt
@@ -56,7 +72,9 @@ function ShowcaseCard({
 					alt={release?.title ?? meta.label}
 					size="full"
 					fill
-					className={release?.coverImageUrl ? "transition-transform duration-300 group-hover:scale-105" : ""}
+					className={
+						release?.coverImageUrl ? "transition-transform duration-300 group-hover:scale-105" : ""
+					}
 					containerClassName="h-full"
 					rounded="rounded-none"
 					fallbackIcon={meta.icon}
@@ -105,7 +123,8 @@ function ShowcaseCard({
 							{release.title}
 						</p>
 						<p className="font-mono text-xs text-on-surface-variant truncate">
-							{release.artist}{release.year ? ` · ${release.year}` : ""}
+							{release.artist}
+							{release.year ? ` · ${release.year}` : ""}
 						</p>
 					</>
 				) : (
@@ -136,7 +155,10 @@ function ShowcasePicker({
 	const handleQuery = useCallback((value: string) => {
 		setQuery(value);
 		if (debounceRef.current) clearTimeout(debounceRef.current);
-		if (!value.trim()) { setResults([]); return; }
+		if (!value.trim()) {
+			setResults([]);
+			return;
+		}
 
 		debounceRef.current = setTimeout(() => {
 			startTransition(async () => {
@@ -169,7 +191,6 @@ function ShowcasePicker({
 				{/* Search input */}
 				<div className="px-5 pt-4 pb-3">
 					<input
-						autoFocus
 						type="text"
 						placeholder="Search your collection..."
 						value={query}
@@ -194,26 +215,26 @@ function ShowcasePicker({
 						</p>
 					)}
 					<div className="space-y-0.5">
-						{!isPending && results.map((r) => (
-							<button
-								key={r.id}
-								type="button"
-								onClick={() => onSelect(r.id)}
-								className="w-full flex items-center gap-3 p-2 rounded-lg hover:bg-surface-container-high transition-colors text-left"
-							>
-								<CoverArt
-									src={r.coverImageUrl}
-									alt={r.title}
-									size="sm"
-								/>
-								<div className="flex-1 min-w-0">
-									<p className="font-heading font-bold text-sm text-on-surface truncate">{r.title}</p>
-									<p className="font-mono text-xs text-on-surface-variant truncate">
-										{r.artist}{r.year ? ` · ${r.year}` : ""}
-									</p>
-								</div>
-							</button>
-						))}
+						{!isPending &&
+							results.map((r) => (
+								<button
+									key={r.id}
+									type="button"
+									onClick={() => onSelect(r.id)}
+									className="w-full flex items-center gap-3 p-2 rounded-lg hover:bg-surface-container-high transition-colors text-left"
+								>
+									<CoverArt src={r.coverImageUrl} alt={r.title} size="sm" />
+									<div className="flex-1 min-w-0">
+										<p className="font-heading font-bold text-sm text-on-surface truncate">
+											{r.title}
+										</p>
+										<p className="font-mono text-xs text-on-surface-variant truncate">
+											{r.artist}
+											{r.year ? ` · ${r.year}` : ""}
+										</p>
+									</div>
+								</button>
+							))}
 					</div>
 				</div>
 
@@ -258,10 +279,17 @@ export function ShowcaseCards({ searching, rarest, favorite, isOwner }: Showcase
 
 	return (
 		<>
-			<div className={`grid grid-cols-3 gap-3 transition-opacity ${isSaving ? "opacity-50 pointer-events-none" : ""}`}>
-				<ShowcaseCard slot="searching" release={searching} isOwner={isOwner} onEdit={setActiveSlot} />
-				<ShowcaseCard slot="rarest"    release={rarest}    isOwner={isOwner} onEdit={setActiveSlot} />
-				<ShowcaseCard slot="favorite"  release={favorite}  isOwner={isOwner} onEdit={setActiveSlot} />
+			<div
+				className={`grid grid-cols-3 gap-3 transition-opacity ${isSaving ? "opacity-50 pointer-events-none" : ""}`}
+			>
+				<ShowcaseCard
+					slot="searching"
+					release={searching}
+					isOwner={isOwner}
+					onEdit={setActiveSlot}
+				/>
+				<ShowcaseCard slot="rarest" release={rarest} isOwner={isOwner} onEdit={setActiveSlot} />
+				<ShowcaseCard slot="favorite" release={favorite} isOwner={isOwner} onEdit={setActiveSlot} />
 			</div>
 
 			{activeSlot && (

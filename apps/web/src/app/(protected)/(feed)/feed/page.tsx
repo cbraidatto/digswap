@@ -6,17 +6,18 @@ export const metadata: Metadata = {
 	title: "Feed — DigSwap",
 	description: "See the latest activity from the digger community.",
 };
+
+import { getExploreFeed } from "@/lib/social/explore-queries";
 import {
-	getProgressBarState,
 	getFollowCounts,
 	getGlobalFeed,
 	getPersonalFeed,
+	getProgressBarState,
 } from "@/lib/social/queries";
-import { getExploreFeed } from "@/lib/social/explore-queries";
 import { FeedContainer } from "./_components/feed-container";
-import { RadarSection } from "./_components/radar-section";
-import { RadarEmptyState } from "./_components/radar-empty-state";
 import { FeedWelcomeBanner } from "./_components/feed-welcome-banner";
+import { RadarEmptyState } from "./_components/radar-empty-state";
+import { RadarSection } from "./_components/radar-section";
 
 export default async function FeedPage({
 	searchParams,
@@ -44,8 +45,7 @@ export default async function FeedPage({
 	if (isExplore) {
 		initialItems = await getExploreFeed(user.id, null, 20);
 	} else {
-		const initialMode =
-			followCounts.followingCount > 0 ? "personal" : "global";
+		const initialMode = followCounts.followingCount > 0 ? "personal" : "global";
 		initialItems =
 			initialMode === "personal"
 				? await getPersonalFeed(user.id, null, 20)
@@ -73,10 +73,7 @@ export default async function FeedPage({
 				)}
 
 				{/* Radar — the hero section */}
-				{progressState.discogsConnected
-					? <RadarSection userId={user.id} />
-					: <RadarEmptyState />
-				}
+				{progressState.discogsConnected ? <RadarSection userId={user.id} /> : <RadarEmptyState />}
 
 				{/* Feed */}
 				<FeedContainer

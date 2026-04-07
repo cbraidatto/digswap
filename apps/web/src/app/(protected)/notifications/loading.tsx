@@ -9,7 +9,10 @@ export default function NotificationsLoading() {
 
 			<div className="space-y-2">
 				{Array.from({ length: 8 }).map((_, i) => (
-					<div key={i} className="flex items-start gap-3 p-3 bg-surface-container-low border border-outline-variant/10 rounded">
+					<div
+						key={i}
+						className="flex items-start gap-3 p-3 bg-surface-container-low border border-outline-variant/10 rounded"
+					>
 						<div className="w-8 h-8 rounded-full bg-surface-container-high animate-pulse flex-shrink-0" />
 						<div className="flex-1 space-y-1.5">
 							<SkeletonLine className="h-3.5 w-3/4" />

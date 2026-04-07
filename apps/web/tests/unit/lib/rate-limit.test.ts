@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 
 // Mock Upstash Redis as a class
 vi.mock("@upstash/redis", () => {
@@ -55,9 +55,7 @@ describe("Rate Limiters", () => {
 
 	it("rate limiters are instances of Ratelimit", async () => {
 		const { Ratelimit } = await import("@upstash/ratelimit");
-		const { authRateLimit, resetRateLimit, totpRateLimit } = await import(
-			"@/lib/rate-limit"
-		);
+		const { authRateLimit, resetRateLimit, totpRateLimit } = await import("@/lib/rate-limit");
 		expect(authRateLimit).toBeInstanceOf(Ratelimit);
 		expect(resetRateLimit).toBeInstanceOf(Ratelimit);
 		expect(totpRateLimit).toBeInstanceOf(Ratelimit);

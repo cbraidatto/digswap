@@ -206,7 +206,10 @@ export async function listTradeThreads(userId: string): Promise<TradeThreadListI
 			) AS unread_count
 		FROM trade_requests tr
 		LEFT JOIN trade_messages tm ON tm.trade_id = tr.id
-		WHERE tr.id = ANY(${sql`ARRAY[${sql.join(tradeIds.map(id => sql`${id}::uuid`), sql`, `)}]`})
+		WHERE tr.id = ANY(${sql`ARRAY[${sql.join(
+			tradeIds.map((id) => sql`${id}::uuid`),
+			sql`, `,
+		)}]`})
 		GROUP BY tr.id, tr.requester_id, tr.requester_last_read_at, tr.provider_last_read_at
 	`);
 

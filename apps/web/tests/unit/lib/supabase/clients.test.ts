@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 
 // Mock @supabase/ssr
 vi.mock("@supabase/ssr", () => ({
@@ -8,12 +8,8 @@ vi.mock("@supabase/ssr", () => ({
 	})),
 	createServerClient: vi.fn(() => ({
 		auth: {
-			getUser: vi.fn(() =>
-				Promise.resolve({ data: { user: null }, error: null }),
-			),
-			getClaims: vi.fn(() =>
-				Promise.resolve({ data: { claims: null }, error: null }),
-			),
+			getUser: vi.fn(() => Promise.resolve({ data: { user: null }, error: null })),
+			getClaims: vi.fn(() => Promise.resolve({ data: { claims: null }, error: null })),
 		},
 		from: vi.fn(),
 	})),
@@ -75,9 +71,7 @@ describe("Supabase Client Factories", () => {
 
 	it("admin client uses service role key (not anon key)", async () => {
 		const { createAdminClient } = await import("@/lib/supabase/admin");
-		const { createClient: mockCreateClient } = await import(
-			"@supabase/supabase-js"
-		);
+		const { createClient: mockCreateClient } = await import("@supabase/supabase-js");
 		const client = createAdminClient();
 		expect(client).toBeDefined();
 		expect(mockCreateClient).toHaveBeenCalledWith(

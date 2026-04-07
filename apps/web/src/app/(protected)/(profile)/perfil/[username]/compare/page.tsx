@@ -1,16 +1,13 @@
+import { eq } from "drizzle-orm";
 import type { Metadata } from "next";
 import Link from "next/link";
-import { eq } from "drizzle-orm";
 import { notFound, redirect } from "next/navigation";
+import { getRarityTier } from "@/lib/collection/rarity";
 import { db } from "@/lib/db";
-import { profiles } from "@/lib/db/schema/users";
 import { collectionItems } from "@/lib/db/schema/collections";
+import { profiles } from "@/lib/db/schema/users";
+import { type ComparisonItem, getCollectionComparison } from "@/lib/social/comparison";
 import { createClient } from "@/lib/supabase/server";
-import {
-	getCollectionComparison,
-	type ComparisonItem,
-} from "@/lib/social/comparison";
-import { GemBadge } from "@/components/ui/gem-badge";
 
 export const metadata: Metadata = {
 	title: "Compare collections — DigSwap",
@@ -40,20 +37,13 @@ function ComparisonColumn({
 				: "bg-tertiary/10";
 
 	return (
-		<div
-			role="region"
-			aria-label={`Records ${label.toLowerCase().replace(/_/g, " ")}`}
-		>
+		<div role="region" aria-label={`Records ${label.toLowerCase().replace(/_/g, " ")}`}>
 			{/* Header */}
 			<div className="flex items-center justify-between mb-4">
-				<span
-					className={`font-mono text-xs uppercase tracking-[0.2em] ${accentColor}`}
-				>
+				<span className={`font-mono text-xs uppercase tracking-[0.2em] ${accentColor}`}>
 					{label}
 				</span>
-				<span
-					className={`font-mono text-xs px-2 py-0.5 rounded ${accentColor} ${bgOpacity}`}
-				>
+				<span className={`font-mono text-xs px-2 py-0.5 rounded ${accentColor} ${bgOpacity}`}>
 					{items.length}
 				</span>
 			</div>
@@ -64,22 +54,29 @@ function ComparisonColumn({
 						{emptyText}
 					</div>
 				) : (
-					items.map((item) => (
-						<div
-							key={item.releaseId}
-							className="px-4 py-3 border-b border-outline-variant/5 last:border-0"
-						>
-							<div className="font-mono text-xs text-on-surface-variant">
-								{item.artist}
+					items.map((item) => {
+						const tier = getRarityTier(item.rarityScore);
+						const rarityColor =
+							tier === "Ultra Rare"
+								? "text-tertiary"
+								: tier === "Rare"
+									? "text-secondary"
+									: "text-primary";
+						return (
+							<div
+								key={item.releaseId}
+								className="px-4 py-3 border-b border-outline-variant/5 last:border-0"
+							>
+								<div className="font-mono text-xs text-on-surface-variant">{item.artist}</div>
+								<div className="font-heading text-sm font-bold text-on-surface truncate">
+									{item.title}
+								</div>
+								<div className={`font-mono text-xs mt-1 ${rarityColor}`}>
+									RARITY: {item.rarityScore !== null ? item.rarityScore.toFixed(1) : "--"}
+								</div>
 							</div>
-							<div className="font-heading text-sm font-bold text-on-surface truncate">
-								{item.title}
-							</div>
-							<div className="mt-1">
-								<GemBadge score={item.rarityScore} showScore={true} />
-							</div>
-						</div>
-					))
+						);
+					})
 				)}
 			</div>
 		</div>
@@ -128,9 +125,7 @@ export default async function ComparePage({ params }: ComparePageProps) {
 					href={`/perfil/${username}`}
 					className="font-mono text-xs text-on-surface-variant hover:text-primary flex items-center gap-1"
 				>
-					<span className="material-symbols-outlined text-base">
-						arrow_back
-					</span>
+					<span className="material-symbols-outlined text-base">arrow_back</span>
 					&lt; back to @{username}
 				</Link>
 				<h1 className="text-3xl font-heading font-bold text-on-surface mt-2">

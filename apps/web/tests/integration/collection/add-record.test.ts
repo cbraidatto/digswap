@@ -1,4 +1,4 @@
-import { describe, test, expect, vi, beforeEach } from "vitest";
+import { beforeEach, describe, expect, test, vi } from "vitest";
 
 // -- Mock Supabase server client --
 const mockGetUser = vi.fn();
@@ -9,7 +9,7 @@ vi.mock("@/lib/supabase/server", () => ({
 			getUser: () => mockGetUser(),
 		},
 	}),
-}))
+}));
 vi.mock("@/lib/rate-limit", () => ({
 	authRateLimit: null,
 	resetRateLimit: null,
@@ -19,7 +19,6 @@ vi.mock("@/lib/rate-limit", () => ({
 	discogsRateLimit: null,
 	safeLimit: vi.fn().mockImplementation(async () => ({ success: true })),
 }));
-;
 
 // -- Chainable admin mock --
 function createChainedMock(resolveValue: unknown = { data: null, error: null }) {
@@ -86,7 +85,7 @@ describe("addRecordToCollection", () => {
 	test("inserts new release and collection item for unknown discogsId", async () => {
 		// Release not found in DB
 		const releasesChain = createChainedMock({ data: null, error: null });
-		fromHandlers["releases"] = releasesChain;
+		fromHandlers.releases = releasesChain;
 
 		// After insert, return new release ID
 		const insertChain = createChainedMock({ data: { id: "new-release-id" }, error: null });
@@ -95,7 +94,7 @@ describe("addRecordToCollection", () => {
 		// No duplicate collection item
 		const collectionChain = createChainedMock({ data: null, error: null });
 		collectionChain.insert = vi.fn().mockResolvedValue({ error: null });
-		fromHandlers["collection_items"] = collectionChain;
+		fromHandlers.collection_items = collectionChain;
 
 		// Discogs API returns release data
 		mockGetRelease.mockResolvedValue({
@@ -122,12 +121,12 @@ describe("addRecordToCollection", () => {
 	test("reuses existing release for known discogsId", async () => {
 		// Release already exists in DB
 		const releasesChain = createChainedMock({ data: { id: "existing-release-id" }, error: null });
-		fromHandlers["releases"] = releasesChain;
+		fromHandlers.releases = releasesChain;
 
 		// No duplicate collection item
 		const collectionChain = createChainedMock({ data: null, error: null });
 		collectionChain.insert = vi.fn().mockResolvedValue({ error: null });
-		fromHandlers["collection_items"] = collectionChain;
+		fromHandlers.collection_items = collectionChain;
 
 		const result = await addRecordToCollection(12345);
 
@@ -139,11 +138,11 @@ describe("addRecordToCollection", () => {
 	test("returns error for duplicate collection item", async () => {
 		// Release exists
 		const releasesChain = createChainedMock({ data: { id: "existing-release-id" }, error: null });
-		fromHandlers["releases"] = releasesChain;
+		fromHandlers.releases = releasesChain;
 
 		// Duplicate found
 		const collectionChain = createChainedMock({ data: { id: "existing-item-id" }, error: null });
-		fromHandlers["collection_items"] = collectionChain;
+		fromHandlers.collection_items = collectionChain;
 
 		const result = await addRecordToCollection(12345);
 

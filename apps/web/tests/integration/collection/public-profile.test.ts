@@ -1,4 +1,4 @@
-import { describe, test, expect, vi, beforeEach } from "vitest";
+import { beforeEach, describe, expect, test, vi } from "vitest";
 
 // -- Mock next/navigation --
 const mockNotFound = vi.fn();
@@ -71,9 +71,14 @@ vi.mock("@/lib/db/schema/users", () => ({
 // it returns JSX. Instead, we test the data flow by verifying the
 // mocked query functions are called correctly.
 
+import {
+	getCollectionCount,
+	getCollectionPage,
+	getUniqueFormats,
+	getUniqueGenres,
+} from "@/lib/collection/queries";
 // Import the page module dynamically to test the server-side logic
 import { db } from "@/lib/db";
-import { getCollectionPage, getCollectionCount, getUniqueGenres, getUniqueFormats } from "@/lib/collection/queries";
 
 describe("public profile", () => {
 	beforeEach(() => {
@@ -98,13 +103,18 @@ describe("public profile", () => {
 		dbQueryResult = [profileData];
 
 		// Verify the db query returns a profile
-		const result = (db.select() as unknown as {
-			from: (...args: unknown[]) => {
-				where: (...args: unknown[]) => {
-					limit: (...args: unknown[]) => unknown[];
+		const result = (
+			db.select() as unknown as {
+				from: (...args: unknown[]) => {
+					where: (...args: unknown[]) => {
+						limit: (...args: unknown[]) => unknown[];
+					};
 				};
-			};
-		}).from("profiles").where("eq-condition").limit(1);
+			}
+		)
+			.from("profiles")
+			.where("eq-condition")
+			.limit(1);
 
 		expect(result).toEqual([profileData]);
 
@@ -136,13 +146,18 @@ describe("public profile", () => {
 		// db query returns empty array (no profile found)
 		dbQueryResult = [];
 
-		const result = (db.select() as unknown as {
-			from: (...args: unknown[]) => {
-				where: (...args: unknown[]) => {
-					limit: (...args: unknown[]) => unknown[];
+		const result = (
+			db.select() as unknown as {
+				from: (...args: unknown[]) => {
+					where: (...args: unknown[]) => {
+						limit: (...args: unknown[]) => unknown[];
+					};
 				};
-			};
-		}).from("profiles").where("eq-condition").limit(1);
+			}
+		)
+			.from("profiles")
+			.where("eq-condition")
+			.limit(1);
 
 		// Destructure: const [profile] = result
 		const [profile] = result;

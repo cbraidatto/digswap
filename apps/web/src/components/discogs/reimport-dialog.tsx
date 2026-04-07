@@ -1,6 +1,10 @@
 "use client";
 
+import { Loader2 } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
+import { toast } from "sonner";
+import { triggerReimport } from "@/actions/discogs";
 import {
 	AlertDialog,
 	AlertDialogAction,
@@ -13,10 +17,6 @@ import {
 	AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
-import { Loader2 } from "lucide-react";
-import { triggerReimport } from "@/actions/discogs";
-import { toast } from "sonner";
-import { useRouter } from "next/navigation";
 
 interface ReimportDialogProps {
 	disabled?: boolean;
@@ -68,14 +68,11 @@ export function ReimportDialog({ disabled }: ReimportDialogProps) {
 				<AlertDialogHeader>
 					<AlertDialogTitle>Reset and re-import?</AlertDialogTitle>
 					<AlertDialogDescription>
-						This will remove your current imported collection and start a
-						fresh import from Discogs.
+						This will remove your current imported collection and start a fresh import from Discogs.
 					</AlertDialogDescription>
 				</AlertDialogHeader>
 				<AlertDialogFooter>
-					<AlertDialogCancel disabled={isPending}>
-						Keep Collection
-					</AlertDialogCancel>
+					<AlertDialogCancel disabled={isPending}>Keep Collection</AlertDialogCancel>
 					<AlertDialogAction
 						variant="destructive"
 						onClick={handleReimport}

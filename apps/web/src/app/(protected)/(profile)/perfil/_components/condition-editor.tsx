@@ -2,13 +2,9 @@
 
 import { useState } from "react";
 import { toast } from "sonner";
-import {
-	Popover,
-	PopoverContent,
-	PopoverTrigger,
-} from "@/components/ui/popover";
-import { CONDITION_GRADES } from "@/lib/collection/filters";
 import { updateConditionGrade } from "@/actions/collection";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { CONDITION_GRADES } from "@/lib/collection/filters";
 
 const GRADE_DESCRIPTIONS: Record<string, string> = {
 	Mint: "Perfect, unplayed",
@@ -32,9 +28,7 @@ export function ConditionEditor({
 	onGradeUpdated,
 }: ConditionEditorProps) {
 	const [isUpdating, setIsUpdating] = useState(false);
-	const [selectedGrade, setSelectedGrade] = useState<string | null>(
-		currentGrade,
-	);
+	const [selectedGrade, setSelectedGrade] = useState<string | null>(currentGrade);
 	const [open, setOpen] = useState(false);
 
 	const handleGradeSelect = async (grade: string) => {
@@ -64,9 +58,7 @@ export function ConditionEditor({
 
 	return (
 		<Popover open={open} onOpenChange={setOpen}>
-			<PopoverTrigger
-				className="font-mono text-xs px-2 py-0.5 rounded border border-outline-variant/20 hover:bg-surface-container-high transition-colors inline-flex items-center gap-1"
-			>
+			<PopoverTrigger className="font-mono text-xs px-2 py-0.5 rounded border border-outline-variant/20 hover:bg-surface-container-high transition-colors inline-flex items-center gap-1">
 				{isUpdating ? (
 					<span className="material-symbols-outlined animate-spin text-[12px] text-primary">
 						progress_activity
@@ -101,17 +93,13 @@ export function ConditionEditor({
 								}`}
 							>
 								<div className="flex items-center gap-2">
-									<span className="font-mono text-xs font-medium w-8">
-										{grade}
-									</span>
+									<span className="font-mono text-xs font-medium w-8">{grade}</span>
 									<span className="text-xs text-on-surface-variant">
 										{GRADE_DESCRIPTIONS[grade]}
 									</span>
 								</div>
 								{isSelected && (
-									<span className="material-symbols-outlined text-primary text-sm">
-										check
-									</span>
+									<span className="material-symbols-outlined text-primary text-sm">check</span>
 								)}
 							</button>
 						);

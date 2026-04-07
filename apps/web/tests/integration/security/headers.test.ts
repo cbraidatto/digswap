@@ -1,4 +1,4 @@
-import { describe, it, expect } from "vitest";
+import { describe, expect, it } from "vitest";
 
 /**
  * Security header tests (SEC-01, D-17, D-20).
@@ -15,7 +15,7 @@ import { describe, it, expect } from "vitest";
 // We parse the config file directly to verify header presence
 
 describe("Security Headers Configuration", () => {
-	let securityHeaders: Array<{ key: string; value: string }>;
+	let _securityHeaders: Array<{ key: string; value: string }>;
 
 	// Dynamically import next.config.ts and extract headers
 	// Since next.config.ts uses export default, we import it as a module
@@ -32,7 +32,7 @@ describe("Security Headers Configuration", () => {
 		expect(configContent).toContain("headers()");
 
 		// Parse individual headers from the config content
-		securityHeaders = [];
+		_securityHeaders = [];
 
 		// Check each required header exists in the config
 		// CSP is handled per-request in middleware (nonce-based), not in next.config.ts

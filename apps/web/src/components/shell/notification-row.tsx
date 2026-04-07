@@ -1,6 +1,5 @@
 "use client";
 
-import Link from "next/link";
 import { cn } from "@/lib/utils";
 
 export interface NotificationData {
@@ -81,17 +80,12 @@ export function NotificationRow({ notification, onClick }: NotificationRowProps)
 				}
 			}}
 			role="listitem"
-			tabIndex={0}
 		>
-			<span className={cn("material-symbols-outlined shrink-0 mt-0.5", iconClassName)}>
-				{icon}
-			</span>
+			<span className={cn("material-symbols-outlined shrink-0 mt-0.5", iconClassName)}>{icon}</span>
 			<div className="flex flex-col gap-0.5 min-w-0 flex-1">
 				<div className="text-sm font-semibold text-on-surface">{notification.title}</div>
 				{notification.body && (
-					<div className="text-sm text-on-surface-variant line-clamp-1">
-						{notification.body}
-					</div>
+					<div className="text-sm text-on-surface-variant line-clamp-1">{notification.body}</div>
 				)}
 				<div className="font-mono text-xs text-on-surface-variant">{relativeTime}</div>
 			</div>

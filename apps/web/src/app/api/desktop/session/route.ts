@@ -1,8 +1,8 @@
-import { NextResponse } from "next/server";
-import { createClient } from "@/lib/supabase/server";
-import { apiRateLimit , safeLimit} from "@/lib/rate-limit";
 import { randomBytes } from "node:crypto";
+import { NextResponse } from "next/server";
 import { storeHandoffCode } from "@/lib/desktop/handoff-store";
+import { apiRateLimit, safeLimit } from "@/lib/rate-limit";
+import { createClient } from "@/lib/supabase/server";
 
 /**
  * POST /api/desktop/session
@@ -54,7 +54,9 @@ export async function POST() {
  */
 export async function GET() {
 	return NextResponse.json(
-		{ error: "This endpoint no longer returns session tokens. Use POST to generate a handoff code." },
+		{
+			error: "This endpoint no longer returns session tokens. Use POST to generate a handoff code.",
+		},
 		{ status: 410 },
 	);
 }

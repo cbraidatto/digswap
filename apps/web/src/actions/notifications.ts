@@ -1,19 +1,19 @@
 "use server";
 
-import { createClient } from "@/lib/supabase/server";
-import { createAdminClient } from "@/lib/supabase/admin";
-import { apiRateLimit , safeLimit} from "@/lib/rate-limit";
 import {
-	getUnreadCount,
-	getRecentNotifications,
 	getNotificationPage,
 	getPreferences,
+	getRecentNotifications,
+	getUnreadCount,
 	upsertPreferences,
 } from "@/lib/notifications/queries";
+import { apiRateLimit, safeLimit } from "@/lib/rate-limit";
+import { createAdminClient } from "@/lib/supabase/admin";
+import { createClient } from "@/lib/supabase/server";
 import {
+	notificationIdSchema,
 	notificationPageSchema,
 	recentNotificationsSchema,
-	notificationIdSchema,
 	updatePreferencesSchema,
 } from "@/lib/validations/notifications";
 

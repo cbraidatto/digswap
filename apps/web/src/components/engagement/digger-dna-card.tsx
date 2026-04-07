@@ -10,19 +10,26 @@ interface DiggerDnaProps {
 }
 
 const profileLabels: Record<string, { label: string; color: string; icon: string }> = {
-	diamond_chaser: { label: "Diamond Chaser", color: "text-tertiary", icon: "diamond" },
-	ruby_hunter: { label: "Ruby Hunter", color: "text-secondary", icon: "psychology" },
-	emerald_seeker: { label: "Emerald Seeker", color: "text-primary", icon: "balance" },
-	quartz_collector: { label: "Quartz Collector", color: "text-on-surface-variant", icon: "trending_up" },
+	ultra_rare_hunter: { label: "Ultra Rare Hunter", color: "text-tertiary", icon: "diamond" },
+	deep_cutter: { label: "Deep Cutter", color: "text-secondary", icon: "psychology" },
+	balanced_digger: { label: "Balanced Digger", color: "text-primary", icon: "balance" },
+	mainstream_maven: {
+		label: "Mainstream Maven",
+		color: "text-on-surface-variant",
+		icon: "trending_up",
+	},
 	newcomer: { label: "Newcomer", color: "text-on-surface-variant", icon: "waving_hand" },
-	// Legacy labels (for cached DB values before gem migration)
-	ultra_rare_hunter: { label: "Diamond Chaser", color: "text-tertiary", icon: "diamond" },
-	deep_cutter: { label: "Ruby Hunter", color: "text-secondary", icon: "psychology" },
-	balanced_digger: { label: "Emerald Seeker", color: "text-primary", icon: "balance" },
-	mainstream_maven: { label: "Quartz Collector", color: "text-on-surface-variant", icon: "trending_up" },
 };
 
-function PercentageBar({ label, percentage, color }: { label: string; percentage: number; color: string }) {
+function PercentageBar({
+	label,
+	percentage,
+	color,
+}: {
+	label: string;
+	percentage: number;
+	color: string;
+}) {
 	return (
 		<div className="flex items-center gap-2">
 			<span className="text-xs text-on-surface-variant w-20 truncate">{label}</span>
@@ -66,12 +73,8 @@ export function DiggerDnaCard({
 			<div className="p-5 pb-4">
 				<div className="flex items-center justify-between mb-4">
 					<div className="flex items-center gap-2">
-						<span className="material-symbols-outlined text-xl text-primary">
-							fingerprint
-						</span>
-						<h3 className="font-heading text-base font-semibold text-on-surface">
-							Digger DNA
-						</h3>
+						<span className="material-symbols-outlined text-xl text-primary">fingerprint</span>
+						<h3 className="font-heading text-base font-semibold text-on-surface">Digger DNA</h3>
 					</div>
 					<div className={cn("flex items-center gap-1 text-xs font-medium", profile.color)}>
 						<span className="material-symbols-outlined text-base">{profile.icon}</span>
@@ -86,7 +89,9 @@ export function DiggerDnaCard({
 						<div className="text-xs text-on-surface-variant">Records</div>
 					</div>
 					<div className="text-center p-2 rounded-lg bg-surface-container/50">
-						<div className="font-heading text-lg font-bold text-on-surface">{avgRarity.toFixed(1)}</div>
+						<div className="font-heading text-lg font-bold text-on-surface">
+							{avgRarity.toFixed(1)}
+						</div>
 						<div className="text-xs text-on-surface-variant">Avg rarity</div>
 					</div>
 					<div className="text-center p-2 rounded-lg bg-surface-container/50">
@@ -103,7 +108,12 @@ export function DiggerDnaCard({
 						</h4>
 						<div className="space-y-1.5">
 							{topGenres.map((g) => (
-								<PercentageBar key={g.name} label={g.name} percentage={g.percentage} color="bg-primary" />
+								<PercentageBar
+									key={g.name}
+									label={g.name}
+									percentage={g.percentage}
+									color="bg-primary"
+								/>
 							))}
 						</div>
 					</div>
@@ -117,7 +127,12 @@ export function DiggerDnaCard({
 						</h4>
 						<div className="space-y-1.5">
 							{topDecades.map((d) => (
-								<PercentageBar key={d.decade} label={d.decade} percentage={d.percentage} color="bg-secondary" />
+								<PercentageBar
+									key={d.decade}
+									label={d.decade}
+									percentage={d.percentage}
+									color="bg-secondary"
+								/>
 							))}
 						</div>
 					</div>

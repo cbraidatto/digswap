@@ -1,4 +1,4 @@
-import { describe, test, expect, vi, beforeEach } from "vitest";
+import { beforeEach, describe, expect, test, vi } from "vitest";
 
 // ---------------------------------------------------------------------------
 // DB mock with thenable chain (project pattern)
@@ -82,9 +82,9 @@ vi.mock("@/lib/db/schema/users", () => ({
 // Import after mocks
 // ---------------------------------------------------------------------------
 import {
-	getReleaseByDiscogsId,
-	getOwnersByReleaseId,
 	getOwnerCountByReleaseId,
+	getOwnersByReleaseId,
+	getReleaseByDiscogsId,
 } from "@/lib/release/queries";
 
 describe("getReleaseByDiscogsId", () => {
@@ -113,10 +113,10 @@ describe("getReleaseByDiscogsId", () => {
 		const release = await getReleaseByDiscogsId(123456);
 
 		expect(release).not.toBeNull();
-		expect(release!.title).toBe("Kind of Blue");
-		expect(release!.artist).toBe("Miles Davis");
-		expect(release!.discogsId).toBe(123456);
-		expect(release!.youtubeVideoId).toBe("abc123");
+		expect(release?.title).toBe("Kind of Blue");
+		expect(release?.artist).toBe("Miles Davis");
+		expect(release?.discogsId).toBe(123456);
+		expect(release?.youtubeVideoId).toBe("abc123");
 	});
 
 	test("returns null for unknown discogsId", async () => {
@@ -178,7 +178,13 @@ describe("getOwnersByReleaseId", () => {
 
 		queryResults = [
 			[
-				{ userId: "user-1", username: "a", avatarUrl: null, displayName: null, conditionGrade: null },
+				{
+					userId: "user-1",
+					username: "a",
+					avatarUrl: null,
+					displayName: null,
+					conditionGrade: null,
+				},
 			],
 		];
 

@@ -52,7 +52,7 @@ export const subscriptions = pgTable(
 export const stripeEventLog = pgTable(
 	"stripe_event_log",
 	{
-		eventId: text("event_id").primaryKey(),       // Stripe evt_xxx identifier
+		eventId: text("event_id").primaryKey(), // Stripe evt_xxx identifier
 		eventType: text("event_type").notNull(),
 		processedAt: timestamp("processed_at", { withTimezone: true }).defaultNow().notNull(),
 	},

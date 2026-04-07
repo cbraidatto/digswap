@@ -1,9 +1,5 @@
 import { create } from "zustand";
-import type {
-	DiscogsProgressPayload,
-	ImportJobStatus,
-	ImportJobType,
-} from "@/lib/discogs/types";
+import type { DiscogsProgressPayload, ImportJobStatus, ImportJobType } from "@/lib/discogs/types";
 
 interface ImportState {
 	isActive: boolean;
@@ -29,8 +25,7 @@ export const useImportStore = create<ImportState>((set) => ({
 
 	updateProgress: (payload) =>
 		set({
-			isActive:
-				payload.status === "processing" || payload.status === "pending",
+			isActive: payload.status === "processing" || payload.status === "pending",
 			jobId: payload.jobId,
 			type: payload.type,
 			status: payload.status,
@@ -50,6 +45,5 @@ export const useImportStore = create<ImportState>((set) => ({
 			currentRecord: null,
 		}),
 
-	setActive: (jobId, type) =>
-		set({ isActive: true, jobId, type, status: "processing" }),
+	setActive: (jobId, type) => set({ isActive: true, jobId, type, status: "processing" }),
 }));

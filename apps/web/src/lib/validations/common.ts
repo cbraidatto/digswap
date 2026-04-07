@@ -18,17 +18,14 @@ export const urlSchema = z
 	.string()
 	.url("Invalid URL")
 	.max(500)
-	.refine(
-		(v) => {
-			try {
-				const p = new URL(v);
-				return p.protocol === "https:" || p.protocol === "http:";
-			} catch {
-				return false;
-			}
-		},
-		"URL must use http:// or https://",
-	)
+	.refine((v) => {
+		try {
+			const p = new URL(v);
+			return p.protocol === "https:" || p.protocol === "http:";
+		} catch {
+			return false;
+		}
+	}, "URL must use http:// or https://")
 	.optional()
 	.or(z.literal(""));
 

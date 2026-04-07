@@ -12,11 +12,11 @@
  * See: ADR-002-desktop-trade-runtime.md D-08, D-10
  */
 
-import { eq, or, and } from "drizzle-orm";
-import { createClient } from "@/lib/supabase/server";
+import { and, eq, or } from "drizzle-orm";
 import { db } from "@/lib/db";
 import { tradeRequests } from "@/lib/db/schema/trades";
 import { createHandoffToken } from "@/lib/desktop/handoff-token";
+import { createClient } from "@/lib/supabase/server";
 import { handoffTokenSchema } from "@/lib/validations/desktop";
 
 /**
@@ -31,50 +31,47 @@ import { handoffTokenSchema } from "@/lib/validations/desktop";
  * @returns { token: string } on success, { error: string } on failure
  */
 export async function generateHandoffToken(
-  tradeId: string,
+	tradeId: string,
 ): Promise<{ token: string } | { error: string }> {
-  try {
-    const parsed = handoffTokenSchema.safeParse({ tradeId });
-    if (!parsed.success) {
-      return { error: "Invalid trade ID" };
-    }
+	try {
+		const parsed = handoffTokenSchema.safeParse({ tradeId });
+		if (!parsed.success) {
+			return { error: "Invalid trade ID" };
+		}
 
-    const supabase = await createClient();
-    const {
-      data: { user },
-      error: authError,
-    } = await supabase.auth.getUser();
+		const supabase = await createClient();
+		const {
+			data: { user },
+			error: authError,
+		} = await supabase.auth.getUser();
 
-    if (authError || !user) {
-      return { error: "Not authenticated" };
-    }
+		if (authError || !user) {
+			return { error: "Not authenticated" };
+		}
 
-    const userId = user.id;
+		const userId = user.id;
 
-    // Verify caller is a participant in the trade (IDOR protection)
-    const trades = await db
-      .select({ id: tradeRequests.id })
-      .from(tradeRequests)
-      .where(
-        and(
-          eq(tradeRequests.id, parsed.data.tradeId),
-          or(
-            eq(tradeRequests.requesterId, userId),
-            eq(tradeRequests.providerId, userId),
-          ),
-        ),
-      );
+		// Verify caller is a participant in the trade (IDOR protection)
+		const trades = await db
+			.select({ id: tradeRequests.id })
+			.from(tradeRequests)
+			.where(
+				and(
+					eq(tradeRequests.id, parsed.data.tradeId),
+					or(eq(tradeRequests.requesterId, userId), eq(tradeRequests.providerId, userId)),
+				),
+			);
 
-    if (trades.length === 0) {
-      return { error: "Trade not found or you are not a participant" };
-    }
+		if (trades.length === 0) {
+			return { error: "Trade not found or you are not a participant" };
+		}
 
-    const token = await createHandoffToken(parsed.data.tradeId, userId);
-    return { token };
-  } catch (err) {
-    console.error("[generateHandoffToken] failed:", err);
-    return { error: "Failed to generate handoff token" };
-  }
+		const token = await createHandoffToken(parsed.data.tradeId, userId);
+		return { token };
+	} catch (err) {
+		console.error("[generateHandoffToken] failed:", err);
+		return { error: "Failed to generate handoff token" };
+	}
 }
 
 /**
@@ -86,12 +83,12 @@ export async function generateHandoffToken(
  * No auth required — this is safe to call from the public /desktop/open page.
  */
 export async function checkDesktopVersion(): Promise<{ minVersion: number }> {
-  try {
-    const raw = process.env.NEXT_PUBLIC_MIN_DESKTOP_VERSION;
-    const minVersion = raw ? parseInt(raw, 10) : 1;
-    return { minVersion: isNaN(minVersion) ? 1 : minVersion };
-  } catch (err) {
-    console.error("[checkDesktopVersion] error:", err);
-    return { minVersion: 1 };
-  }
+	try {
+		const raw = process.env.NEXT_PUBLIC_MIN_DESKTOP_VERSION;
+		const minVersion = raw ? parseInt(raw, 10) : 1;
+		return { minVersion: Number.isNaN(minVersion) ? 1 : minVersion };
+	} catch (err) {
+		console.error("[checkDesktopVersion] error:", err);
+		return { minVersion: 1 };
+	}
 }

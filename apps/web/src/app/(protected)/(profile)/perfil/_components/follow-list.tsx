@@ -1,8 +1,8 @@
 "use client";
 
-import { useState, useTransition } from "react";
-import Link from "next/link";
 import Image from "next/image";
+import Link from "next/link";
+import { useState, useTransition } from "react";
 import { fetchFollowersList, fetchFollowingList } from "@/actions/social";
 import type { FollowUser } from "@/lib/social/queries";
 
@@ -60,9 +60,7 @@ export function FollowList({ userId, type, count }: FollowListProps) {
 						</div>
 					) : users.length === 0 ? (
 						<div className="font-mono text-sm text-on-surface-variant text-center py-6">
-							{type === "followers"
-								? "no followers yet"
-								: "not following anyone yet"}
+							{type === "followers" ? "no followers yet" : "not following anyone yet"}
 						</div>
 					) : (
 						users.map((user) => (
@@ -83,9 +81,7 @@ export function FollowList({ userId, type, count }: FollowListProps) {
 										/>
 									) : (
 										<span className="text-xs font-mono font-bold text-primary">
-											{(user.displayName || user.username || "?")
-												.charAt(0)
-												.toUpperCase()}
+											{(user.displayName || user.username || "?").charAt(0).toUpperCase()}
 										</span>
 									)}
 								</div>
@@ -99,16 +95,12 @@ export function FollowList({ userId, type, count }: FollowListProps) {
 										{user.username}
 									</Link>
 								) : (
-									<span className="font-mono text-xs text-on-surface-variant">
-										unknown
-									</span>
+									<span className="font-mono text-xs text-on-surface-variant">unknown</span>
 								)}
 
 								{/* Display name */}
 								{user.displayName && (
-									<span className="text-xs text-on-surface-variant">
-										{user.displayName}
-									</span>
+									<span className="text-xs text-on-surface-variant">{user.displayName}</span>
 								)}
 							</div>
 						))

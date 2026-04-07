@@ -1,13 +1,10 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import {
-	getNotificationsAction,
-	markNotificationRead,
-} from "@/actions/notifications";
-import { NotificationRow } from "@/components/shell/notification-row";
+import { useEffect, useState } from "react";
+import { getNotificationsAction, markNotificationRead } from "@/actions/notifications";
 import type { NotificationData } from "@/components/shell/notification-row";
+import { NotificationRow } from "@/components/shell/notification-row";
 
 const PAGE_SIZE = 20;
 
@@ -86,9 +83,7 @@ export default function NotificationsPage() {
 				</div>
 			) : notifications.length === 0 ? (
 				<div className="text-center py-16">
-					<div className="font-mono text-xs text-on-surface-variant">
-						[NO_NOTIFICATIONS]
-					</div>
+					<div className="font-mono text-xs text-on-surface-variant">[NO_NOTIFICATIONS]</div>
 					<div className="font-mono text-sm text-on-surface-variant mt-2">
 						When someone has a record from your wantlist, you will be notified here.
 					</div>
@@ -97,14 +92,8 @@ export default function NotificationsPage() {
 				<>
 					<div role="list">
 						{notifications.map((notification) => (
-							<div
-								key={notification.id}
-								className="border-b border-outline-variant/10"
-							>
-								<NotificationRow
-									notification={notification}
-									onClick={handleNotificationClick}
-								/>
+							<div key={notification.id} className="border-b border-outline-variant/10">
+								<NotificationRow notification={notification} onClick={handleNotificationClick} />
 							</div>
 						))}
 					</div>

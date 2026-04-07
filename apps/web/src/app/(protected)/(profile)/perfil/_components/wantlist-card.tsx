@@ -1,14 +1,14 @@
 "use client";
 
-import { useState } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
+import { useState } from "react";
 import { toast } from "sonner";
-import type { WantlistItem } from "@/lib/wantlist/queries";
 import { markAsFound, removeFromWantlist } from "@/actions/wantlist";
-import { GemBadge } from "@/components/ui/gem-badge";
-import { RecordLink } from "@/components/ui/record-link";
+import { RarityPill } from "@/components/ui/rarity-pill";
 import { RecordContextMenu } from "@/components/ui/record-context-menu";
+import { RecordLink } from "@/components/ui/record-link";
+import type { WantlistItem } from "@/lib/wantlist/queries";
 
 interface WantlistCardProps {
 	item: WantlistItem;
@@ -50,11 +50,13 @@ export function WantlistCard({ item, isOwner }: WantlistCardProps) {
 	};
 
 	return (
-		<div className={`group relative bg-surface-container-low rounded-lg overflow-hidden border transition-all hover:shadow-lg ${
-			isFound
-				? "border-primary/20 opacity-60 hover:opacity-80"
-				: "border-outline-variant/10 hover:border-secondary/30 hover:shadow-secondary/5"
-		}`}>
+		<div
+			className={`group relative bg-surface-container-low rounded-lg overflow-hidden border transition-all hover:shadow-lg ${
+				isFound
+					? "border-primary/20 opacity-60 hover:opacity-80"
+					: "border-outline-variant/10 hover:border-secondary/30 hover:shadow-secondary/5"
+			}`}
+		>
 			{/* Cover Art */}
 			<div className="relative aspect-square bg-surface-container-high">
 				{item.coverImageUrl ? (
@@ -149,10 +151,12 @@ export function WantlistCard({ item, isOwner }: WantlistCardProps) {
 					{item.artist ?? "Unknown Artist"}
 				</p>
 				<div className="mt-1.5 flex items-center gap-2">
-					<GemBadge score={item.rarityScore} />
+					<RarityPill score={item.rarityScore} showScore={false} />
 					{item.huntingCount > 0 && (
 						<span className="font-mono text-[9px] text-secondary">
-							<span className="material-symbols-outlined text-[10px] align-middle mr-0.5">group</span>
+							<span className="material-symbols-outlined text-[10px] align-middle mr-0.5">
+								group
+							</span>
 							{item.huntingCount} hunting
 						</span>
 					)}

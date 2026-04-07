@@ -1,4 +1,4 @@
-import { describe, test, expect, vi, beforeEach } from "vitest";
+import { beforeEach, describe, expect, test, vi } from "vitest";
 
 // ---------------------------------------------------------------------------
 // Supabase admin client mock
@@ -15,7 +15,10 @@ vi.mock("@/lib/supabase/admin", () => ({
 	})),
 }));
 
-function createChain(terminalResult: { data?: unknown; error?: { code?: string; message?: string } | null }) {
+function createChain(terminalResult: {
+	data?: unknown;
+	error?: { code?: string; message?: string } | null;
+}) {
 	const chain: Record<string, unknown> = {};
 	const methods = ["select", "eq", "single", "maybeSingle", "insert"];
 	for (const m of methods) {
@@ -52,7 +55,10 @@ describe("awardBadge", () => {
 	test("awardBadge returns false when badge already awarded (idempotent via 23505)", async () => {
 		const badgesChain = createChain({ data: { id: "badge-1", name: "FIRST_DIG" } });
 		// ON CONFLICT DO NOTHING → unique_violation
-		const insertConflictChain = createChain({ data: null, error: { code: "23505", message: "unique_violation" } });
+		const insertConflictChain = createChain({
+			data: null,
+			error: { code: "23505", message: "unique_violation" },
+		});
 
 		mockFrom.mockImplementation((table: string) => {
 			if (table === "badges") return badgesChain;

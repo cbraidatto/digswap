@@ -1,8 +1,8 @@
 "use client";
 
-import { useTransition } from "react";
-import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useTransition } from "react";
 
 interface Props {
 	open: boolean;
@@ -46,13 +46,9 @@ export function TradeLimitModal({ open, onClose, tradesUsed, tradesLimit = 5 }: 
 			>
 				{/* Header */}
 				<div className="flex items-start gap-3">
-					<span className="material-symbols-outlined text-[#c8914a] flex-shrink-0">
-						album
-					</span>
+					<span className="material-symbols-outlined text-[#c8914a] flex-shrink-0">album</span>
 					<div>
-						<div className="text-[#e8dcc8] font-mono text-sm font-bold">
-							MONTHLY LIMIT REACHED
-						</div>
+						<div className="text-[#e8dcc8] font-mono text-sm font-bold">MONTHLY LIMIT REACHED</div>
 						<div className="text-[#4a4035] font-mono text-xs mt-0.5">
 							{tradesUsed} / {tradesLimit} trades this month
 						</div>

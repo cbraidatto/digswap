@@ -1,5 +1,5 @@
-import { describe, it, expect, vi, beforeEach } from "vitest";
-import { render, screen, waitFor, cleanup, fireEvent } from "@testing-library/react";
+import { cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 
 // ── Mocks ───────────────────────────────────────────────────────────────────
 
@@ -46,11 +46,9 @@ const mockMarkNotificationRead = vi.fn().mockResolvedValue({ success: true });
 
 vi.mock("@/actions/notifications", () => ({
 	getUnreadCountAction: (...args: unknown[]) => mockGetUnreadCount(...args),
-	getRecentNotificationsAction: (...args: unknown[]) =>
-		mockGetRecentNotifications(...args),
+	getRecentNotificationsAction: (...args: unknown[]) => mockGetRecentNotifications(...args),
 	markAllRead: (...args: unknown[]) => mockMarkAllRead(...args),
-	markNotificationRead: (...args: unknown[]) =>
-		mockMarkNotificationRead(...args),
+	markNotificationRead: (...args: unknown[]) => mockMarkNotificationRead(...args),
 }));
 
 // Mock next/navigation
@@ -68,11 +66,7 @@ vi.mock("next/navigation", () => ({
 
 // Mock next/link
 vi.mock("next/link", () => ({
-	default: ({
-		href,
-		children,
-		...props
-	}: Record<string, unknown>) => (
+	default: ({ href, children, ...props }: Record<string, unknown>) => (
 		<a href={href as string} {...props}>
 			{children as React.ReactNode}
 		</a>
@@ -88,19 +82,14 @@ vi.mock("@/components/ui/popover", () => ({
 		open?: boolean;
 		onOpenChange?: (open: boolean) => void;
 	}) => <div data-testid="popover">{children}</div>,
-	PopoverTrigger: ({
-		children,
-		...props
-	}: Record<string, unknown>) => (
+	PopoverTrigger: ({ children, ...props }: Record<string, unknown>) => (
 		<button type="button" {...props}>
 			{children as React.ReactNode}
 		</button>
 	),
-	PopoverContent: ({
-		children,
-	}: {
-		children: React.ReactNode;
-	}) => <div data-testid="popover-content">{children}</div>,
+	PopoverContent: ({ children }: { children: React.ReactNode }) => (
+		<div data-testid="popover-content">{children}</div>
+	),
 }));
 
 // Mock Separator
@@ -139,9 +128,7 @@ describe("NotificationBell", () => {
 		render(<NotificationBell userId="user-123" />);
 
 		await waitFor(() => {
-			expect(
-				screen.getByLabelText("3 unread notifications"),
-			).toBeInTheDocument();
+			expect(screen.getByLabelText("3 unread notifications")).toBeInTheDocument();
 			expect(screen.getByText("3")).toBeInTheDocument();
 		});
 	});
@@ -165,9 +152,7 @@ describe("NotificationBell", () => {
 			expect(mockGetUnreadCount).toHaveBeenCalled();
 		});
 
-		expect(
-			screen.queryByLabelText(/unread notifications/),
-		).not.toBeInTheDocument();
+		expect(screen.queryByLabelText(/unread notifications/)).not.toBeInTheDocument();
 	});
 
 	it('bell has aria-label="Notifications"', () => {

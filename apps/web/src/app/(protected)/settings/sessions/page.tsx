@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
-import { createClient } from "@/lib/supabase/server";
 import { SessionList } from "@/components/settings/session-list";
+import { createClient } from "@/lib/supabase/server";
 
 export const metadata: Metadata = {
 	title: "Active sessions — DigSwap",
@@ -33,8 +33,7 @@ export default async function SessionsPage() {
 						Active Sessions
 					</h1>
 					<p className="mt-1 text-sm text-muted-foreground">
-						Manage your active sessions across devices. You can have up to 3
-						simultaneous sessions.
+						Manage your active sessions across devices. You can have up to 3 simultaneous sessions.
 					</p>
 				</div>
 

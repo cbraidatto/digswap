@@ -1,9 +1,9 @@
 "use client";
 
-import { useState, useRef, useCallback, useTransition } from "react";
-import Link from "next/link";
 import Image from "next/image";
-import { searchUsers, type SearchResult } from "@/actions/social";
+import Link from "next/link";
+import { useCallback, useRef, useState, useTransition } from "react";
+import { type SearchResult, searchUsers } from "@/actions/social";
 import { FollowButton } from "@/app/(protected)/(profile)/perfil/[username]/_components/follow-button";
 
 export function SearchSection() {
@@ -13,31 +13,28 @@ export function SearchSection() {
 	const [isPending, startTransition] = useTransition();
 	const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-	const handleInputChange = useCallback(
-		(e: React.ChangeEvent<HTMLInputElement>) => {
-			const value = e.target.value;
-			setQuery(value);
+	const handleInputChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+		const value = e.target.value;
+		setQuery(value);
 
-			if (timeoutRef.current) {
-				clearTimeout(timeoutRef.current);
-			}
+		if (timeoutRef.current) {
+			clearTimeout(timeoutRef.current);
+		}
 
-			if (value.trim().length < 2) {
-				setResults([]);
-				setSearched(false);
-				return;
-			}
+		if (value.trim().length < 2) {
+			setResults([]);
+			setSearched(false);
+			return;
+		}
 
-			timeoutRef.current = setTimeout(() => {
-				startTransition(async () => {
-					const data = await searchUsers(value);
-					setResults(data);
-					setSearched(true);
-				});
-			}, 300);
-		},
-		[],
-	);
+		timeoutRef.current = setTimeout(() => {
+			startTransition(async () => {
+				const data = await searchUsers(value);
+				setResults(data);
+				setSearched(true);
+			});
+		}, 300);
+	}, []);
 
 	return (
 		<div>
@@ -87,9 +84,7 @@ export function SearchSection() {
 										/>
 									) : (
 										<span className="text-sm font-mono font-bold text-primary">
-											{(result.displayName || result.username || "?")
-												.charAt(0)
-												.toUpperCase()}
+											{(result.displayName || result.username || "?").charAt(0).toUpperCase()}
 										</span>
 									)}
 								</div>
@@ -104,13 +99,11 @@ export function SearchSection() {
 											{result.username}
 										</Link>
 									) : (
-										<span className="font-mono text-sm text-on-surface-variant">
-											unknown
-										</span>
+										<span className="font-mono text-sm text-on-surface-variant">unknown</span>
 									)}
 									<div className="font-mono text-xs text-on-surface-variant">
-										{result.displayName || ""} &middot; {result.recordCount}{" "}
-										records &middot; {result.followerCount} followers
+										{result.displayName || ""} &middot; {result.recordCount} records &middot;{" "}
+										{result.followerCount} followers
 									</div>
 								</div>
 

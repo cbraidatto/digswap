@@ -1,4 +1,4 @@
-import { describe, test, expect, vi, beforeEach } from "vitest";
+import { beforeEach, describe, expect, test, vi } from "vitest";
 
 // Track call count to return different results for sequential queries.
 // The new getSuggestedRecords removes the "ownedIds" prefetch query —

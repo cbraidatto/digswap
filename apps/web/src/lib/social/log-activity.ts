@@ -19,7 +19,13 @@ export async function logActivity(
 	metadata: Record<string, unknown> | null,
 ): Promise<void> {
 	try {
-		const parsed = logActivitySchema.safeParse({ userId, actionType, targetType, targetId, metadata });
+		const parsed = logActivitySchema.safeParse({
+			userId,
+			actionType,
+			targetType,
+			targetId,
+			metadata,
+		});
 		if (!parsed.success) {
 			return;
 		}

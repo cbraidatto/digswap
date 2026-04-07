@@ -1,8 +1,8 @@
 import "server-only";
 
+import type { SubscriptionPlan } from "@/lib/stripe";
 import { createClient } from "@/lib/supabase/server";
 import { PricingCards } from "./_components/PricingCards";
-import type { SubscriptionPlan } from "@/lib/stripe";
 
 export const metadata = {
 	title: "Pricing — DigSwap",
@@ -31,7 +31,7 @@ export default async function PricingPage() {
 	// "free" = signed in, no subscription row yet or free plan
 	let currentPlan: SubscriptionPlan | null = null;
 	if (user) {
-		currentPlan = await getCurrentPlan(user.id).catch(() => null) ?? "free";
+		currentPlan = (await getCurrentPlan(user.id).catch(() => null)) ?? "free";
 	}
 
 	const monthlyPriceId = process.env.NEXT_PUBLIC_STRIPE_PRICE_MONTHLY ?? "";

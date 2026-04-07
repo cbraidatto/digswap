@@ -1,7 +1,7 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
 import Link from "next/link";
+import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import { addRecordToCollection } from "@/actions/collection";
 import { addToWantlist } from "@/actions/wantlist";
@@ -78,10 +78,10 @@ export function RecordContextMenu({
 	}
 
 	function handleShare() {
-		const url = discogsId
-			? `${window.location.origin}/release/${discogsId}`
-			: window.location.href;
-		const text = title ? `${title}${artist ? ` by ${artist}` : ""} on DigSwap` : "Check this out on DigSwap";
+		const url = discogsId ? `${window.location.origin}/release/${discogsId}` : window.location.href;
+		const text = title
+			? `${title}${artist ? ` by ${artist}` : ""} on DigSwap`
+			: "Check this out on DigSwap";
 
 		if (navigator.share) {
 			navigator.share({ title: text, url }).catch(() => {});
@@ -95,7 +95,11 @@ export function RecordContextMenu({
 		<div ref={menuRef} className="relative">
 			<button
 				type="button"
-				onClick={(e) => { e.preventDefault(); e.stopPropagation(); setOpen(!open); }}
+				onClick={(e) => {
+					e.preventDefault();
+					e.stopPropagation();
+					setOpen(!open);
+				}}
 				className="p-1 rounded text-on-surface-variant/40 hover:text-on-surface hover:bg-surface-container-high transition-colors"
 				aria-label="More actions"
 			>
@@ -110,7 +114,9 @@ export function RecordContextMenu({
 							onClick={() => setOpen(false)}
 							className="flex items-center gap-2.5 px-3 py-2 font-mono text-xs text-on-surface hover:bg-surface-container-high transition-colors w-full"
 						>
-							<span className="material-symbols-outlined text-[16px] text-on-surface-variant">album</span>
+							<span className="material-symbols-outlined text-[16px] text-on-surface-variant">
+								album
+							</span>
 							View release
 						</Link>
 					)}
@@ -122,7 +128,9 @@ export function RecordContextMenu({
 							disabled={pending}
 							className="flex items-center gap-2.5 px-3 py-2 font-mono text-xs text-on-surface hover:bg-surface-container-high transition-colors w-full disabled:opacity-50"
 						>
-							<span className="material-symbols-outlined text-[16px] text-on-surface-variant">add_circle</span>
+							<span className="material-symbols-outlined text-[16px] text-on-surface-variant">
+								add_circle
+							</span>
 							Add to collection
 						</button>
 					)}
@@ -134,7 +142,9 @@ export function RecordContextMenu({
 							disabled={pending}
 							className="flex items-center gap-2.5 px-3 py-2 font-mono text-xs text-on-surface hover:bg-surface-container-high transition-colors w-full disabled:opacity-50"
 						>
-							<span className="material-symbols-outlined text-[16px] text-on-surface-variant">favorite</span>
+							<span className="material-symbols-outlined text-[16px] text-on-surface-variant">
+								favorite
+							</span>
 							Add to wantlist
 						</button>
 					)}
@@ -144,7 +154,9 @@ export function RecordContextMenu({
 						onClick={handleShare}
 						className="flex items-center gap-2.5 px-3 py-2 font-mono text-xs text-on-surface hover:bg-surface-container-high transition-colors w-full"
 					>
-						<span className="material-symbols-outlined text-[16px] text-on-surface-variant">share</span>
+						<span className="material-symbols-outlined text-[16px] text-on-surface-variant">
+							share
+						</span>
 						Share
 					</button>
 				</div>

@@ -1,4 +1,4 @@
-import { describe, test, expect, vi, beforeEach } from "vitest";
+import { beforeEach, describe, expect, test, vi } from "vitest";
 
 // -- Mock Supabase server client --
 const mockGetUser = vi.fn();
@@ -9,7 +9,7 @@ vi.mock("@/lib/supabase/server", () => ({
 			getUser: () => mockGetUser(),
 		},
 	}),
-}))
+}));
 vi.mock("@/lib/rate-limit", () => ({
 	authRateLimit: null,
 	resetRateLimit: null,
@@ -19,7 +19,6 @@ vi.mock("@/lib/rate-limit", () => ({
 	discogsRateLimit: null,
 	safeLimit: vi.fn().mockImplementation(async () => ({ success: true })),
 }));
-;
 
 // -- Mock next/headers --
 vi.mock("next/headers", () => ({
@@ -51,7 +50,12 @@ vi.mock("@/lib/db/schema/social", () => ({
 
 // -- Mock users schema --
 vi.mock("@/lib/db/schema/users", () => ({
-	profiles: { id: "id", username: "username", displayName: "display_name", avatarUrl: "avatar_url" },
+	profiles: {
+		id: "id",
+		username: "username",
+		displayName: "display_name",
+		avatarUrl: "avatar_url",
+	},
 }));
 
 // -- Mock drizzle-orm --

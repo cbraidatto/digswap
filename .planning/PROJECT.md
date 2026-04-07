@@ -60,6 +60,16 @@ Each step completed unlocks more of the app and awards a welcome badge. Users wi
 
 Feed and Profile have equal weight — both are primary entry points. Feed-first for social diggers; Profile-first for collection-focused diggers. Neither is secondary.
 
+## Current Milestone: v1.1 Deploy Readiness
+
+**Goal:** Resolver todos os blockers técnicos que impedem o deploy em produção
+
+**Target features:**
+- Fix erros TypeScript que bloqueiam o build (gems/queries.ts)
+- Atualizar Vite para resolver 6 vulnerabilidades HIGH
+- Fix testes falhando (gem-badge.test.tsx)
+- Cleanup lint CRLF (179 erros de formatação)
+
 ## Requirements
 
 ### Validated
@@ -185,7 +195,7 @@ Feed and Profile have equal weight — both are primary entry points. Feed-first
 
 This document evolves at phase transitions and milestone boundaries.
 
-*Last updated: 2026-03-26 — Phase 7 complete (community + reviews)*
+*Last updated: 2026-04-06 — Milestone v1.1 Deploy Readiness started*
 
 **After each phase transition** (via `/gsd:transition`):
 1. Requirements invalidated? → Move to Out of Scope with reason

@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 
 // ---------------------------------------------------------------------------
 // Mock Supabase client
@@ -52,7 +52,9 @@ describe("Open Redirect Prevention", () => {
 	});
 
 	it("accepts valid relative path with query string", async () => {
-		const request = new Request("http://localhost:3000/api/auth/callback?code=abc&next=/settings?tab=profile");
+		const request = new Request(
+			"http://localhost:3000/api/auth/callback?code=abc&next=/settings?tab=profile",
+		);
 		const response = await GET(request);
 
 		const location = response.headers.get("location");
@@ -60,7 +62,9 @@ describe("Open Redirect Prevention", () => {
 	});
 
 	it("rejects absolute URL https://evil.com", async () => {
-		const request = new Request("http://localhost:3000/api/auth/callback?code=abc&next=https://evil.com");
+		const request = new Request(
+			"http://localhost:3000/api/auth/callback?code=abc&next=https://evil.com",
+		);
 		const response = await GET(request);
 
 		const location = response.headers.get("location");
@@ -84,7 +88,9 @@ describe("Open Redirect Prevention", () => {
 	});
 
 	it("rejects javascript: protocol", async () => {
-		const request = new Request("http://localhost:3000/api/auth/callback?code=abc&next=javascript:alert(1)");
+		const request = new Request(
+			"http://localhost:3000/api/auth/callback?code=abc&next=javascript:alert(1)",
+		);
 		const response = await GET(request);
 
 		const location = response.headers.get("location");
@@ -94,7 +100,9 @@ describe("Open Redirect Prevention", () => {
 	it("redirects to signin error when code exchange fails", async () => {
 		mockExchangeCodeForSession.mockResolvedValue({ error: new Error("invalid code") });
 
-		const request = new Request("http://localhost:3000/api/auth/callback?code=bad-code&next=/dashboard");
+		const request = new Request(
+			"http://localhost:3000/api/auth/callback?code=bad-code&next=/dashboard",
+		);
 		const response = await GET(request);
 
 		const location = response.headers.get("location");

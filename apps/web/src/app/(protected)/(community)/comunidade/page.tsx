@@ -37,10 +37,7 @@ export default async function ComunidadePage() {
 			</div>
 
 			{/* Discovery Hub */}
-			<GroupDiscoveryHub
-				initialGenreGroups={genreGroups}
-				initialMemberGroups={memberGroups}
-			/>
+			<GroupDiscoveryHub initialGenreGroups={genreGroups} initialMemberGroups={memberGroups} />
 		</div>
 	);
 }

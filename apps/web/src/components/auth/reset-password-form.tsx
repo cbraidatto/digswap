@@ -1,17 +1,16 @@
 "use client";
 
+import { zodResolver } from "@hookform/resolvers/zod";
+import { CheckCircle, Loader2 } from "lucide-react";
+import Link from "next/link";
 import { useState, useTransition } from "react";
 import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { Loader2, CheckCircle } from "lucide-react";
-import Link from "next/link";
 import { toast } from "sonner";
-
+import { resetPassword } from "@/actions/auth";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { resetPasswordSchema, type ResetPasswordInput } from "@/lib/validations/auth";
-import { resetPassword } from "@/actions/auth";
+import { type ResetPasswordInput, resetPasswordSchema } from "@/lib/validations/auth";
 
 /**
  * Reset password form component.
@@ -91,10 +90,7 @@ export function ResetPasswordForm() {
 					<p className="text-sm text-muted-foreground">{successMessage}</p>
 				</div>
 				<div className="text-center">
-					<Link
-						href="/signin"
-						className="text-sm text-primary underline-offset-4 hover:underline"
-					>
+					<Link href="/signin" className="text-sm text-primary underline-offset-4 hover:underline">
 						Sign In
 					</Link>
 				</div>
@@ -130,40 +126,25 @@ export function ResetPasswordForm() {
 					type="password"
 					placeholder="Confirm new password"
 					autoComplete="new-password"
-					aria-describedby={
-						errors.confirmPassword ? "confirm-password-error" : undefined
-					}
+					aria-describedby={errors.confirmPassword ? "confirm-password-error" : undefined}
 					aria-invalid={!!errors.confirmPassword}
 					disabled={isPending}
 					{...register("confirmPassword")}
 				/>
 				{errors.confirmPassword && (
-					<p
-						id="confirm-password-error"
-						className="text-sm text-destructive"
-					>
+					<p id="confirm-password-error" className="text-sm text-destructive">
 						{errors.confirmPassword.message}
 					</p>
 				)}
 			</div>
 
 			<p className="text-xs text-muted-foreground">
-				Password must be at least 8 characters with one uppercase letter, one
-				number, and one special character.
+				Password must be at least 8 characters with one uppercase letter, one number, and one
+				special character.
 			</p>
 
-			<Button
-				type="submit"
-				className="w-full"
-				size="lg"
-				disabled={isPending}
-				aria-busy={isPending}
-			>
-				{isPending ? (
-					<Loader2 className="size-4 animate-spin" />
-				) : (
-					"Update Password"
-				)}
+			<Button type="submit" className="w-full" size="lg" disabled={isPending} aria-busy={isPending}>
+				{isPending ? <Loader2 className="size-4 animate-spin" /> : "Update Password"}
 			</Button>
 		</form>
 	);

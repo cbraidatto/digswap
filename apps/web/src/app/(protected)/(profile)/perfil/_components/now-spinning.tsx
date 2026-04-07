@@ -12,7 +12,9 @@ export function NowSpinning() {
 	return (
 		<div className="flex items-center gap-3 bg-surface-container-low/80 backdrop-blur-sm rounded-full pl-1 pr-4 py-1 border border-outline-variant/10">
 			{/* Spinning vinyl animation */}
-			<div className={`relative w-8 h-8 flex-shrink-0 ${isPlaying ? "animate-[spin_3s_linear_infinite]" : ""}`}>
+			<div
+				className={`relative w-8 h-8 flex-shrink-0 ${isPlaying ? "animate-[spin_3s_linear_infinite]" : ""}`}
+			>
 				{currentTrack.coverUrl ? (
 					<Image
 						src={currentTrack.coverUrl}

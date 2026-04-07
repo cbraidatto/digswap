@@ -1,8 +1,8 @@
 "use client";
 
-import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { useState } from "react";
 import { getMoreReviews } from "@/actions/release";
 
 interface ReviewItem {
@@ -144,11 +144,7 @@ export function ReviewsSection({ releaseId, initialReviews, initialCount }: Revi
 							)}
 
 							{/* Body */}
-							{review.body && (
-								<p className="text-sm text-on-surface-variant">
-									{review.body}
-								</p>
-							)}
+							{review.body && <p className="text-sm text-on-surface-variant">{review.body}</p>}
 
 							{/* Pressing specific badge */}
 							{review.isPressingSpecific && (

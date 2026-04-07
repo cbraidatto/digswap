@@ -1,6 +1,10 @@
 "use client";
 
+import { Loader2 } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
+import { toast } from "sonner";
+import { disconnectDiscogs } from "@/actions/discogs";
 import {
 	AlertDialog,
 	AlertDialogAction,
@@ -13,10 +17,6 @@ import {
 	AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
-import { Loader2 } from "lucide-react";
-import { disconnectDiscogs } from "@/actions/discogs";
-import { toast } from "sonner";
-import { useRouter } from "next/navigation";
 
 interface DisconnectDialogProps {
 	disabled?: boolean;
@@ -64,14 +64,12 @@ export function DisconnectDialog({ disabled }: DisconnectDialogProps) {
 				<AlertDialogHeader>
 					<AlertDialogTitle>Disconnect Discogs?</AlertDialogTitle>
 					<AlertDialogDescription>
-						Your imported collection and wantlist will be removed from
-						DigSwap. Records added manually will not be affected.
+						Your imported collection and wantlist will be removed from DigSwap. Records added
+						manually will not be affected.
 					</AlertDialogDescription>
 				</AlertDialogHeader>
 				<AlertDialogFooter>
-					<AlertDialogCancel disabled={isPending}>
-						Keep Discogs
-					</AlertDialogCancel>
+					<AlertDialogCancel disabled={isPending}>Keep Discogs</AlertDialogCancel>
 					<AlertDialogAction
 						variant="destructive"
 						onClick={handleDisconnect}

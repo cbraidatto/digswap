@@ -1,5 +1,3 @@
-import type { LeaderboardEntry } from "@/lib/gamification/queries";
-
 interface LeaderboardRowProps {
 	rank: number | null;
 	username: string | null;
@@ -8,13 +6,7 @@ interface LeaderboardRowProps {
 	isOwnUser: boolean;
 }
 
-export function LeaderboardRow({
-	rank,
-	username,
-	title,
-	score,
-	isOwnUser,
-}: LeaderboardRowProps) {
+export function LeaderboardRow({ rank, username, title, score, isOwnUser }: LeaderboardRowProps) {
 	return (
 		<li
 			className={`h-12 flex items-center gap-2 px-3 rounded-lg border ${
@@ -42,9 +34,7 @@ export function LeaderboardRow({
 			</span>
 
 			{/* Title */}
-			<span className="font-mono text-xs text-secondary flex-shrink-0">
-				{title ?? ""}
-			</span>
+			<span className="font-mono text-xs text-secondary flex-shrink-0">{title ?? ""}</span>
 
 			{/* Score */}
 			<span className="font-mono text-sm text-primary tabular-nums text-right">

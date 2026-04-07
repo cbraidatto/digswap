@@ -3,9 +3,12 @@
 import dynamic from "next/dynamic";
 import { useState } from "react";
 
-const AddToWantlistDialog = dynamic(() => import("./add-to-wantlist-dialog").then(m => m.AddToWantlistDialog), {
-	ssr: false,
-});
+const AddToWantlistDialog = dynamic(
+	() => import("./add-to-wantlist-dialog").then((m) => m.AddToWantlistDialog),
+	{
+		ssr: false,
+	},
+);
 
 export function WantlistAddButton() {
 	const [open, setOpen] = useState(false);

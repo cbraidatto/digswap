@@ -1,9 +1,10 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
-import { useRouter } from "next/navigation";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
+import { addRecordToCollection, searchDiscogs } from "@/actions/collection";
 import {
 	Dialog,
 	DialogContent,
@@ -12,7 +13,6 @@ import {
 	DialogTitle,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
-import { searchDiscogs, addRecordToCollection } from "@/actions/collection";
 
 interface SearchResult {
 	discogsId: number;
@@ -189,13 +189,9 @@ export function AddRecordDialog({ open, onOpenChange }: AddRecordDialogProps) {
 											)}
 										</div>
 										<div className="flex-1 min-w-0">
-											<div className="text-sm font-medium text-on-surface truncate">
-												{release}
-											</div>
+											<div className="text-sm font-medium text-on-surface truncate">{release}</div>
 											{artist && (
-												<div className="text-xs text-on-surface-variant truncate">
-													{artist}
-												</div>
+												<div className="text-xs text-on-surface-variant truncate">{artist}</div>
 											)}
 										</div>
 										<div className="flex-shrink-0 text-right">
@@ -207,9 +203,7 @@ export function AddRecordDialog({ open, onOpenChange }: AddRecordDialogProps) {
 												<div className="text-xs font-mono text-on-surface-variant">
 													{result.year && <div>{result.year}</div>}
 													{result.format && (
-														<div className="text-on-surface-variant/60">
-															{result.format}
-														</div>
+														<div className="text-on-surface-variant/60">{result.format}</div>
 													)}
 												</div>
 											)}
@@ -220,19 +214,16 @@ export function AddRecordDialog({ open, onOpenChange }: AddRecordDialogProps) {
 						</div>
 					)}
 
-					{query.trim().length >= 2 &&
-						!isSearching &&
-						!error &&
-						results.length === 0 && (
-							<div className="text-center py-8">
-								<span className="material-symbols-outlined text-on-surface-variant text-3xl block mb-2">
-									search_off
-								</span>
-								<span className="text-xs font-mono text-on-surface-variant">
-									No results found for &ldquo;{query.trim()}&rdquo;
-								</span>
-							</div>
-						)}
+					{query.trim().length >= 2 && !isSearching && !error && results.length === 0 && (
+						<div className="text-center py-8">
+							<span className="material-symbols-outlined text-on-surface-variant text-3xl block mb-2">
+								search_off
+							</span>
+							<span className="text-xs font-mono text-on-surface-variant">
+								No results found for &ldquo;{query.trim()}&rdquo;
+							</span>
+						</div>
+					)}
 
 					{query.trim().length < 2 && !isSearching && results.length === 0 && (
 						<div className="text-center py-8">

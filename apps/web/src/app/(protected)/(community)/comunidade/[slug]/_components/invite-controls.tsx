@@ -1,8 +1,8 @@
 "use client";
 
 import { useState, useTransition } from "react";
-import { generateInviteAction, inviteUserAction } from "@/actions/community";
 import { toast } from "sonner";
+import { generateInviteAction, inviteUserAction } from "@/actions/community";
 
 interface InviteControlsProps {
 	groupId: string;
@@ -55,10 +55,7 @@ export function InviteControls({ groupId, groupSlug }: InviteControlsProps) {
 		<div className="flex items-center gap-3 mb-6">
 			{/* Invite by username */}
 			{showInviteInput ? (
-				<form
-					onSubmit={handleInviteUser}
-					className="flex items-center gap-2"
-				>
+				<form onSubmit={handleInviteUser} className="flex items-center gap-2">
 					<input
 						type="text"
 						value={username}
@@ -67,7 +64,6 @@ export function InviteControls({ groupId, groupSlug }: InviteControlsProps) {
 							setInviteError(null);
 						}}
 						placeholder="Username to invite..."
-						autoFocus
 						className="font-mono text-xs bg-surface-container-low border border-outline-variant/20 rounded px-2 py-1 text-on-surface placeholder:text-on-surface-variant/50 outline-none focus:border-primary transition-colors"
 					/>
 					<button
@@ -88,11 +84,7 @@ export function InviteControls({ groupId, groupSlug }: InviteControlsProps) {
 					>
 						[Cancel]
 					</button>
-					{inviteError && (
-						<span className="font-mono text-xs text-destructive">
-							{inviteError}
-						</span>
-					)}
+					{inviteError && <span className="font-mono text-xs text-destructive">{inviteError}</span>}
 				</form>
 			) : (
 				<button

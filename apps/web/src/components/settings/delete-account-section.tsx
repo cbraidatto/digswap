@@ -1,7 +1,7 @@
 "use client";
 
-import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
+import { useState, useTransition } from "react";
 import { deleteAccountAction } from "@/actions/account";
 
 export function DeleteAccountSection() {
@@ -57,9 +57,7 @@ export function DeleteAccountSection() {
 						/>
 					</div>
 
-					{error && (
-						<p className="font-mono text-xs text-destructive">{error}</p>
-					)}
+					{error && <p className="font-mono text-xs text-destructive">{error}</p>}
 
 					<div className="flex items-center gap-2">
 						<button

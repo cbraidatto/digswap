@@ -1,4 +1,4 @@
-import { describe, test, expect, vi, beforeEach } from "vitest";
+import { beforeEach, describe, expect, test, vi } from "vitest";
 
 // Track call count to return different results for sequential queries
 let queryCallCount = 0;
@@ -31,7 +31,7 @@ vi.mock("@/lib/db", () => {
 	};
 
 	return { db: chain };
-})
+});
 vi.mock("@/lib/rate-limit", () => ({
 	authRateLimit: null,
 	resetRateLimit: null,
@@ -41,7 +41,6 @@ vi.mock("@/lib/rate-limit", () => ({
 	discogsRateLimit: null,
 	safeLimit: vi.fn().mockImplementation(async () => ({ success: true })),
 }));
-;
 
 vi.mock("@/lib/db/schema/releases", () => ({
 	releases: {

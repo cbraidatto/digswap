@@ -1,12 +1,12 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { ChevronRight, Disc3 } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { Disc3, ChevronRight } from "lucide-react";
+import { useEffect, useRef } from "react";
+import type { DiscogsProgressPayload } from "@/lib/discogs/types";
+import { getImportChannelName } from "@/lib/discogs/types";
 import { createClient } from "@/lib/supabase/client";
 import { useImportStore } from "@/stores/import-store";
-import { getImportChannelName } from "@/lib/discogs/types";
-import type { DiscogsProgressPayload } from "@/lib/discogs/types";
 
 interface ImportBannerProps {
 	userId: string;
@@ -14,11 +14,8 @@ interface ImportBannerProps {
 
 export function ImportBanner({ userId }: ImportBannerProps) {
 	const router = useRouter();
-	const { isActive, processedItems, totalItems, type, updateProgress } =
-		useImportStore();
-	const channelRef = useRef<ReturnType<
-		ReturnType<typeof createClient>["channel"]
-	> | null>(null);
+	const { isActive, processedItems, totalItems, type, updateProgress } = useImportStore();
+	const channelRef = useRef<ReturnType<ReturnType<typeof createClient>["channel"]> | null>(null);
 
 	// Subscribe to Supabase Realtime channel for import progress
 	useEffect(() => {
@@ -40,7 +37,7 @@ export function ImportBanner({ userId }: ImportBannerProps) {
 			channelRef.current = null;
 		};
 		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [userId]);
+	}, [userId, updateProgress]);
 
 	// Don't render when no active import
 	if (!isActive) {
@@ -67,7 +64,6 @@ export function ImportBanner({ userId }: ImportBannerProps) {
 					router.push("/import-progress");
 				}
 			}}
-			tabIndex={0}
 		>
 			<Disc3
 				className="size-4 text-primary animate-spin"

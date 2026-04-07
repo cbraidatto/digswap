@@ -1,9 +1,5 @@
-import { describe, test, expect } from "vitest";
-import {
-	getRarityTier,
-	getRarityBadgeVariant,
-	type RarityTier,
-} from "@/lib/collection/rarity";
+import { describe, expect, test } from "vitest";
+import { getRarityBadgeVariant, getRarityTier, type RarityTier } from "@/lib/collection/rarity";
 
 describe("getRarityTier", () => {
 	test("returns 'Ultra Rare' for score >= 2.0", () => {

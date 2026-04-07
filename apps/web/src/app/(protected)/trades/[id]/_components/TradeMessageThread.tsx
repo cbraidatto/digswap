@@ -126,7 +126,7 @@ export function TradeMessageThread({
 
 	useEffect(() => {
 		bottomRef.current?.scrollIntoView({ behavior: "instant" });
-	}, [messages.length]);
+	}, []);
 
 	if (messages.length === 0) {
 		return (

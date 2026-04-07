@@ -1,19 +1,15 @@
 "use client";
 
-import { useState, useCallback } from "react";
-import { Loader2, Check, Copy, Shield } from "lucide-react";
+import { Check, Copy, Loader2, Shield } from "lucide-react";
+import { useCallback, useState } from "react";
 import { toast } from "sonner";
 
 import { enrollTotp, verifyTotpEnrollment } from "@/actions/mfa";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Skeleton } from "@/components/ui/skeleton";
-import {
-	Alert,
-	AlertDescription,
-	AlertTitle,
-} from "@/components/ui/alert";
 
 type SetupStep = "loading" | "scan" | "verify" | "success";
 
@@ -141,23 +137,22 @@ export function TotpSetup({ onComplete }: { onComplete?: () => void }) {
 				{/* QR Code */}
 				<div className="flex flex-col items-center gap-3">
 					<div className="rounded-lg bg-white p-3">
-					{/* Render QR as <img> with data URI to prevent SVG script execution (M-08) */}
-					{/* eslint-disable-next-line @next/next/no-img-element */}
-					<img
-						src={
-							enrollment.qrCode.startsWith("data:")
-								? enrollment.qrCode
-								: `data:image/svg+xml;charset=utf-8,${encodeURIComponent(enrollment.qrCode)}`
-						}
-						alt="TOTP QR Code — scan with your authenticator app"
-						width={200}
-						height={200}
-						style={{ imageRendering: "pixelated" }}
-					/>
-				</div>
+						{/* Render QR as <img> with data URI to prevent SVG script execution (M-08) */}
+						{/* eslint-disable-next-line @next/next/no-img-element */}
+						<img
+							src={
+								enrollment.qrCode.startsWith("data:")
+									? enrollment.qrCode
+									: `data:image/svg+xml;charset=utf-8,${encodeURIComponent(enrollment.qrCode)}`
+							}
+							alt="TOTP QR Code — scan with your authenticator app"
+							width={200}
+							height={200}
+							style={{ imageRendering: "pixelated" }}
+						/>
+					</div>
 					<p className="text-center text-sm text-muted-foreground">
-						Scan this QR code with your authenticator app, then enter the
-						6-digit code to verify.
+						Scan this QR code with your authenticator app, then enter the 6-digit code to verify.
 					</p>
 				</div>
 
@@ -167,8 +162,7 @@ export function TotpSetup({ onComplete }: { onComplete?: () => void }) {
 						<Shield className="size-4" />
 						<AlertTitle>Save your backup codes</AlertTitle>
 						<AlertDescription>
-							Save these codes in a safe place. Each code can only be used
-							once.
+							Save these codes in a safe place. Each code can only be used once.
 						</AlertDescription>
 					</Alert>
 
@@ -183,12 +177,7 @@ export function TotpSetup({ onComplete }: { onComplete?: () => void }) {
 						))}
 					</div>
 
-					<Button
-						variant="outline"
-						size="sm"
-						className="w-full"
-						onClick={copyBackupCodes}
-					>
+					<Button variant="outline" size="sm" className="w-full" onClick={copyBackupCodes}>
 						{codesCopied ? (
 							<>
 								<Check className="size-4" data-icon="inline-start" />
@@ -215,8 +204,7 @@ export function TotpSetup({ onComplete }: { onComplete?: () => void }) {
 		return (
 			<div className="space-y-4">
 				<p className="text-sm text-muted-foreground">
-					Enter the 6-digit code from your authenticator app to complete
-					setup.
+					Enter the 6-digit code from your authenticator app to complete setup.
 				</p>
 
 				{error && (
@@ -253,18 +241,10 @@ export function TotpSetup({ onComplete }: { onComplete?: () => void }) {
 					aria-busy={isSubmitting}
 					onClick={handleVerify}
 				>
-					{isSubmitting ? (
-						<Loader2 className="size-4 animate-spin" />
-					) : (
-						"Verify and Enable"
-					)}
+					{isSubmitting ? <Loader2 className="size-4 animate-spin" /> : "Verify and Enable"}
 				</Button>
 
-				<Button
-					variant="ghost"
-					className="w-full"
-					onClick={() => setStep("scan")}
-				>
+				<Button variant="ghost" className="w-full" onClick={() => setStep("scan")}>
 					Back to QR Code
 				</Button>
 			</div>
@@ -283,8 +263,7 @@ export function TotpSetup({ onComplete }: { onComplete?: () => void }) {
 						Two-Factor Authentication Enabled
 					</h3>
 					<p className="mt-1 text-sm text-muted-foreground">
-						Your account is now protected with an additional layer of
-						security.
+						Your account is now protected with an additional layer of security.
 					</p>
 				</div>
 			</div>

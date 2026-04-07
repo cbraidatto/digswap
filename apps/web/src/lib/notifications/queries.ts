@@ -1,9 +1,6 @@
+import { and, count, desc, eq } from "drizzle-orm";
 import { db } from "@/lib/db";
-import {
-	notifications,
-	notificationPreferences,
-} from "@/lib/db/schema/notifications";
-import { eq, and, desc, count, sql } from "drizzle-orm";
+import { notificationPreferences, notifications } from "@/lib/db/schema/notifications";
 import { createAdminClient } from "@/lib/supabase/admin";
 
 /**
@@ -13,12 +10,7 @@ export async function getUnreadCount(userId: string): Promise<number> {
 	const result = await db
 		.select({ count: count() })
 		.from(notifications)
-		.where(
-			and(
-				eq(notifications.userId, userId),
-				eq(notifications.read, false),
-			),
-		);
+		.where(and(eq(notifications.userId, userId), eq(notifications.read, false)));
 
 	return Number(result[0]?.count ?? 0);
 }
@@ -26,10 +18,7 @@ export async function getUnreadCount(userId: string): Promise<number> {
 /**
  * Get recent notifications for a user (for the notification dropdown).
  */
-export async function getRecentNotifications(
-	userId: string,
-	limit = 5,
-) {
+export async function getRecentNotifications(userId: string, limit = 5) {
 	return db
 		.select()
 		.from(notifications)
@@ -41,11 +30,7 @@ export async function getRecentNotifications(
 /**
  * Get a paginated page of notifications with total count.
  */
-export async function getNotificationPage(
-	userId: string,
-	page = 1,
-	pageSize = 20,
-) {
+export async function getNotificationPage(userId: string, page = 1, pageSize = 20) {
 	const offset = (Math.max(1, page) - 1) * pageSize;
 
 	const [items, totalResult] = await Promise.all([
@@ -56,10 +41,7 @@ export async function getNotificationPage(
 			.orderBy(desc(notifications.createdAt))
 			.limit(pageSize)
 			.offset(offset),
-		db
-			.select({ count: count() })
-			.from(notifications)
-			.where(eq(notifications.userId, userId)),
+		db.select({ count: count() }).from(notifications).where(eq(notifications.userId, userId)),
 	]);
 
 	return {
@@ -117,10 +99,8 @@ export async function upsertPreferences(
 		snakeCasePrefs.trade_completed_inapp = prefs.tradeCompletedInapp;
 	if (prefs.rankingChangeInapp !== undefined)
 		snakeCasePrefs.ranking_change_inapp = prefs.rankingChangeInapp;
-	if (prefs.newBadgeInapp !== undefined)
-		snakeCasePrefs.new_badge_inapp = prefs.newBadgeInapp;
-	if (prefs.pushEnabled !== undefined)
-		snakeCasePrefs.push_enabled = prefs.pushEnabled;
+	if (prefs.newBadgeInapp !== undefined) snakeCasePrefs.new_badge_inapp = prefs.newBadgeInapp;
+	if (prefs.pushEnabled !== undefined) snakeCasePrefs.push_enabled = prefs.pushEnabled;
 
 	const { data, error } = await admin
 		.from("notification_preferences")

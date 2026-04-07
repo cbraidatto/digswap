@@ -1,6 +1,6 @@
+import Link from "next/link";
 import { AuthCard } from "@/components/auth/auth-card";
 import { SignUpForm } from "@/components/auth/sign-up-form";
-import Link from "next/link";
 
 export const metadata = {
 	title: "Create Your Account | DigSwap",
@@ -14,10 +14,7 @@ export default function SignUpPage() {
 			footer={
 				<p>
 					Already have an account?{" "}
-					<Link
-						href="/signin"
-						className="text-primary hover:underline"
-					>
+					<Link href="/signin" className="text-primary hover:underline">
 						Sign in
 					</Link>
 				</p>

@@ -1,6 +1,6 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import type { Metadata } from "next";
 
 export const metadata: Metadata = {
 	title: "DigSwap — The social network for vinyl diggers",
@@ -33,16 +33,10 @@ function FeatureCard({
 	return (
 		<div className="bg-surface-container-low/80 backdrop-blur-sm rounded-xl border border-outline-variant/10 p-6 transition-all hover:border-primary/20 hover:shadow-lg hover:shadow-primary/5">
 			<div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center mb-4">
-				<span className="material-symbols-outlined text-primary text-xl">
-					{icon}
-				</span>
+				<span className="material-symbols-outlined text-primary text-xl">{icon}</span>
 			</div>
-			<h3 className="font-heading text-base font-semibold text-on-surface mb-1.5">
-				{title}
-			</h3>
-			<p className="text-sm text-on-surface-variant leading-relaxed">
-				{description}
-			</p>
+			<h3 className="font-heading text-base font-semibold text-on-surface mb-1.5">{title}</h3>
+			<p className="text-sm text-on-surface-variant leading-relaxed">{description}</p>
 		</div>
 	);
 }
@@ -50,9 +44,7 @@ function FeatureCard({
 function StatBlock({ value, label }: { value: string; label: string }) {
 	return (
 		<div className="text-center">
-			<div className="font-heading text-2xl md:text-3xl font-bold text-primary">
-				{value}
-			</div>
+			<div className="font-heading text-2xl md:text-3xl font-bold text-primary">{value}</div>
 			<div className="text-xs text-on-surface-variant mt-0.5">{label}</div>
 		</div>
 	);
@@ -78,8 +70,7 @@ export default async function Home({
 			<div
 				className="fixed inset-0 opacity-[0.02] pointer-events-none"
 				style={{
-					backgroundImage:
-						"radial-gradient(var(--primary) 1px, transparent 1px)",
+					backgroundImage: "radial-gradient(var(--primary) 1px, transparent 1px)",
 					backgroundSize: "32px 32px",
 				}}
 			/>
@@ -88,9 +79,7 @@ export default async function Home({
 			<section className="relative z-10 flex flex-col items-center justify-center min-h-[85vh] px-6 pt-16 pb-12">
 				{/* Logo / Brand */}
 				<div className="mb-6 flex items-center gap-2">
-					<span className="material-symbols-outlined text-primary text-3xl">
-						album
-					</span>
+					<span className="material-symbols-outlined text-primary text-3xl">album</span>
 					<span className="font-heading text-xl font-bold text-on-surface tracking-tight">
 						DIGSWAP
 					</span>
@@ -105,9 +94,8 @@ export default async function Home({
 
 				{/* Subheadline */}
 				<p className="mt-6 text-base md:text-lg text-on-surface-variant text-center max-w-xl leading-relaxed">
-					The social network for vinyl diggers. Import your Discogs library,
-					discover matches with other collectors, and connect with the
-					community.
+					The social network for vinyl diggers. Import your Discogs library, discover matches with
+					other collectors, and connect with the community.
 				</p>
 
 				{/* CTAs */}
@@ -117,9 +105,7 @@ export default async function Home({
 						className="flex-1 bg-primary text-on-primary font-medium py-3 px-6 rounded-lg text-sm hover:brightness-110 transition-all flex items-center justify-center gap-2 shadow-lg shadow-primary/20"
 					>
 						Start digging
-						<span className="material-symbols-outlined text-base">
-							arrow_forward
-						</span>
+						<span className="material-symbols-outlined text-base">arrow_forward</span>
 					</Link>
 					<Link
 						href="/signin"
@@ -142,51 +128,41 @@ export default async function Home({
 						How it works
 					</h2>
 					<p className="text-sm text-on-surface-variant text-center mb-12 max-w-lg mx-auto">
-						Three steps from &ldquo;I want that record&rdquo; to &ldquo;I
-						found who has it.&rdquo;
+						Three steps from &ldquo;I want that record&rdquo; to &ldquo;I found who has it.&rdquo;
 					</p>
 
 					<div className="grid md:grid-cols-3 gap-6">
 						<div className="text-center">
 							<div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-4">
-								<span className="font-heading text-lg font-bold text-primary">
-									1
-								</span>
+								<span className="font-heading text-lg font-bold text-primary">1</span>
 							</div>
 							<h3 className="font-heading text-base font-semibold text-on-surface mb-1">
 								Import your collection
 							</h3>
 							<p className="text-sm text-on-surface-variant">
-								Connect your Discogs account. Your library and wantlist sync
-								automatically.
+								Connect your Discogs account. Your library and wantlist sync automatically.
 							</p>
 						</div>
 						<div className="text-center">
 							<div className="w-12 h-12 rounded-full bg-secondary/10 flex items-center justify-center mx-auto mb-4">
-								<span className="font-heading text-lg font-bold text-secondary">
-									2
-								</span>
+								<span className="font-heading text-lg font-bold text-secondary">2</span>
 							</div>
 							<h3 className="font-heading text-base font-semibold text-on-surface mb-1">
 								Discover matches
 							</h3>
 							<p className="text-sm text-on-surface-variant">
-								The Radar scans the network and tells you who owns records from
-								your wantlist.
+								The Radar scans the network and tells you who owns records from your wantlist.
 							</p>
 						</div>
 						<div className="text-center">
 							<div className="w-12 h-12 rounded-full bg-tertiary/10 flex items-center justify-center mx-auto mb-4">
-								<span className="font-heading text-lg font-bold text-tertiary">
-									3
-								</span>
+								<span className="font-heading text-lg font-bold text-tertiary">3</span>
 							</div>
 							<h3 className="font-heading text-base font-semibold text-on-surface mb-1">
 								Connect &amp; trade
 							</h3>
 							<p className="text-sm text-on-surface-variant">
-								Message other diggers, compare collections, and arrange trades
-								directly.
+								Message other diggers, compare collections, and arrange trades directly.
 							</p>
 						</div>
 					</div>
@@ -250,17 +226,15 @@ export default async function Home({
 					Your next find is one connection away
 				</h2>
 				<p className="text-sm text-on-surface-variant mb-8 max-w-md mx-auto">
-					Join DigSwap and turn your wantlist into real connections with
-					collectors who have what you&apos;re looking for.
+					Join DigSwap and turn your wantlist into real connections with collectors who have what
+					you&apos;re looking for.
 				</p>
 				<Link
 					href="/signup"
 					className="inline-flex items-center gap-2 bg-primary text-on-primary font-medium py-3 px-8 rounded-lg text-sm hover:brightness-110 transition-all shadow-lg shadow-primary/20"
 				>
 					Start digging — it&apos;s free
-					<span className="material-symbols-outlined text-base">
-						arrow_forward
-					</span>
+					<span className="material-symbols-outlined text-base">arrow_forward</span>
 				</Link>
 			</section>
 
@@ -268,12 +242,8 @@ export default async function Home({
 			<footer className="relative z-10 px-6 py-8 border-t border-outline-variant/10">
 				<div className="max-w-5xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
 					<div className="flex items-center gap-1.5">
-						<span className="material-symbols-outlined text-primary text-lg">
-							album
-						</span>
-						<span className="font-heading text-sm font-semibold text-on-surface">
-							DIGSWAP
-						</span>
+						<span className="material-symbols-outlined text-primary text-lg">album</span>
+						<span className="font-heading text-sm font-semibold text-on-surface">DIGSWAP</span>
 					</div>
 					<div className="flex items-center gap-6 text-xs text-on-surface-variant">
 						<Link href="/pricing" className="hover:text-on-surface transition-colors">
@@ -286,9 +256,7 @@ export default async function Home({
 							Sign up
 						</Link>
 					</div>
-					<p className="text-xs text-on-surface-variant/50">
-						© {new Date().getFullYear()} DigSwap
-					</p>
+					<p className="text-xs text-on-surface-variant/50">© {new Date().getFullYear()} DigSwap</p>
 				</div>
 			</footer>
 		</div>

@@ -1,4 +1,4 @@
-import { describe, test, expect, vi, beforeEach } from "vitest";
+import { beforeEach, describe, expect, test, vi } from "vitest";
 
 // ---------------------------------------------------------------------------
 // DB mock with thenable chain (project pattern)
@@ -49,7 +49,7 @@ vi.mock("@/lib/db", () => {
 	}));
 
 	return { db: chain };
-})
+});
 vi.mock("@/lib/rate-limit", () => ({
 	authRateLimit: null,
 	resetRateLimit: null,
@@ -59,7 +59,6 @@ vi.mock("@/lib/rate-limit", () => ({
 	discogsRateLimit: null,
 	safeLimit: vi.fn().mockImplementation(async () => ({ success: true })),
 }));
-;
 
 // ---------------------------------------------------------------------------
 // Schema mocks

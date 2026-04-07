@@ -17,30 +17,25 @@ export async function broadcastProgress(
 	const channel = getImportChannelName(userId);
 
 	try {
-		const response = await fetch(
-			`${supabaseUrl}/realtime/v1/api/broadcast`,
-			{
-				method: "POST",
-				headers: {
-					apikey: serviceKey,
-					"Content-Type": "application/json",
-				},
-				body: JSON.stringify({
-					messages: [
-						{
-							topic: channel,
-							event: "progress",
-							payload,
-						},
-					],
-				}),
+		const response = await fetch(`${supabaseUrl}/realtime/v1/api/broadcast`, {
+			method: "POST",
+			headers: {
+				apikey: serviceKey,
+				"Content-Type": "application/json",
 			},
-		);
+			body: JSON.stringify({
+				messages: [
+					{
+						topic: channel,
+						event: "progress",
+						payload,
+					},
+				],
+			}),
+		});
 
 		if (!response.ok) {
-			console.error(
-				`Broadcast failed: ${response.status} ${response.statusText}`,
-			);
+			console.error(`Broadcast failed: ${response.status} ${response.statusText}`);
 		}
 	} catch (error) {
 		// Non-fatal: progress display is a nice-to-have, import continues

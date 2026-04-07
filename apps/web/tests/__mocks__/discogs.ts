@@ -1,7 +1,7 @@
 import type {
-	DiscogsCollectionResponse,
-	DiscogsCollectionItem,
 	DiscogsBasicInformation,
+	DiscogsCollectionItem,
+	DiscogsCollectionResponse,
 	DiscogsPagination,
 } from "@/lib/discogs/types";
 
@@ -102,11 +102,7 @@ export function mockCollectionPage(
 			createMockCollectionItem({
 				id: album.id + (page - 1) * perPage + i,
 				instance_id: 10000 + (page - 1) * perPage + i,
-				date_added: new Date(
-					2024,
-					0,
-					15 - ((page - 1) * perPage + i),
-				).toISOString(),
+				date_added: new Date(2024, 0, 15 - ((page - 1) * perPage + i)).toISOString(),
 				basic_information: createMockBasicInformation({
 					id: album.id,
 					title: album.title,
@@ -175,11 +171,7 @@ export function mockWantlistPage(
 			createMockCollectionItem({
 				id: album.id + (page - 1) * perPage + i,
 				instance_id: 20000 + (page - 1) * perPage + i,
-				date_added: new Date(
-					2024,
-					5,
-					1 - ((page - 1) * perPage + i),
-				).toISOString(),
+				date_added: new Date(2024, 5, 1 - ((page - 1) * perPage + i)).toISOString(),
 				basic_information: createMockBasicInformation({
 					id: album.id,
 					title: album.title,

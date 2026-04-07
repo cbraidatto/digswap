@@ -1,4 +1,4 @@
-import { describe, test, expect, vi, beforeEach } from "vitest";
+import { beforeEach, describe, expect, test, vi } from "vitest";
 
 // -- Mock Drizzle db --
 const mockSelect = vi.fn();
@@ -41,8 +41,8 @@ vi.mock("drizzle-orm", () => ({
 }));
 
 import {
-	getFollowCounts,
 	checkIsFollowing,
+	getFollowCounts,
 	getFollowers,
 	getFollowing,
 } from "@/lib/social/queries";
@@ -120,7 +120,12 @@ describe("getFollowers", () => {
 	test("returns array of { id, username, displayName, avatarUrl }", async () => {
 		const mockFollowers = [
 			{ id: "u1", username: "digger1", displayName: "Digger One", avatarUrl: null },
-			{ id: "u2", username: "digger2", displayName: "Digger Two", avatarUrl: "https://example.com/avatar.jpg" },
+			{
+				id: "u2",
+				username: "digger2",
+				displayName: "Digger Two",
+				avatarUrl: "https://example.com/avatar.jpg",
+			},
 		];
 		const chain = createSelectChain(mockFollowers);
 		mockSelect.mockReturnValue(chain);

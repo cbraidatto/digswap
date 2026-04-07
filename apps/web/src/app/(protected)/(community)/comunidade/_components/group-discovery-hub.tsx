@@ -1,10 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
-import {
-	loadGenreGroupsAction,
-	loadMemberGroupsAction,
-} from "@/actions/community";
+import { loadGenreGroupsAction, loadMemberGroupsAction } from "@/actions/community";
 import type { GenreGroup, MemberGroup } from "@/lib/community/queries";
 import { DISCOGS_GENRES } from "@/lib/discogs/taxonomy";
 import { GenreGroupRow } from "./genre-group-row";
@@ -21,14 +18,10 @@ export function GroupDiscoveryHub({
 	initialMemberGroups,
 }: GroupDiscoveryHubProps) {
 	const [activeGenre, setActiveGenre] = useState<string | null>(null);
-	const [genreGroups, setGenreGroups] =
-		useState<GenreGroup[]>(initialGenreGroups);
-	const [memberGroups, setMemberGroups] =
-		useState<MemberGroup[]>(initialMemberGroups);
+	const [genreGroups, setGenreGroups] = useState<GenreGroup[]>(initialGenreGroups);
+	const [memberGroups, setMemberGroups] = useState<MemberGroup[]>(initialMemberGroups);
 	const [showAllGenres, setShowAllGenres] = useState(false);
-	const [hasMoreMembers, setHasMoreMembers] = useState(
-		initialMemberGroups.length >= 10,
-	);
+	const [hasMoreMembers, setHasMoreMembers] = useState(initialMemberGroups.length >= 10);
 	const [cursor, setCursor] = useState<string | null>(
 		initialMemberGroups.length > 0
 			? initialMemberGroups[initialMemberGroups.length - 1].createdAt
@@ -48,9 +41,7 @@ export function GroupDiscoveryHub({
 			setMemberGroups(newMemberGroups);
 			setHasMoreMembers(newMemberGroups.length >= 10);
 			setCursor(
-				newMemberGroups.length > 0
-					? newMemberGroups[newMemberGroups.length - 1].createdAt
-					: null,
+				newMemberGroups.length > 0 ? newMemberGroups[newMemberGroups.length - 1].createdAt : null,
 			);
 		});
 	}
@@ -58,23 +49,14 @@ export function GroupDiscoveryHub({
 	function handleLoadMore() {
 		if (!cursor) return;
 		startTransition(async () => {
-			const moreGroups = await loadMemberGroupsAction(
-				activeGenre ?? undefined,
-				cursor,
-			);
+			const moreGroups = await loadMemberGroupsAction(activeGenre ?? undefined, cursor);
 			setMemberGroups((prev) => [...prev, ...moreGroups]);
 			setHasMoreMembers(moreGroups.length >= 10);
-			setCursor(
-				moreGroups.length > 0
-					? moreGroups[moreGroups.length - 1].createdAt
-					: null,
-			);
+			setCursor(moreGroups.length > 0 ? moreGroups[moreGroups.length - 1].createdAt : null);
 		});
 	}
 
-	const visibleGenreGroups = showAllGenres
-		? genreGroups
-		: genreGroups.slice(0, 6);
+	const visibleGenreGroups = showAllGenres ? genreGroups : genreGroups.slice(0, 6);
 
 	return (
 		<div className="space-y-8">
@@ -119,9 +101,7 @@ export function GroupDiscoveryHub({
 
 				{memberGroups.length === 0 ? (
 					<div className="bg-surface-container-low border border-outline-variant/10 rounded p-8 text-center">
-						<div className="font-mono text-xs text-outline mb-2">
-							[NO_GROUPS_YET]
-						</div>
+						<div className="font-mono text-xs text-outline mb-2">[NO_GROUPS_YET]</div>
 						<p className="font-mono text-xs text-on-surface-variant">
 							No community groups yet. Be the first to create one.
 						</p>

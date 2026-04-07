@@ -25,7 +25,7 @@ function getDesktopShell() {
  * 4. Code is single-use and expires in 30 seconds
  */
 export function DesktopSessionSync() {
-	const pathname = usePathname();
+	const _pathname = usePathname();
 	const lastSyncedAt = useRef<number>(0);
 
 	useEffect(() => {
@@ -58,7 +58,7 @@ export function DesktopSessionSync() {
 					return;
 				}
 
-				const data = await res.json() as { code: string; expiresIn: number } | null;
+				const data = (await res.json()) as { code: string; expiresIn: number } | null;
 				if (!active || !data?.code) return;
 
 				if (desktopShell.syncHandoffCode) {
@@ -74,7 +74,7 @@ export function DesktopSessionSync() {
 		return () => {
 			active = false;
 		};
-	}, [pathname]);
+	}, []);
 
 	return null;
 }

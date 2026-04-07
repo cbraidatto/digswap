@@ -1,20 +1,20 @@
 "use server";
 
 import { z } from "zod";
-import { db } from "@/lib/db";
-import { directMessages } from "@/lib/db/schema/direct-messages";
 import { requireUser } from "@/lib/auth/require-user";
-import { apiRateLimit, safeLimit } from "@/lib/rate-limit";
-import { uuidSchema } from "@/lib/validations/common";
 import {
 	areMutualFriends,
-	getConversations,
-	getMessages,
-	getMutualFriends,
 	type ChatMessage,
 	type ConversationPreview,
 	type Friend,
+	getConversations,
+	getMessages,
+	getMutualFriends,
 } from "@/lib/chat/queries";
+import { db } from "@/lib/db";
+import { directMessages } from "@/lib/db/schema/direct-messages";
+import { apiRateLimit, safeLimit } from "@/lib/rate-limit";
+import { uuidSchema } from "@/lib/validations/common";
 
 // ---------------------------------------------------------------------------
 // Validation
@@ -58,10 +58,7 @@ export async function getConversationsAction(): Promise<ConversationPreview[]> {
 /**
  * Get messages in a conversation between the current user and a friend.
  */
-export async function getMessagesAction(
-	friendId: string,
-	cursor?: string,
-): Promise<ChatMessage[]> {
+export async function getMessagesAction(friendId: string, cursor?: string): Promise<ChatMessage[]> {
 	try {
 		const user = await requireUser();
 

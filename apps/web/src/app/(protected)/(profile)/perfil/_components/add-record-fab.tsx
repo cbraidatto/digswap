@@ -3,9 +3,12 @@
 import dynamic from "next/dynamic";
 import { useState } from "react";
 
-const AddRecordDialog = dynamic(() => import("./add-record-dialog").then(m => m.AddRecordDialog), {
-	ssr: false,
-});
+const AddRecordDialog = dynamic(
+	() => import("./add-record-dialog").then((m) => m.AddRecordDialog),
+	{
+		ssr: false,
+	},
+);
 
 export function AddRecordFAB() {
 	const [dialogOpen, setDialogOpen] = useState(false);

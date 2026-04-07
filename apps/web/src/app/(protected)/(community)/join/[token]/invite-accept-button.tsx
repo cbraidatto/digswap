@@ -2,8 +2,8 @@
 
 import { useRouter } from "next/navigation";
 import { useTransition } from "react";
-import { acceptInviteAction } from "@/actions/community";
 import { toast } from "sonner";
+import { acceptInviteAction } from "@/actions/community";
 
 interface InviteAcceptButtonProps {
 	token: string;
@@ -11,11 +11,7 @@ interface InviteAcceptButtonProps {
 	groupSlug: string;
 }
 
-export function InviteAcceptButton({
-	token,
-	groupName,
-	groupSlug,
-}: InviteAcceptButtonProps) {
+export function InviteAcceptButton({ token, groupName, groupSlug }: InviteAcceptButtonProps) {
 	const router = useRouter();
 	const [isPending, startTransition] = useTransition();
 

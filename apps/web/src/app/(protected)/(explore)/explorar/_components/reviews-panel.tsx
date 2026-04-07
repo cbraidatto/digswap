@@ -1,7 +1,7 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
+import { useCallback, useEffect, useState } from "react";
 import { loadReviewsForReleaseAction } from "@/actions/community";
 import { StarRating } from "@/components/ui/star-rating";
 import type { ReviewItem } from "@/lib/community/queries";
@@ -99,9 +99,7 @@ export function ReviewsPanel({ releaseId, isExpanded }: ReviewsPanelProps) {
 					REVIEWS
 				</div>
 				<div className="py-2">
-					<div className="font-mono text-xs text-on-surface-variant">
-						[NO_REVIEWS_YET]
-					</div>
+					<div className="font-mono text-xs text-on-surface-variant">[NO_REVIEWS_YET]</div>
 					<div className="font-mono text-xs text-on-surface-variant mt-1">
 						Be the first to review this record.
 					</div>
@@ -112,15 +110,11 @@ export function ReviewsPanel({ releaseId, isExpanded }: ReviewsPanelProps) {
 
 	return (
 		<div className="bg-surface-container-lowest border-t border-outline-variant/10 px-4 pt-3 pb-3">
-			<div className="font-mono text-xs uppercase tracking-[0.2em] text-outline pb-2">
-				REVIEWS
-			</div>
+			<div className="font-mono text-xs uppercase tracking-[0.2em] text-outline pb-2">REVIEWS</div>
 
 			{reviews.map((review, index) => (
 				<div key={review.id}>
-					{index > 0 && (
-						<hr className="border-t border-outline-variant/10 my-2" />
-					)}
+					{index > 0 && <hr className="border-t border-outline-variant/10 my-2" />}
 					<div className="space-y-1">
 						<div className="flex items-center gap-2">
 							<StarRating rating={review.rating} />
@@ -136,9 +130,7 @@ export function ReviewsPanel({ releaseId, isExpanded }: ReviewsPanelProps) {
 							</span>
 						</div>
 						{review.body && (
-							<p className="text-sm text-on-surface leading-relaxed line-clamp-3">
-								{review.body}
-							</p>
+							<p className="text-sm text-on-surface leading-relaxed line-clamp-3">{review.body}</p>
 						)}
 					</div>
 				</div>

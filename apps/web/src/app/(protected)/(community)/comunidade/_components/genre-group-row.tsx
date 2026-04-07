@@ -15,10 +15,7 @@ function formatCount(n: number): string {
 
 export function GenreGroupRow({ name, slug, memberCount }: GenreGroupRowProps) {
 	return (
-		<Link
-			href={`/comunidade/${slug}`}
-			className="flex items-baseline gap-2 group py-1"
-		>
+		<Link href={`/comunidade/${slug}`} className="flex items-baseline gap-2 group py-1">
 			<span className="font-mono text-xs text-on-surface group-hover:text-primary transition-colors whitespace-nowrap">
 				{name}
 			</span>

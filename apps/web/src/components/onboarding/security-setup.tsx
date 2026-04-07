@@ -1,7 +1,7 @@
 "use client";
 
-import { useRouter } from "next/navigation";
 import { Shield } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 import { Button } from "@/components/ui/button";
 
@@ -28,24 +28,16 @@ export function SecuritySetup({ onSkip }: SecuritySetupProps) {
 					<Shield className="size-8 text-primary" />
 				</div>
 				<p className="text-center text-sm text-muted-foreground">
-					Two-factor authentication adds an extra layer of security. We
-					recommend enabling it.
+					Two-factor authentication adds an extra layer of security. We recommend enabling it.
 				</p>
 			</div>
 
 			<div className="space-y-3">
-				<Button
-					className="h-11 w-full"
-					onClick={() => router.push("/onboarding/2fa")}
-				>
+				<Button className="h-11 w-full" onClick={() => router.push("/onboarding/2fa")}>
 					Enable 2FA
 				</Button>
 
-				<Button
-					variant="ghost"
-					className="h-11 w-full"
-					onClick={onSkip}
-				>
+				<Button variant="ghost" className="h-11 w-full" onClick={onSkip}>
 					Skip for Now
 				</Button>
 			</div>

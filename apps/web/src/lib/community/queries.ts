@@ -1,10 +1,10 @@
-import { eq, and, lt, desc, sql, count, ne } from "drizzle-orm";
+import { and, count, desc, eq, lt, ne } from "drizzle-orm";
 import { db } from "@/lib/db";
-import { groups, groupMembers, groupPosts } from "@/lib/db/schema/groups";
 import { groupInvites } from "@/lib/db/schema/group-invites";
+import { groupMembers, groupPosts, groups } from "@/lib/db/schema/groups";
+import { releases } from "@/lib/db/schema/releases";
 import { reviews } from "@/lib/db/schema/reviews";
 import { profiles } from "@/lib/db/schema/users";
-import { releases } from "@/lib/db/schema/releases";
 
 // ---------------------------------------------------------------------------
 // Types
@@ -66,28 +66,19 @@ export type ReviewItem = {
 // System user ID for genre groups
 // ---------------------------------------------------------------------------
 
-const SYSTEM_USER_ID =
-	process.env.SYSTEM_USER_ID ?? "00000000-0000-0000-0000-000000000000";
+const SYSTEM_USER_ID = process.env.SYSTEM_USER_ID ?? "00000000-0000-0000-0000-000000000000";
 
 // ---------------------------------------------------------------------------
 // Group queries
 // ---------------------------------------------------------------------------
 
-export async function getGroupBySlug(
-	slug: string,
-): Promise<typeof groups.$inferSelect | null> {
-	const rows = await db
-		.select()
-		.from(groups)
-		.where(eq(groups.slug, slug))
-		.limit(1);
+export async function getGroupBySlug(slug: string): Promise<typeof groups.$inferSelect | null> {
+	const rows = await db.select().from(groups).where(eq(groups.slug, slug)).limit(1);
 
 	return rows[0] ?? null;
 }
 
-export async function getGenreGroups(
-	genreFilter?: string,
-): Promise<GenreGroup[]> {
+export async function getGenreGroups(genreFilter?: string): Promise<GenreGroup[]> {
 	const conditions = [eq(groups.creatorId, SYSTEM_USER_ID)];
 
 	if (genreFilter) {
@@ -143,10 +134,7 @@ export async function getMemberGroups(
 
 	return rows.map((row) => ({
 		...row,
-		createdAt:
-			row.createdAt instanceof Date
-				? row.createdAt.toISOString()
-				: String(row.createdAt),
+		createdAt: row.createdAt instanceof Date ? row.createdAt.toISOString() : String(row.createdAt),
 	}));
 }
 
@@ -157,12 +145,7 @@ export async function getGroupMembershipState(
 	const rows = await db
 		.select({ role: groupMembers.role })
 		.from(groupMembers)
-		.where(
-			and(
-				eq(groupMembers.groupId, groupId),
-				eq(groupMembers.userId, userId),
-			),
-		)
+		.where(and(eq(groupMembers.groupId, groupId), eq(groupMembers.userId, userId)))
 		.limit(1);
 
 	if (rows.length === 0) {
@@ -226,10 +209,7 @@ export async function getGroupPosts(
 
 	return rows.map((row) => ({
 		...row,
-		createdAt:
-			row.createdAt instanceof Date
-				? row.createdAt.toISOString()
-				: String(row.createdAt),
+		createdAt: row.createdAt instanceof Date ? row.createdAt.toISOString() : String(row.createdAt),
 	}));
 }
 
@@ -269,16 +249,11 @@ export async function getReviewsForRelease(
 
 	return rows.map((row) => ({
 		...row,
-		createdAt:
-			row.createdAt instanceof Date
-				? row.createdAt.toISOString()
-				: String(row.createdAt),
+		createdAt: row.createdAt instanceof Date ? row.createdAt.toISOString() : String(row.createdAt),
 	}));
 }
 
-export async function getReviewCountForRelease(
-	releaseId: string,
-): Promise<number> {
+export async function getReviewCountForRelease(releaseId: string): Promise<number> {
 	const result = await db
 		.select({ count: count() })
 		.from(reviews)
@@ -291,9 +266,7 @@ export async function getReviewCountForRelease(
 // Invite queries
 // ---------------------------------------------------------------------------
 
-export async function getInviteByToken(
-	token: string,
-): Promise<{
+export async function getInviteByToken(token: string): Promise<{
 	groupId: string;
 	groupName: string;
 	groupSlug: string;
@@ -335,9 +308,7 @@ export async function getInviteByToken(
 	};
 }
 
-export async function getGroupInviteToken(
-	groupId: string,
-): Promise<string | null> {
+export async function getGroupInviteToken(groupId: string): Promise<string | null> {
 	const rows = await db
 		.select({ token: groupInvites.token })
 		.from(groupInvites)

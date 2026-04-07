@@ -1,22 +1,15 @@
 interface RankCardProps {
 	title: string;
 	globalRank: number | null;
-	gemScore: number;
+	rarityScore: number;
 	contributionScore: number;
 }
 
-export function RankCard({
-	title,
-	globalRank,
-	gemScore,
-	contributionScore,
-}: RankCardProps) {
+export function RankCard({ title, globalRank, rarityScore, contributionScore }: RankCardProps) {
 	return (
 		<div className="bg-surface-container-high p-3 rounded border-l-2 border-secondary">
 			<div className="flex items-center gap-2">
-				<span className="material-symbols-outlined text-secondary">
-					military_tech
-				</span>
+				<span className="material-symbols-outlined text-secondary">military_tech</span>
 				<div>
 					<div className="text-xs text-secondary font-mono uppercase tracking-widest">
 						Class Status
@@ -36,10 +29,10 @@ export function RankCard({
 				</div>
 				<div>
 					<div className="text-xl font-bold font-heading text-primary">
-						{gemScore.toLocaleString()}
+						{rarityScore.toFixed(1)}
 					</div>
 					<div className="font-mono text-[9px] text-on-surface-variant/50 uppercase tracking-widest">
-						Gem Score
+						Rarity
 					</div>
 				</div>
 				<div>

@@ -11,7 +11,14 @@ interface CountUpProps {
 	decimals?: number;
 }
 
-export function CountUp({ end, duration = 1000, className, prefix = "", suffix = "", decimals = 0 }: CountUpProps) {
+export function CountUp({
+	end,
+	duration = 1000,
+	className,
+	prefix = "",
+	suffix = "",
+	decimals = 0,
+}: CountUpProps) {
 	const [value, setValue] = useState(0);
 	const ref = useRef<HTMLSpanElement>(null);
 	const hasAnimated = useRef(false);
@@ -29,7 +36,7 @@ export function CountUp({ end, duration = 1000, className, prefix = "", suffix =
 					const elapsed = now - start;
 					const progress = Math.min(elapsed / duration, 1);
 					// Ease-out cubic
-					const eased = 1 - Math.pow(1 - progress, 3);
+					const eased = 1 - (1 - progress) ** 3;
 					setValue(eased * end);
 					if (progress < 1) requestAnimationFrame(animate);
 				};
@@ -46,7 +53,9 @@ export function CountUp({ end, duration = 1000, className, prefix = "", suffix =
 
 	return (
 		<span ref={ref} className={className}>
-			{prefix}{display}{suffix}
+			{prefix}
+			{display}
+			{suffix}
 		</span>
 	);
 }

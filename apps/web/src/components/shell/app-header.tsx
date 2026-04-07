@@ -2,10 +2,10 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { NotificationBell } from "@/components/shell/notification-bell";
 import { ChatToggleButton } from "@/components/chat/chat-toggle-button";
-import { GlobalSearch } from "@/components/shell/global-search";
 import { BarcodeScanner } from "@/components/shell/barcode-scanner";
+import { GlobalSearch } from "@/components/shell/global-search";
+import { NotificationBell } from "@/components/shell/notification-bell";
 
 const NAV_ITEMS = [
 	{ href: "/feed", label: "Feed", icon: "home" },

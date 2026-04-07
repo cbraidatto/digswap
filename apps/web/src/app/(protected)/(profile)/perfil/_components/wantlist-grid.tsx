@@ -11,9 +11,7 @@ export function WantlistGrid({ items, isOwner }: WantlistGridProps) {
 		return (
 			<div className="bg-surface-container-low rounded-xl p-12 flex flex-col items-center gap-4 text-center border border-outline-variant/10">
 				<div className="w-16 h-16 bg-surface-container-high rounded-full flex items-center justify-center">
-					<span className="material-symbols-outlined text-secondary text-3xl">
-						manage_search
-					</span>
+					<span className="material-symbols-outlined text-secondary text-3xl">manage_search</span>
 				</div>
 				<div>
 					<div className="text-xs font-mono text-secondary uppercase tracking-widest mb-2">

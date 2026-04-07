@@ -1,5 +1,5 @@
-import { createAdminClient } from "@/lib/supabase/admin";
 import { sendWantlistMatchEmail } from "@/lib/notifications/email";
+import { createAdminClient } from "@/lib/supabase/admin";
 
 /**
  * Check if any users have a given release on their wantlist and notify them.
@@ -92,25 +92,16 @@ export async function checkWantlistMatches(
 				// Default to true if no preferences row exists (per D-18)
 				if (prefs?.wantlist_match_email !== false) {
 					// Get user's email address
-					const { data: userData } =
-						await admin.auth.admin.getUserById(match.user_id);
+					const { data: userData } = await admin.auth.admin.getUserById(match.user_id);
 
 					const email = userData?.user?.email;
 					if (email) {
-						await sendWantlistMatchEmail(
-							email,
-							release.title,
-							release.artist,
-							adderUsername,
-						);
+						await sendWantlistMatchEmail(email, release.title, release.artist, adderUsername);
 					}
 				}
 			} catch (error) {
 				// Per-user notification failure is non-fatal
-				console.error(
-					`Failed to notify user ${match.user_id} about wantlist match:`,
-					error,
-				);
+				console.error(`Failed to notify user ${match.user_id} about wantlist match:`, error);
 			}
 		}
 	} catch (error) {

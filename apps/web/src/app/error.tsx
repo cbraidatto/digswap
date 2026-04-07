@@ -20,9 +20,7 @@ export default function GlobalError({
 		<div className="min-h-screen flex items-center justify-center p-6 bg-background">
 			<div className="w-full max-w-md text-center">
 				<div className="w-16 h-16 mx-auto mb-6 rounded-full bg-destructive/10 flex items-center justify-center">
-					<span className="material-symbols-outlined text-3xl text-destructive">
-						error
-					</span>
+					<span className="material-symbols-outlined text-3xl text-destructive">error</span>
 				</div>
 
 				<h1 className="font-heading text-2xl font-bold text-foreground mb-2">

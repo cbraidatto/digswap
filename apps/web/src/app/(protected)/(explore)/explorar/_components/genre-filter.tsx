@@ -8,15 +8,10 @@ interface GenreFilterProps {
 	disabled?: boolean;
 }
 
-export function GenreFilter({
-	activeGenre,
-	onGenreChange,
-	disabled,
-}: GenreFilterProps) {
+export function GenreFilter({ activeGenre, onGenreChange, disabled }: GenreFilterProps) {
 	const chipBase =
 		"px-3 py-2 font-mono text-xs uppercase tracking-wider rounded-md border whitespace-nowrap flex-shrink-0 transition-colors";
-	const chipActive =
-		"bg-secondary/15 text-secondary border-secondary/30 font-bold";
+	const chipActive = "bg-secondary/15 text-secondary border-secondary/30 font-bold";
 	const chipInactive =
 		"bg-transparent text-on-surface-variant border-outline-variant/20 hover:text-on-surface hover:border-outline-variant/40";
 

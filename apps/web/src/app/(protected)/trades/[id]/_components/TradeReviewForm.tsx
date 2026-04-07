@@ -1,7 +1,7 @@
 "use client";
 
-import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
+import { useState, useTransition } from "react";
 import { submitTradeReviewAction } from "@/actions/trades";
 
 interface Props {
@@ -61,9 +61,7 @@ export function TradeReviewForm({ tradeId, status }: Props) {
 						type="button"
 						onClick={() => setRating(star)}
 						className={`text-lg transition-colors ${
-							star <= rating
-								? "text-primary"
-								: "text-outline-variant/30 hover:text-outline-variant"
+							star <= rating ? "text-primary" : "text-outline-variant/30 hover:text-outline-variant"
 						}`}
 					>
 						<span className="material-symbols-outlined text-xl">
@@ -72,9 +70,7 @@ export function TradeReviewForm({ tradeId, status }: Props) {
 					</button>
 				))}
 				{rating > 0 && (
-					<span className="font-mono text-xs text-muted-foreground ml-2">
-						{rating}/5
-					</span>
+					<span className="font-mono text-xs text-muted-foreground ml-2">{rating}/5</span>
 				)}
 			</div>
 
@@ -88,9 +84,7 @@ export function TradeReviewForm({ tradeId, status }: Props) {
 				className="w-full bg-surface-container-lowest border border-outline-variant/20 rounded p-2 font-mono text-xs text-foreground placeholder:text-muted-foreground/50 resize-none focus:outline-none focus:border-primary/50"
 			/>
 
-			{error && (
-				<p className="font-mono text-xs text-destructive mt-1">{error}</p>
-			)}
+			{error && <p className="font-mono text-xs text-destructive mt-1">{error}</p>}
 
 			<button
 				type="button"

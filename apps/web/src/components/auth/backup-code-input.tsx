@@ -1,19 +1,15 @@
 "use client";
 
-import { useState } from "react";
+import { AlertTriangle, Loader2 } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { Loader2, AlertTriangle } from "lucide-react";
+import { useState } from "react";
 import { toast } from "sonner";
 
 import { useBackupCode } from "@/actions/mfa";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import {
-	Alert,
-	AlertDescription,
-	AlertTitle,
-} from "@/components/ui/alert";
 
 /**
  * Backup code entry component for 2FA login.
@@ -23,11 +19,7 @@ import {
  * - Warns if this is the last backup code
  * - "Back to authenticator code" link toggles back to TOTP challenge
  */
-export function BackupCodeInput({
-	onBack,
-}: {
-	onBack: () => void;
-}) {
+export function BackupCodeInput({ onBack }: { onBack: () => void }) {
 	const router = useRouter();
 	const [code, setCode] = useState("");
 	const [error, setError] = useState<string | null>(null);
@@ -54,9 +46,7 @@ export function BackupCodeInput({
 		// Check if this was the last backup code
 		if (result.data.remainingCodes === 0) {
 			setLastCodeWarning(true);
-			toast.warning(
-				"This was your last backup code. Please re-enable 2FA to generate new codes.",
-			);
+			toast.warning("This was your last backup code. Please re-enable 2FA to generate new codes.");
 			// Brief delay so user sees the warning before redirect
 			setTimeout(() => {
 				router.push(result.data.redirectTo);
@@ -70,9 +60,7 @@ export function BackupCodeInput({
 
 	return (
 		<div className="space-y-4">
-			<p className="text-sm text-muted-foreground">
-				Enter one of your backup codes to sign in.
-			</p>
+			<p className="text-sm text-muted-foreground">Enter one of your backup codes to sign in.</p>
 
 			{error && (
 				<div
@@ -88,8 +76,7 @@ export function BackupCodeInput({
 					<AlertTriangle className="size-4" />
 					<AlertTitle>Last backup code used</AlertTitle>
 					<AlertDescription>
-						This is your last backup code. Please re-enable 2FA to generate
-						new codes.
+						This is your last backup code. Please re-enable 2FA to generate new codes.
 					</AlertDescription>
 				</Alert>
 			)}
@@ -105,9 +92,7 @@ export function BackupCodeInput({
 					className="h-11 text-center font-mono text-lg tracking-widest uppercase"
 					value={code}
 					onChange={(e) => {
-						const val = e.target.value
-							.replace(/[^A-Za-z0-9]/g, "")
-							.toUpperCase();
+						const val = e.target.value.replace(/[^A-Za-z0-9]/g, "").toUpperCase();
 						setCode(val);
 					}}
 					onKeyDown={(e) => {
@@ -125,19 +110,11 @@ export function BackupCodeInput({
 				aria-busy={isSubmitting}
 				onClick={handleSubmit}
 			>
-				{isSubmitting ? (
-					<Loader2 className="size-4 animate-spin" />
-				) : (
-					"Use Backup Code"
-				)}
+				{isSubmitting ? <Loader2 className="size-4 animate-spin" /> : "Use Backup Code"}
 			</Button>
 
 			<div className="text-center">
-				<button
-					type="button"
-					className="text-sm text-primary hover:underline"
-					onClick={onBack}
-				>
+				<button type="button" className="text-sm text-primary hover:underline" onClick={onBack}>
 					Back to authenticator code
 				</button>
 			</div>

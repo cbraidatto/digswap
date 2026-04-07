@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 
 // ---------------------------------------------------------------------------
 // Mock rate limiters
@@ -12,7 +12,7 @@ vi.mock("@/lib/rate-limit", () => ({
 	authRateLimit: null,
 	resetRateLimit: null,
 	totpRateLimit: null,
-	apiRateLimit: "api",       // sentinel value so safeLimit can identify it
+	apiRateLimit: "api", // sentinel value so safeLimit can identify it
 	tradeRateLimit: "trade",
 	discogsRateLimit: "discogs",
 	// safeLimit(limiter, key, failClosed) — route to the right mock based on limiter sentinel
@@ -49,8 +49,18 @@ const mockFrom = vi.fn();
 function createQueryChain(result: { data?: unknown; error?: unknown }) {
 	const chain: Record<string, unknown> = {};
 	const methods = [
-		"select", "eq", "neq", "single", "maybeSingle", "insert",
-		"update", "delete", "in", "or", "order", "limit",
+		"select",
+		"eq",
+		"neq",
+		"single",
+		"maybeSingle",
+		"insert",
+		"update",
+		"delete",
+		"in",
+		"or",
+		"order",
+		"limit",
 	];
 	for (const method of methods) {
 		chain[method] = vi.fn().mockReturnValue(chain);
@@ -100,9 +110,20 @@ let queryResults: unknown[][] = [];
 vi.mock("@/lib/db", () => {
 	const chain: Record<string, unknown> = {};
 	const methods = [
-		"select", "from", "where", "orderBy", "limit", "innerJoin",
-		"leftJoin", "groupBy", "offset", "selectDistinctOn", "update", "set",
-		"delete", "execute",
+		"select",
+		"from",
+		"where",
+		"orderBy",
+		"limit",
+		"innerJoin",
+		"leftJoin",
+		"groupBy",
+		"offset",
+		"selectDistinctOn",
+		"update",
+		"set",
+		"delete",
+		"execute",
 	];
 	for (const method of methods) {
 		chain[method] = vi.fn().mockImplementation(() => chain);
@@ -147,45 +168,110 @@ vi.mock("@/lib/db", () => {
 
 vi.mock("@/lib/db/schema/social", () => ({
 	follows: { id: "id", followerId: "follower_id", followingId: "following_id" },
-	activityFeed: { userId: "user_id", actionType: "action_type", targetType: "target_type", targetId: "target_id", metadata: "metadata" },
+	activityFeed: {
+		userId: "user_id",
+		actionType: "action_type",
+		targetType: "target_type",
+		targetId: "target_id",
+		metadata: "metadata",
+	},
 }));
 vi.mock("@/lib/db/schema/users", () => ({
-	profiles: { id: "id", username: "username", displayName: "display_name", avatarUrl: "avatar_url", updatedAt: "updated_at", onboardingCompleted: "onboarding_completed", holyGrailIds: "holy_grail_ids", coverUrl: "cover_url", coverPositionY: "cover_position_y" },
+	profiles: {
+		id: "id",
+		username: "username",
+		displayName: "display_name",
+		avatarUrl: "avatar_url",
+		updatedAt: "updated_at",
+		onboardingCompleted: "onboarding_completed",
+		holyGrailIds: "holy_grail_ids",
+		coverUrl: "cover_url",
+		coverPositionY: "cover_position_y",
+	},
 }));
 vi.mock("@/lib/db/schema/collections", () => ({
 	collectionItems: { userId: "user_id", releaseId: "release_id" },
 }));
 vi.mock("@/lib/db/schema/releases", () => ({
-	releases: { id: "id", title: "title", artist: "artist", year: "year", coverImageUrl: "cover_image_url" },
+	releases: {
+		id: "id",
+		title: "title",
+		artist: "artist",
+		year: "year",
+		coverImageUrl: "cover_image_url",
+	},
 }));
 vi.mock("@/lib/db/schema/groups", () => ({
 	groups: { id: "id", slug: "slug", name: "name", memberCount: "member_count" },
 	groupMembers: { id: "id", groupId: "group_id", userId: "user_id", role: "role" },
-	groupPosts: { id: "id", groupId: "group_id", userId: "user_id", content: "content", releaseId: "release_id", reviewId: "review_id" },
+	groupPosts: {
+		id: "id",
+		groupId: "group_id",
+		userId: "user_id",
+		content: "content",
+		releaseId: "release_id",
+		reviewId: "review_id",
+	},
 }));
 vi.mock("@/lib/db/schema/group-invites", () => ({
-	groupInvites: { id: "id", groupId: "group_id", token: "token", createdBy: "created_by", expiresAt: "expires_at" },
+	groupInvites: {
+		id: "id",
+		groupId: "group_id",
+		token: "token",
+		createdBy: "created_by",
+		expiresAt: "expires_at",
+	},
 }));
 vi.mock("@/lib/db/schema/reviews", () => ({
-	reviews: { id: "id", userId: "user_id", releaseId: "release_id", rating: "rating", title: "title", body: "body", isPressingSpecific: "is_pressing_specific", pressingDetails: "pressing_details", updatedAt: "updated_at" },
+	reviews: {
+		id: "id",
+		userId: "user_id",
+		releaseId: "release_id",
+		rating: "rating",
+		title: "title",
+		body: "body",
+		isPressingSpecific: "is_pressing_specific",
+		pressingDetails: "pressing_details",
+		updatedAt: "updated_at",
+	},
 }));
 vi.mock("@/lib/db/schema/leads", () => ({
-	leads: { userId: "user_id", targetType: "target_type", targetId: "target_id", note: "note", status: "status", updatedAt: "updated_at" },
+	leads: {
+		userId: "user_id",
+		targetType: "target_type",
+		targetId: "target_id",
+		note: "note",
+		status: "status",
+		updatedAt: "updated_at",
+	},
 }));
 vi.mock("@/lib/db/schema/sessions", () => ({
-	userSessions: { id: "id", userId: "user_id", sessionId: "session_id", deviceInfo: "device_info", ipAddress: "ip_address", createdAt: "created_at", lastSeenAt: "last_seen_at" },
+	userSessions: {
+		id: "id",
+		userId: "user_id",
+		sessionId: "session_id",
+		deviceInfo: "device_info",
+		ipAddress: "ip_address",
+		createdAt: "created_at",
+		lastSeenAt: "last_seen_at",
+	},
 }));
 
 vi.mock("@/lib/community/slugify", () => ({
 	slugify: vi.fn().mockReturnValue("test-slug"),
 }));
 vi.mock("@/lib/community/queries", () => ({
-	getGroupPosts: vi.fn(), getGenreGroups: vi.fn(), getMemberGroups: vi.fn(),
-	getReviewsForRelease: vi.fn(), getReviewCountForRelease: vi.fn(),
+	getGroupPosts: vi.fn(),
+	getGenreGroups: vi.fn(),
+	getMemberGroups: vi.fn(),
+	getReviewsForRelease: vi.fn(),
+	getReviewCountForRelease: vi.fn(),
 }));
 vi.mock("@/lib/social/queries", () => ({
-	getGlobalFeed: vi.fn(), getPersonalFeed: vi.fn(),
-	getFollowers: vi.fn(), getFollowing: vi.fn(),
+	getGlobalFeed: vi.fn(),
+	getPersonalFeed: vi.fn(),
+	getFollowers: vi.fn(),
+	getFollowing: vi.fn(),
 }));
 vi.mock("@/lib/collection/filters", () => ({
 	CONDITION_GRADES: ["M", "NM", "VG+", "VG", "G+", "G", "F", "P"] as const,
@@ -205,7 +291,8 @@ vi.mock("@/lib/notifications/queries", () => ({
 	upsertPreferences: vi.fn().mockResolvedValue({}),
 }));
 vi.mock("@/lib/discogs/oauth", () => ({
-	getRequestToken: vi.fn(), deleteTokens: vi.fn(),
+	getRequestToken: vi.fn(),
+	deleteTokens: vi.fn(),
 }));
 vi.mock("@/lib/youtube/client", () => ({
 	searchYouTube: vi.fn(),
@@ -228,13 +315,13 @@ vi.mock("next/navigation", () => ({
 	redirect: vi.fn(),
 }));
 
+import { loadGlobalLeaderboard } from "@/actions/gamification";
+import { markNotificationRead } from "@/actions/notifications";
+import { searchCollectionForShowcase } from "@/actions/profile";
 // ---------------------------------------------------------------------------
 // Import actions after mocks
 // ---------------------------------------------------------------------------
 import { followUser } from "@/actions/social";
-import { searchCollectionForShowcase } from "@/actions/profile";
-import { loadGlobalLeaderboard } from "@/actions/gamification";
-import { markNotificationRead } from "@/actions/notifications";
 
 describe("Server Action Rate Limiting", () => {
 	beforeEach(() => {

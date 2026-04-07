@@ -1,4 +1,4 @@
-import { describe, test, expect, vi, beforeEach } from "vitest";
+import { beforeEach, describe, expect, test, vi } from "vitest";
 
 // -- Track all admin calls for assertions --
 const adminCalls: { table: string; method: string; args: unknown[] }[] = [];
@@ -142,9 +142,7 @@ describe("Discogs disconnect", () => {
 	test("cancels active import jobs", async () => {
 		await disconnectDiscogs();
 
-		const jobUpdates = adminCalls.filter(
-			(c) => c.table === "import_jobs" && c.method === "update",
-		);
+		const jobUpdates = adminCalls.filter((c) => c.table === "import_jobs" && c.method === "update");
 		expect(jobUpdates.length).toBeGreaterThanOrEqual(1);
 	});
 });

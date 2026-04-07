@@ -23,13 +23,7 @@ interface AuthCardProps {
  *
  * @param wide - When true, uses 520px max-width (onboarding variant)
  */
-export function AuthCard({
-	title,
-	subtitle,
-	children,
-	footer,
-	wide = false,
-}: AuthCardProps) {
+export function AuthCard({ title, subtitle, children, footer, wide = false }: AuthCardProps) {
 	return (
 		<Card
 			className={cn(
@@ -42,9 +36,7 @@ export function AuthCard({
 					{title}
 				</CardTitle>
 				{subtitle && (
-					<CardDescription className="text-sm text-muted-foreground">
-						{subtitle}
-					</CardDescription>
+					<CardDescription className="text-sm text-muted-foreground">{subtitle}</CardDescription>
 				)}
 			</CardHeader>
 			<CardContent className="px-0">{children}</CardContent>

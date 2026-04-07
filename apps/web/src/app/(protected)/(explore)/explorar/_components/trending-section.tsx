@@ -1,12 +1,12 @@
 "use client";
 
-import { useEffect, useState, useTransition } from "react";
 import Link from "next/link";
+import { useEffect, useState, useTransition } from "react";
 import { getTrendingAction } from "@/actions/discovery";
-import type { TrendingRecord } from "@/lib/discovery/queries";
 import { CoverArt } from "@/components/ui/cover-art";
-import { GemBadge } from "@/components/ui/gem-badge";
+import { RarityPill } from "@/components/ui/rarity-pill";
 import { RecordContextMenu } from "@/components/ui/record-context-menu";
+import type { TrendingRecord } from "@/lib/discovery/queries";
 
 export function TrendingSection() {
 	const [records, setRecords] = useState<TrendingRecord[]>([]);
@@ -37,7 +37,10 @@ export function TrendingSection() {
 			{isPending && !loaded ? (
 				<div className="flex gap-3 overflow-hidden">
 					{Array.from({ length: 5 }).map((_, i) => (
-						<div key={i} className="w-36 h-52 rounded-xl bg-surface-container-high animate-pulse flex-shrink-0" />
+						<div
+							key={i}
+							className="w-36 h-52 rounded-xl bg-surface-container-high animate-pulse flex-shrink-0"
+						/>
 					))}
 				</div>
 			) : (
@@ -81,7 +84,11 @@ export function TrendingSection() {
 									<span className="font-mono text-[9px] text-primary font-semibold">
 										+{record.addCount}
 									</span>
-									<GemBadge score={record.rarityScore} className="text-[8px] px-1.5" />
+									<RarityPill
+										score={record.rarityScore}
+										showScore={false}
+										className="text-[8px] px-1.5"
+									/>
 								</div>
 							</div>
 						</div>

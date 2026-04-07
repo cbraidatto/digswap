@@ -1,29 +1,33 @@
 "use server";
 
-import { createAdminClient } from "@/lib/supabase/admin";
+import { and, eq, sql } from "drizzle-orm";
 import { requireUser } from "@/lib/auth/require-user";
-import { db } from "@/lib/db";
-import { groups, groupMembers, groupPosts } from "@/lib/db/schema/groups";
-import { groupInvites } from "@/lib/db/schema/group-invites";
-import { reviews } from "@/lib/db/schema/reviews";
-import { profiles } from "@/lib/db/schema/users";
-import { eq, and, sql } from "drizzle-orm";
-import { logActivity } from "@/lib/social/log-activity";
-import { awardBadge } from "@/lib/gamification/badge-awards";
-import { apiRateLimit , safeLimit} from "@/lib/rate-limit";
-import { slugify } from "@/lib/community/slugify";
-import { createGroupSchema, createPostSchema, createReviewSchema } from "@/lib/validations/community";
 import {
-	getGroupPosts,
-	getGenreGroups,
-	getMemberGroups,
-	getReviewsForRelease,
-	getReviewCountForRelease,
 	type GenreGroup,
-	type MemberGroup,
 	type GroupPost,
+	getGenreGroups,
+	getGroupPosts,
+	getMemberGroups,
+	getReviewCountForRelease,
+	getReviewsForRelease,
+	type MemberGroup,
 	type ReviewItem,
 } from "@/lib/community/queries";
+import { slugify } from "@/lib/community/slugify";
+import { db } from "@/lib/db";
+import { groupInvites } from "@/lib/db/schema/group-invites";
+import { groupMembers, groupPosts, groups } from "@/lib/db/schema/groups";
+import { reviews } from "@/lib/db/schema/reviews";
+import { profiles } from "@/lib/db/schema/users";
+import { awardBadge } from "@/lib/gamification/badge-awards";
+import { apiRateLimit, safeLimit } from "@/lib/rate-limit";
+import { logActivity } from "@/lib/social/log-activity";
+import { createAdminClient } from "@/lib/supabase/admin";
+import {
+	createGroupSchema,
+	createPostSchema,
+	createReviewSchema,
+} from "@/lib/validations/community";
 
 // ---------------------------------------------------------------------------
 // Group CRUD
@@ -51,7 +55,7 @@ export async function createGroupAction(data: {
 		const { name, category, description, visibility } = parsed.data;
 
 		// Generate slug with conflict resolution
-		let baseSlug = slugify(name);
+		const baseSlug = slugify(name);
 		let candidateSlug = baseSlug;
 		let suffix = 2;
 
@@ -132,12 +136,7 @@ export async function joinGroupAction(
 		const existingMember = await db
 			.select({ id: groupMembers.id })
 			.from(groupMembers)
-			.where(
-				and(
-					eq(groupMembers.groupId, groupId),
-					eq(groupMembers.userId, user.id),
-				),
-			)
+			.where(and(eq(groupMembers.groupId, groupId), eq(groupMembers.userId, user.id)))
 			.limit(1);
 
 		if (existingMember.length > 0) {
@@ -197,12 +196,7 @@ export async function leaveGroupAction(
 		const [membership] = await db
 			.select({ id: groupMembers.id, role: groupMembers.role })
 			.from(groupMembers)
-			.where(
-				and(
-					eq(groupMembers.groupId, groupId),
-					eq(groupMembers.userId, user.id),
-				),
-			)
+			.where(and(eq(groupMembers.groupId, groupId), eq(groupMembers.userId, user.id)))
 			.limit(1);
 
 		if (!membership) {
@@ -214,26 +208,18 @@ export async function leaveGroupAction(
 			const otherAdmins = await db
 				.select({ id: groupMembers.id })
 				.from(groupMembers)
-				.where(
-					and(
-						eq(groupMembers.groupId, groupId),
-						eq(groupMembers.role, "admin"),
-					),
-				);
+				.where(and(eq(groupMembers.groupId, groupId), eq(groupMembers.role, "admin")));
 
 			if (otherAdmins.length <= 1) {
 				return {
-					error:
-						"Cannot leave as the sole admin. Promote another member first.",
+					error: "Cannot leave as the sole admin. Promote another member first.",
 				};
 			}
 		}
 
 		// SECURITY: Use transaction to ensure member removal and count decrement are atomic
 		await db.transaction(async (tx) => {
-			await tx
-				.delete(groupMembers)
-				.where(eq(groupMembers.id, membership.id));
+			await tx.delete(groupMembers).where(eq(groupMembers.id, membership.id));
 
 			await tx
 				.update(groups)
@@ -279,12 +265,7 @@ export async function createPostAction(data: {
 		const [membership] = await db
 			.select({ id: groupMembers.id })
 			.from(groupMembers)
-			.where(
-				and(
-					eq(groupMembers.groupId, data.groupId),
-					eq(groupMembers.userId, user.id),
-				),
-			)
+			.where(and(eq(groupMembers.groupId, data.groupId), eq(groupMembers.userId, user.id)))
 			.limit(1);
 
 		if (!membership) {
@@ -371,12 +352,7 @@ export async function createReviewAction(data: {
 		const [membership] = await db
 			.select({ id: groupMembers.id })
 			.from(groupMembers)
-			.where(
-				and(
-					eq(groupMembers.groupId, data.groupId),
-					eq(groupMembers.userId, user.id),
-				),
-			)
+			.where(and(eq(groupMembers.groupId, data.groupId), eq(groupMembers.userId, user.id)))
 			.limit(1);
 
 		if (!membership) {
@@ -466,12 +442,7 @@ export async function generateInviteAction(
 		const [membership] = await db
 			.select({ role: groupMembers.role })
 			.from(groupMembers)
-			.where(
-				and(
-					eq(groupMembers.groupId, groupId),
-					eq(groupMembers.userId, user.id),
-				),
-			)
+			.where(and(eq(groupMembers.groupId, groupId), eq(groupMembers.userId, user.id)))
 			.limit(1);
 
 		if (!membership || membership.role !== "admin") {
@@ -513,12 +484,7 @@ export async function inviteUserAction(
 		const [membership] = await db
 			.select({ role: groupMembers.role })
 			.from(groupMembers)
-			.where(
-				and(
-					eq(groupMembers.groupId, groupId),
-					eq(groupMembers.userId, user.id),
-				),
-			)
+			.where(and(eq(groupMembers.groupId, groupId), eq(groupMembers.userId, user.id)))
 			.limit(1);
 
 		if (!membership || membership.role !== "admin") {
@@ -624,12 +590,7 @@ export async function acceptInviteAction(
 		const existingMember = await db
 			.select({ id: groupMembers.id })
 			.from(groupMembers)
-			.where(
-				and(
-					eq(groupMembers.groupId, invite.groupId),
-					eq(groupMembers.userId, user.id),
-				),
-			)
+			.where(and(eq(groupMembers.groupId, invite.groupId), eq(groupMembers.userId, user.id)))
 			.limit(1);
 
 		if (existingMember.length > 0) {
@@ -715,7 +676,8 @@ export async function removeMemberAction(
 
 		await db.transaction(async (tx) => {
 			await tx.delete(groupMembers).where(eq(groupMembers.id, targetMembership.id));
-			await tx.update(groups)
+			await tx
+				.update(groups)
 				.set({ memberCount: sql`${groups.memberCount} - 1` })
 				.where(eq(groups.id, groupId));
 		});
@@ -758,7 +720,8 @@ export async function promoteToAdminAction(
 		if (!targetMembership) return { error: "User is not a member of this group." };
 		if (targetMembership.role === "admin") return { error: "User is already an admin." };
 
-		await db.update(groupMembers)
+		await db
+			.update(groupMembers)
 			.set({ role: "admin" })
 			.where(eq(groupMembers.id, targetMembership.id));
 
@@ -802,10 +765,7 @@ export async function revokeInviteAction(
 // Feed query wrappers (for UI server actions)
 // ---------------------------------------------------------------------------
 
-export async function loadGroupPostsAction(
-	groupId: string,
-	cursor?: string,
-): Promise<GroupPost[]> {
+export async function loadGroupPostsAction(groupId: string, cursor?: string): Promise<GroupPost[]> {
 	try {
 		const user = await requireUser();
 
@@ -820,12 +780,7 @@ export async function loadGroupPostsAction(
 			const [membership] = await db
 				.select({ id: groupMembers.id })
 				.from(groupMembers)
-				.where(
-					and(
-						eq(groupMembers.groupId, groupId),
-						eq(groupMembers.userId, user.id),
-					),
-				)
+				.where(and(eq(groupMembers.groupId, groupId), eq(groupMembers.userId, user.id)))
 				.limit(1);
 
 			if (!membership) {
@@ -840,9 +795,7 @@ export async function loadGroupPostsAction(
 	}
 }
 
-export async function loadGenreGroupsAction(
-	genreFilter?: string,
-): Promise<GenreGroup[]> {
+export async function loadGenreGroupsAction(genreFilter?: string): Promise<GenreGroup[]> {
 	try {
 		await requireUser();
 		return getGenreGroups(genreFilter);
@@ -878,9 +831,7 @@ export async function loadReviewsForReleaseAction(
 	}
 }
 
-export async function getReviewCountAction(
-	releaseId: string,
-): Promise<number> {
+export async function getReviewCountAction(releaseId: string): Promise<number> {
 	try {
 		await requireUser();
 		return getReviewCountForRelease(releaseId);

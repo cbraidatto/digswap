@@ -2,12 +2,12 @@
 
 import { and, eq, ilike, or } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
+import { z } from "zod";
 import { db } from "@/lib/db";
 import { collectionItems } from "@/lib/db/schema/collections";
 import { releases } from "@/lib/db/schema/releases";
 import { profiles } from "@/lib/db/schema/users";
-import { z } from "zod";
-import { apiRateLimit , safeLimit} from "@/lib/rate-limit";
+import { apiRateLimit, safeLimit } from "@/lib/rate-limit";
 import { createClient } from "@/lib/supabase/server";
 import { sanitizeWildcards, uuidSchema } from "@/lib/validations/common";
 import { updateProfileSchema } from "@/lib/validations/profile";
@@ -19,8 +19,8 @@ const showcaseReleaseIdSchema = uuidSchema.nullable();
 
 const SLOT_COLUMN = {
 	searching: "showcaseSearchingId",
-	rarest:    "showcaseRarestId",
-	favorite:  "showcaseFavoriteId",
+	rarest: "showcaseRarestId",
+	favorite: "showcaseFavoriteId",
 } as const;
 
 // ---------------------------------------------------------------------------
@@ -34,9 +34,9 @@ const SLOT_COLUMN = {
  * because browsers execute inline script in SVGs served from the same origin.
  */
 const ALLOWED_IMAGE_TYPES: Record<string, { magic: number[]; ext: string[] }> = {
-	"image/jpeg": { magic: [0xff, 0xd8, 0xff],          ext: ["jpg", "jpeg"] },
-	"image/png":  { magic: [0x89, 0x50, 0x4e, 0x47],    ext: ["png"] },
-	"image/webp": { magic: [0x52, 0x49, 0x46, 0x46],    ext: ["webp"] },
+	"image/jpeg": { magic: [0xff, 0xd8, 0xff], ext: ["jpg", "jpeg"] },
+	"image/png": { magic: [0x89, 0x50, 0x4e, 0x47], ext: ["png"] },
+	"image/webp": { magic: [0x52, 0x49, 0x46, 0x46], ext: ["webp"] },
 };
 
 /**
@@ -85,7 +85,9 @@ export async function updateShowcase(slot: ShowcaseSlot, releaseId: string | nul
 		}
 
 		const supabase = await createClient();
-		const { data: { user } } = await supabase.auth.getUser();
+		const {
+			data: { user },
+		} = await supabase.auth.getUser();
 		if (!user) return { error: "Unauthenticated" };
 
 		const { success: rlSuccess } = await safeLimit(apiRateLimit, user.id, true);
@@ -109,7 +111,9 @@ export async function updateShowcase(slot: ShowcaseSlot, releaseId: string | nul
 export async function searchCollectionForShowcase(query: string) {
 	try {
 		const supabase = await createClient();
-		const { data: { user } } = await supabase.auth.getUser();
+		const {
+			data: { user },
+		} = await supabase.auth.getUser();
 		if (!user) return [];
 
 		const { success: rlSuccess } = await safeLimit(apiRateLimit, user.id, false);
@@ -124,11 +128,11 @@ export async function searchCollectionForShowcase(query: string) {
 
 		const rows = await db
 			.selectDistinctOn([releases.id], {
-				id:            releases.id,
-				discogsId:     releases.discogsId,
-				title:         releases.title,
-				artist:        releases.artist,
-				year:          releases.year,
+				id: releases.id,
+				discogsId: releases.discogsId,
+				title: releases.title,
+				artist: releases.artist,
+				year: releases.year,
 				coverImageUrl: releases.coverImageUrl,
 			})
 			.from(collectionItems)
@@ -136,10 +140,7 @@ export async function searchCollectionForShowcase(query: string) {
 			.where(
 				and(
 					eq(collectionItems.userId, user.id),
-					or(
-						ilike(releases.title,  `%${sanitized}%`),
-						ilike(releases.artist, `%${sanitized}%`),
-					),
+					or(ilike(releases.title, `%${sanitized}%`), ilike(releases.artist, `%${sanitized}%`)),
 				),
 			)
 			.limit(8);
@@ -156,15 +157,17 @@ export async function updateProfile(data: {
 	username: string;
 	location: string;
 	bio?: string;
-	youtubeUrl?:    string;
-	instagramUrl?:  string;
+	youtubeUrl?: string;
+	instagramUrl?: string;
 	soundcloudUrl?: string;
-	discogsUrl?:    string;
-	beatportUrl?:   string;
+	discogsUrl?: string;
+	beatportUrl?: string;
 }) {
 	try {
 		const supabase = await createClient();
-		const { data: { user } } = await supabase.auth.getUser();
+		const {
+			data: { user },
+		} = await supabase.auth.getUser();
 		if (!user) return { error: "Unauthenticated" };
 
 		const { success: rlSuccess } = await safeLimit(apiRateLimit, user.id, true);
@@ -190,7 +193,7 @@ export async function updateProfile(data: {
 			beatportUrl: data.beatportUrl,
 		};
 		for (const [field, value] of Object.entries(socialUrls)) {
-			if (value && value.trim()) {
+			if (value?.trim()) {
 				try {
 					const parsed = new URL(value.trim());
 					if (parsed.protocol !== "https:") {
@@ -203,7 +206,11 @@ export async function updateProfile(data: {
 		}
 
 		const displayName = data.displayName.trim().slice(0, 50);
-		const username = data.username.trim().toLowerCase().replace(/[^a-z0-9_]/g, "").slice(0, 30);
+		const username = data.username
+			.trim()
+			.toLowerCase()
+			.replace(/[^a-z0-9_]/g, "")
+			.slice(0, 30);
 		const location = data.location.trim().slice(0, 300);
 		const bio = (data.bio ?? "").trim().slice(0, 300);
 
@@ -214,15 +221,15 @@ export async function updateProfile(data: {
 
 		const profileData = {
 			displayName,
-			username:      username || null,
-			location:      location || null,
-			bio:           bio || null,
-			youtubeUrl:    clean(data.youtubeUrl),
-			instagramUrl:  clean(data.instagramUrl),
+			username: username || null,
+			location: location || null,
+			bio: bio || null,
+			youtubeUrl: clean(data.youtubeUrl),
+			instagramUrl: clean(data.instagramUrl),
 			soundcloudUrl: clean(data.soundcloudUrl),
-			discogsUrl:    clean(data.discogsUrl),
-			beatportUrl:   clean(data.beatportUrl),
-			updatedAt:     new Date(),
+			discogsUrl: clean(data.discogsUrl),
+			beatportUrl: clean(data.beatportUrl),
+			updatedAt: new Date(),
 		};
 
 		await db
@@ -270,9 +277,7 @@ export async function uploadCoverImage(formData: FormData) {
 
 		if (uploadError) return { error: uploadError.message };
 
-		const { data: urlData } = supabase.storage
-			.from("profile-covers")
-			.getPublicUrl(path);
+		const { data: urlData } = supabase.storage.from("profile-covers").getPublicUrl(path);
 
 		// Bust cache with timestamp
 		const coverUrl = `${urlData.publicUrl}?t=${Date.now()}`;
@@ -321,9 +326,7 @@ export async function uploadAvatar(formData: FormData) {
 
 		if (uploadError) return { error: uploadError.message };
 
-		const { data: urlData } = supabase.storage
-			.from("profile-covers")
-			.getPublicUrl(path);
+		const { data: urlData } = supabase.storage.from("profile-covers").getPublicUrl(path);
 
 		const avatarUrl = `${urlData.publicUrl}?t=${Date.now()}`;
 
@@ -343,7 +346,9 @@ export async function uploadAvatar(formData: FormData) {
 export async function updateHolyGrails(ids: string[]) {
 	try {
 		const supabase = await createClient();
-		const { data: { user } } = await supabase.auth.getUser();
+		const {
+			data: { user },
+		} = await supabase.auth.getUser();
 		if (!user) return { error: "Not authenticated" };
 
 		const { success: rlSuccess } = await safeLimit(apiRateLimit, user.id, true);

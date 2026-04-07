@@ -1,13 +1,5 @@
-import {
-	pgTable,
-	uuid,
-	timestamp,
-	text,
-	integer,
-	index,
-} from "drizzle-orm/pg-core";
-import { pgPolicy } from "drizzle-orm/pg-core";
 import { sql } from "drizzle-orm";
+import { index, integer, pgPolicy, pgTable, text, timestamp, uuid } from "drizzle-orm/pg-core";
 import { authenticatedRole, authUid } from "drizzle-orm/supabase";
 import { releases } from "./releases";
 
@@ -21,9 +13,7 @@ export const listeningLogs = pgTable(
 			.references(() => releases.id, { onDelete: "cascade" }),
 		caption: text("caption"),
 		rating: integer("rating"), // 1-5, optional
-		listenedAt: timestamp("listened_at", { withTimezone: true })
-			.defaultNow()
-			.notNull(),
+		listenedAt: timestamp("listened_at", { withTimezone: true }).defaultNow().notNull(),
 	},
 	(table) => [
 		// RLS: own user can select their own logs

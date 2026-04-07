@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 
 // ---------------------------------------------------------------------------
 // Hoisted state — vi.mock factories are hoisted above imports so all shared
@@ -62,7 +62,16 @@ vi.mock("@/lib/supabase/server", () => ({
 vi.mock("@/lib/db", () => {
 	const makeSelectChain = () => {
 		const chain: Record<string, unknown> = {};
-		const chainMethods = ["from", "where", "limit", "innerJoin", "leftJoin", "groupBy", "offset", "orderBy"];
+		const chainMethods = [
+			"from",
+			"where",
+			"limit",
+			"innerJoin",
+			"leftJoin",
+			"groupBy",
+			"offset",
+			"orderBy",
+		];
 		for (const m of chainMethods) {
 			chain[m] = vi.fn().mockReturnValue(chain);
 		}
@@ -126,12 +135,12 @@ vi.mock("@/lib/crates/queries", () => ({
 // Import actions after all mocks are in place
 // ---------------------------------------------------------------------------
 import {
-	createCrate,
 	addToCrate,
-	moveToWantlist,
-	moveToCollection,
-	markAsFound,
+	createCrate,
 	createSet,
+	markAsFound,
+	moveToCollection,
+	moveToWantlist,
 	updateSetTracks,
 } from "@/actions/crates";
 
@@ -216,13 +225,15 @@ describe("crates server actions", () => {
 	it("moveToWantlist on active item returns success and item status becomes 'found'", async () => {
 		mocks.setResults([
 			// select(crateItems) → found item
-			[{
-				id: CRATE_ITEM_ID,
-				crateId: CRATE_ID,
-				userId: USER_ID,
-				releaseId: "b802c99e-7c0b-4ef8-bb6d-6bb9bd380a11",
-				status: "active",
-			}],
+			[
+				{
+					id: CRATE_ITEM_ID,
+					crateId: CRATE_ID,
+					userId: USER_ID,
+					releaseId: "b802c99e-7c0b-4ef8-bb6d-6bb9bd380a11",
+					status: "active",
+				},
+			],
 			// insert(wantlistItems).returning() → [{wantlistItemId}]
 			[{ wantlistItemId: "c903c99f-8c0b-4ef8-bb6d-6bb9bd380a11" }],
 		]);
@@ -239,13 +250,15 @@ describe("crates server actions", () => {
 	it("moveToCollection on active item returns success and item status becomes 'found'", async () => {
 		mocks.setResults([
 			// select(crateItems) → found item
-			[{
-				id: CRATE_ITEM_ID,
-				crateId: CRATE_ID,
-				userId: USER_ID,
-				releaseId: "b802c99e-7c0b-4ef8-bb6d-6bb9bd380a11",
-				status: "active",
-			}],
+			[
+				{
+					id: CRATE_ITEM_ID,
+					crateId: CRATE_ID,
+					userId: USER_ID,
+					releaseId: "b802c99e-7c0b-4ef8-bb6d-6bb9bd380a11",
+					status: "active",
+				},
+			],
 			// insert(collectionItems).returning() → [{collectionItemId}]
 			[{ collectionItemId: "da04c99a-9c0b-4ef8-bb6d-6bb9bd380a11" }],
 		]);
@@ -289,7 +302,7 @@ describe("crates server actions", () => {
 		]);
 
 		// Intercept values() to capture all inserts while keeping returning() working
-		mocks.insertValuesSpy.mockImplementation((vals: unknown) => ({
+		mocks.insertValuesSpy.mockImplementation((_vals: unknown) => ({
 			returning: mocks.insertReturning,
 		}));
 
@@ -311,7 +324,7 @@ describe("crates server actions", () => {
 		);
 		expect(trackCall).toBeTruthy();
 
-		const tracks = trackCall![0] as Array<{
+		const tracks = trackCall?.[0] as Array<{
 			crateItemId: string;
 			position: number;
 		}>;
@@ -350,7 +363,7 @@ describe("crates server actions", () => {
 			(call: unknown[]) => Array.isArray(call[0]) && (call[0] as unknown[]).length === 2,
 		);
 		expect(trackCall).toBeTruthy();
-		const tracks = trackCall![0] as Array<{
+		const tracks = trackCall?.[0] as Array<{
 			crateItemId: string;
 			position: number;
 		}>;

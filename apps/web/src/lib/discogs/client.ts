@@ -10,9 +10,7 @@ const CONSUMER_SECRET = process.env.DISCOGS_CONSUMER_SECRET!;
  *
  * WARNING: Server-side only. Never import this in client components.
  */
-export async function createDiscogsClient(
-	userId: string,
-): Promise<DiscogsClient> {
+export async function createDiscogsClient(userId: string): Promise<DiscogsClient> {
 	const admin = createAdminClient();
 
 	// Retrieve tokens from Vault (or fallback table)

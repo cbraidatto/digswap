@@ -5,13 +5,15 @@ interface FeedWelcomeBannerProps {
 	followingCount: number;
 }
 
-export function FeedWelcomeBanner({
-	discogsConnected,
-	followingCount,
-}: FeedWelcomeBannerProps) {
+export function FeedWelcomeBanner({ discogsConnected, followingCount }: FeedWelcomeBannerProps) {
 	const steps = [
 		{ done: discogsConnected, label: "Connect Discogs", href: "/settings", icon: "link" },
-		{ done: followingCount >= 3, label: `Follow 3 diggers (${Math.min(followingCount, 3)}/3)`, href: "/explorar", icon: "person_add" },
+		{
+			done: followingCount >= 3,
+			label: `Follow 3 diggers (${Math.min(followingCount, 3)}/3)`,
+			href: "/explorar",
+			icon: "person_add",
+		},
 		{ done: false, label: "Join a community", href: "/comunidade", icon: "group" },
 	];
 
@@ -20,12 +22,8 @@ export function FeedWelcomeBanner({
 	return (
 		<div className="mb-6 rounded-xl bg-gradient-to-r from-primary/5 via-surface-container-low to-secondary/5 border border-outline-variant/10 p-5">
 			<div className="flex items-center justify-between mb-3">
-				<h2 className="font-heading text-sm font-bold text-on-surface">
-					Get started
-				</h2>
-				<span className="font-mono text-[10px] text-on-surface-variant">
-					{doneCount}/3
-				</span>
+				<h2 className="font-heading text-sm font-bold text-on-surface">Get started</h2>
+				<span className="font-mono text-[10px] text-on-surface-variant">{doneCount}/3</span>
 			</div>
 
 			{/* Progress dots */}

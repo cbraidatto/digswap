@@ -1,9 +1,11 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
-import { useRouter } from "next/navigation";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
+import { searchDiscogs } from "@/actions/collection";
+import { addToWantlist, addToWantlistFromYouTube, searchYouTube } from "@/actions/wantlist";
 import {
 	Dialog,
 	DialogContent,
@@ -12,8 +14,6 @@ import {
 	DialogTitle,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
-import { searchDiscogs } from "@/actions/collection";
-import { addToWantlist, searchYouTube, addToWantlistFromYouTube } from "@/actions/wantlist";
 
 type Tab = "discogs" | "youtube";
 
@@ -71,7 +71,7 @@ export function AddToWantlistDialog({ open, onOpenChange }: AddToWantlistDialogP
 		setYoutubeResults([]);
 		setError(null);
 		setIsSearching(false);
-	}, [tab]);
+	}, []);
 
 	const handleSearch = useCallback((value: string, currentTab: Tab) => {
 		setQuery(value);
@@ -105,41 +105,62 @@ export function AddToWantlistDialog({ open, onOpenChange }: AddToWantlistDialogP
 	}, []);
 
 	useEffect(() => {
-		return () => { if (debounceRef.current) clearTimeout(debounceRef.current); };
+		return () => {
+			if (debounceRef.current) clearTimeout(debounceRef.current);
+		};
 	}, []);
 
 	const handleAddDiscogs = async (result: DiscogsResult) => {
 		setIsAdding(String(result.discogsId));
 		try {
 			const res = await addToWantlist(result.discogsId);
-			if (res.error) { toast.error(res.error); }
-			else { toast.success("Added to wantlist"); onOpenChange(false); router.refresh(); }
-		} catch { toast.error("Failed to add. Please try again."); }
-		finally { setIsAdding(null); }
+			if (res.error) {
+				toast.error(res.error);
+			} else {
+				toast.success("Added to wantlist");
+				onOpenChange(false);
+				router.refresh();
+			}
+		} catch {
+			toast.error("Failed to add. Please try again.");
+		} finally {
+			setIsAdding(null);
+		}
 	};
 
 	const handleAddYouTube = async (result: YouTubeResult) => {
 		setIsAdding(result.videoId);
 		try {
-			const res = await addToWantlistFromYouTube(result.videoId, result.title, result.channelTitle, result.thumbnail);
+			const res = await addToWantlistFromYouTube(
+				result.videoId,
+				result.title,
+				result.channelTitle,
+				result.thumbnail,
+			);
 			if (res.error) {
 				toast.error(res.error);
 			} else {
 				if (res.existingOwners && res.existingOwners > 0) {
-					toast.success(`Added! ${res.existingOwners} other${res.existingOwners > 1 ? "s are" : " is"} also hunting this`);
+					toast.success(
+						`Added! ${res.existingOwners} other${res.existingOwners > 1 ? "s are" : " is"} also hunting this`,
+					);
 				} else {
 					toast.success("Added! You're the first to tag this one");
 				}
 				onOpenChange(false);
 				router.refresh();
 			}
-		} catch { toast.error("Failed to add. Please try again."); }
-		finally { setIsAdding(null); }
+		} catch {
+			toast.error("Failed to add. Please try again.");
+		} finally {
+			setIsAdding(null);
+		}
 	};
 
 	const parseTitle = (title: string) => {
 		const parts = title.split(" - ");
-		if (parts.length >= 2) return { artist: parts[0].trim(), release: parts.slice(1).join(" - ").trim() };
+		if (parts.length >= 2)
+			return { artist: parts[0].trim(), release: parts.slice(1).join(" - ").trim() };
 		return { artist: "", release: title };
 	};
 
@@ -183,7 +204,9 @@ export function AddToWantlistDialog({ open, onOpenChange }: AddToWantlistDialogP
 
 				<div className="px-1">
 					<Input
-						placeholder={tab === "discogs" ? "Search by title or artist..." : "Search on YouTube..."}
+						placeholder={
+							tab === "discogs" ? "Search by title or artist..." : "Search on YouTube..."
+						}
 						value={query}
 						onChange={(e) => handleSearch(e.target.value, tab)}
 						className="font-mono"
@@ -194,7 +217,9 @@ export function AddToWantlistDialog({ open, onOpenChange }: AddToWantlistDialogP
 				<div className="flex-1 overflow-y-auto min-h-0 mt-2">
 					{isSearching && (
 						<div className="flex items-center justify-center py-8">
-							<span className="material-symbols-outlined animate-spin text-primary">progress_activity</span>
+							<span className="material-symbols-outlined animate-spin text-primary">
+								progress_activity
+							</span>
 							<span className="ml-2 text-xs font-mono text-on-surface-variant">
 								Searching {tab === "discogs" ? "Discogs" : "YouTube"}...
 							</span>
@@ -223,24 +248,39 @@ export function AddToWantlistDialog({ open, onOpenChange }: AddToWantlistDialogP
 									>
 										<div className="w-12 h-12 rounded bg-surface-container-high flex-shrink-0 overflow-hidden">
 											{result.coverImage ? (
-												<Image src={result.coverImage} alt={result.title} width={48} height={48} className="w-full h-full object-cover" unoptimized />
+												<Image
+													src={result.coverImage}
+													alt={result.title}
+													width={48}
+													height={48}
+													className="w-full h-full object-cover"
+													unoptimized
+												/>
 											) : (
 												<div className="w-full h-full flex items-center justify-center">
-													<span className="material-symbols-outlined text-on-surface-variant text-lg">album</span>
+													<span className="material-symbols-outlined text-on-surface-variant text-lg">
+														album
+													</span>
 												</div>
 											)}
 										</div>
 										<div className="flex-1 min-w-0">
 											<div className="text-sm font-medium text-on-surface truncate">{release}</div>
-											{artist && <div className="text-xs text-on-surface-variant truncate">{artist}</div>}
+											{artist && (
+												<div className="text-xs text-on-surface-variant truncate">{artist}</div>
+											)}
 										</div>
 										<div className="flex-shrink-0 text-right">
 											{adding ? (
-												<span className="material-symbols-outlined animate-spin text-secondary text-sm">progress_activity</span>
+												<span className="material-symbols-outlined animate-spin text-secondary text-sm">
+													progress_activity
+												</span>
 											) : (
 												<div className="text-xs font-mono text-on-surface-variant">
 													{result.year && <div>{result.year}</div>}
-													{result.format && <div className="text-on-surface-variant/60">{result.format}</div>}
+													{result.format && (
+														<div className="text-on-surface-variant/60">{result.format}</div>
+													)}
 												</div>
 											)}
 										</div>
@@ -265,22 +305,39 @@ export function AddToWantlistDialog({ open, onOpenChange }: AddToWantlistDialogP
 									>
 										<div className="w-16 h-12 rounded bg-surface-container-high flex-shrink-0 overflow-hidden">
 											{result.thumbnail ? (
-												<Image src={result.thumbnail} alt={result.title} width={64} height={48} className="w-full h-full object-cover" unoptimized />
+												<Image
+													src={result.thumbnail}
+													alt={result.title}
+													width={64}
+													height={48}
+													className="w-full h-full object-cover"
+													unoptimized
+												/>
 											) : (
 												<div className="w-full h-full flex items-center justify-center">
-													<span className="material-symbols-outlined text-on-surface-variant text-lg">play_circle</span>
+													<span className="material-symbols-outlined text-on-surface-variant text-lg">
+														play_circle
+													</span>
 												</div>
 											)}
 										</div>
 										<div className="flex-1 min-w-0">
-											<div className="text-sm font-medium text-on-surface line-clamp-2 leading-snug">{result.title}</div>
-											<div className="text-xs text-on-surface-variant truncate mt-0.5">{result.channelTitle}</div>
+											<div className="text-sm font-medium text-on-surface line-clamp-2 leading-snug">
+												{result.title}
+											</div>
+											<div className="text-xs text-on-surface-variant truncate mt-0.5">
+												{result.channelTitle}
+											</div>
 										</div>
 										<div className="flex-shrink-0">
 											{adding ? (
-												<span className="material-symbols-outlined animate-spin text-secondary text-sm">progress_activity</span>
+												<span className="material-symbols-outlined animate-spin text-secondary text-sm">
+													progress_activity
+												</span>
 											) : (
-												<span className="material-symbols-outlined text-on-surface-variant/40 text-lg">add_circle</span>
+												<span className="material-symbols-outlined text-on-surface-variant/40 text-lg">
+													add_circle
+												</span>
 											)}
 										</div>
 									</button>
@@ -289,13 +346,19 @@ export function AddToWantlistDialog({ open, onOpenChange }: AddToWantlistDialogP
 						</div>
 					)}
 
-					{query.trim().length >= 2 && !isSearching && !error &&
+					{query.trim().length >= 2 &&
+						!isSearching &&
+						!error &&
 						(tab === "discogs" ? discogsResults : youtubeResults).length === 0 && (
-						<div className="text-center py-8">
-							<span className="material-symbols-outlined text-on-surface-variant text-3xl block mb-2">search_off</span>
-							<span className="text-xs font-mono text-on-surface-variant">No results for &ldquo;{query.trim()}&rdquo;</span>
-						</div>
-					)}
+							<div className="text-center py-8">
+								<span className="material-symbols-outlined text-on-surface-variant text-3xl block mb-2">
+									search_off
+								</span>
+								<span className="text-xs font-mono text-on-surface-variant">
+									No results for &ldquo;{query.trim()}&rdquo;
+								</span>
+							</div>
+						)}
 
 					{query.trim().length < 2 && !isSearching && (
 						<div className="text-center py-8">

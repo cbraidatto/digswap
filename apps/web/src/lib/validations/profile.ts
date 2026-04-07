@@ -1,17 +1,17 @@
 import { z } from "zod";
-import { urlSchema } from "./common";
 
 // Social links must be HTTPS to prevent XSS via javascript: protocol
 const socialUrlSchema = z
 	.string()
 	.url("Invalid URL")
 	.max(500)
-	.refine(
-		(v) => {
-			try { return new URL(v).protocol === "https:"; } catch { return false; }
-		},
-		"Social links must use https://",
-	)
+	.refine((v) => {
+		try {
+			return new URL(v).protocol === "https:";
+		} catch {
+			return false;
+		}
+	}, "Social links must use https://")
 	.optional()
 	.or(z.literal(""));
 

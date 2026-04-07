@@ -1,5 +1,5 @@
+import { and, asc, desc, eq, gte, ilike, lt, or, sql } from "drizzle-orm";
 import { unstable_cache } from "next/cache";
-import { eq, desc, asc, and, gte, lt, sql, ilike, or } from "drizzle-orm";
 import { db } from "@/lib/db";
 import { collectionItems } from "@/lib/db/schema/collections";
 import { releases } from "@/lib/db/schema/releases";
@@ -37,9 +37,7 @@ function buildWhereConditions(userId: string, filters: CollectionFilters) {
 	const conditions = [eq(collectionItems.userId, userId)];
 
 	if (filters.genre) {
-		conditions.push(
-			sql`${releases.genre} @> ARRAY[${filters.genre}]::text[]`,
-		);
+		conditions.push(sql`${releases.genre} @> ARRAY[${filters.genre}]::text[]`);
 	}
 
 	if (filters.decade) {
@@ -57,12 +55,7 @@ function buildWhereConditions(userId: string, filters: CollectionFilters) {
 	if (filters.search) {
 		const sanitized = filters.search.replace(/[%_\\]/g, "\\$&");
 		const pattern = `%${sanitized}%`;
-		conditions.push(
-			or(
-				ilike(releases.title, pattern),
-				ilike(releases.artist, pattern),
-			)!,
-		);
+		conditions.push(or(ilike(releases.title, pattern), ilike(releases.artist, pattern))!);
 	}
 
 	return conditions;
@@ -80,7 +73,6 @@ function buildOrderBy(sort: string) {
 		case "rating":
 			// Falls back to rarity if personal_rating column doesn't exist yet
 			return desc(sql`COALESCE(${releases.rarityScore}, -1)`);
-		case "rarity":
 		default:
 			return desc(sql`COALESCE(${releases.rarityScore}, -1)`);
 	}
@@ -171,7 +163,10 @@ export const getUniqueGenres = unstable_cache(
 			.innerJoin(releases, eq(collectionItems.releaseId, releases.id))
 			.where(eq(collectionItems.userId, userId));
 
-		return rows.map((r) => r.genre).filter(Boolean).sort();
+		return rows
+			.map((r) => r.genre)
+			.filter(Boolean)
+			.sort();
 	},
 	["collection-genres"],
 	{ revalidate: 300, tags: ["collection"] },

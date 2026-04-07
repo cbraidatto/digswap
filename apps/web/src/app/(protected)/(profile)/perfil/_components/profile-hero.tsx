@@ -1,10 +1,9 @@
 import Image from "next/image";
-import Link from "next/link";
-import { EditProfileModal } from "./edit-profile-modal";
-import { SocialLinks } from "./social-links";
 import { PremiumBadge } from "@/components/ui/PremiumBadge";
-import { NowSpinning } from "./now-spinning";
 import type { UserBadge } from "@/lib/gamification/queries";
+import { EditProfileModal } from "./edit-profile-modal";
+import { NowSpinning } from "./now-spinning";
+import { SocialLinks } from "./social-links";
 
 interface ProfileHeroProps {
 	profile: {
@@ -36,7 +35,8 @@ interface ProfileHeroProps {
 
 export function ProfileHero({ profile, stats, badges, isOwner }: ProfileHeroProps) {
 	const displayName = profile.displayName || "DIGGER";
-	const isPremium = profile.subscriptionTier === "premium_monthly" || profile.subscriptionTier === "premium_annual";
+	const isPremium =
+		profile.subscriptionTier === "premium_monthly" || profile.subscriptionTier === "premium_annual";
 	const coverY = Number(profile.coverPositionY ?? 50);
 
 	return (

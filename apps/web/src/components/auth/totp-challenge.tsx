@@ -1,15 +1,15 @@
 "use client";
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
 import { Loader2 } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
 import { toast } from "sonner";
 
 import { challengeTotp } from "@/actions/mfa";
+import { BackupCodeInput } from "@/components/auth/backup-code-input";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { BackupCodeInput } from "@/components/auth/backup-code-input";
 
 /**
  * 2FA login challenge component.
@@ -47,11 +47,7 @@ export function TotpChallenge() {
 	}
 
 	if (showBackupCode) {
-		return (
-			<BackupCodeInput
-				onBack={() => setShowBackupCode(false)}
-			/>
-		);
+		return <BackupCodeInput onBack={() => setShowBackupCode(false)} />;
 	}
 
 	return (
@@ -99,11 +95,7 @@ export function TotpChallenge() {
 				aria-busy={isSubmitting}
 				onClick={handleSubmit}
 			>
-				{isSubmitting ? (
-					<Loader2 className="size-4 animate-spin" />
-				) : (
-					"Verify Code"
-				)}
+				{isSubmitting ? <Loader2 className="size-4 animate-spin" /> : "Verify Code"}
 			</Button>
 
 			<div className="text-center">

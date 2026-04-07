@@ -1,12 +1,12 @@
 "use client";
 
-import { useState } from "react";
 import Image from "next/image";
+import { useState } from "react";
 import { usePlayerStore } from "@/lib/player/store";
 import { cn } from "@/lib/utils";
 
 function formatTime(seconds: number): string {
-	if (!isFinite(seconds) || seconds < 0) return "0:00";
+	if (!Number.isFinite(seconds) || seconds < 0) return "0:00";
 	const m = Math.floor(seconds / 60);
 	const s = Math.floor(seconds % 60);
 	return `${m}:${s.toString().padStart(2, "0")}`;
@@ -34,7 +34,8 @@ export function FloatingPlayer() {
 	if (!currentTrack) return null;
 
 	const progress = duration > 0 ? (currentTime / duration) * 100 : 0;
-	const openYouTube = () => window.open(`https://www.youtube.com/watch?v=${currentTrack.videoId}`, "_blank");
+	const openYouTube = () =>
+		window.open(`https://www.youtube.com/watch?v=${currentTrack.videoId}`, "_blank");
 
 	return (
 		<>
@@ -60,7 +61,9 @@ export function FloatingPlayer() {
 					<div className="bg-surface-container-low border-t border-outline-variant/10 px-4 pt-3 pb-2 max-h-64 overflow-y-auto">
 						{/* Now playing header */}
 						<div className="flex items-center justify-between mb-2">
-							<span className="text-xs text-on-surface-variant font-mono uppercase tracking-wider">Now playing</span>
+							<span className="text-xs text-on-surface-variant font-mono uppercase tracking-wider">
+								Now playing
+							</span>
 							<button
 								type="button"
 								onClick={() => setExpanded(false)}
@@ -128,7 +131,9 @@ export function FloatingPlayer() {
 					{embedError ? (
 						<div className="flex items-center gap-3">
 							<div className="w-8 h-8 rounded bg-surface-container-high flex-shrink-0 flex items-center justify-center">
-								<span className="material-symbols-outlined text-base text-on-surface-variant/50">music_off</span>
+								<span className="material-symbols-outlined text-base text-on-surface-variant/50">
+									music_off
+								</span>
 							</div>
 							<div className="flex-1 min-w-0">
 								<p className="text-xs text-on-surface truncate">{currentTrack.title}</p>
@@ -173,7 +178,9 @@ export function FloatingPlayer() {
 										/>
 									) : (
 										<div className="w-9 h-9 rounded bg-surface-container-high flex items-center justify-center">
-											<span className="material-symbols-outlined text-base text-on-surface-variant/50">album</span>
+											<span className="material-symbols-outlined text-base text-on-surface-variant/50">
+												album
+											</span>
 										</div>
 									)}
 								</button>
@@ -187,9 +194,7 @@ export function FloatingPlayer() {
 									<p className="text-sm font-medium text-on-surface truncate leading-tight">
 										{currentTrack.title}
 									</p>
-									<p className="text-xs text-on-surface-variant truncate">
-										{currentTrack.artist}
-									</p>
+									<p className="text-xs text-on-surface-variant truncate">{currentTrack.artist}</p>
 								</button>
 
 								{/* Time */}

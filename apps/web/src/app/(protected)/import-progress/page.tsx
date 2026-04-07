@@ -2,9 +2,9 @@ import "server-only";
 
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
-import { createClient } from "@/lib/supabase/server";
-import { createAdminClient } from "@/lib/supabase/admin";
 import { ImportProgress } from "@/components/discogs/import-progress";
+import { createAdminClient } from "@/lib/supabase/admin";
+import { createClient } from "@/lib/supabase/server";
 
 export const metadata: Metadata = {
 	title: "Import progress — DigSwap",

@@ -1,11 +1,8 @@
 import type { Metadata } from "next";
-import { redirect } from "next/navigation";
 import Link from "next/link";
+import { redirect } from "next/navigation";
+import { getGroupMembershipState, getInviteByToken } from "@/lib/community/queries";
 import { createClient } from "@/lib/supabase/server";
-import {
-	getInviteByToken,
-	getGroupMembershipState,
-} from "@/lib/community/queries";
 import { InviteAcceptButton } from "./invite-accept-button";
 
 export const metadata: Metadata = {
@@ -13,11 +10,7 @@ export const metadata: Metadata = {
 	description: "Accept an invitation to join a DigSwap community group.",
 };
 
-export default async function JoinByTokenPage({
-	params,
-}: {
-	params: Promise<{ token: string }>;
-}) {
+export default async function JoinByTokenPage({ params }: { params: Promise<{ token: string }> }) {
 	const { token } = await params;
 
 	const supabase = await createClient();
@@ -38,9 +31,7 @@ export default async function JoinByTokenPage({
 				<span className="font-mono text-xs uppercase tracking-[0.2em] text-outline block mb-4">
 					[INVITE_INVALID]
 				</span>
-				<p className="text-sm text-on-surface-variant mb-6">
-					This invite link is no longer valid.
-				</p>
+				<p className="text-sm text-on-surface-variant mb-6">This invite link is no longer valid.</p>
 				<Link
 					href="/comunidade"
 					className="font-mono text-xs text-primary border border-primary px-3 py-1 rounded hover:bg-primary/10 transition-colors"
@@ -83,16 +74,11 @@ export default async function JoinByTokenPage({
 				{invite.groupName}
 			</h1>
 			<p className="font-mono text-xs text-on-surface-variant mb-8">
-				{invite.memberCount}{" "}
-				{invite.memberCount === 1 ? "member" : "members"} &middot; private
+				{invite.memberCount} {invite.memberCount === 1 ? "member" : "members"} &middot; private
 				group
 			</p>
 
-			<InviteAcceptButton
-				token={token}
-				groupName={invite.groupName}
-				groupSlug={invite.groupSlug}
-			/>
+			<InviteAcceptButton token={token} groupName={invite.groupName} groupSlug={invite.groupSlug} />
 
 			<div className="mt-4">
 				<Link

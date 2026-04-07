@@ -1,6 +1,6 @@
 "use client";
 
-import { type HTMLMotionProps, type Variants, motion } from "framer-motion";
+import { type HTMLMotionProps, motion, type Variants } from "framer-motion";
 import { forwardRef } from "react";
 
 // ── Shared easing ──────────────────────────────────────────
@@ -41,20 +41,19 @@ export const stagger = (staggerDelay = 0.05): Variants => ({
 });
 
 // ── AnimatedCard — hover lift + tap press ──────────────────
-export const AnimatedCard = forwardRef<
-	HTMLDivElement,
-	HTMLMotionProps<"div">
->(({ children, className, ...props }, ref) => (
-	<motion.div
-		ref={ref}
-		className={className}
-		whileHover={{ y: -2, transition: { duration: 0.2, ease: ease.smooth } }}
-		whileTap={{ scale: 0.985 }}
-		{...props}
-	>
-		{children}
-	</motion.div>
-));
+export const AnimatedCard = forwardRef<HTMLDivElement, HTMLMotionProps<"div">>(
+	({ children, className, ...props }, ref) => (
+		<motion.div
+			ref={ref}
+			className={className}
+			whileHover={{ y: -2, transition: { duration: 0.2, ease: ease.smooth } }}
+			whileTap={{ scale: 0.985 }}
+			{...props}
+		>
+			{children}
+		</motion.div>
+	),
+);
 AnimatedCard.displayName = "AnimatedCard";
 
 // ── AnimatedList — staggered children ──────────────────────

@@ -1,7 +1,7 @@
 import { eq } from "drizzle-orm";
 import { redirect } from "next/navigation";
-import { AppShell } from "@/components/shell/app-shell";
 import { ImportBanner } from "@/components/discogs/import-banner";
+import { AppShell } from "@/components/shell/app-shell";
 import { db } from "@/lib/db";
 import { profiles } from "@/lib/db/schema/users";
 import { createClient } from "@/lib/supabase/server";

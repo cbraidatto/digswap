@@ -1,16 +1,16 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { createClient } from "@/lib/supabase/server";
+import { getReviewCountForRelease, getReviewsForRelease } from "@/lib/community/queries";
 import { getReleaseByDiscogsId } from "@/lib/release/queries";
-import { getReviewsForRelease, getReviewCountForRelease } from "@/lib/community/queries";
-import { ReleaseHero } from "./_components/release-hero";
-import { ReleaseActions } from "./_components/release-actions";
-import { YouTubeEmbed } from "./_components/youtube-embed";
+import { createClient } from "@/lib/supabase/server";
 import { OwnersSection } from "./_components/owners-section";
-import { WhoHasItSection } from "./_components/who-has-it-section";
+import { ReleaseActions } from "./_components/release-actions";
+import { ReleaseHero } from "./_components/release-hero";
 import { ReviewsSection } from "./_components/reviews-section";
-import { TracklistSection } from "./_components/tracklist-section";
 import { SimilarSection } from "./_components/similar-section";
+import { TracklistSection } from "./_components/tracklist-section";
+import { WhoHasItSection } from "./_components/who-has-it-section";
+import { YouTubeEmbed } from "./_components/youtube-embed";
 
 interface ReleasePageProps {
 	params: Promise<{ discogsId: string }>;
@@ -48,7 +48,9 @@ export default async function ReleasePage({ params }: ReleasePageProps) {
 
 	// Check auth state for YouTube search trigger
 	const supabase = await createClient();
-	const { data: { user } } = await supabase.auth.getUser();
+	const {
+		data: { user },
+	} = await supabase.auth.getUser();
 	const isAuthenticated = !!user;
 
 	// Pre-fetch reviews for initial render (limit 10 per plan spec)
@@ -99,9 +101,7 @@ export default async function ReleasePage({ params }: ReleasePageProps) {
 
 			<OwnersSection releaseId={release.id} />
 
-			{release.discogsId && (
-				<WhoHasItSection discogsId={release.discogsId} />
-			)}
+			{release.discogsId && <WhoHasItSection discogsId={release.discogsId} />}
 
 			<SimilarSection releaseId={release.id} />
 

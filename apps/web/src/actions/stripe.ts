@@ -2,10 +2,10 @@
 
 import { eq } from "drizzle-orm";
 import { z } from "zod";
+import { requireUser } from "@/lib/auth/require-user";
 import { db } from "@/lib/db";
 import { subscriptions } from "@/lib/db/schema/subscriptions";
 import { getSiteUrl, getStripe, getStripePriceIds } from "@/lib/stripe";
-import { requireUser } from "@/lib/auth/require-user";
 
 const checkoutPriceSchema = z.string().min(1, "Invalid price.");
 

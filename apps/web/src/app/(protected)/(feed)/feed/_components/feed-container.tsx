@@ -1,14 +1,14 @@
 "use client";
 
-import { useState, useEffect, useTransition } from "react";
 import { useRouter } from "next/navigation";
+import { useEffect, useState, useTransition } from "react";
 import { useInView } from "react-intersection-observer";
+import { loadExploreFeed, loadMoreFeed } from "@/actions/social";
+import type { ContextReason } from "@/components/feed/context-label";
 import type { FeedItem } from "@/lib/social/types";
-import { loadMoreFeed, loadExploreFeed } from "@/actions/social";
 import { FeedCard } from "./feed-card";
 import { FollowEventCard } from "./follow-event-card";
 import { GroupFeedCard } from "./group-feed-card";
-import type { ContextReason } from "@/components/feed/context-label";
 
 type FeedMode = "personal" | "global" | "explore";
 
@@ -18,7 +18,7 @@ interface FeedContainerProps {
 	followingCount: number;
 }
 
-function resolveSubMode(count: number): "personal" | "global" {
+function _resolveSubMode(count: number): "personal" | "global" {
 	return count > 0 ? "personal" : "global";
 }
 
@@ -30,37 +30,23 @@ const TABS = [
 
 type TabKey = (typeof TABS)[number]["key"];
 
-export function FeedContainer({
-	initialItems,
-	initialMode,
-	followingCount,
-}: FeedContainerProps) {
+export function FeedContainer({ initialItems, initialMode, followingCount }: FeedContainerProps) {
 	const router = useRouter();
 
 	const initialTab: TabKey =
-		initialMode === "explore"
-			? "explore"
-			: initialMode === "personal"
-				? "following"
-				: "global";
+		initialMode === "explore" ? "explore" : initialMode === "personal" ? "following" : "global";
 
 	const [activeTab, setActiveTab] = useState<TabKey>(initialTab);
 	const [items, setItems] = useState<FeedItem[]>(initialItems);
 	const [cursor, setCursor] = useState<string | null>(
-		initialItems.length > 0
-			? initialItems[initialItems.length - 1].createdAt
-			: null,
+		initialItems.length > 0 ? initialItems[initialItems.length - 1].createdAt : null,
 	);
 	const [hasMore, setHasMore] = useState(initialItems.length >= 20);
 	const [isPending, startTransition] = useTransition();
 	const { ref: sentinelRef, inView } = useInView({ threshold: 0 });
 
 	const currentMode: FeedMode =
-		activeTab === "explore"
-			? "explore"
-			: activeTab === "following"
-				? "personal"
-				: "global";
+		activeTab === "explore" ? "explore" : activeTab === "following" ? "personal" : "global";
 
 	// Infinite scroll
 	useEffect(() => {
@@ -78,10 +64,7 @@ export function FeedContainer({
 				}
 				setItems((prev) => {
 					const existingIds = new Set(prev.map((item) => item.id));
-					return [
-						...prev,
-						...newItems.filter((item) => !existingIds.has(item.id)),
-					];
+					return [...prev, ...newItems.filter((item) => !existingIds.has(item.id))];
 				});
 				setCursor(newItems[newItems.length - 1].createdAt);
 				if (newItems.length < 20) setHasMore(false);
@@ -108,11 +91,7 @@ export function FeedContainer({
 				newItems = await loadMoreFeed(null, mode);
 			}
 			setItems(newItems);
-			setCursor(
-				newItems.length > 0
-					? newItems[newItems.length - 1].createdAt
-					: null,
-			);
+			setCursor(newItems.length > 0 ? newItems[newItems.length - 1].createdAt : null);
 			setHasMore(newItems.length >= 20);
 		});
 	}
@@ -162,8 +141,7 @@ export function FeedContainer({
 			{/* Feed items */}
 			<div aria-live="polite" className="space-y-3">
 				{items.map((item) =>
-					item.actionType === "added_record" ||
-					item.actionType === "spinning_now" ? (
+					item.actionType === "added_record" || item.actionType === "spinning_now" ? (
 						<FeedCard
 							key={item.id}
 							item={item}
@@ -175,8 +153,7 @@ export function FeedContainer({
 						/>
 					) : item.actionType === "followed_user" ? (
 						<FollowEventCard key={item.id} item={item} />
-					) : item.actionType === "group_post" ||
-						item.actionType === "wrote_review" ? (
+					) : item.actionType === "group_post" || item.actionType === "wrote_review" ? (
 						<GroupFeedCard key={item.id} item={item} />
 					) : (
 						<FeedCard key={item.id} item={item} />
@@ -188,7 +165,11 @@ export function FeedContainer({
 			{items.length === 0 && !isPending && !hasMore && (
 				<div className="rounded-xl border border-dashed border-outline-variant/20 p-12 flex flex-col items-center text-center">
 					<span className="material-symbols-outlined text-3xl text-on-surface-variant/20 mb-3">
-						{activeTab === "explore" ? "travel_explore" : activeTab === "following" ? "group" : "public"}
+						{activeTab === "explore"
+							? "travel_explore"
+							: activeTab === "following"
+								? "group"
+								: "public"}
 					</span>
 					<p className="font-mono text-xs text-on-surface-variant mb-1">
 						{activeTab === "following"
@@ -207,7 +188,10 @@ export function FeedContainer({
 			{isPending && (
 				<div className="space-y-3 mt-3">
 					{[1, 2, 3].map((i) => (
-						<div key={i} className="bg-surface-container-low rounded-xl h-32 animate-pulse border border-outline-variant/5" />
+						<div
+							key={i}
+							className="bg-surface-container-low rounded-xl h-32 animate-pulse border border-outline-variant/5"
+						/>
 					))}
 				</div>
 			)}

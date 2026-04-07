@@ -1,4 +1,4 @@
-import { describe, test, expect, vi, beforeEach } from "vitest";
+import { beforeEach, describe, expect, test, vi } from "vitest";
 
 // ---------------------------------------------------------------------------
 // DB mock with thenable chain (project pattern)
@@ -78,7 +78,7 @@ vi.mock("@/lib/db", () => {
 	});
 
 	return { db: chain };
-})
+});
 vi.mock("@/lib/rate-limit", () => ({
 	authRateLimit: null,
 	resetRateLimit: null,
@@ -88,7 +88,6 @@ vi.mock("@/lib/rate-limit", () => ({
 	discogsRateLimit: null,
 	safeLimit: vi.fn().mockImplementation(async () => ({ success: true })),
 }));
-;
 
 // ---------------------------------------------------------------------------
 // Schema mocks
@@ -226,12 +225,8 @@ vi.mock("@/lib/community/queries", () => ({
 // ---------------------------------------------------------------------------
 // Import after mocks
 // ---------------------------------------------------------------------------
-import {
-	generateInviteAction,
-	acceptInviteAction,
-	inviteUserAction,
-} from "@/actions/community";
-import { getMemberGroups, getGroupPosts as getGroupPostsQuery } from "@/lib/community/queries";
+import { acceptInviteAction, generateInviteAction, inviteUserAction } from "@/actions/community";
+import { getGroupPosts as getGroupPostsQuery, getMemberGroups } from "@/lib/community/queries";
 
 describe("group visibility", () => {
 	beforeEach(() => {

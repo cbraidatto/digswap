@@ -46,14 +46,13 @@ export async function consumeHandoffCode(code: string): Promise<string | null> {
 
 	// SECURITY: Atomic GET+DEL via Lua script to prevent TOCTOU race condition.
 	// Two concurrent requests can no longer both read the same code before deletion.
-	const raw = await redis.eval(
+	const raw = (await redis.eval(
 		`local v = redis.call('GET', KEYS[1]); if v then redis.call('DEL', KEYS[1]); end; return v;`,
 		[key],
 		[],
-	) as string | null;
+	)) as string | null;
 	if (!raw) return null;
 
-	const entry =
-		typeof raw === "string" ? (JSON.parse(raw) as HandoffEntry) : (raw as HandoffEntry);
+	const entry = typeof raw === "string" ? (JSON.parse(raw) as HandoffEntry) : (raw as HandoffEntry);
 	return entry.userId;
 }

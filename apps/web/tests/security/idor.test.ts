@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 
 // ---------------------------------------------------------------------------
 // Mock rate limiters (must allow all to test IDOR logic)
@@ -40,8 +40,18 @@ const mockFrom = vi.fn();
 function createQueryChain(result: { data?: unknown; error?: unknown }) {
 	const chain: Record<string, unknown> = {};
 	const methods = [
-		"select", "eq", "neq", "single", "maybeSingle", "insert",
-		"update", "delete", "in", "or", "order", "limit",
+		"select",
+		"eq",
+		"neq",
+		"single",
+		"maybeSingle",
+		"insert",
+		"update",
+		"delete",
+		"in",
+		"or",
+		"order",
+		"limit",
 	];
 	for (const method of methods) {
 		chain[method] = vi.fn().mockReturnValue(chain);
@@ -76,9 +86,20 @@ let queryResults: unknown[][] = [];
 vi.mock("@/lib/db", () => {
 	const chain: Record<string, unknown> = {};
 	const methods = [
-		"select", "from", "where", "orderBy", "limit", "innerJoin",
-		"leftJoin", "groupBy", "offset", "selectDistinctOn", "update", "set",
-		"delete", "execute",
+		"select",
+		"from",
+		"where",
+		"orderBy",
+		"limit",
+		"innerJoin",
+		"leftJoin",
+		"groupBy",
+		"offset",
+		"selectDistinctOn",
+		"update",
+		"set",
+		"delete",
+		"execute",
 	];
 	for (const method of methods) {
 		chain[method] = vi.fn().mockImplementation(() => chain);
@@ -115,16 +136,39 @@ vi.mock("@/lib/db", () => {
 });
 
 vi.mock("@/lib/db/schema/users", () => ({
-	profiles: { id: "id", username: "username", displayName: "display_name", avatarUrl: "avatar_url", updatedAt: "updated_at", onboardingCompleted: "onboarding_completed", holyGrailIds: "holy_grail_ids", coverUrl: "cover_url", coverPositionY: "cover_position_y" },
+	profiles: {
+		id: "id",
+		username: "username",
+		displayName: "display_name",
+		avatarUrl: "avatar_url",
+		updatedAt: "updated_at",
+		onboardingCompleted: "onboarding_completed",
+		holyGrailIds: "holy_grail_ids",
+		coverUrl: "cover_url",
+		coverPositionY: "cover_position_y",
+	},
 }));
 vi.mock("@/lib/db/schema/collections", () => ({
 	collectionItems: { userId: "user_id", releaseId: "release_id" },
 }));
 vi.mock("@/lib/db/schema/releases", () => ({
-	releases: { id: "id", title: "title", artist: "artist", year: "year", coverImageUrl: "cover_image_url" },
+	releases: {
+		id: "id",
+		title: "title",
+		artist: "artist",
+		year: "year",
+		coverImageUrl: "cover_image_url",
+	},
 }));
 vi.mock("@/lib/db/schema/leads", () => ({
-	leads: { userId: "user_id", targetType: "target_type", targetId: "target_id", note: "note", status: "status", updatedAt: "updated_at" },
+	leads: {
+		userId: "user_id",
+		targetType: "target_type",
+		targetId: "target_id",
+		note: "note",
+		status: "status",
+		updatedAt: "updated_at",
+	},
 }));
 vi.mock("@/lib/collection/filters", () => ({
 	CONDITION_GRADES: ["M", "NM", "VG+", "VG", "G+", "G", "F", "P"] as const,
@@ -154,10 +198,10 @@ vi.mock("next/cache", () => ({
 // Import after mocks
 // ---------------------------------------------------------------------------
 import { updateConditionGrade } from "@/actions/collection";
-import { markNotificationRead } from "@/actions/notifications";
-import { removeFromWantlist } from "@/actions/wantlist";
-import { updateProfile } from "@/actions/profile";
 import { saveLead } from "@/actions/leads";
+import { markNotificationRead } from "@/actions/notifications";
+import { updateProfile } from "@/actions/profile";
+import { removeFromWantlist } from "@/actions/wantlist";
 
 describe("IDOR Prevention", () => {
 	beforeEach(() => {
@@ -169,9 +213,7 @@ describe("IDOR Prevention", () => {
 	describe("updateConditionGrade ownership check", () => {
 		it("only updates collection items belonging to the current user", async () => {
 			// Admin query returns null (no matching item for user-A)
-			mockFrom.mockReturnValue(
-				createQueryChain({ data: null, error: null }),
-			);
+			mockFrom.mockReturnValue(createQueryChain({ data: null, error: null }));
 
 			const result = await updateConditionGrade("item-owned-by-user-B", "NM");
 
@@ -183,9 +225,7 @@ describe("IDOR Prevention", () => {
 	describe("markNotificationRead ownership check", () => {
 		it("returns error for notification belonging to another user", async () => {
 			// Admin query with eq(user_id, user-A) returns null (not found)
-			mockFrom.mockReturnValue(
-				createQueryChain({ data: null, error: null }),
-			);
+			mockFrom.mockReturnValue(createQueryChain({ data: null, error: null }));
 
 			const result = await markNotificationRead("a0000000-0000-4000-a000-00000000000b");
 
@@ -196,9 +236,7 @@ describe("IDOR Prevention", () => {
 	describe("removeFromWantlist ownership check", () => {
 		it("uses user_id filter when deleting wantlist items", async () => {
 			// The eq chain filters by both id and user_id
-			mockFrom.mockReturnValue(
-				createQueryChain({ data: null, error: null }),
-			);
+			mockFrom.mockReturnValue(createQueryChain({ data: null, error: null }));
 
 			const result = await removeFromWantlist("a0000000-0000-4000-a000-000000000001");
 

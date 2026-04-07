@@ -40,7 +40,7 @@ export function ChatSidebar() {
 		document.addEventListener("keydown", handleKeyDown);
 		// Focus the first focusable element on open
 		const firstFocusable = panelRef.current.querySelector<HTMLElement>(
-			'button, [href], input, textarea',
+			"button, [href], input, textarea",
 		);
 		firstFocusable?.focus();
 

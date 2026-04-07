@@ -1,13 +1,13 @@
 "use client";
 
-import { useState, useEffect, useTransition } from "react";
-import { Monitor, Smartphone, Globe, Clock, AlertCircle } from "lucide-react";
+import { AlertCircle, Clock, Globe, Monitor, Smartphone } from "lucide-react";
+import { useEffect, useState, useTransition } from "react";
+import type { SessionInfo } from "@/actions/sessions";
+import { getSessions, terminateSession } from "@/actions/sessions";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
-import { getSessions, terminateSession } from "@/actions/sessions";
-import type { SessionInfo } from "@/actions/sessions";
 
 /**
  * Maximum sessions allowed per user (D-13).
@@ -19,8 +19,7 @@ const MAX_SESSIONS = 3;
  * Determine the appropriate device icon based on parsed device info.
  */
 function DeviceIcon({ deviceInfo }: { deviceInfo: string }) {
-	const isPhone =
-		deviceInfo.includes("Android") || deviceInfo.includes("iOS");
+	const isPhone = deviceInfo.includes("Android") || deviceInfo.includes("iOS");
 	if (isPhone) {
 		return <Smartphone className="h-5 w-5 text-muted-foreground" />;
 	}
@@ -137,16 +136,11 @@ export function SessionList() {
 
 			{/* Session list */}
 			{sessions.length === 0 ? (
-				<p className="py-8 text-center text-sm text-muted-foreground">
-					No active sessions found.
-				</p>
+				<p className="py-8 text-center text-sm text-muted-foreground">No active sessions found.</p>
 			) : (
 				<div className="space-y-3">
 					{sessions.map((session) => (
-						<Card
-							key={session.id}
-							className="border border-border bg-card"
-						>
+						<Card key={session.id} className="border border-border bg-card">
 							<CardContent className="flex items-center justify-between gap-4 p-4">
 								{/* Device info */}
 								<div className="flex items-start gap-3">
@@ -159,10 +153,7 @@ export function SessionList() {
 												{session.deviceInfo}
 											</span>
 											{session.isCurrent && (
-												<Badge
-													variant="secondary"
-													className="text-xs"
-												>
+												<Badge variant="secondary" className="text-xs">
 													Current session
 												</Badge>
 											)}
@@ -182,43 +173,39 @@ export function SessionList() {
 
 								{/* Actions */}
 								<div className="flex items-center gap-2 shrink-0">
-									{!session.isCurrent && (
-										<>
-											{confirmingId === session.id ? (
-												<div className="flex items-center gap-2">
-													<span className="text-xs text-muted-foreground max-w-[140px] text-right">
-														End this session? You will be signed out on
-														that device.
-													</span>
-													<Button
-														variant="destructive"
-														size="sm"
-														onClick={() => handleTerminate(session.id)}
-														disabled={isPending}
-													>
-														{isPending ? "Ending..." : "Confirm"}
-													</Button>
-													<Button
-														variant="ghost"
-														size="sm"
-														onClick={handleCancelConfirm}
-														disabled={isPending}
-													>
-														Cancel
-													</Button>
-												</div>
-											) : (
+									{!session.isCurrent &&
+										(confirmingId === session.id ? (
+											<div className="flex items-center gap-2">
+												<span className="text-xs text-muted-foreground max-w-[140px] text-right">
+													End this session? You will be signed out on that device.
+												</span>
 												<Button
-													variant="outline"
+													variant="destructive"
 													size="sm"
-													className="text-destructive hover:bg-destructive/10 hover:text-destructive"
 													onClick={() => handleTerminate(session.id)}
+													disabled={isPending}
 												>
-													End Session
+													{isPending ? "Ending..." : "Confirm"}
 												</Button>
-											)}
-										</>
-									)}
+												<Button
+													variant="ghost"
+													size="sm"
+													onClick={handleCancelConfirm}
+													disabled={isPending}
+												>
+													Cancel
+												</Button>
+											</div>
+										) : (
+											<Button
+												variant="outline"
+												size="sm"
+												className="text-destructive hover:bg-destructive/10 hover:text-destructive"
+												onClick={() => handleTerminate(session.id)}
+											>
+												End Session
+											</Button>
+										))}
 								</div>
 							</CardContent>
 						</Card>

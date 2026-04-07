@@ -1,16 +1,20 @@
 "use client";
 
-import { useTransition } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { useTransition } from "react";
 import { toast } from "sonner";
-import type { CollectionItem } from "@/lib/collection/queries";
-import { getGemTier } from "@/lib/gems/constants";
+import {
+	removeRecordFromCollection,
+	setPersonalRating,
+	toggleOpenForTrade,
+} from "@/actions/collection";
 import { PlayButton } from "@/components/player/play-button";
-import { removeRecordFromCollection, toggleOpenForTrade, setPersonalRating, updateCollectionNotes } from "@/actions/collection";
-import { GemBadge } from "@/components/ui/gem-badge";
+import { RarityPill } from "@/components/ui/rarity-pill";
 import { RecordContextMenu } from "@/components/ui/record-context-menu";
+import type { CollectionItem } from "@/lib/collection/queries";
+import { getRarityTier } from "@/lib/collection/rarity";
 
 interface CollectionCardProps {
 	item: CollectionItem;
@@ -18,7 +22,7 @@ interface CollectionCardProps {
 }
 
 export function CollectionCard({ item, isOwner }: CollectionCardProps) {
-	const tier = getGemTier(item.rarityScore);
+	const tier = getRarityTier(item.rarityScore);
 	const router = useRouter();
 	const [isRemoving, startRemoveTransition] = useTransition();
 
@@ -27,7 +31,10 @@ export function CollectionCard({ item, isOwner }: CollectionCardProps) {
 		startRemoveTransition(async () => {
 			const result = await removeRecordFromCollection(item.id);
 			if (result.error) toast.error(result.error);
-			else { toast.success("Removed"); router.refresh(); }
+			else {
+				toast.success("Removed");
+				router.refresh();
+			}
 		});
 	}
 
@@ -48,7 +55,9 @@ export function CollectionCard({ item, isOwner }: CollectionCardProps) {
 					/>
 				) : (
 					<div className="absolute inset-0 flex items-center justify-center">
-						<span className="material-symbols-outlined text-4xl text-on-surface-variant/15">album</span>
+						<span className="material-symbols-outlined text-4xl text-on-surface-variant/15">
+							album
+						</span>
 					</div>
 				)}
 
@@ -58,7 +67,7 @@ export function CollectionCard({ item, isOwner }: CollectionCardProps) {
 				{/* Rarity — always visible bottom-left */}
 				{tier && (
 					<div className="absolute bottom-2 left-2 z-10">
-						<GemBadge score={item.rarityScore} />
+						<RarityPill score={item.rarityScore} showScore={false} />
 					</div>
 				)}
 
@@ -94,7 +103,10 @@ export function CollectionCard({ item, isOwner }: CollectionCardProps) {
 			<div className="px-3 pt-2.5 pb-2">
 				{/* Row 1: Title + menu */}
 				<div className="flex items-start justify-between gap-1">
-					<Link href={item.discogsId ? `/release/${item.discogsId}` : "#"} className="min-w-0 flex-1">
+					<Link
+						href={item.discogsId ? `/release/${item.discogsId}` : "#"}
+						className="min-w-0 flex-1"
+					>
 						<h3 className="font-heading text-[13px] font-bold text-on-surface group-hover:text-primary transition-colors line-clamp-1 leading-tight">
 							{item.title}
 						</h3>
@@ -123,7 +135,10 @@ export function CollectionCard({ item, isOwner }: CollectionCardProps) {
 									key={star}
 									type="button"
 									onClick={async () => {
-										const r = await setPersonalRating(item.id, item.personalRating === star ? null : star);
+										const r = await setPersonalRating(
+											item.id,
+											item.personalRating === star ? null : star,
+										);
 										if (r.success) router.refresh();
 									}}
 									className={`transition-colors ${
@@ -145,7 +160,10 @@ export function CollectionCard({ item, isOwner }: CollectionCardProps) {
 								type="button"
 								onClick={async () => {
 									const r = await toggleOpenForTrade(item.id, !item.openForTrade);
-									if (r.success) { toast.success(item.openForTrade ? "Removed" : "Open for trade!"); router.refresh(); }
+									if (r.success) {
+										toast.success(item.openForTrade ? "Removed" : "Open for trade!");
+										router.refresh();
+									}
 								}}
 								className={`p-1 rounded-full transition-colors ${
 									item.openForTrade
@@ -173,7 +191,10 @@ export function CollectionCard({ item, isOwner }: CollectionCardProps) {
 
 				{/* Notes — compact, owner only */}
 				{isOwner && item.notes && (
-					<p className="font-mono text-[9px] text-on-surface-variant/40 truncate mt-1" title={item.notes}>
+					<p
+						className="font-mono text-[9px] text-on-surface-variant/40 truncate mt-1"
+						title={item.notes}
+					>
 						📝 {item.notes}
 					</p>
 				)}
@@ -186,7 +207,6 @@ export function CollectionCard({ item, isOwner }: CollectionCardProps) {
 						</span>
 					</div>
 				)}
-
 			</div>
 		</div>
 	);

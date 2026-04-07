@@ -37,7 +37,9 @@ export function ChallengesCard({ challenges, onJoin }: ChallengesCardProps) {
 				<span className="material-symbols-outlined text-3xl text-on-surface-variant/30 mb-2 block">
 					emoji_events
 				</span>
-				<h3 className="font-heading text-sm font-semibold text-on-surface mb-1">No active challenges</h3>
+				<h3 className="font-heading text-sm font-semibold text-on-surface mb-1">
+					No active challenges
+				</h3>
 				<p className="text-xs text-on-surface-variant">
 					Check back soon — new challenges drop every week.
 				</p>
@@ -48,12 +50,8 @@ export function ChallengesCard({ challenges, onJoin }: ChallengesCardProps) {
 	return (
 		<div className="bg-surface-container-low rounded-xl border border-outline-variant/10 overflow-hidden">
 			<div className="p-5 pb-3 flex items-center gap-2">
-				<span className="material-symbols-outlined text-xl text-tertiary">
-					emoji_events
-				</span>
-				<h3 className="font-heading text-base font-semibold text-on-surface">
-					Dig Challenges
-				</h3>
+				<span className="material-symbols-outlined text-xl text-tertiary">emoji_events</span>
+				<h3 className="font-heading text-base font-semibold text-on-surface">Dig Challenges</h3>
 			</div>
 
 			<div className="px-5 pb-5 space-y-3">
@@ -73,23 +71,25 @@ export function ChallengesCard({ challenges, onJoin }: ChallengesCardProps) {
 							)}
 						>
 							<div className="flex items-start gap-3">
-								<div className={cn(
-									"w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0",
-									c.completed ? "bg-primary/15" : "bg-surface-container-high",
-								)}>
-									<span className={cn(
-										"material-symbols-outlined text-base",
-										c.completed ? "text-primary" : "text-on-surface-variant",
-									)}>
+								<div
+									className={cn(
+										"w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0",
+										c.completed ? "bg-primary/15" : "bg-surface-container-high",
+									)}
+								>
+									<span
+										className={cn(
+											"material-symbols-outlined text-base",
+											c.completed ? "text-primary" : "text-on-surface-variant",
+										)}
+									>
 										{c.completed ? "check_circle" : icon}
 									</span>
 								</div>
 
 								<div className="flex-1 min-w-0">
 									<div className="flex items-center justify-between gap-2">
-										<h4 className="text-sm font-medium text-on-surface truncate">
-											{c.title}
-										</h4>
+										<h4 className="text-sm font-medium text-on-surface truncate">{c.title}</h4>
 										{!c.completed && (
 											<span className="text-xs text-on-surface-variant flex-shrink-0">
 												{days}d left
@@ -109,10 +109,12 @@ export function ChallengesCard({ challenges, onJoin }: ChallengesCardProps) {
 												<span className="text-on-surface-variant">
 													{c.progress}/{c.goal}
 												</span>
-												<span className={cn(
-													"font-medium",
-													c.completed ? "text-primary" : "text-on-surface-variant",
-												)}>
+												<span
+													className={cn(
+														"font-medium",
+														c.completed ? "text-primary" : "text-on-surface-variant",
+													)}
+												>
 													{progressPct}%
 												</span>
 											</div>

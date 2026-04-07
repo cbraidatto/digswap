@@ -19,10 +19,7 @@ import { createAdminClient } from "@/lib/supabase/admin";
  *
  * @returns true if badge was newly awarded, false if already had it or not found
  */
-export async function awardBadge(
-	userId: string,
-	badgeSlug: string,
-): Promise<boolean> {
+export async function awardBadge(userId: string, badgeSlug: string): Promise<boolean> {
 	try {
 		const admin = createAdminClient();
 

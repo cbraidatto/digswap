@@ -1,13 +1,13 @@
 "use server";
 
-import { createAdminClient } from "@/lib/supabase/admin";
+import { eq } from "drizzle-orm";
+import { getReviewsForRelease } from "@/lib/community/queries";
 import { db } from "@/lib/db";
 import { releases } from "@/lib/db/schema/releases";
-import { eq } from "drizzle-orm";
-import { apiRateLimit , safeLimit} from "@/lib/rate-limit";
+import { apiRateLimit, safeLimit } from "@/lib/rate-limit";
+import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
-import { getReviewsForRelease } from "@/lib/community/queries";
-import { releaseIdSchema, getMoreReviewsSchema } from "@/lib/validations/release";
+import { getMoreReviewsSchema, releaseIdSchema } from "@/lib/validations/release";
 
 const YOUTUBE_SEARCH_URL = "https://www.googleapis.com/youtube/v3/search";
 
@@ -20,80 +20,80 @@ const YOUTUBE_SEARCH_URL = "https://www.googleapis.com/youtube/v3/search";
  * Gracefully degrades when YOUTUBE_API_KEY is not set or quota is exceeded.
  */
 export async function searchYouTubeForRelease(
-  releaseInternalId: string,
+	releaseInternalId: string,
 ): Promise<{ videoId: string | null; error?: string }> {
-  try {
-    const parsed = releaseIdSchema.safeParse({ releaseInternalId });
-    if (!parsed.success) {
-      return { videoId: null, error: "Invalid release ID" };
-    }
+	try {
+		const parsed = releaseIdSchema.safeParse({ releaseInternalId });
+		if (!parsed.success) {
+			return { videoId: null, error: "Invalid release ID" };
+		}
 
-    // Authenticate user (rate limiting requires user ID)
-    const supabase = await createClient();
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
-    if (!user) return { videoId: null, error: "Authentication required" };
+		// Authenticate user (rate limiting requires user ID)
+		const supabase = await createClient();
+		const {
+			data: { user },
+		} = await supabase.auth.getUser();
+		if (!user) return { videoId: null, error: "Authentication required" };
 
-    // Rate limit
-    const { success } = await safeLimit(apiRateLimit, user.id, false);
-    if (!success) return { videoId: null, error: "Rate limited" };
+		// Rate limit
+		const { success } = await safeLimit(apiRateLimit, user.id, false);
+		if (!success) return { videoId: null, error: "Rate limited" };
 
-    // Fetch release data
-    const [release] = await db
-      .select({
-        id: releases.id,
-        title: releases.title,
-        artist: releases.artist,
-        youtubeVideoId: releases.youtubeVideoId,
-      })
-      .from(releases)
-      .where(eq(releases.id, parsed.data.releaseInternalId))
-      .limit(1);
+		// Fetch release data
+		const [release] = await db
+			.select({
+				id: releases.id,
+				title: releases.title,
+				artist: releases.artist,
+				youtubeVideoId: releases.youtubeVideoId,
+			})
+			.from(releases)
+			.where(eq(releases.id, parsed.data.releaseInternalId))
+			.limit(1);
 
-    if (!release) return { videoId: null, error: "Release not found" };
+		if (!release) return { videoId: null, error: "Release not found" };
 
-    // Cache hit -- return immediately
-    if (release.youtubeVideoId) return { videoId: release.youtubeVideoId };
+		// Cache hit -- return immediately
+		if (release.youtubeVideoId) return { videoId: release.youtubeVideoId };
 
-    // No API key configured -- skip gracefully
-    const apiKey = process.env.YOUTUBE_API_KEY;
-    if (!apiKey) return { videoId: null };
+		// No API key configured -- skip gracefully
+		const apiKey = process.env.YOUTUBE_API_KEY;
+		if (!apiKey) return { videoId: null };
 
-    // Call YouTube Data API v3 search.list
-    const params = new URLSearchParams({
-      part: "snippet",
-      q: `${release.artist} ${release.title}`,
-      type: "video",
-      videoCategoryId: "10", // Music
-      maxResults: "1",
-      key: apiKey,
-    });
+		// Call YouTube Data API v3 search.list
+		const params = new URLSearchParams({
+			part: "snippet",
+			q: `${release.artist} ${release.title}`,
+			type: "video",
+			videoCategoryId: "10", // Music
+			maxResults: "1",
+			key: apiKey,
+		});
 
-    const response = await fetch(`${YOUTUBE_SEARCH_URL}?${params}`);
-    if (!response.ok) return { videoId: null }; // Quota exceeded or API error -- fail gracefully
+		const response = await fetch(`${YOUTUBE_SEARCH_URL}?${params}`);
+		if (!response.ok) return { videoId: null }; // Quota exceeded or API error -- fail gracefully
 
-    const data = await response.json();
-    const videoId: string | null = data.items?.[0]?.id?.videoId ?? null;
+		const data = await response.json();
+		const videoId: string | null = data.items?.[0]?.id?.videoId ?? null;
 
-    // Cache result in DB via admin client (only when video found)
-    // Do NOT store null results -- leave column null so future searches can retry
-    if (videoId) {
-      const admin = createAdminClient();
-      await admin
-        .from("releases")
-        .update({
-          youtube_video_id: videoId,
-          updated_at: new Date().toISOString(),
-        })
-        .eq("id", release.id);
-    }
+		// Cache result in DB via admin client (only when video found)
+		// Do NOT store null results -- leave column null so future searches can retry
+		if (videoId) {
+			const admin = createAdminClient();
+			await admin
+				.from("releases")
+				.update({
+					youtube_video_id: videoId,
+					updated_at: new Date().toISOString(),
+				})
+				.eq("id", release.id);
+		}
 
-    return { videoId };
-  } catch (err) {
-    console.error("[searchYouTubeForRelease] error:", err);
-    return { videoId: null, error: "Failed to search YouTube. Please try again." };
-  }
+		return { videoId };
+	} catch (err) {
+		console.error("[searchYouTubeForRelease] error:", err);
+		return { videoId: null, error: "Failed to search YouTube. Please try again." };
+	}
 }
 
 /**
@@ -101,20 +101,22 @@ export async function searchYouTubeForRelease(
  * Wraps getReviewsForRelease for client component consumption.
  */
 export async function getMoreReviews(releaseId: string, cursor: string, limit = 10) {
-  try {
-    const parsed = getMoreReviewsSchema.safeParse({ releaseId, cursor, limit });
-    if (!parsed.success) {
-      return [];
-    }
+	try {
+		const parsed = getMoreReviewsSchema.safeParse({ releaseId, cursor, limit });
+		if (!parsed.success) {
+			return [];
+		}
 
-    // Auth check — reviews are public but require authentication to paginate
-    const supabase = await createClient();
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) return [];
+		// Auth check — reviews are public but require authentication to paginate
+		const supabase = await createClient();
+		const {
+			data: { user },
+		} = await supabase.auth.getUser();
+		if (!user) return [];
 
-    return await getReviewsForRelease(parsed.data.releaseId, parsed.data.cursor, parsed.data.limit);
-  } catch (err) {
-    console.error("[getMoreReviews] error:", err);
-    return [];
-  }
+		return await getReviewsForRelease(parsed.data.releaseId, parsed.data.cursor, parsed.data.limit);
+	} catch (err) {
+		console.error("[getMoreReviews] error:", err);
+		return [];
+	}
 }

@@ -42,7 +42,9 @@ export async function updateSession(request: NextRequest) {
 	// IMPORTANT: Do NOT use supabase.auth.getSession() -- it doesn't validate JWT.
 	// getUser() validates the JWT server-side AND refreshes expired tokens via
 	// the refresh token cookie, keeping sessions alive across navigations.
-	const { data: { user } } = await supabase.auth.getUser();
+	const {
+		data: { user },
+	} = await supabase.auth.getUser();
 
 	const { pathname } = request.nextUrl;
 
@@ -53,7 +55,8 @@ export async function updateSession(request: NextRequest) {
 	// then check if it exists in our user_sessions tracking table.
 	// Only block when user HAS tracked sessions but current isn't among them.
 	if (user) {
-		const isProtectedPath = !pathname.startsWith("/signin") &&
+		const isProtectedPath =
+			!pathname.startsWith("/signin") &&
 			!pathname.startsWith("/signup") &&
 			!pathname.startsWith("/forgot-password") &&
 			!pathname.startsWith("/reset-password") &&
@@ -129,10 +132,10 @@ export async function updateSession(request: NextRequest) {
 		"/explorar",
 		"/comunidade",
 		"/import-progress",
-		"/crates",        // M-16: added — under (protected) layout
-		"/radar",         // M-16: added — under (protected) layout
-		"/wrapped",       // M-16: added — under (protected) layout
-		"/trades",        // M-16: added — under (protected) layout
+		"/crates", // M-16: added — under (protected) layout
+		"/radar", // M-16: added — under (protected) layout
+		"/wrapped", // M-16: added — under (protected) layout
+		"/trades", // M-16: added — under (protected) layout
 		"/notifications", // M-16: added — under (protected) layout
 		"/como-usar",
 	];

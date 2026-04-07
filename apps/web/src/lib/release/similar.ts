@@ -1,4 +1,4 @@
-import { sql, eq, ne, and, desc } from "drizzle-orm";
+import { and, desc, eq, ne, sql } from "drizzle-orm";
 import { db } from "@/lib/db";
 import { releases } from "@/lib/db/schema/releases";
 
@@ -18,10 +18,7 @@ export interface SimilarRecord {
  *
  * Scoring: 2 points per shared genre + 1 point per shared style + year proximity bonus.
  */
-export async function getSimilarRecords(
-	releaseId: string,
-	limit = 8,
-): Promise<SimilarRecord[]> {
+export async function getSimilarRecords(releaseId: string, limit = 8): Promise<SimilarRecord[]> {
 	// Get the source release's genre, style, and year
 	const [source] = await db
 		.select({

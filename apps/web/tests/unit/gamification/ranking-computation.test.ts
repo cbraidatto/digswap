@@ -1,10 +1,10 @@
-import { describe, test, expect } from "vitest";
+import { describe, expect, test } from "vitest";
 import {
-	getRankTitleFromScore,
-	computeGlobalScore,
-	CONTRIBUTION_POINTS,
-	RANK_TITLES,
 	BADGE_DEFINITIONS,
+	CONTRIBUTION_POINTS,
+	computeGlobalScore,
+	getRankTitleFromScore,
+	RANK_TITLES,
 } from "@/lib/gamification/constants";
 
 // ---------------------------------------------------------------------------
@@ -165,9 +165,7 @@ describe("RANK_TITLES", () => {
 	test("has 4 tiers in ascending order", () => {
 		expect(RANK_TITLES).toHaveLength(4);
 		for (let i = 1; i < RANK_TITLES.length; i++) {
-			expect(RANK_TITLES[i].minScore).toBeGreaterThan(
-				RANK_TITLES[i - 1].minScore,
-			);
+			expect(RANK_TITLES[i].minScore).toBeGreaterThan(RANK_TITLES[i - 1].minScore);
 		}
 	});
 });

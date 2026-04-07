@@ -1,7 +1,7 @@
 "use client";
 
-import { DISCOGS_GENRES } from "@/lib/discogs/taxonomy";
 import { DECADES } from "@/lib/collection/filters";
+import { DISCOGS_GENRES } from "@/lib/discogs/taxonomy";
 
 /**
  * Subset of Discogs genres most relevant for vinyl digger browsing.
@@ -73,9 +73,7 @@ export function BrowseFilters({
 						<button
 							key={decade.label}
 							type="button"
-							onClick={() =>
-								onDecadeChange(isActive ? null : decade.label)
-							}
+							onClick={() => onDecadeChange(isActive ? null : decade.label)}
 							className={`px-4 py-1 rounded-full font-mono text-xs transition-colors ${
 								isActive
 									? "bg-primary/10 text-primary border border-primary"

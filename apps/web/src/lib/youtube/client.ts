@@ -32,14 +32,13 @@ export async function searchYouTube(query: string): Promise<YouTubeSearchResult[
 
 	const data = await res.json();
 
-	return (data.items ?? []).map((item: {
-		id: { videoId: string };
-		snippet: { title: string; channelTitle: string };
-	}) => ({
-		videoId: item.id.videoId,
-		title: decodeHtmlEntities(item.snippet.title),
-		channelTitle: decodeHtmlEntities(item.snippet.channelTitle),
-		// hqdefault = 480x360, always available for any video
-		thumbnail: `https://i.ytimg.com/vi/${item.id.videoId}/hqdefault.jpg`,
-	}));
+	return (data.items ?? []).map(
+		(item: { id: { videoId: string }; snippet: { title: string; channelTitle: string } }) => ({
+			videoId: item.id.videoId,
+			title: decodeHtmlEntities(item.snippet.title),
+			channelTitle: decodeHtmlEntities(item.snippet.channelTitle),
+			// hqdefault = 480x360, always available for any video
+			thumbnail: `https://i.ytimg.com/vi/${item.id.videoId}/hqdefault.jpg`,
+		}),
+	);
 }

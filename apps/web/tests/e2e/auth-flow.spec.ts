@@ -1,4 +1,4 @@
-import { test, expect } from "@playwright/test";
+import { expect, test } from "@playwright/test";
 
 /**
  * Authentication flow E2E tests.
@@ -16,9 +16,7 @@ test.describe("Authentication Pages", () => {
 		// Verify form elements are visible
 		await expect(page.getByLabel(/email/i)).toBeVisible();
 		await expect(page.getByLabel(/^password$/i)).toBeVisible();
-		await expect(
-			page.getByRole("button", { name: /sign up|create account/i }),
-		).toBeVisible();
+		await expect(page.getByRole("button", { name: /sign up|create account/i })).toBeVisible();
 	});
 
 	test("signin page loads and shows form", async ({ page }) => {
@@ -28,9 +26,7 @@ test.describe("Authentication Pages", () => {
 		// Verify form elements are visible
 		await expect(page.getByLabel(/email/i)).toBeVisible();
 		await expect(page.getByLabel(/password/i)).toBeVisible();
-		await expect(
-			page.getByRole("button", { name: /sign in|log in/i }),
-		).toBeVisible();
+		await expect(page.getByRole("button", { name: /sign in|log in/i })).toBeVisible();
 	});
 
 	test("forgot-password page loads", async ({ page }) => {
@@ -39,9 +35,7 @@ test.describe("Authentication Pages", () => {
 
 		// Verify email input for reset
 		await expect(page.getByLabel(/email/i)).toBeVisible();
-		await expect(
-			page.getByRole("button", { name: /reset|send/i }),
-		).toBeVisible();
+		await expect(page.getByRole("button", { name: /reset|send/i })).toBeVisible();
 	});
 
 	test("signup page shows password requirements", async ({ page }) => {
@@ -67,9 +61,7 @@ test.describe("Authenticated Routes", () => {
 	// These tests require a Supabase connection and valid auth session.
 	// They are scaffolded for future implementation.
 
-	test.skip("onboarding page loads for authenticated user", async ({
-		page,
-	}) => {
+	test.skip("onboarding page loads for authenticated user", async ({ page }) => {
 		// Requires: authenticated Supabase session via test user
 		// Would navigate to /onboarding and verify step 1 loads
 		await page.goto("/onboarding");
@@ -97,9 +89,7 @@ test.describe("Authenticated Routes", () => {
 		await expect(page.getByText(/current session/i)).toBeVisible();
 	});
 
-	test.skip("can terminate a session from sessions page", async ({
-		page,
-	}) => {
+	test.skip("can terminate a session from sessions page", async ({ page }) => {
 		// Requires: multiple authenticated sessions
 		// Would click "End Session" -> confirm -> verify session removed
 		await page.goto("/settings/sessions");

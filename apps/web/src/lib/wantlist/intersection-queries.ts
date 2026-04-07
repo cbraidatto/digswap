@@ -1,8 +1,8 @@
-import { and, eq, desc, sql } from "drizzle-orm";
+import { and, desc, eq, sql } from "drizzle-orm";
 import { db } from "@/lib/db";
-import { wantlistItems } from "@/lib/db/schema/wantlist";
 import { collectionItems } from "@/lib/db/schema/collections";
 import { releases } from "@/lib/db/schema/releases";
+import { wantlistItems } from "@/lib/db/schema/wantlist";
 
 export interface WantlistIntersection {
 	releaseId: string;

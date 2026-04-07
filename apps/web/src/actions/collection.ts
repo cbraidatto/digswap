@@ -1,14 +1,14 @@
 "use server";
 
 import { z } from "zod";
-import { createClient } from "@/lib/supabase/server";
-import { createAdminClient } from "@/lib/supabase/admin";
-import { createDiscogsClient, computeRarityScore } from "@/lib/discogs/client";
 import { CONDITION_GRADES } from "@/lib/collection/filters";
-import { logActivity } from "@/lib/social/log-activity";
-import { apiRateLimit , safeLimit} from "@/lib/rate-limit";
-import { checkWantlistMatches } from "@/lib/notifications/match";
+import { computeRarityScore, createDiscogsClient } from "@/lib/discogs/client";
 import { awardBadge } from "@/lib/gamification/badge-awards";
+import { checkWantlistMatches } from "@/lib/notifications/match";
+import { apiRateLimit, safeLimit } from "@/lib/rate-limit";
+import { logActivity } from "@/lib/social/log-activity";
+import { createAdminClient } from "@/lib/supabase/admin";
+import { createClient } from "@/lib/supabase/server";
 import { uuidSchema } from "@/lib/validations/common";
 
 /**
@@ -125,25 +125,24 @@ export async function addRecordToCollection(
 			const want = release.community?.want ?? 0;
 
 			// Extract tracklist if available
-			const tracklist = release.tracklist?.map((t: { position?: string; title?: string; duration?: string }) => ({
-				position: t.position ?? "",
-				title: t.title ?? "",
-				duration: t.duration ?? "",
-			})) ?? null;
+			const tracklist =
+				release.tracklist?.map((t: { position?: string; title?: string; duration?: string }) => ({
+					position: t.position ?? "",
+					title: t.title ?? "",
+					duration: t.duration ?? "",
+				})) ?? null;
 
 			const { data: inserted, error: insertError } = await admin
 				.from("releases")
 				.insert({
 					discogs_id: release.id,
 					title: release.title ?? "Unknown",
-					artist:
-						release.artists?.[0]?.name ?? "Unknown",
+					artist: release.artists?.[0]?.name ?? "Unknown",
 					year: release.year || null,
 					genre: release.genres || [],
 					style: release.styles || [],
 					format: release.formats?.[0]?.name || null,
-					cover_image_url:
-						release.images?.[0]?.uri || null,
+					cover_image_url: release.images?.[0]?.uri || null,
 					discogs_have: have,
 					discogs_want: want,
 					rarity_score: computeRarityScore(have, want),
@@ -185,15 +184,13 @@ export async function addRecordToCollection(
 		}
 
 		// Insert collection item — unique constraint (user_id, release_id) catches concurrent duplicates
-		const { error: collectionError } = await admin
-			.from("collection_items")
-			.insert({
-				user_id: user.id,
-				release_id: releaseId,
-				added_via: "manual",
-				created_at: new Date().toISOString(),
-				updated_at: new Date().toISOString(),
-			});
+		const { error: collectionError } = await admin.from("collection_items").insert({
+			user_id: user.id,
+			release_id: releaseId,
+			added_via: "manual",
+			created_at: new Date().toISOString(),
+			updated_at: new Date().toISOString(),
+		});
 
 		if (collectionError) {
 			// 23505 = unique_violation — already in collection (concurrent request)
@@ -373,7 +370,9 @@ export async function toggleOpenForTrade(
 ): Promise<{ success?: boolean; error?: string }> {
 	try {
 		const supabase = await createClient();
-		const { data: { user } } = await supabase.auth.getUser();
+		const {
+			data: { user },
+		} = await supabase.auth.getUser();
 		if (!user) return { error: "Not authenticated" };
 
 		const { success: rlSuccess } = await safeLimit(apiRateLimit, user.id, true);
@@ -408,7 +407,9 @@ export async function updateCollectionNotes(
 ): Promise<{ success?: boolean; error?: string }> {
 	try {
 		const supabase = await createClient();
-		const { data: { user } } = await supabase.auth.getUser();
+		const {
+			data: { user },
+		} = await supabase.auth.getUser();
 		if (!user) return { error: "Not authenticated" };
 
 		const { success: rlSuccess } = await safeLimit(apiRateLimit, user.id, true);
@@ -445,7 +446,9 @@ export async function setPersonalRating(
 ): Promise<{ success?: boolean; error?: string }> {
 	try {
 		const supabase = await createClient();
-		const { data: { user } } = await supabase.auth.getUser();
+		const {
+			data: { user },
+		} = await supabase.auth.getUser();
 		if (!user) return { error: "Not authenticated" };
 
 		const { success: rlSuccess } = await safeLimit(apiRateLimit, user.id, true);

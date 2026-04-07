@@ -1,24 +1,20 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import {
-	Popover,
-	PopoverContent,
-	PopoverTrigger,
-} from "@/components/ui/popover";
-import { Separator } from "@/components/ui/separator";
-import { createClient } from "@/lib/supabase/client";
-import {
-	getUnreadCountAction,
 	getRecentNotificationsAction,
+	getUnreadCountAction,
 	markAllRead,
 	markNotificationRead,
 } from "@/actions/notifications";
-import { NotificationRow } from "@/components/shell/notification-row";
 import type { NotificationData } from "@/components/shell/notification-row";
+import { NotificationRow } from "@/components/shell/notification-row";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Separator } from "@/components/ui/separator";
+import { createClient } from "@/lib/supabase/client";
 
 interface NotificationBellProps {
 	userId: string;
@@ -114,9 +110,7 @@ export function NotificationBell({ userId }: NotificationBellProps) {
 			const result = await markAllRead();
 			if (result.success) {
 				setUnreadCount(0);
-				setRecentNotifications((prev) =>
-					prev.map((n) => ({ ...n, read: true })),
-				);
+				setRecentNotifications((prev) => prev.map((n) => ({ ...n, read: true })));
 				toast("All notifications marked as read");
 			}
 		} catch {
@@ -204,13 +198,9 @@ export function NotificationBell({ userId }: NotificationBellProps) {
 			>
 				{/* Header */}
 				<div className="flex items-center justify-between p-4 border-b border-outline-variant/10">
-					<span className="font-heading font-semibold text-on-surface">
-						Notifications
-					</span>
+					<span className="font-heading font-semibold text-on-surface">Notifications</span>
 					{unreadCount > 0 && (
-						<span className="font-mono text-xs text-on-surface-variant">
-							({unreadCount})
-						</span>
+						<span className="font-mono text-xs text-on-surface-variant">({unreadCount})</span>
 					)}
 				</div>
 
@@ -223,13 +213,8 @@ export function NotificationBell({ userId }: NotificationBellProps) {
 					) : (
 						recentNotifications.map((notification, index) => (
 							<div key={notification.id}>
-								{index > 0 && (
-									<Separator className="border-outline-variant/10" />
-								)}
-								<NotificationRow
-									notification={notification}
-									onClick={handleNotificationClick}
-								/>
+								{index > 0 && <Separator className="border-outline-variant/10" />}
+								<NotificationRow notification={notification} onClick={handleNotificationClick} />
 							</div>
 						))
 					)}

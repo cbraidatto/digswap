@@ -1,4 +1,4 @@
-import { describe, test, expect, vi, beforeEach } from "vitest";
+import { beforeEach, describe, expect, test, vi } from "vitest";
 
 // Track call count to return different results for sequential queries
 let queryCallCount = 0;
@@ -61,7 +61,7 @@ vi.mock("@/lib/db/schema/notifications", () => ({
 }));
 
 // Mock admin client for upsertPreferences
-const mockUpsert = vi.fn();
+const _mockUpsert = vi.fn();
 const mockAdminFrom = vi.fn();
 const mockAdminClient = {
 	from: mockAdminFrom,
@@ -71,11 +71,7 @@ vi.mock("@/lib/supabase/admin", () => ({
 	createAdminClient: () => mockAdminClient,
 }));
 
-import {
-	getUnreadCount,
-	getPreferences,
-	upsertPreferences,
-} from "@/lib/notifications/queries";
+import { getPreferences, getUnreadCount, upsertPreferences } from "@/lib/notifications/queries";
 
 describe("notification queries", () => {
 	beforeEach(() => {
@@ -123,8 +119,7 @@ describe("notification queries", () => {
 			chain.upsert = vi.fn().mockReturnValue(chain);
 			chain.select = vi.fn().mockReturnValue(chain);
 			chain.single = vi.fn().mockReturnValue(chain);
-			chain.then = (resolve: (v: unknown) => void) =>
-				resolve({ data: mockData, error: null });
+			chain.then = (resolve: (v: unknown) => void) => resolve({ data: mockData, error: null });
 
 			mockAdminFrom.mockReturnValue(chain);
 
@@ -133,9 +128,7 @@ describe("notification queries", () => {
 			});
 
 			expect(result).toEqual(mockData);
-			expect(mockAdminFrom).toHaveBeenCalledWith(
-				"notification_preferences",
-			);
+			expect(mockAdminFrom).toHaveBeenCalledWith("notification_preferences");
 		});
 
 		test("updates existing row via upsert", async () => {
@@ -150,8 +143,7 @@ describe("notification queries", () => {
 			chain.upsert = vi.fn().mockReturnValue(chain);
 			chain.select = vi.fn().mockReturnValue(chain);
 			chain.single = vi.fn().mockReturnValue(chain);
-			chain.then = (resolve: (v: unknown) => void) =>
-				resolve({ data: mockData, error: null });
+			chain.then = (resolve: (v: unknown) => void) => resolve({ data: mockData, error: null });
 
 			mockAdminFrom.mockReturnValue(chain);
 

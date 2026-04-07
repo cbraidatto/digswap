@@ -9,7 +9,7 @@
  */
 
 import { createHmac, randomBytes } from "node:crypto";
-import { eq, and, isNull } from "drizzle-orm";
+import { and, eq, isNull } from "drizzle-orm";
 import { db } from "@/lib/db";
 import { handoffTokens } from "@/lib/db/schema/trades";
 
@@ -21,17 +21,15 @@ import { handoffTokens } from "@/lib/db/schema/trades";
 const TOKEN_TTL_MS = 30_000;
 
 function getHmacSecret(): string {
-  const secret = process.env.HANDOFF_HMAC_SECRET;
-  if (!secret) {
-    throw new Error(
-      "HANDOFF_HMAC_SECRET env var is required for handoff token operations",
-    );
-  }
-  return secret;
+	const secret = process.env.HANDOFF_HMAC_SECRET;
+	if (!secret) {
+		throw new Error("HANDOFF_HMAC_SECRET env var is required for handoff token operations");
+	}
+	return secret;
 }
 
 function computeHmac(plaintext: string, secret: string): string {
-  return createHmac("sha256", secret).update(plaintext).digest("hex");
+	return createHmac("sha256", secret).update(plaintext).digest("hex");
 }
 
 /**
@@ -44,25 +42,22 @@ function computeHmac(plaintext: string, secret: string): string {
  * @param userId - UUID of the user requesting the handoff
  * @returns Plaintext 64-char hex token (32 random bytes)
  */
-export async function createHandoffToken(
-  tradeId: string,
-  userId: string,
-): Promise<string> {
-  const plaintext = randomBytes(32).toString("hex");
-  const hmac = computeHmac(plaintext, getHmacSecret());
-  const expiresAt = new Date(Date.now() + TOKEN_TTL_MS);
+export async function createHandoffToken(tradeId: string, userId: string): Promise<string> {
+	const plaintext = randomBytes(32).toString("hex");
+	const hmac = computeHmac(plaintext, getHmacSecret());
+	const expiresAt = new Date(Date.now() + TOKEN_TTL_MS);
 
-  await db
-    .insert(handoffTokens)
-    .values({
-      tradeId,
-      userId,
-      tokenHmac: hmac,
-      expiresAt,
-    })
-    .returning({ id: handoffTokens.id });
+	await db
+		.insert(handoffTokens)
+		.values({
+			tradeId,
+			userId,
+			tokenHmac: hmac,
+			expiresAt,
+		})
+		.returning({ id: handoffTokens.id });
 
-  return plaintext;
+	return plaintext;
 }
 
 /**
@@ -84,50 +79,48 @@ export async function createHandoffToken(
  * @param userId - Authenticated user's UUID (must match stored row)
  */
 export async function verifyAndConsumeHandoffToken(
-  plaintext: string,
-  tradeId: string,
-  userId: string,
+	plaintext: string,
+	tradeId: string,
+	userId: string,
 ): Promise<boolean> {
-  const hmac = computeHmac(plaintext, getHmacSecret());
+	const hmac = computeHmac(plaintext, getHmacSecret());
 
-  // Fetch the matching unused row
-  const rows = await db
-    .select()
-    .from(handoffTokens)
-    .where(
-      and(
-        eq(handoffTokens.tokenHmac, hmac),
-        eq(handoffTokens.tradeId, tradeId),
-        eq(handoffTokens.userId, userId),
-        isNull(handoffTokens.usedAt),
-      ),
-    );
+	// Fetch the matching unused row
+	const rows = await db
+		.select()
+		.from(handoffTokens)
+		.where(
+			and(
+				eq(handoffTokens.tokenHmac, hmac),
+				eq(handoffTokens.tradeId, tradeId),
+				eq(handoffTokens.userId, userId),
+				isNull(handoffTokens.usedAt),
+			),
+		);
 
-  if (rows.length === 0) {
-    // No matching unused token — either wrong token, wrong trade, or already consumed
-    return false;
-  }
+	if (rows.length === 0) {
+		// No matching unused token — either wrong token, wrong trade, or already consumed
+		return false;
+	}
 
-  const row = rows[0];
+	const row = rows[0];
 
-  // Check expiry in application layer (DB row might be found but expired)
-  if (row.expiresAt < new Date()) {
-    return false;
-  }
+	// Check expiry in application layer (DB row might be found but expired)
+	if (row.expiresAt < new Date()) {
+		return false;
+	}
 
-  // Atomically claim the token — WHERE usedAt IS NULL prevents concurrent replay
-  const updated = await db
-    .update(handoffTokens)
-    .set({ usedAt: new Date() })
-    .where(
-      and(eq(handoffTokens.id, row.id), isNull(handoffTokens.usedAt)),
-    )
-    .returning({ id: handoffTokens.id });
+	// Atomically claim the token — WHERE usedAt IS NULL prevents concurrent replay
+	const updated = await db
+		.update(handoffTokens)
+		.set({ usedAt: new Date() })
+		.where(and(eq(handoffTokens.id, row.id), isNull(handoffTokens.usedAt)))
+		.returning({ id: handoffTokens.id });
 
-  if (updated.length === 0) {
-    // Concurrent request already consumed this token — replay blocked
-    return false;
-  }
+	if (updated.length === 0) {
+		// Concurrent request already consumed this token — replay blocked
+		return false;
+	}
 
-  return true;
+	return true;
 }

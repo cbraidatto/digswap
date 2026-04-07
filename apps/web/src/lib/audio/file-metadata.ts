@@ -2,9 +2,7 @@
  * Analyzes an audio file using Web Audio API to extract format metadata.
  * Decodes the file to determine duration, channels, and sample rate.
  */
-export async function analyzeAudioFile(
-	file: Blob,
-): Promise<{
+export async function analyzeAudioFile(file: Blob): Promise<{
 	format: string;
 	duration: number;
 	channels: number;
@@ -59,7 +57,6 @@ export function formatDuration(seconds: number): string {
 export function formatFileSize(bytes: number): string {
 	if (bytes < 1024) return `${bytes} B`;
 	if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
-	if (bytes < 1024 * 1024 * 1024)
-		return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+	if (bytes < 1024 * 1024 * 1024) return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
 	return `${(bytes / (1024 * 1024 * 1024)).toFixed(2)} GB`;
 }

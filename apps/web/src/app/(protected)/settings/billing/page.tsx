@@ -1,7 +1,7 @@
-import { redirect } from "next/navigation";
 import Link from "next/link";
-import { createClient } from "@/lib/supabase/server";
+import { redirect } from "next/navigation";
 import { getQuotaStatus } from "@/lib/entitlements";
+import { createClient } from "@/lib/supabase/server";
 import { ManageButton } from "./_components/ManageButton";
 
 export const metadata = {
@@ -73,9 +73,7 @@ export default async function BillingPage({
 						check_circle
 					</span>
 					<div>
-						<div className="text-tertiary text-xs font-bold">
-							Subscription activated
-						</div>
+						<div className="text-tertiary text-xs font-bold">Subscription activated</div>
 						<div className="text-tertiary/60 text-xs mt-0.5">
 							Welcome to Premium — unlimited trades unlocked.
 						</div>
@@ -85,9 +83,7 @@ export default async function BillingPage({
 
 			{/* Subscription card */}
 			<div className="bg-surface-container border border-outline-variant rounded p-5 space-y-4">
-				<div className="text-xs text-muted-foreground uppercase tracking-widest">
-					Current plan
-				</div>
+				<div className="text-xs text-muted-foreground uppercase tracking-widest">Current plan</div>
 
 				{isPremium ? (
 					<div className="space-y-3">
@@ -97,9 +93,7 @@ export default async function BillingPage({
 						</div>
 						<div className="flex items-center justify-between text-xs">
 							<span className="text-muted-foreground">Next renewal</span>
-							<span className="text-on-surface-variant">
-								{formatDate(currentPeriodEnd)}
-							</span>
+							<span className="text-on-surface-variant">{formatDate(currentPeriodEnd)}</span>
 						</div>
 						<div className="flex items-center justify-between text-xs">
 							<span className="text-muted-foreground">Trades this month</span>

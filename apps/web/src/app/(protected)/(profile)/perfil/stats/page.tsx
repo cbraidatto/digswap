@@ -1,14 +1,12 @@
-import { redirect } from "next/navigation";
-import { eq, desc, count, avg } from "drizzle-orm";
-import { sql } from "drizzle-orm";
+import { avg, count, desc, eq, sql } from "drizzle-orm";
 import type { Metadata } from "next";
 import Link from "next/link";
-
-import { createClient } from "@/lib/supabase/server";
+import { redirect } from "next/navigation";
 import { db } from "@/lib/db";
 import { collectionItems } from "@/lib/db/schema/collections";
-import { releases } from "@/lib/db/schema/releases";
 import { listeningLogs } from "@/lib/db/schema/listening-logs";
+import { releases } from "@/lib/db/schema/releases";
+import { createClient } from "@/lib/supabase/server";
 
 export const metadata: Metadata = {
 	title: "My Stats — DigSwap",
@@ -98,16 +96,10 @@ export default async function StatsPage() {
 			.where(eq(collectionItems.userId, userId)),
 
 		// Total records
-		db
-			.select({ total: count() })
-			.from(collectionItems)
-			.where(eq(collectionItems.userId, userId)),
+		db.select({ total: count() }).from(collectionItems).where(eq(collectionItems.userId, userId)),
 
 		// Total listens
-		db
-			.select({ total: count() })
-			.from(listeningLogs)
-			.where(eq(listeningLogs.userId, userId)),
+		db.select({ total: count() }).from(listeningLogs).where(eq(listeningLogs.userId, userId)),
 	]);
 
 	const topGenres = topGenresRaw.filter((r) => r.genre != null);
@@ -129,9 +121,7 @@ export default async function StatsPage() {
 					<span className="font-mono text-[10px] uppercase tracking-[0.2em] text-primary">
 						Collection Analytics
 					</span>
-					<h1 className="text-3xl font-bold font-heading text-on-surface mt-1">
-						Your_Stats
-					</h1>
+					<h1 className="text-3xl font-bold font-heading text-on-surface mt-1">Your_Stats</h1>
 				</div>
 				<Link
 					href="/perfil"
@@ -144,18 +134,31 @@ export default async function StatsPage() {
 			{/* Summary row */}
 			<div className="grid grid-cols-3 gap-4">
 				{[
-					{ label: "Records", value: totalRecords.toLocaleString(), icon: "album", color: "text-primary" },
-					{ label: "Avg Rarity", value: avgRarity.toFixed(1), icon: "diamond", color: "text-secondary" },
-					{ label: "Listens", value: totalListens.toLocaleString(), icon: "headphones", color: "text-tertiary" },
+					{
+						label: "Records",
+						value: totalRecords.toLocaleString(),
+						icon: "album",
+						color: "text-primary",
+					},
+					{
+						label: "Avg Rarity",
+						value: avgRarity.toFixed(1),
+						icon: "diamond",
+						color: "text-secondary",
+					},
+					{
+						label: "Listens",
+						value: totalListens.toLocaleString(),
+						icon: "headphones",
+						color: "text-tertiary",
+					},
 				].map((stat) => (
 					<div
 						key={stat.label}
 						className="bg-surface-container-low rounded-lg p-4 border border-outline-variant/10 flex flex-col gap-1"
 					>
 						<div className="flex items-center gap-1.5">
-							<span className={`material-symbols-outlined text-sm ${stat.color}`}>
-								{stat.icon}
-							</span>
+							<span className={`material-symbols-outlined text-sm ${stat.color}`}>{stat.icon}</span>
 							<span className="font-mono text-[9px] uppercase tracking-[0.18em] text-on-surface-variant">
 								{stat.label}
 							</span>
@@ -246,7 +249,5 @@ function StatRow({ label, count, max }: { label: string; count: number; max: num
 }
 
 function Empty() {
-	return (
-		<p className="font-mono text-xs text-outline/60 italic">no data yet</p>
-	);
+	return <p className="font-mono text-xs text-outline/60 italic">no data yet</p>;
 }

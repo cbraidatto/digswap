@@ -1,9 +1,6 @@
 export type ContextReason = "dna_match" | "network" | "trending" | null;
 
-const LABELS: Record<
-	NonNullable<ContextReason>,
-	{ icon: string; text: string }
-> = {
+const LABELS: Record<NonNullable<ContextReason>, { icon: string; text: string }> = {
 	dna_match: { icon: "music_note", text: "Based on your taste" },
 	network: { icon: "group", text: "From the community" },
 	trending: { icon: "trending_up", text: "Trending find" },

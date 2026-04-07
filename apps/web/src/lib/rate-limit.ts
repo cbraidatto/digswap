@@ -6,9 +6,7 @@ const redisToken = process.env.UPSTASH_REDIS_REST_TOKEN ?? "";
 
 const redisAvailable = redisUrl.length > 0 && redisToken.length > 0;
 
-const redis = redisAvailable
-	? new Redis({ url: redisUrl, token: redisToken })
-	: null;
+const redis = redisAvailable ? new Redis({ url: redisUrl, token: redisToken }) : null;
 
 /**
  * Safe rate limit wrapper.
@@ -27,7 +25,9 @@ export async function safeLimit(
 			if (failClosed) {
 				console.error("[rate-limit] Redis unavailable - failing closed");
 			} else {
-				console.warn("[rate-limit] Redis unavailable - allowing request because limiter is fail-open");
+				console.warn(
+					"[rate-limit] Redis unavailable - allowing request because limiter is fail-open",
+				);
 			}
 		}
 		return { success: !failClosed };
@@ -82,4 +82,7 @@ export const apiRateLimit = makeRatelimit(Ratelimit.slidingWindow(30, "60 s"), "
 export const tradeRateLimit = makeRatelimit(Ratelimit.slidingWindow(10, "60 s"), "ratelimit:trade");
 
 /** Discogs API proxy: 5 req per 60s per user */
-export const discogsRateLimit = makeRatelimit(Ratelimit.slidingWindow(5, "60 s"), "ratelimit:discogs");
+export const discogsRateLimit = makeRatelimit(
+	Ratelimit.slidingWindow(5, "60 s"),
+	"ratelimit:discogs",
+);

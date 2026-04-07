@@ -1,13 +1,13 @@
 "use server";
 
+import { and, eq, or } from "drizzle-orm";
 import { z } from "zod";
-import { eq, and, or } from "drizzle-orm";
-import { db } from "@/lib/db";
-import { tradeRequests, tradeReviews, tradeMessages } from "@/lib/db/schema/trades";
-import { tradeRateLimit, safeLimit } from "@/lib/rate-limit";
-import { createClient } from "@/lib/supabase/server";
 import { requireUser } from "@/lib/auth/require-user";
+import { db } from "@/lib/db";
+import { tradeMessages, tradeRequests, tradeReviews } from "@/lib/db/schema/trades";
 import { checkAndIncrementTradeCount } from "@/lib/entitlements";
+import { safeLimit, tradeRateLimit } from "@/lib/rate-limit";
+import { createClient } from "@/lib/supabase/server";
 import { uuidSchema } from "@/lib/validations/common";
 
 const createTradeSchema = z.object({
@@ -26,8 +26,8 @@ const createTradeSchema = z.object({
 // ---------------------------------------------------------------------------
 const VALID_TRANSITIONS: Record<string, string[]> = {
 	pending: ["accepted", "declined", "cancelled"],
-	accepted: ["cancelled"],  // allow cancel after accept but before lobby
-	lobby: ["cancelled"],     // allow cancel from lobby
+	accepted: ["cancelled"], // allow cancel after accept but before lobby
+	lobby: ["cancelled"], // allow cancel from lobby
 };
 
 /**
@@ -46,10 +46,7 @@ async function loadTradeForParticipant(tradeId: string, userId: string) {
 		.where(
 			and(
 				eq(tradeRequests.id, tradeId),
-				or(
-					eq(tradeRequests.requesterId, userId),
-					eq(tradeRequests.providerId, userId),
-				),
+				or(eq(tradeRequests.requesterId, userId), eq(tradeRequests.providerId, userId)),
 			),
 		)
 		.limit(1);
@@ -355,10 +352,7 @@ export async function submitTradeReviewAction(input: {
 			.select({ id: tradeReviews.id })
 			.from(tradeReviews)
 			.where(
-				and(
-					eq(tradeReviews.tradeId, parsed.data.tradeId),
-					eq(tradeReviews.reviewerId, user.id),
-				),
+				and(eq(tradeReviews.tradeId, parsed.data.tradeId), eq(tradeReviews.reviewerId, user.id)),
 			)
 			.limit(1);
 

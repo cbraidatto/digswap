@@ -1,12 +1,12 @@
 "use client";
 
 import { usePathname } from "next/navigation";
+import { ChatSidebar } from "@/components/chat/chat-sidebar";
+import { FloatingPlayer } from "@/components/player/floating-player";
+import { PlayerProvider } from "@/components/player/player-provider";
 import { AppHeader } from "@/components/shell/app-header";
 import { BottomBar } from "@/components/shell/bottom-bar";
-import { PlayerProvider } from "@/components/player/player-provider";
-import { FloatingPlayer } from "@/components/player/floating-player";
 import { usePlayerStore } from "@/lib/player/store";
-import { ChatSidebar } from "@/components/chat/chat-sidebar";
 
 const SHELL_EXCLUDED_PREFIXES = ["/onboarding", "/settings"];
 
@@ -42,7 +42,12 @@ export function AppShell({ user, banner, children }: AppShellProps) {
 	return (
 		<>
 			<PlayerProvider />
-			<AppHeader displayName={user.displayName} avatarUrl={user.avatarUrl} xp={user.xp} userId={user.id} />
+			<AppHeader
+				displayName={user.displayName}
+				avatarUrl={user.avatarUrl}
+				xp={user.xp}
+				userId={user.id}
+			/>
 			{banner}
 			<main
 				id="main-content"

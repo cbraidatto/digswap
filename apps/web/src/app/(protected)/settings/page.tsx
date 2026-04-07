@@ -1,13 +1,13 @@
 import "server-only";
 
 import type { Metadata } from "next";
-import { redirect } from "next/navigation";
 import Link from "next/link";
-import { createClient } from "@/lib/supabase/server";
-import { createAdminClient } from "@/lib/supabase/admin";
+import { redirect } from "next/navigation";
 import { DiscogsSettings } from "@/components/discogs/discogs-settings";
-import { NotificationPreferences } from "./_components/notification-preferences";
 import { DeleteAccountSection } from "@/components/settings/delete-account-section";
+import { createAdminClient } from "@/lib/supabase/admin";
+import { createClient } from "@/lib/supabase/server";
+import { NotificationPreferences } from "./_components/notification-preferences";
 
 export const metadata: Metadata = {
 	title: "Settings — DigSwap",
@@ -68,10 +68,14 @@ export default async function SettingsPage({
 					</span>
 					<div>
 						<div className="text-foreground font-mono text-sm">Billing</div>
-						<div className="text-muted-foreground font-mono text-xs">Manage your subscription and trade quota</div>
+						<div className="text-muted-foreground font-mono text-xs">
+							Manage your subscription and trade quota
+						</div>
 					</div>
 				</div>
-				<span className="material-symbols-outlined text-outline-variant text-sm">chevron_right</span>
+				<span className="material-symbols-outlined text-outline-variant text-sm">
+					chevron_right
+				</span>
 			</Link>
 
 			{oauthError && <OAuthErrorBanner error={oauthError} />}

@@ -1,19 +1,13 @@
-import { describe, test, expect, vi } from "vitest";
 import { render, screen } from "@testing-library/react";
+import { describe, expect, test, vi } from "vitest";
 import type { CollectionItem } from "@/lib/collection/queries";
 
 // Mock CollectionCard to avoid importing next/image, condition-editor, etc.
-vi.mock(
-	"@/app/(protected)/(profile)/perfil/_components/collection-card",
-	() => ({
-		CollectionCard: ({
-			item,
-		}: {
-			item: CollectionItem;
-			isOwner: boolean;
-		}) => <div data-testid={`card-${item.id}`}>{item.title}</div>,
-	}),
-);
+vi.mock("@/app/(protected)/(profile)/perfil/_components/collection-card", () => ({
+	CollectionCard: ({ item }: { item: CollectionItem; isOwner: boolean }) => (
+		<div data-testid={`card-${item.id}`}>{item.title}</div>
+	),
+}));
 
 import { CollectionGrid } from "@/app/(protected)/(profile)/perfil/_components/collection-grid";
 
@@ -64,9 +58,7 @@ describe("CollectionGrid", () => {
 	test("grid has responsive classes", () => {
 		const items = [makeItem({ id: "item-1" })];
 
-		const { container } = render(
-			<CollectionGrid items={items} isOwner={false} />,
-		);
+		const { container } = render(<CollectionGrid items={items} isOwner={false} />);
 
 		const gridDiv = container.firstChild as HTMLElement;
 		expect(gridDiv.className).toContain("grid-cols-2");

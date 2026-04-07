@@ -1,7 +1,7 @@
 import { and, desc, eq, lt, or, sql } from "drizzle-orm";
 import { db } from "@/lib/db";
-import { follows } from "@/lib/db/schema/social";
 import { directMessages } from "@/lib/db/schema/direct-messages";
+import { follows } from "@/lib/db/schema/social";
 import { profiles } from "@/lib/db/schema/users";
 
 // ---------------------------------------------------------------------------
@@ -73,10 +73,7 @@ export async function getMutualFriends(userId: string): Promise<Friend[]> {
 /**
  * Check if two users are mutual followers.
  */
-export async function areMutualFriends(
-	userA: string,
-	userB: string,
-): Promise<boolean> {
+export async function areMutualFriends(userA: string, userB: string): Promise<boolean> {
 	const [forward] = await db
 		.select({ id: follows.id })
 		.from(follows)
@@ -102,9 +99,7 @@ export async function areMutualFriends(
  * Get a preview of all conversations for a user, sorted by most recent message.
  * Uses a lateral join pattern to get the last message per conversation partner.
  */
-export async function getConversations(
-	userId: string,
-): Promise<ConversationPreview[]> {
+export async function getConversations(userId: string): Promise<ConversationPreview[]> {
 	// Get all distinct conversation partners
 	const partners = await db.execute(sql`
 		SELECT DISTINCT
@@ -134,14 +129,8 @@ export async function getConversations(
 			.from(directMessages)
 			.where(
 				or(
-					and(
-						eq(directMessages.senderId, userId),
-						eq(directMessages.receiverId, friendId),
-					),
-					and(
-						eq(directMessages.senderId, friendId),
-						eq(directMessages.receiverId, userId),
-					),
+					and(eq(directMessages.senderId, userId), eq(directMessages.receiverId, friendId)),
+					and(eq(directMessages.senderId, friendId), eq(directMessages.receiverId, userId)),
 				),
 			)
 			.orderBy(desc(directMessages.createdAt))
@@ -195,14 +184,8 @@ export async function getMessages(
 ): Promise<ChatMessage[]> {
 	const conditions = [
 		or(
-			and(
-				eq(directMessages.senderId, userId),
-				eq(directMessages.receiverId, friendId),
-			),
-			and(
-				eq(directMessages.senderId, friendId),
-				eq(directMessages.receiverId, userId),
-			),
+			and(eq(directMessages.senderId, userId), eq(directMessages.receiverId, friendId)),
+			and(eq(directMessages.senderId, friendId), eq(directMessages.receiverId, userId)),
 		)!,
 	];
 

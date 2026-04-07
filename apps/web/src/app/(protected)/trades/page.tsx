@@ -1,29 +1,30 @@
 import type { Metadata } from "next";
-import { redirect } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
+import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 
 export const metadata: Metadata = {
 	title: "Trades — DigSwap",
 	description: "Manage your vinyl trade requests and active swaps.",
 };
-import { listTradeThreads, type TradeThreadListItem } from "@/lib/trades/messages";
-import { getQuotaStatus } from "@/lib/entitlements";
+
 import { TradeQuotaBanner } from "@/components/trades/TradeQuotaBanner";
+import { getQuotaStatus } from "@/lib/entitlements";
+import { listTradeThreads, type TradeThreadListItem } from "@/lib/trades/messages";
 
 const TERMINAL_STATUSES = new Set(["completed", "declined", "cancelled", "expired"]);
 
 const STATUS_LABEL: Record<string, { label: string; className: string }> = {
-	pending:     { label: "Pending",      className: "text-muted-foreground border-outline-variant" },
-	lobby:       { label: "Lobby",        className: "text-primary border-primary/30" },
-	previewing:  { label: "Previewing",   className: "text-primary border-primary/30" },
-	accepted:    { label: "Accepted",     className: "text-primary border-primary/30" },
-	transferring:{ label: "Transferring", className: "text-secondary border-secondary/30" },
-	completed:   { label: "Complete",     className: "text-tertiary border-tertiary/30" },
-	declined:    { label: "Declined",     className: "text-muted-foreground border-outline-variant" },
-	cancelled:   { label: "Cancelled",    className: "text-muted-foreground border-outline-variant" },
-	expired:     { label: "Expired",      className: "text-muted-foreground border-outline-variant" },
+	pending: { label: "Pending", className: "text-muted-foreground border-outline-variant" },
+	lobby: { label: "Lobby", className: "text-primary border-primary/30" },
+	previewing: { label: "Previewing", className: "text-primary border-primary/30" },
+	accepted: { label: "Accepted", className: "text-primary border-primary/30" },
+	transferring: { label: "Transferring", className: "text-secondary border-secondary/30" },
+	completed: { label: "Complete", className: "text-tertiary border-tertiary/30" },
+	declined: { label: "Declined", className: "text-muted-foreground border-outline-variant" },
+	cancelled: { label: "Cancelled", className: "text-muted-foreground border-outline-variant" },
+	expired: { label: "Expired", className: "text-muted-foreground border-outline-variant" },
 };
 
 function formatRelativeTime(iso: string) {
@@ -64,9 +65,7 @@ function TradeCard({ thread }: { thread: TradeThreadListItem }) {
 							</span>
 						</div>
 					)}
-					<span className="text-foreground text-sm truncate">
-						{thread.counterpartyUsername}
-					</span>
+					<span className="text-foreground text-sm truncate">{thread.counterpartyUsername}</span>
 				</div>
 
 				<div className="flex items-center gap-2 flex-shrink-0">
@@ -83,9 +82,7 @@ function TradeCard({ thread }: { thread: TradeThreadListItem }) {
 
 			<div className="flex items-end justify-between gap-2">
 				<p className="text-muted-foreground text-xs truncate flex-1">
-					{thread.lastMessage
-						? thread.lastMessage.body
-						: "No messages yet"}
+					{thread.lastMessage ? thread.lastMessage.body : "No messages yet"}
 				</p>
 				<span className="text-muted-foreground/60 text-xs flex-shrink-0">
 					{formatRelativeTime(timestamp)}
@@ -102,10 +99,7 @@ export default async function TradesPage() {
 	} = await supabase.auth.getUser();
 	if (!user) redirect("/signin");
 
-	const [threads, quota] = await Promise.all([
-		listTradeThreads(user.id),
-		getQuotaStatus(user.id),
-	]);
+	const [threads, quota] = await Promise.all([listTradeThreads(user.id), getQuotaStatus(user.id)]);
 
 	return (
 		<div className="max-w-2xl mx-auto px-4 py-8">
@@ -117,9 +111,7 @@ export default async function TradesPage() {
 				percentUsed={quota.percentUsed}
 			/>
 			<div className="mb-6">
-				<h1 className="text-foreground font-heading text-xl font-bold tracking-tight">
-					Trades
-				</h1>
+				<h1 className="text-foreground font-heading text-xl font-bold tracking-tight">Trades</h1>
 				<p className="text-muted-foreground text-xs mt-1">
 					{threads.length} active trade{threads.length !== 1 ? "s" : ""}
 				</p>

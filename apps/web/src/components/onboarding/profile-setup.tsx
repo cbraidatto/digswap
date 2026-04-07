@@ -1,7 +1,7 @@
 "use client";
 
-import { useState } from "react";
 import { Loader2 } from "lucide-react";
+import { useState } from "react";
 
 import { updateProfile } from "@/actions/onboarding";
 import { Button } from "@/components/ui/button";
@@ -110,11 +110,7 @@ export function ProfileSetup({ onComplete }: ProfileSetupProps) {
 				disabled={isSubmitting}
 				aria-busy={isSubmitting}
 			>
-				{isSubmitting ? (
-					<Loader2 className="size-4 animate-spin" />
-				) : (
-					"Continue Setup"
-				)}
+				{isSubmitting ? <Loader2 className="size-4 animate-spin" /> : "Continue Setup"}
 			</Button>
 		</form>
 	);

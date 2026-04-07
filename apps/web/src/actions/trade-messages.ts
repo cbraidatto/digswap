@@ -3,9 +3,9 @@
 import { and, count, eq, gte } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
+import { requireUser } from "@/lib/auth/require-user";
 import { db } from "@/lib/db";
 import { tradeMessages, tradeRequests } from "@/lib/db/schema/trades";
-import { requireUser } from "@/lib/auth/require-user";
 import { getTradeParticipantContext } from "@/lib/trades/messages";
 import { uuidSchema } from "@/lib/validations/common";
 
@@ -45,7 +45,10 @@ export async function sendTradeMessage(
 			);
 
 		if (Number(rateLimitRows[0]?.count ?? 0) >= 10) {
-			return { success: false, error: "Too many messages in a short period. Please wait a moment." };
+			return {
+				success: false,
+				error: "Too many messages in a short period. Please wait a moment.",
+			};
 		}
 
 		await db.insert(tradeMessages).values({

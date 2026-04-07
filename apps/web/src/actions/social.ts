@@ -1,27 +1,25 @@
 "use server";
 
-import { createClient } from "@/lib/supabase/server";
+import { and, eq, ilike, sql } from "drizzle-orm";
 import { db } from "@/lib/db";
-import { follows, activityFeed } from "@/lib/db/schema/social";
+import { follows } from "@/lib/db/schema/social";
 import { profiles } from "@/lib/db/schema/users";
-import { collectionItems } from "@/lib/db/schema/collections";
-import { eq, and, ilike, sql } from "drizzle-orm";
-import { apiRateLimit , safeLimit} from "@/lib/rate-limit";
-import type { FeedItem } from "@/lib/social/types";
-import {
-	getGlobalFeed,
-	getPersonalFeed,
-	getFollowers,
-	getFollowing,
-	type FollowUser,
-} from "@/lib/social/queries";
+import { apiRateLimit, safeLimit } from "@/lib/rate-limit";
 import { getExploreFeed } from "@/lib/social/explore-queries";
 import {
-	logActivitySchema,
+	type FollowUser,
+	getFollowers,
+	getFollowing,
+	getGlobalFeed,
+	getPersonalFeed,
+} from "@/lib/social/queries";
+import type { FeedItem } from "@/lib/social/types";
+import { createClient } from "@/lib/supabase/server";
+import {
 	followUserSchema,
 	loadMoreFeedSchema,
-	userIdSchema,
 	searchUsersSchema,
+	userIdSchema,
 } from "@/lib/validations/social";
 
 export interface SearchResult {
@@ -117,10 +115,7 @@ export async function unfollowUser(
 		await db
 			.delete(follows)
 			.where(
-				and(
-					eq(follows.followerId, user.id),
-					eq(follows.followingId, parsed.data.targetUserId),
-				),
+				and(eq(follows.followerId, user.id), eq(follows.followingId, parsed.data.targetUserId)),
 			);
 
 		return { success: true };
@@ -163,9 +158,7 @@ export async function loadMoreFeed(
 	}
 }
 
-export async function loadExploreFeed(
-	cursor: string | null,
-): Promise<FeedItem[]> {
+export async function loadExploreFeed(cursor: string | null): Promise<FeedItem[]> {
 	try {
 		const supabase = await createClient();
 		const {
@@ -183,9 +176,7 @@ export async function loadExploreFeed(
 	}
 }
 
-export async function fetchFollowersList(
-	userId: string,
-): Promise<FollowUser[]> {
+export async function fetchFollowersList(userId: string): Promise<FollowUser[]> {
 	try {
 		const parsed = userIdSchema.safeParse({ userId });
 		if (!parsed.success) {
@@ -194,7 +185,9 @@ export async function fetchFollowersList(
 
 		// Auth check — prevent unauthenticated enumeration of follower graphs
 		const supabase = await createClient();
-		const { data: { user } } = await supabase.auth.getUser();
+		const {
+			data: { user },
+		} = await supabase.auth.getUser();
 		if (!user) return [];
 
 		return await getFollowers(parsed.data.userId);
@@ -204,9 +197,7 @@ export async function fetchFollowersList(
 	}
 }
 
-export async function fetchFollowingList(
-	userId: string,
-): Promise<FollowUser[]> {
+export async function fetchFollowingList(userId: string): Promise<FollowUser[]> {
 	try {
 		const parsed = userIdSchema.safeParse({ userId });
 		if (!parsed.success) {
@@ -215,7 +206,9 @@ export async function fetchFollowingList(
 
 		// Auth check — prevent unauthenticated enumeration of following graphs
 		const supabase = await createClient();
-		const { data: { user } } = await supabase.auth.getUser();
+		const {
+			data: { user },
+		} = await supabase.auth.getUser();
 		if (!user) return [];
 
 		return await getFollowing(parsed.data.userId);
@@ -225,9 +218,7 @@ export async function fetchFollowingList(
 	}
 }
 
-export async function searchUsers(
-	query: string,
-): Promise<SearchResult[]> {
+export async function searchUsers(query: string): Promise<SearchResult[]> {
 	try {
 		const parsed = searchUsersSchema.safeParse({ query });
 		if (!parsed.success) {

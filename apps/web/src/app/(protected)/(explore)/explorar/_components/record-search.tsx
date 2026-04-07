@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useCallback, useTransition } from "react";
+import { useCallback, useRef, useState, useTransition } from "react";
 import { searchRecordsAction } from "@/actions/discovery";
 import type { SearchResult } from "@/lib/discovery/queries";
 import { RecordSearchCard } from "./record-search-card";
@@ -12,31 +12,28 @@ export function RecordSearch() {
 	const [isPending, startTransition] = useTransition();
 	const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-	const handleInputChange = useCallback(
-		(e: React.ChangeEvent<HTMLInputElement>) => {
-			const value = e.target.value;
-			setQuery(value);
+	const handleInputChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+		const value = e.target.value;
+		setQuery(value);
 
-			if (timeoutRef.current) {
-				clearTimeout(timeoutRef.current);
-			}
+		if (timeoutRef.current) {
+			clearTimeout(timeoutRef.current);
+		}
 
-			if (value.trim().length < 2) {
-				setResults([]);
-				setSearched(false);
-				return;
-			}
+		if (value.trim().length < 2) {
+			setResults([]);
+			setSearched(false);
+			return;
+		}
 
-			timeoutRef.current = setTimeout(() => {
-				startTransition(async () => {
-					const data = await searchRecordsAction(value);
-					setResults(data);
-					setSearched(true);
-				});
-			}, 300);
-		},
-		[],
-	);
+		timeoutRef.current = setTimeout(() => {
+			startTransition(async () => {
+				const data = await searchRecordsAction(value);
+				setResults(data);
+				setSearched(true);
+			});
+		}, 300);
+	}, []);
 
 	return (
 		<div>
@@ -71,8 +68,7 @@ export function RecordSearch() {
 			{searched && results.length > 0 && (
 				<>
 					<div className="font-mono text-xs text-on-surface-variant mt-4 mb-4">
-						<span className="text-primary">{results.length}</span> results
-						found
+						<span className="text-primary">{results.length}</span> results found
 					</div>
 					<div className="space-y-3">
 						{results.map((release) => (

@@ -1,8 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import type { FeedItem } from "@/lib/social/types";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import type { FeedItem } from "@/lib/social/types";
 
 function formatRelativeTime(dateStr: string): string {
 	const diff = Date.now() - new Date(dateStr).getTime();

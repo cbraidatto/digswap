@@ -1,11 +1,11 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
 import Image from "next/image";
-import { useChatStore } from "@/lib/chat/store";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { getMessagesAction, sendMessageAction } from "@/actions/chat";
-import { createClient } from "@/lib/supabase/client";
 import type { ChatMessage } from "@/lib/chat/queries";
+import { useChatStore } from "@/lib/chat/store";
+import { createClient } from "@/lib/supabase/client";
 
 export function ChatThread() {
 	const { activeFriendId, activeFriendUsername, activeFriendAvatarUrl } = useChatStore();
@@ -40,7 +40,9 @@ export function ChatThread() {
 			}
 		}
 		load();
-		return () => { cancelled = true; };
+		return () => {
+			cancelled = true;
+		};
 	}, [activeFriendId, scrollToBottom]);
 
 	// Subscribe to realtime messages via Supabase Realtime
@@ -71,8 +73,7 @@ export function ChatThread() {
 
 					// Only add messages relevant to this conversation
 					const isRelevant =
-						(newRow.sender_id === activeFriendId) ||
-						(newRow.receiver_id === activeFriendId);
+						newRow.sender_id === activeFriendId || newRow.receiver_id === activeFriendId;
 
 					if (!isRelevant) return;
 
@@ -134,7 +135,9 @@ export function ChatThread() {
 		} else if (result.messageId) {
 			// Replace optimistic ID with real ID
 			setMessages((prev) =>
-				prev.map((m) => (m.id === optimisticId ? { ...m, id: result.messageId!, senderId: "" } : m)),
+				prev.map((m) =>
+					m.id === optimisticId ? { ...m, id: result.messageId!, senderId: "" } : m,
+				),
 			);
 		}
 
@@ -192,10 +195,7 @@ export function ChatThread() {
 					</div>
 				) : (
 					messages.map((msg) => (
-						<div
-							key={msg.id}
-							className={`flex ${msg.isOwn ? "justify-end" : "justify-start"}`}
-						>
+						<div key={msg.id} className={`flex ${msg.isOwn ? "justify-end" : "justify-start"}`}>
 							<div
 								className={`max-w-[85%] rounded-lg px-3 py-2 ${
 									msg.isOwn
@@ -203,9 +203,7 @@ export function ChatThread() {
 										: "bg-surface-container-high text-on-surface"
 								}`}
 							>
-								<p className="font-mono text-xs whitespace-pre-wrap break-words">
-									{msg.body}
-								</p>
+								<p className="font-mono text-xs whitespace-pre-wrap break-words">{msg.body}</p>
 								<span
 									className={`font-mono text-[9px] mt-1 block ${
 										msg.isOwn ? "text-background/60" : "text-on-surface-variant/40"

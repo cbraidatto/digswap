@@ -2,12 +2,8 @@
 
 import { useState, useTransition } from "react";
 import { toast } from "sonner";
-import {
-	Popover,
-	PopoverContent,
-	PopoverTrigger,
-} from "@/components/ui/popover";
 import { logListening } from "@/actions/engagement";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 
 interface SpinningLogButtonProps {
 	releaseId: string;

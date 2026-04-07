@@ -1,8 +1,8 @@
 "use client";
 
+import { Loader2 } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
-import { Loader2 } from "lucide-react";
 
 import { resendVerification } from "@/actions/auth";
 import { Button } from "@/components/ui/button";
@@ -22,16 +22,11 @@ export function ResendVerificationButton({ email }: { email: string }) {
 			const result = await resendVerification(email);
 
 			if (!result.success) {
-				toast.error(
-					result.error ||
-						"Something went wrong. Please try again.",
-				);
+				toast.error(result.error || "Something went wrong. Please try again.");
 				return;
 			}
 
-			toast.success(
-				"Verification email sent again. Check your spam folder if you don't see it.",
-			);
+			toast.success("Verification email sent again. Check your spam folder if you don't see it.");
 			setHasSent(true);
 		} catch {
 			toast.error("Something went wrong. Please try again.");

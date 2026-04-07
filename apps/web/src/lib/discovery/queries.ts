@@ -1,23 +1,10 @@
-import { db } from "@/lib/db";
-import { releases } from "@/lib/db/schema/releases";
-import { collectionItems } from "@/lib/db/schema/collections";
-import { profiles } from "@/lib/db/schema/users";
-import { follows } from "@/lib/db/schema/social";
+import { and, count, countDistinct, desc, eq, gte, ilike, inArray, ne, or, sql } from "drizzle-orm";
 import { getDecadeRange } from "@/lib/collection/filters";
-import {
-	sql,
-	eq,
-	or,
-	and,
-	ilike,
-	desc,
-	gte,
-	inArray,
-	isNull,
-	ne,
-	count,
-	countDistinct,
-} from "drizzle-orm";
+import { db } from "@/lib/db";
+import { collectionItems } from "@/lib/db/schema/collections";
+import { releases } from "@/lib/db/schema/releases";
+import { follows } from "@/lib/db/schema/social";
+import { profiles } from "@/lib/db/schema/users";
 
 export interface RecordOwner {
 	releaseId: string;
@@ -79,10 +66,7 @@ export interface SuggestionResult {
  *
  * Per DISC2-01: Search across all user collections to find who has a specific record.
  */
-export async function searchRecords(
-	term: string,
-	limit = 20,
-): Promise<SearchResult[]> {
+export async function searchRecords(term: string, limit = 20): Promise<SearchResult[]> {
 	const trimmed = term.trim();
 	if (!trimmed) return [];
 
@@ -106,12 +90,7 @@ export async function searchRecords(
 			youtubeVideoId: releases.youtubeVideoId,
 		})
 		.from(releases)
-		.where(
-			or(
-				ilike(releases.title, pattern),
-				ilike(releases.artist, pattern),
-			),
-		)
+		.where(or(ilike(releases.title, pattern), ilike(releases.artist, pattern)))
 		.orderBy(desc(sql`COALESCE(${releases.rarityScore}, -1)`))
 		.limit(limit);
 
@@ -140,7 +119,7 @@ export async function searchRecords(
 		if (!ownersByRelease.has(rid)) {
 			ownersByRelease.set(rid, []);
 		}
-		ownersByRelease.get(rid)!.push({
+		ownersByRelease.get(rid)?.push({
 			releaseId: rid,
 			userId: row.userId,
 			username: row.username,
@@ -187,16 +166,12 @@ export async function browseRecords(
 
 	// Legacy single-genre filter (kept for backward compat)
 	if (genre) {
-		conditions.push(
-			sql`${releases.genre} @> ARRAY[${genre}]::text[]`,
-		);
+		conditions.push(sql`${releases.genre} @> ARRAY[${genre}]::text[]`);
 	}
 
 	// Multi-genre filter (any of): combine with OR
 	if (genres.length > 0) {
-		const genreConditions = genres.map(
-			(g) => sql`${releases.genre} @> ARRAY[${g}]::text[]`,
-		);
+		const genreConditions = genres.map((g) => sql`${releases.genre} @> ARRAY[${g}]::text[]`);
 		conditions.push(or(...genreConditions)!);
 	}
 
@@ -204,19 +179,14 @@ export async function browseRecords(
 		const range = getDecadeRange(decade);
 		if (range) {
 			conditions.push(
-				and(
-					sql`${releases.year} >= ${range.start}`,
-					sql`${releases.year} < ${range.end}`,
-				)!,
+				and(sql`${releases.year} >= ${range.start}`, sql`${releases.year} < ${range.end}`)!,
 			);
 		}
 	}
 
 	// Style filter (any of): combine with OR on style array
 	if (styles.length > 0) {
-		const styleConditions = styles.map(
-			(s) => sql`${releases.style} @> ARRAY[${s}]::text[]`,
-		);
+		const styleConditions = styles.map((s) => sql`${releases.style} @> ARRAY[${s}]::text[]`);
 		conditions.push(or(...styleConditions)!);
 	}
 
@@ -243,9 +213,7 @@ export async function browseRecords(
 
 	if (minRarity > 0) {
 		// rarityScore is stored 0-1 range or 0-100 depending on compute — treat as 0-1, scale input
-		conditions.push(
-			sql`COALESCE(${releases.rarityScore}, 0) >= ${minRarity / 100}`,
-		);
+		conditions.push(sql`COALESCE(${releases.rarityScore}, 0) >= ${minRarity / 100}`);
 	}
 
 	// Inner join with collection_items to only show records in at least one collection
@@ -265,9 +233,7 @@ export async function browseRecords(
 			ownerCount: countDistinct(collectionItems.userId).as("owner_count"),
 			...(userId
 				? {
-						isOwned: sql<boolean>`bool_or(${collectionItems.userId} = ${userId})`.as(
-							"is_owned",
-						),
+						isOwned: sql<boolean>`bool_or(${collectionItems.userId} = ${userId})`.as("is_owned"),
 					}
 				: {}),
 		})
@@ -288,10 +254,13 @@ export async function browseRecords(
 			releases.youtubeVideoId,
 		)
 		.orderBy(
-			sort === "year" ? desc(sql`COALESCE(${releases.year}, 0)`)
-			: sort === "alpha" ? sql`${releases.title} ASC`
-			: sort === "owners" ? desc(sql`count(DISTINCT ${collectionItems.userId})`)
-			: desc(sql`COALESCE(${releases.rarityScore}, -1)`),
+			sort === "year"
+				? desc(sql`COALESCE(${releases.year}, 0)`)
+				: sort === "alpha"
+					? sql`${releases.title} ASC`
+					: sort === "owners"
+						? desc(sql`count(DISTINCT ${collectionItems.userId})`)
+						: desc(sql`COALESCE(${releases.rarityScore}, -1)`),
 		)
 		.limit(limit)
 		.offset(offset);
@@ -310,10 +279,7 @@ export async function browseRecords(
  * Per DISC2-04: Recommendation engine based on collection taste and
  * what similar diggers have.
  */
-export async function getSuggestedRecords(
-	userId: string,
-	limit = 8,
-): Promise<SuggestionResult[]> {
+export async function getSuggestedRecords(userId: string, limit = 8): Promise<SuggestionResult[]> {
 	// Step 1: Get user's top 3 genres from their collection
 	const topGenres = await db
 		.select({
@@ -339,9 +305,7 @@ export async function getSuggestedRecords(
 	// Step 3: Genre-based suggestions -- records in user's top genres they don't own
 	let genreSuggestions: SuggestionResult[] = [];
 	if (genreNames.length > 0) {
-		const genreConditions = genreNames.map(
-			(g) => sql`${releases.genre} @> ARRAY[${g}]::text[]`,
-		);
+		const genreConditions = genreNames.map((g) => sql`${releases.genre} @> ARRAY[${g}]::text[]`);
 
 		const genreQuery = db
 			.select({
@@ -355,18 +319,12 @@ export async function getSuggestedRecords(
 				genre: releases.genre,
 				rarityScore: releases.rarityScore,
 				coverImageUrl: releases.coverImageUrl,
-			youtubeVideoId: releases.youtubeVideoId,
+				youtubeVideoId: releases.youtubeVideoId,
 				ownerCount: countDistinct(collectionItems.userId).as("owner_count"),
 			})
 			.from(releases)
 			.innerJoin(collectionItems, eq(collectionItems.releaseId, releases.id))
-			.where(
-				and(
-					or(...genreConditions),
-					notOwnedExpr,
-					ne(collectionItems.userId, userId),
-				),
-			)
+			.where(and(or(...genreConditions), notOwnedExpr, ne(collectionItems.userId, userId)))
 			.groupBy(
 				releases.id,
 				releases.discogsId,
@@ -411,17 +369,12 @@ export async function getSuggestedRecords(
 				genre: releases.genre,
 				rarityScore: releases.rarityScore,
 				coverImageUrl: releases.coverImageUrl,
-			youtubeVideoId: releases.youtubeVideoId,
+				youtubeVideoId: releases.youtubeVideoId,
 				ownerCount: countDistinct(collectionItems.userId).as("owner_count"),
 			})
 			.from(collectionItems)
 			.innerJoin(releases, eq(collectionItems.releaseId, releases.id))
-			.where(
-				and(
-					inArray(collectionItems.userId, followedIds),
-					notOwnedExpr,
-				),
-			)
+			.where(and(inArray(collectionItems.userId, followedIds), notOwnedExpr))
 			.groupBy(
 				releases.id,
 				releases.discogsId,

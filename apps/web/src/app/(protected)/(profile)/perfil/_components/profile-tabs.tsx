@@ -1,7 +1,7 @@
 "use client";
 
+import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
 
 const TABS = [
 	{ key: "collection", label: "Collection", icon: "album" },
@@ -74,7 +74,9 @@ export function ProfileTabs({
 							</span>
 							{tab.label}
 							{count !== undefined && (
-								<span className={`text-[10px] ml-0.5 ${isActive ? "text-primary/70" : "text-on-surface-variant/40"}`}>
+								<span
+									className={`text-[10px] ml-0.5 ${isActive ? "text-primary/70" : "text-on-surface-variant/40"}`}
+								>
 									{count}
 								</span>
 							)}
@@ -84,11 +86,7 @@ export function ProfileTabs({
 			</div>
 
 			{/* Tab content with fade transition */}
-			<div
-				role="tabpanel"
-				key={activeTab}
-				className="animate-in fade-in duration-200"
-			>
+			<div role="tabpanel" key={activeTab} className="animate-in fade-in duration-200">
 				{children[activeTab]}
 			</div>
 		</div>

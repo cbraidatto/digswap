@@ -1,11 +1,11 @@
 "use client";
 
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useCallback } from "react";
-import { useRouter, useSearchParams, usePathname } from "next/navigation";
-import { RecordSearch } from "./record-search";
-import { BrowseFilters } from "./browse-filters";
 import { AdvancedSearchFilters } from "./advanced-search-filters";
+import { BrowseFilters } from "./browse-filters";
 import { BrowseGrid } from "./browse-grid";
+import { RecordSearch } from "./record-search";
 import { SuggestedSection } from "./suggested-section";
 import { TrendingSection } from "./trending-section";
 

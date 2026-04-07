@@ -1,4 +1,4 @@
-import { describe, test, expect, vi, beforeEach } from "vitest";
+import { beforeEach, describe, expect, test, vi } from "vitest";
 
 // ---------------------------------------------------------------------------
 // DB mock with thenable chain (project pattern)
@@ -63,7 +63,7 @@ vi.mock("@/lib/db", () => {
 	}));
 
 	return { db: chain };
-})
+});
 vi.mock("@/lib/rate-limit", () => ({
 	authRateLimit: null,
 	resetRateLimit: null,
@@ -73,7 +73,6 @@ vi.mock("@/lib/rate-limit", () => ({
 	discogsRateLimit: null,
 	safeLimit: vi.fn().mockImplementation(async () => ({ success: true })),
 }));
-;
 
 // ---------------------------------------------------------------------------
 // Schema mocks
@@ -199,10 +198,7 @@ vi.mock("@/lib/community/queries", () => ({
 // Import after mocks
 // ---------------------------------------------------------------------------
 import { createReviewAction } from "@/actions/community";
-import {
-	getReviewsForRelease,
-	getReviewCountForRelease,
-} from "@/lib/community/queries";
+import { getReviewCountForRelease, getReviewsForRelease } from "@/lib/community/queries";
 
 const TEST_GROUP_ID = "11111111-1111-4111-8111-111111111111";
 const TEST_RELEASE_ID = "22222222-2222-4222-8222-222222222222";

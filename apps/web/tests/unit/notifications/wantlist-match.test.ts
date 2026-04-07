@@ -1,4 +1,4 @@
-import { describe, test, expect, vi, beforeEach } from "vitest";
+import { beforeEach, describe, expect, test, vi } from "vitest";
 
 // Mock sendWantlistMatchEmail
 const mockSendEmail = vi.fn();
@@ -74,9 +74,9 @@ describe("checkWantlistMatches", () => {
 			data: { user: { email: "wanter@example.com" } },
 		});
 
-		let fromCallCount = 0;
+		let _fromCallCount = 0;
 		mockFrom.mockImplementation((table: string) => {
-			fromCallCount++;
+			_fromCallCount++;
 			if (table === "wantlist_items") return matchChain;
 			if (table === "releases") return releaseChain;
 			if (table === "profiles") return adderChain;
@@ -195,8 +195,6 @@ describe("checkWantlistMatches", () => {
 		});
 
 		// Should not throw
-		await expect(
-			checkWantlistMatches("release-1", "adder-user"),
-		).resolves.toBeUndefined();
+		await expect(checkWantlistMatches("release-1", "adder-user")).resolves.toBeUndefined();
 	});
 });

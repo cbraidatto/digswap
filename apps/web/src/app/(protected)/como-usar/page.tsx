@@ -3,7 +3,8 @@ import Link from "next/link";
 
 export const metadata: Metadata = {
 	title: "Como Usar — DigSwap",
-	description: "Aprenda a usar o DigSwap: importe sua coleção, descubra matches, e troque vinis com outros diggers.",
+	description:
+		"Aprenda a usar o DigSwap: importe sua coleção, descubra matches, e troque vinis com outros diggers.",
 };
 
 // ---------------------------------------------------------------------------
@@ -46,7 +47,7 @@ const CORE_FEATURES: TutorialStep[] = [
 		title: "Sua Coleção",
 		description:
 			"Veja todos os seus discos organizados por raridade, gênero ou data. Cada disco mostra um score de raridade baseado nos dados do Discogs. Você pode adicionar discos manualmente buscando no catálogo do Discogs.",
-		tip: "Use o filtro de formato para separar LPs de 7\" e 12\".",
+		tip: 'Use o filtro de formato para separar LPs de 7" e 12".',
 	},
 	{
 		icon: "favorite",
@@ -148,9 +149,7 @@ function StepCard({ step }: { step: TutorialStep }) {
 				<span className="material-symbols-outlined text-xl text-primary">{step.icon}</span>
 			</div>
 			<div className="flex-1 min-w-0">
-				<h3 className="font-heading text-sm font-bold text-on-surface mb-1">
-					{step.title}
-				</h3>
+				<h3 className="font-heading text-sm font-bold text-on-surface mb-1">{step.title}</h3>
 				<p className="font-mono text-xs text-on-surface-variant leading-relaxed">
 					{step.description}
 				</p>
@@ -159,9 +158,7 @@ function StepCard({ step }: { step: TutorialStep }) {
 						<span className="material-symbols-outlined text-xs text-primary flex-shrink-0 mt-0.5">
 							lightbulb
 						</span>
-						<span className="font-mono text-[10px] text-primary leading-relaxed">
-							{step.tip}
-						</span>
+						<span className="font-mono text-[10px] text-primary leading-relaxed">{step.tip}</span>
 					</div>
 				)}
 			</div>
@@ -216,15 +213,13 @@ export default function ComoUsarPage() {
 						<h1 className="font-heading text-2xl font-extrabold text-on-surface">
 							Como Usar o DigSwap
 						</h1>
-						<p className="font-mono text-xs text-on-surface-variant">
-							Guia completo da plataforma
-						</p>
+						<p className="font-mono text-xs text-on-surface-variant">Guia completo da plataforma</p>
 					</div>
 				</div>
 
 				<p className="font-mono text-xs text-on-surface-variant leading-relaxed max-w-lg">
-					O DigSwap é uma rede social para vinyl diggers. Importe sua coleção do Discogs,
-					descubra quem tem os discos que você procura, e conecte-se com a comunidade.
+					O DigSwap é uma rede social para vinyl diggers. Importe sua coleção do Discogs, descubra
+					quem tem os discos que você procura, e conecte-se com a comunidade.
 				</p>
 			</div>
 

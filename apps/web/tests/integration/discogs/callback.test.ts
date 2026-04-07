@@ -1,4 +1,4 @@
-import { describe, test, expect, vi, beforeEach } from "vitest";
+import { beforeEach, describe, expect, test, vi } from "vitest";
 
 // Use vi.hoisted for all mock references used in vi.mock factories
 const {
@@ -137,9 +137,7 @@ describe("Discogs OAuth callback route", () => {
 
 		await GET(request);
 
-		expect(mockRedirect).toHaveBeenCalledWith(
-			expect.stringContaining("/settings?error="),
-		);
+		expect(mockRedirect).toHaveBeenCalledWith(expect.stringContaining("/settings?error="));
 	});
 
 	test("redirects to settings when OAuth cookie is missing", async () => {
@@ -151,9 +149,7 @@ describe("Discogs OAuth callback route", () => {
 
 		await GET(request);
 
-		expect(mockRedirect).toHaveBeenCalledWith(
-			expect.stringContaining("/settings?error="),
-		);
+		expect(mockRedirect).toHaveBeenCalledWith(expect.stringContaining("/settings?error="));
 	});
 
 	test("exchanges verifier, stores tokens, updates profile, creates import job, and redirects", async () => {
@@ -183,7 +179,7 @@ describe("Discogs OAuth callback route", () => {
 
 		// Profile update chain
 		const profileChain = createAdminChain();
-		adminFromHandlers["profiles"] = profileChain;
+		adminFromHandlers.profiles = profileChain;
 
 		// Import jobs chain
 		const importJobsChain = createAdminChain();
@@ -199,7 +195,7 @@ describe("Discogs OAuth callback route", () => {
 				single: vi.fn().mockResolvedValue({ data: { id: "new-job-id" }, error: null }),
 			}),
 		});
-		adminFromHandlers["import_jobs"] = importJobsChain;
+		adminFromHandlers.import_jobs = importJobsChain;
 
 		const request = createRequest({
 			oauth_token: "req_tok",

@@ -1,13 +1,17 @@
 "use server";
 
+import { and, asc, desc, eq } from "drizzle-orm";
 import { headers } from "next/headers";
-import { eq, and, asc, desc, sql } from "drizzle-orm";
-import { createClient } from "@/lib/supabase/server";
-import { createAdminClient } from "@/lib/supabase/admin";
 import { db } from "@/lib/db";
 import { userSessions } from "@/lib/db/schema/sessions";
-import { apiRateLimit , safeLimit} from "@/lib/rate-limit";
-import { sessionIdSchema, enforceSessionLimitSchema, recordSessionSchema } from "@/lib/validations/sessions";
+import { apiRateLimit, safeLimit } from "@/lib/rate-limit";
+import { createAdminClient } from "@/lib/supabase/admin";
+import { createClient } from "@/lib/supabase/server";
+import {
+	enforceSessionLimitSchema,
+	recordSessionSchema,
+	sessionIdSchema,
+} from "@/lib/validations/sessions";
 
 /**
  * Maximum concurrent sessions allowed per user (D-13).
@@ -140,9 +144,7 @@ export async function terminateSession(
 		const [session] = await db
 			.select()
 			.from(userSessions)
-			.where(
-				and(eq(userSessions.id, parsed.data.sessionId), eq(userSessions.userId, userId)),
-			)
+			.where(and(eq(userSessions.id, parsed.data.sessionId), eq(userSessions.userId, userId)))
 			.limit(1);
 
 		if (!session) {
@@ -168,9 +170,7 @@ export async function terminateSession(
 		// Remove from our session tracking table (both admin client and Drizzle)
 		await db
 			.delete(userSessions)
-			.where(
-				and(eq(userSessions.id, parsed.data.sessionId), eq(userSessions.userId, userId)),
-			);
+			.where(and(eq(userSessions.id, parsed.data.sessionId), eq(userSessions.userId, userId)));
 
 		return { success: true };
 	} catch (err) {
@@ -188,10 +188,7 @@ export async function terminateSession(
  * @param userId - The user's UUID
  * @param newSessionId - The session identifier for the new session being created
  */
-export async function enforceSessionLimit(
-	userId: string,
-	newSessionId: string,
-): Promise<void> {
+export async function enforceSessionLimit(userId: string, newSessionId: string): Promise<void> {
 	try {
 		const parsed = enforceSessionLimitSchema.safeParse({ userId, newSessionId });
 		if (!parsed.success) {
@@ -200,7 +197,9 @@ export async function enforceSessionLimit(
 
 		// Security: verify caller owns this userId to prevent session DoS attacks
 		const supabase = await createClient();
-		const { data: { user } } = await supabase.auth.getUser();
+		const {
+			data: { user },
+		} = await supabase.auth.getUser();
 		if (!user || user.id !== parsed.data.userId) return;
 
 		// Count active sessions
@@ -212,28 +211,20 @@ export async function enforceSessionLimit(
 
 		if (sessions.length >= MAX_SESSIONS) {
 			// Find sessions to remove (oldest first, keep MAX_SESSIONS - 1 to make room for new)
-			const sessionsToRemove = sessions.slice(
-				0,
-				sessions.length - MAX_SESSIONS + 1,
-			);
+			const sessionsToRemove = sessions.slice(0, sessions.length - MAX_SESSIONS + 1);
 
 			const admin = createAdminClient();
 
 			for (const oldSession of sessionsToRemove) {
 				// Remove from Supabase tracking
 				try {
-					await admin
-						.from("user_sessions")
-						.delete()
-						.eq("id", oldSession.id);
+					await admin.from("user_sessions").delete().eq("id", oldSession.id);
 				} catch {
 					// Continue even if admin deletion fails
 				}
 
 				// Remove from Drizzle table
-				await db
-					.delete(userSessions)
-					.where(eq(userSessions.id, oldSession.id));
+				await db.delete(userSessions).where(eq(userSessions.id, oldSession.id));
 			}
 		}
 	} catch (err) {
@@ -252,10 +243,7 @@ export async function enforceSessionLimit(
  * @param userId - The user's UUID
  * @param sessionId - A unique session identifier (e.g., last 32 chars of access token)
  */
-export async function recordSession(
-	userId: string,
-	sessionId: string,
-): Promise<void> {
+export async function recordSession(userId: string, sessionId: string): Promise<void> {
 	try {
 		const parsed = recordSessionSchema.safeParse({ userId, sessionId });
 		if (!parsed.success) {
@@ -264,7 +252,9 @@ export async function recordSession(
 
 		// Security: verify caller owns this userId
 		const supabase = await createClient();
-		const { data: { user } } = await supabase.auth.getUser();
+		const {
+			data: { user },
+		} = await supabase.auth.getUser();
 		if (!user || user.id !== parsed.data.userId) return;
 
 		const headerStore = await headers();

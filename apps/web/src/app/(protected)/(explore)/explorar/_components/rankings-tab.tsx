@@ -1,13 +1,10 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
-import {
-	loadGlobalLeaderboard,
-	loadGenreLeaderboard,
-} from "@/actions/gamification";
-import { LeaderboardRow } from "./leaderboard-row";
-import { GenreFilter } from "./genre-filter";
+import { useCallback, useEffect, useState } from "react";
+import { loadGenreLeaderboard, loadGlobalLeaderboard } from "@/actions/gamification";
 import type { LeaderboardEntry } from "@/lib/gamification/queries";
+import { GenreFilter } from "./genre-filter";
+import { LeaderboardRow } from "./leaderboard-row";
 
 interface RankingsTabProps {
 	currentUserId: string;
@@ -66,11 +63,7 @@ export function RankingsTab({ currentUserId }: RankingsTabProps) {
 	return (
 		<div className="max-w-4xl mx-auto p-8 md:p-12">
 			{/* Genre Filter */}
-			<GenreFilter
-				activeGenre={activeGenre}
-				onGenreChange={handleGenreChange}
-				disabled={loading}
-			/>
+			<GenreFilter activeGenre={activeGenre} onGenreChange={handleGenreChange} disabled={loading} />
 
 			{/* Section Header */}
 			<div className="font-mono text-xs uppercase tracking-wider text-tertiary mt-6 mb-4">
@@ -88,7 +81,7 @@ export function RankingsTab({ currentUserId }: RankingsTabProps) {
 
 			{/* Leaderboard Rows */}
 			{!loading && entries.length > 0 && (
-				<ol role="list" className="space-y-1">
+				<ol className="space-y-1">
 					{entries.map((entry) => (
 						<LeaderboardRow
 							key={entry.userId}
@@ -109,8 +102,8 @@ export function RankingsTab({ currentUserId }: RankingsTabProps) {
 						NO_RANKINGS_YET
 					</p>
 					<p className="font-mono text-xs text-outline mt-2">
-						Rankings are computed every 15 minutes. Import your collection and
-						start digging to appear on the leaderboard.
+						Rankings are computed every 15 minutes. Import your collection and start digging to
+						appear on the leaderboard.
 					</p>
 				</div>
 			)}
