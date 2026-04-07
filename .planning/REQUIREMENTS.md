@@ -289,7 +289,7 @@
 
 ### Security
 
-- [ ] **SEC-08**: Zero vulnerabilidades HIGH/CRITICAL em `pnpm audit`
+- [x] **SEC-08**: Zero vulnerabilidades HIGH/CRITICAL em `pnpm audit`
 
 ### Tests
 
@@ -317,7 +317,7 @@ None — this is a focused fix milestone.
 |-------------|-------|--------|
 | BUILD-01 | Phase 21: TypeScript Fix | Complete |
 | BUILD-02 | Phase 21: TypeScript Fix | Complete |
-| SEC-08 | Phase 22: Dependency Security | Pending |
+| SEC-08 | Phase 22: Dependency Security | Complete |
 | TEST-01 | Phase 23: Test Fix | Pending |
 | QUAL-01 | Phase 24: Lint Cleanup | Pending |
 

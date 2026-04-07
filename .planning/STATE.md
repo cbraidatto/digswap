@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.1
 milestone_name: Deploy Readiness
 status: verifying
-stopped_at: Completed 21-01-PLAN.md
-last_updated: "2026-04-07T01:10:52.875Z"
+stopped_at: Completed 22-01-PLAN.md
+last_updated: "2026-04-07T01:23:54.068Z"
 last_activity: 2026-04-07
 progress:
   total_phases: 25
-  completed_phases: 20
-  total_plans: 97
-  completed_plans: 95
+  completed_phases: 21
+  total_plans: 98
+  completed_plans: 96
   percent: 0
 ---
 
@@ -21,12 +21,12 @@ progress:
 See: .planning/PROJECT.md (updated 2026-04-06)
 
 **Core value:** A digger opens the app and immediately finds who has the record they've been hunting -- and sees where they stand in the community.
-**Current focus:** Phase 21 — typescript-fix
+**Current focus:** Phase 22 — dependency-security
 
 ## Current Position
 
-Phase: 22
-Plan: Not started
+Phase: 22 (dependency-security) — EXECUTING
+Plan: 1 of 1
 Status: Phase complete — ready for verification
 Last activity: 2026-04-07
 
@@ -104,6 +104,7 @@ Progress: [░░░░░░░░░░] 0%
 | Phase 20 P01 | 3min | 1 tasks | 7 files |
 | Phase 20 P02 | 3min | 2 tasks | 6 files |
 | Phase 21 P01 | 1min | 1 tasks | 1 files |
+| Phase 22 P01 | 3min | 1 tasks | 5 files |
 
 ## Accumulated Context
 
@@ -234,6 +235,7 @@ Recent decisions affecting current work:
 - [Phase 20]: Reuse rarity_score DB column for gem scores — semantic rename at TypeScript layer only (UserRanking.gemScore)
 - [Phase 20]: RANK_TITLES recalibrated to 501/2001/5001 — typical 200-record collection scores ~1030 gem points
 - [Phase 21]: Used standard 'as unknown as T' double-cast pattern for raw SQL results from db.execute()
+- [Phase 22]: Direct devDep vite ^8.0.5 in apps/web to force patched transitive resolution from @vitejs/plugin-react (pnpm overrides caused cross-workspace conflicts)
 
 ### Roadmap Evolution
 
@@ -261,6 +263,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-04-07T01:08:23.537Z
-Stopped at: Completed 21-01-PLAN.md
+Last session: 2026-04-07T01:23:54.061Z
+Stopped at: Completed 22-01-PLAN.md
 Resume file: None
