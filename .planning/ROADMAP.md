@@ -32,6 +32,14 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [ ] **Phase 20: Gem Economy** - Dynamic gem-based rarity system replacing static scores — 6 gem tiers (Quartzo→Diamante), market-like fluctuation, weighted scoring, visual effects
 - [x] **Phase 16: Monetization** - Stripe freemium, trade quotas, premium features (completed 2026-03-31)
 
+
+### v1.1 Deploy Readiness
+
+- [ ] **Phase 21: TypeScript Fix** - Fix all TypeScript errors blocking next build and tsc --noEmit
+- [ ] **Phase 22: Dependency Security** - Update Vite and dependencies to resolve HIGH/CRITICAL audit vulnerabilities
+- [ ] **Phase 23: Test Fix** - Fix failing unit tests so vitest run passes with 0 failures
+- [ ] **Phase 24: Lint Cleanup** - Normalize CRLF line endings to LF so lint passes cleanly
+
 ## Phase Details
 
 ### Phase 1: Foundation + Authentication
@@ -399,7 +407,7 @@ Plans:
 ## Progress
 
 **Execution Order:**
-Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 4.5 -> 5 -> 6 -> 7 -> 8 -> 9(superseded) -> 10 -> 11 -> 12 -> 13 -> 14 -> 15 -> 16 -> 17 -> 18 -> 19 -> 20
+Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 4.5 -> 5 -> 6 -> 7 -> 8 -> 9(superseded) -> 10 -> 11 -> 12 -> 13 -> 14 -> 15 -> 16 -> 17 -> 18 -> 19 -> 20 -> 21 -> 22 -> 23 -> 24
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
@@ -424,6 +432,15 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 4.5 -> 5 -> 6 -> 7 -> 8 -> 
 | 18. Desktop Shell Refactor | 3/3 | Complete ✓ | 2026-04-02 |
 | 19. Security Audit Closure | 3/3 | Complete   | 2026-04-04 |
 | 20. Gem Economy | 4/5 | In Progress|  |
+
+**v1.1 Deploy Readiness:**
+
+| Phase | Plans Complete | Status | Completed |
+|-------|----------------|--------|----------|
+| 21. TypeScript Fix | 0/1 | Not started | - |
+| 22. Dependency Security | 0/1 | Not started | - |
+| 23. Test Fix | 0/1 | Not started | - |
+| 24. Lint Cleanup | 0/1 | Not started | - |
 
 ### Phase 19: Security Hardening — Fix 74 audit vulnerabilities
 
@@ -463,3 +480,41 @@ Plans:
 - [x] 20-04-PLAN.md -- GemVault profile component, gem distribution queries, tier change notifications, OG image update
 - [ ] 20-05-PLAN.md -- Badge awards, Digger DNA labels, RarityCardModal, visual verification checkpoint
 **UI hint**: yes
+
+### v1.1 Deploy Readiness
+
+### Phase 21: TypeScript Fix
+**Goal**: Production build completes without TypeScript errors
+**Depends on**: Nothing (independent fix)
+**Requirements**: BUILD-01, BUILD-02
+**Success Criteria** (what must be TRUE):
+  1. `next build` completes successfully with zero TypeScript errors
+  2. `tsc --noEmit` passes with zero errors across the entire codebase
+**Plans**: TBD
+
+### Phase 22: Dependency Security
+**Goal**: Zero HIGH/CRITICAL vulnerabilities in dependency audit
+**Depends on**: Nothing (independent fix)
+**Requirements**: SEC-08
+**Success Criteria** (what must be TRUE):
+  1. `pnpm audit` reports zero HIGH and zero CRITICAL vulnerabilities
+  2. All Vite-related packages are updated to patched versions
+**Plans**: TBD
+
+### Phase 23: Test Fix
+**Goal**: All unit tests pass with zero failures
+**Depends on**: Nothing (independent fix)
+**Requirements**: TEST-01
+**Success Criteria** (what must be TRUE):
+  1. `vitest run` completes with 0 test failures
+  2. Previously failing gem-badge.test.tsx passes
+**Plans**: TBD
+
+### Phase 24: Lint Cleanup
+**Goal**: Lint passes cleanly with no CRLF formatting errors
+**Depends on**: Nothing (independent fix)
+**Requirements**: QUAL-01
+**Success Criteria** (what must be TRUE):
+  1. All source files use LF line endings (no CRLF)
+  2. Lint (`biome check`) passes with zero formatting errors related to line endings
+**Plans**: TBD
