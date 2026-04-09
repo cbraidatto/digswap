@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { publicEnv } from "@/lib/env";
 
 /**
  * Validates that a URL is HTTPS and hosted on the project's own Supabase Storage.
@@ -8,7 +9,7 @@ import { z } from "zod";
  */
 const supabaseStorageHost = (() => {
 	try {
-		return new URL(process.env.NEXT_PUBLIC_SUPABASE_URL ?? "").hostname;
+		return new URL(publicEnv.NEXT_PUBLIC_SUPABASE_URL).hostname;
 	} catch {
 		return null;
 	}

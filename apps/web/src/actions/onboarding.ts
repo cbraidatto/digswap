@@ -1,10 +1,10 @@
 "use server";
 
 import { eq } from "drizzle-orm";
+import { requireUser } from "@/lib/auth/require-user";
 import { db } from "@/lib/db";
 import { profiles } from "@/lib/db/schema/users";
 import { apiRateLimit, safeLimit } from "@/lib/rate-limit";
-import { createClient } from "@/lib/supabase/server";
 import { onboardingProfileSchema, skipToStepSchema } from "@/lib/validations/onboarding";
 
 /**
@@ -16,33 +16,26 @@ import { onboardingProfileSchema, skipToStepSchema } from "@/lib/validations/onb
 export async function updateProfile(
 	formData: FormData,
 ): Promise<{ success: boolean; error?: string }> {
-	const supabase = await createClient();
-	const {
-		data: { user },
-	} = await supabase.auth.getUser();
-
-	if (!user) {
-		return { success: false, error: "Not authenticated." };
-	}
-
-	const { success: rlSuccess } = await safeLimit(apiRateLimit, user.id, true);
-	if (!rlSuccess) {
-		return { success: false, error: "Too many requests. Please wait a moment." };
-	}
-
-	const displayName = formData.get("display_name") as string;
-	const avatarUrl = formData.get("avatar_url") as string | null;
-
-	// Validate with Zod
-	const parsed = onboardingProfileSchema.safeParse({
-		display_name: displayName,
-		avatar_url: avatarUrl,
-	});
-	if (!parsed.success) {
-		return { success: false, error: parsed.error.issues[0]?.message ?? "Invalid input" };
-	}
-
 	try {
+		const user = await requireUser();
+
+		const { success: rlSuccess } = await safeLimit(apiRateLimit, user.id, true);
+		if (!rlSuccess) {
+			return { success: false, error: "Too many requests. Please wait a moment." };
+		}
+
+		const displayName = formData.get("display_name") as string;
+		const avatarUrl = formData.get("avatar_url") as string | null;
+
+		// Validate with Zod
+		const parsed = onboardingProfileSchema.safeParse({
+			display_name: displayName,
+			avatar_url: avatarUrl,
+		});
+		if (!parsed.success) {
+			return { success: false, error: parsed.error.issues[0]?.message ?? "Invalid input" };
+		}
+
 		await db
 			.update(profiles)
 			.set({
@@ -53,7 +46,8 @@ export async function updateProfile(
 			.where(eq(profiles.id, user.id));
 
 		return { success: true };
-	} catch {
+	} catch (err) {
+		console.error("[updateProfile] error:", err);
 		return {
 			success: false,
 			error: "Failed to update profile. Please try again.",
@@ -71,21 +65,14 @@ export async function completeOnboarding(): Promise<{
 	error?: string;
 	redirectTo?: string;
 }> {
-	const supabase = await createClient();
-	const {
-		data: { user },
-	} = await supabase.auth.getUser();
-
-	if (!user) {
-		return { success: false, error: "Not authenticated." };
-	}
-
-	const { success: rlSuccess } = await safeLimit(apiRateLimit, user.id, true);
-	if (!rlSuccess) {
-		return { success: false, error: "Too many requests. Please wait a moment." };
-	}
-
 	try {
+		const user = await requireUser();
+
+		const { success: rlSuccess } = await safeLimit(apiRateLimit, user.id, true);
+		if (!rlSuccess) {
+			return { success: false, error: "Too many requests. Please wait a moment." };
+		}
+
 		await db
 			.update(profiles)
 			.set({
@@ -95,7 +82,8 @@ export async function completeOnboarding(): Promise<{
 			.where(eq(profiles.id, user.id));
 
 		return { success: true, redirectTo: "/feed" };
-	} catch {
+	} catch (err) {
+		console.error("[completeOnboarding] error:", err);
 		return {
 			success: false,
 			error: "Failed to complete onboarding. Please try again.",
@@ -117,13 +105,7 @@ export async function skipToStep(
 		}
 
 		// Auth check — prevent unauthenticated access to onboarding state
-		const supabase = await createClient();
-		const {
-			data: { user },
-		} = await supabase.auth.getUser();
-		if (!user) {
-			return { success: false, nextStep: step, error: "Not authenticated" };
-		}
+		await requireUser();
 
 		return { success: true, nextStep: parsed.data.step };
 	} catch (err) {

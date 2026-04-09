@@ -2,8 +2,9 @@ import { slugify } from "@/lib/community/slugify";
 import { db } from "@/lib/db";
 import { groups } from "@/lib/db/schema/groups";
 import { DISCOGS_GENRES } from "@/lib/discogs/taxonomy";
+import { env } from "@/lib/env";
 
-const SYSTEM_USER_ID = process.env.SYSTEM_USER_ID ?? "00000000-0000-0000-0000-000000000000";
+const SYSTEM_USER_ID = env.SYSTEM_USER_ID || "00000000-0000-0000-0000-000000000000";
 
 const GENRE_DESCRIPTIONS: Record<string, string> = {
 	Blues: "Blues diggers and collectors",

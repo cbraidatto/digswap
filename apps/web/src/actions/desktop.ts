@@ -13,10 +13,11 @@
  */
 
 import { and, eq, or } from "drizzle-orm";
+import { requireUser } from "@/lib/auth/require-user";
 import { db } from "@/lib/db";
 import { tradeRequests } from "@/lib/db/schema/trades";
 import { createHandoffToken } from "@/lib/desktop/handoff-token";
-import { createClient } from "@/lib/supabase/server";
+import { publicEnv } from "@/lib/env";
 import { handoffTokenSchema } from "@/lib/validations/desktop";
 
 /**
@@ -39,16 +40,7 @@ export async function generateHandoffToken(
 			return { error: "Invalid trade ID" };
 		}
 
-		const supabase = await createClient();
-		const {
-			data: { user },
-			error: authError,
-		} = await supabase.auth.getUser();
-
-		if (authError || !user) {
-			return { error: "Not authenticated" };
-		}
-
+		const user = await requireUser();
 		const userId = user.id;
 
 		// Verify caller is a participant in the trade (IDOR protection)
@@ -84,7 +76,7 @@ export async function generateHandoffToken(
  */
 export async function checkDesktopVersion(): Promise<{ minVersion: number }> {
 	try {
-		const raw = process.env.NEXT_PUBLIC_MIN_DESKTOP_VERSION;
+		const raw = publicEnv.NEXT_PUBLIC_MIN_DESKTOP_VERSION;
 		const minVersion = raw ? parseInt(raw, 10) : 1;
 		return { minVersion: Number.isNaN(minVersion) ? 1 : minVersion };
 	} catch (err) {

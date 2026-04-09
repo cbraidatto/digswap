@@ -1,24 +1,21 @@
 import Stripe from "stripe";
+import { env, publicEnv } from "@/lib/env";
 
 export type SubscriptionPlan = "free" | "premium_monthly" | "premium_annual";
 
 let stripeClient: Stripe | null = null;
-
-function requireEnv(name: string) {
-	const value = process.env[name];
-	if (!value) {
-		throw new Error(`${name} is not configured.`);
-	}
-
-	return value;
-}
 
 export function getStripe() {
 	if (stripeClient) {
 		return stripeClient;
 	}
 
-	stripeClient = new Stripe(requireEnv("STRIPE_SECRET_KEY"), {
+	const key = env.STRIPE_SECRET_KEY;
+	if (!key) {
+		throw new Error("STRIPE_SECRET_KEY is not configured.");
+	}
+
+	stripeClient = new Stripe(key, {
 		// Pinned per Phase 16 plan; cast is required because stripe-node types only track the latest version.
 		apiVersion: "2024-06-20" as Stripe.LatestApiVersion,
 		typescript: true,
@@ -28,11 +25,12 @@ export function getStripe() {
 }
 
 export function getSiteUrl() {
-	const siteUrl = process.env.NEXT_PUBLIC_SITE_URL?.trim();
+	const siteUrl = publicEnv.NEXT_PUBLIC_SITE_URL?.trim();
 	if (siteUrl) {
 		return siteUrl.replace(/\/$/, "");
 	}
 
+	// VERCEL_URL is auto-provided by Vercel, not in our Zod schema
 	const vercelUrl = process.env.VERCEL_URL?.trim();
 	if (vercelUrl) {
 		return `https://${vercelUrl.replace(/\/$/, "")}`;
@@ -46,10 +44,14 @@ export function getSiteUrl() {
 // backend validates them before creating checkout sessions. They do not grant
 // payment access. See security audit LOW finding L-03.
 export function getStripePriceIds() {
-	return {
-		premiumAnnual: requireEnv("NEXT_PUBLIC_STRIPE_PRICE_ANNUAL"),
-		premiumMonthly: requireEnv("NEXT_PUBLIC_STRIPE_PRICE_MONTHLY"),
-	};
+	const premiumAnnual = publicEnv.NEXT_PUBLIC_STRIPE_PRICE_ANNUAL;
+	const premiumMonthly = publicEnv.NEXT_PUBLIC_STRIPE_PRICE_MONTHLY;
+	if (!premiumAnnual || !premiumMonthly) {
+		throw new Error(
+			"Stripe price IDs (NEXT_PUBLIC_STRIPE_PRICE_ANNUAL/MONTHLY) are not configured.",
+		);
+	}
+	return { premiumAnnual, premiumMonthly };
 }
 
 export function getPlanFromPriceId(priceId: string | null | undefined): SubscriptionPlan | null {

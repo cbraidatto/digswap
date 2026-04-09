@@ -1,5 +1,6 @@
 import { Redis } from "@upstash/redis";
 import { ImageResponse } from "next/og";
+import { env } from "@/lib/env";
 
 export const runtime = "edge";
 
@@ -15,7 +16,7 @@ async function verifyOgSignature(
 	avg: string,
 	sig: string | null,
 ): Promise<boolean> {
-	const secret = process.env.HANDOFF_HMAC_SECRET;
+	const secret = env.HANDOFF_HMAC_SECRET;
 	if (!secret) return true; // fail-open in dev (no secret configured)
 	if (!sig) return false;
 
@@ -45,8 +46,8 @@ async function verifyOgSignature(
 // Without this, the endpoint can be used for compute-level DoS since
 // ImageResponse is CPU-intensive (Satori renders a full image per request).
 async function checkRateLimit(ip: string): Promise<boolean> {
-	const url = process.env.UPSTASH_REDIS_REST_URL;
-	const token = process.env.UPSTASH_REDIS_REST_TOKEN;
+	const url = env.UPSTASH_REDIS_REST_URL;
+	const token = env.UPSTASH_REDIS_REST_TOKEN;
 	if (!url || !token) return true; // fail-open if Redis not configured
 
 	try {

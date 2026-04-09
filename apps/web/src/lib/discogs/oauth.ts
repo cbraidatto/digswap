@@ -1,4 +1,5 @@
 import { DiscogsOAuth } from "@lionralfs/discogs-client";
+import { env } from "@/lib/env";
 import { createAdminClient } from "@/lib/supabase/admin";
 
 /**
@@ -6,7 +7,7 @@ import { createAdminClient } from "@/lib/supabase/admin";
  * Centralizes credential access to avoid duplication.
  */
 function createOAuthClient(): DiscogsOAuth {
-	return new DiscogsOAuth(process.env.DISCOGS_CONSUMER_KEY!, process.env.DISCOGS_CONSUMER_SECRET!);
+	return new DiscogsOAuth(env.DISCOGS_CONSUMER_KEY, env.DISCOGS_CONSUMER_SECRET);
 }
 
 /**

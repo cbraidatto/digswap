@@ -12,6 +12,7 @@ import { createHmac, randomBytes } from "node:crypto";
 import { and, eq, isNull } from "drizzle-orm";
 import { db } from "@/lib/db";
 import { handoffTokens } from "@/lib/db/schema/trades";
+import { env } from "@/lib/env";
 
 /**
  * Token TTL: 30 seconds — aligned with TRADE_HANDOFF_TOKEN_TTL_MS in trade-domain
@@ -21,7 +22,7 @@ import { handoffTokens } from "@/lib/db/schema/trades";
 const TOKEN_TTL_MS = 30_000;
 
 function getHmacSecret(): string {
-	const secret = process.env.HANDOFF_HMAC_SECRET;
+	const secret = env.HANDOFF_HMAC_SECRET;
 	if (!secret) {
 		throw new Error("HANDOFF_HMAC_SECRET env var is required for handoff token operations");
 	}

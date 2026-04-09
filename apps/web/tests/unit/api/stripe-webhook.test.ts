@@ -1,5 +1,34 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
+// -- Mock env module (cached at import time, so process.env mutations don't work) --
+vi.mock("@/lib/env", () => ({
+	env: {
+		DATABASE_URL: "postgresql://test:test@localhost:5432/test",
+		SUPABASE_SERVICE_ROLE_KEY: "test-service-role-key",
+		DISCOGS_CONSUMER_KEY: "test-discogs-key",
+		DISCOGS_CONSUMER_SECRET: "test-discogs-secret",
+		IMPORT_WORKER_SECRET: "test-import-worker-secret",
+		HANDOFF_HMAC_SECRET: "dev-hmac-secret-not-for-production",
+		UPSTASH_REDIS_REST_URL: "",
+		UPSTASH_REDIS_REST_TOKEN: "",
+		RESEND_API_KEY: "",
+		RESEND_FROM_EMAIL: "noreply@digswap.com",
+		STRIPE_WEBHOOK_SECRET: "whsec_test",
+		YOUTUBE_API_KEY: "",
+		SYSTEM_USER_ID: "",
+		NODE_ENV: "test",
+	},
+	publicEnv: {
+		NEXT_PUBLIC_SUPABASE_URL: "https://test.supabase.co",
+		NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: "test-anon-key",
+		NEXT_PUBLIC_SITE_URL: "http://localhost:3000",
+		NEXT_PUBLIC_APP_URL: "http://localhost:3000",
+		NEXT_PUBLIC_STRIPE_PRICE_MONTHLY: "",
+		NEXT_PUBLIC_STRIPE_PRICE_ANNUAL: "",
+		NEXT_PUBLIC_MIN_DESKTOP_VERSION: "1",
+	},
+}));
+
 const {
 	mockConstructEvent,
 	mockProfilesUpdate,
@@ -107,7 +136,6 @@ function createRequest(body = "{}") {
 
 beforeEach(() => {
 	vi.clearAllMocks();
-	process.env.STRIPE_WEBHOOK_SECRET = "whsec_test";
 
 	mockGetPlanFromStripeSubscription.mockReturnValue("premium_monthly");
 	mockGetTierFromSubscription.mockReturnValue("premium");

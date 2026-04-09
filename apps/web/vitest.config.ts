@@ -5,6 +5,16 @@ import { defineConfig } from "vitest/config";
 export default defineConfig({
 	plugins: [react()],
 	test: {
+		env: {
+			NEXT_PUBLIC_SUPABASE_URL: "https://test.supabase.co",
+			NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: "test-anon-key",
+			SUPABASE_SERVICE_ROLE_KEY: "test-service-role-key",
+			DATABASE_URL: "postgresql://test:test@localhost:5432/test",
+			DISCOGS_CONSUMER_KEY: "test-discogs-key",
+			DISCOGS_CONSUMER_SECRET: "test-discogs-secret",
+			IMPORT_WORKER_SECRET: "test-import-worker-secret",
+			STRIPE_SECRET_KEY: "test-stripe-secret-key",
+		},
 		environment: "jsdom",
 		include: ["tests/**/*.test.ts", "tests/**/*.test.tsx", "src/tests/**/*.test.ts"],
 		globals: true,

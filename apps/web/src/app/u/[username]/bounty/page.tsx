@@ -8,6 +8,7 @@ import { db } from "@/lib/db";
 import { releases } from "@/lib/db/schema/releases";
 import { profiles } from "@/lib/db/schema/users";
 import { wantlistItems } from "@/lib/db/schema/wantlist";
+import { publicEnv } from "@/lib/env";
 import { createClient } from "@/lib/supabase/server";
 
 interface BountyPageProps {
@@ -64,7 +65,7 @@ export default async function BountyPage({ params }: BountyPageProps) {
 					.where(inArray(wantlistItems.id, holyGrailIds.slice(0, 3)))
 			: [];
 
-	const bountyUrl = `${process.env.NEXT_PUBLIC_APP_URL ?? ""}/u/${username}/bounty`;
+	const bountyUrl = `${publicEnv.NEXT_PUBLIC_APP_URL}/u/${username}/bounty`;
 
 	function getRarityLabel(score: number | null): {
 		label: string;

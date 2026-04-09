@@ -7,7 +7,6 @@ import { db } from "@/lib/db";
 import { tradeMessages, tradeRequests, tradeReviews } from "@/lib/db/schema/trades";
 import { checkAndIncrementTradeCount } from "@/lib/entitlements";
 import { safeLimit, tradeRateLimit } from "@/lib/rate-limit";
-import { createClient } from "@/lib/supabase/server";
 import { uuidSchema } from "@/lib/validations/common";
 
 const createTradeSchema = z.object({
@@ -79,12 +78,7 @@ export async function initiateTradeAction(input: {
 	message?: string;
 }): Promise<{ tradeId: string } | { error: string; limitReached?: boolean }> {
 	try {
-		const supabase = await createClient();
-		const {
-			data: { user },
-		} = await supabase.auth.getUser();
-
-		if (!user) return { error: "Not authenticated" };
+		const user = await requireUser();
 
 		// Rate limit: trade initiation is expensive — use stricter trade limiter
 		const { success: rlSuccess } = await safeLimit(tradeRateLimit, user.id, true);

@@ -181,6 +181,19 @@ Conventions not yet established. Will populate as patterns emerge during develop
 Architecture not yet mapped. Follow existing patterns found in the codebase.
 <!-- GSD:architecture-end -->
 
+## Skills
+
+Specialized agent skills that simulate a professional engineering team. Each skill is a persona with domain expertise, workflows, references, and output contracts.
+
+| Role | Skill | When to Use |
+|------|-------|-------------|
+| Security Engineer | `.pi/agent/skills/digswap-appsec/` | Security review, threat modeling, pentest prep, auth/RLS hardening |
+| DevOps Engineer | `.pi/agent/skills/digswap-devops/` | CI/CD, Vercel deploy, env management, infra provisioning, rollback |
+| Database Admin | `.pi/agent/skills/digswap-dba/` | Migration review, RLS audit, backup/restore, data integrity, performance |
+| QA Lead | `.pi/agent/skills/digswap-qa/` | Test strategy, pre-deploy validation, smoke tests, regression runs |
+| SRE | `.pi/agent/skills/digswap-sre/` | Production readiness review, SLOs, incident response, capacity planning |
+| Release Manager | `.pi/agent/skills/digswap-release/` | Release process, changelog, hotfix flow, versioning, feature flags |
+
 <!-- GSD:workflow-start source:GSD defaults -->
 ## GSD Workflow Enforcement
 

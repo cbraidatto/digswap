@@ -1,4 +1,5 @@
 import { Resend } from "resend";
+import { env, publicEnv } from "@/lib/env";
 
 function escapeHtml(unsafe: string): string {
 	return unsafe
@@ -22,10 +23,10 @@ export async function sendWantlistMatchEmail(
 	ownerUsername: string,
 ): Promise<void> {
 	try {
-		if (!process.env.RESEND_API_KEY) return;
-		const resend = new Resend(process.env.RESEND_API_KEY);
-		const from = process.env.RESEND_FROM_EMAIL || "DigSwap <onboarding@resend.dev>";
-		const appUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
+		if (!env.RESEND_API_KEY) return;
+		const resend = new Resend(env.RESEND_API_KEY);
+		const from = env.RESEND_FROM_EMAIL || "DigSwap <onboarding@resend.dev>";
+		const appUrl = publicEnv.NEXT_PUBLIC_APP_URL;
 
 		const safeTitle = escapeHtml(recordTitle);
 		const safeArtist = escapeHtml(recordArtist);

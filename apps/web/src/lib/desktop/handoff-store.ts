@@ -1,14 +1,15 @@
 import { Redis } from "@upstash/redis";
+import { env } from "@/lib/env";
 
 const HANDOFF_TTL_SECONDS = 30; // 30 s window for desktop to pick up the code
 
 function getRedis(): Redis | null {
-	if (!process.env.UPSTASH_REDIS_REST_URL || !process.env.UPSTASH_REDIS_REST_TOKEN) {
+	if (!env.UPSTASH_REDIS_REST_URL || !env.UPSTASH_REDIS_REST_TOKEN) {
 		return null;
 	}
 	return new Redis({
-		url: process.env.UPSTASH_REDIS_REST_URL,
-		token: process.env.UPSTASH_REDIS_REST_TOKEN,
+		url: env.UPSTASH_REDIS_REST_URL,
+		token: env.UPSTASH_REDIS_REST_TOKEN,
 	});
 }
 

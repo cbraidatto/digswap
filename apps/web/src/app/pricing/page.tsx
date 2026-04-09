@@ -1,5 +1,6 @@
 import "server-only";
 
+import { publicEnv } from "@/lib/env";
 import type { SubscriptionPlan } from "@/lib/stripe";
 import { createClient } from "@/lib/supabase/server";
 import { PricingCards } from "./_components/PricingCards";
@@ -34,8 +35,8 @@ export default async function PricingPage() {
 		currentPlan = (await getCurrentPlan(user.id).catch(() => null)) ?? "free";
 	}
 
-	const monthlyPriceId = process.env.NEXT_PUBLIC_STRIPE_PRICE_MONTHLY ?? "";
-	const annualPriceId = process.env.NEXT_PUBLIC_STRIPE_PRICE_ANNUAL ?? "";
+	const monthlyPriceId = publicEnv.NEXT_PUBLIC_STRIPE_PRICE_MONTHLY;
+	const annualPriceId = publicEnv.NEXT_PUBLIC_STRIPE_PRICE_ANNUAL;
 
 	return (
 		<div className="min-h-screen bg-surface-container-lowest px-4 py-16">

@@ -1,4 +1,5 @@
 import { createHmac } from "node:crypto";
+import { env } from "@/lib/env";
 
 /**
  * Generate an HMAC signature for OG image query params.
@@ -11,7 +12,7 @@ export function signOgParams(
 	gems: string | number,
 	avg: string | number,
 ): string {
-	const secret = process.env.HANDOFF_HMAC_SECRET ?? "dev-hmac-secret-not-for-production";
+	const secret = env.HANDOFF_HMAC_SECRET ?? "dev-hmac-secret-not-for-production";
 	const data = `${username}:${total}:${gems}:${avg}`;
 	return createHmac("sha256", secret).update(data).digest("hex").slice(0, 16);
 }

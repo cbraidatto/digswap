@@ -1,5 +1,34 @@
 import { beforeEach, describe, expect, test, vi } from "vitest";
 
+// -- Mock env module (cached at import time, so process.env mutations don't work) --
+vi.mock("@/lib/env", () => ({
+	env: {
+		DATABASE_URL: "postgresql://test:test@localhost:5432/test",
+		SUPABASE_SERVICE_ROLE_KEY: "test-service-role-key",
+		DISCOGS_CONSUMER_KEY: "test-discogs-key",
+		DISCOGS_CONSUMER_SECRET: "test-discogs-secret",
+		IMPORT_WORKER_SECRET: "test-import-worker-secret",
+		HANDOFF_HMAC_SECRET: "dev-hmac-secret-not-for-production",
+		UPSTASH_REDIS_REST_URL: "",
+		UPSTASH_REDIS_REST_TOKEN: "",
+		RESEND_API_KEY: "",
+		RESEND_FROM_EMAIL: "noreply@digswap.com",
+		STRIPE_WEBHOOK_SECRET: "",
+		YOUTUBE_API_KEY: "",
+		SYSTEM_USER_ID: "",
+		NODE_ENV: "test",
+	},
+	publicEnv: {
+		NEXT_PUBLIC_SUPABASE_URL: "https://test.supabase.co",
+		NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: "test-anon-key",
+		NEXT_PUBLIC_SITE_URL: "http://localhost:3000",
+		NEXT_PUBLIC_APP_URL: "http://localhost:3000",
+		NEXT_PUBLIC_STRIPE_PRICE_MONTHLY: "",
+		NEXT_PUBLIC_STRIPE_PRICE_ANNUAL: "",
+		NEXT_PUBLIC_MIN_DESKTOP_VERSION: "1",
+	},
+}));
+
 // -- Mock admin client --
 function createChainedMock(resolveValue: unknown = { data: null, error: null }) {
 	const chain: Record<string, ReturnType<typeof vi.fn>> = {};
@@ -48,8 +77,6 @@ import { POST } from "@/app/api/discogs/import/route";
 describe("Import API route integration", () => {
 	beforeEach(() => {
 		vi.clearAllMocks();
-		process.env.IMPORT_WORKER_SECRET = "test_worker_secret";
-		process.env.NEXT_PUBLIC_SITE_URL = "http://localhost:3000";
 	});
 
 	function createRequest(body: Record<string, unknown>, authToken?: string) {
@@ -82,7 +109,7 @@ describe("Import API route integration", () => {
 	});
 
 	test("authenticates with correct IMPORT_WORKER_SECRET", async () => {
-		const request = createRequest({ jobId: "job-123" }, "test_worker_secret");
+		const request = createRequest({ jobId: "job-123" }, "test-import-worker-secret");
 
 		const response = await POST(request);
 
@@ -91,7 +118,7 @@ describe("Import API route integration", () => {
 	});
 
 	test("returns 400 for missing jobId", async () => {
-		const request = createRequest({}, "test_worker_secret");
+		const request = createRequest({}, "test-import-worker-secret");
 
 		const response = await POST(request);
 
@@ -99,7 +126,7 @@ describe("Import API route integration", () => {
 	});
 
 	test("completed jobs get early 200 response", async () => {
-		const request = createRequest({ jobId: "job-123" }, "test_worker_secret");
+		const request = createRequest({ jobId: "job-123" }, "test-import-worker-secret");
 
 		const response = await POST(request);
 		const body = await response.json();

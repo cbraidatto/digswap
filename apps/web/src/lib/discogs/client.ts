@@ -1,8 +1,9 @@
 import { DiscogsClient } from "@lionralfs/discogs-client";
+import { env } from "@/lib/env";
 import { createAdminClient } from "@/lib/supabase/admin";
 
-const CONSUMER_KEY = process.env.DISCOGS_CONSUMER_KEY!;
-const CONSUMER_SECRET = process.env.DISCOGS_CONSUMER_SECRET!;
+const CONSUMER_KEY = env.DISCOGS_CONSUMER_KEY;
+const CONSUMER_SECRET = env.DISCOGS_CONSUMER_SECRET;
 
 /**
  * Creates an authenticated Discogs API client for a given user.

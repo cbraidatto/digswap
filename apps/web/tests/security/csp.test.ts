@@ -36,8 +36,12 @@ describe("Content Security Policy", () => {
 		});
 
 		it("allows supabase in connect-src", () => {
-			expect(csp).toContain("https://*.supabase.co");
-			expect(csp).toContain("wss://*.supabase.co");
+			// With NEXT_PUBLIC_SUPABASE_URL set (vitest config provides
+			// "https://test.supabase.co"), the CSP uses the exact hostname
+			// instead of the wildcard fallback.
+			const supabaseHost = "test.supabase.co";
+			expect(csp).toContain(`https://${supabaseHost}`);
+			expect(csp).toContain(`wss://${supabaseHost}`);
 		});
 
 		it("is a single line with semicolon-separated directives", () => {

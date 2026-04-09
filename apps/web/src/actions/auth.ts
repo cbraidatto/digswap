@@ -5,6 +5,7 @@ import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { extractSessionId } from "@/lib/auth/session-utils";
 import { db } from "@/lib/db";
+import { publicEnv } from "@/lib/env";
 import { authRateLimit, resetRateLimit, safeLimit } from "@/lib/rate-limit";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
@@ -78,7 +79,7 @@ export async function signUp(
 
 		// Create user in Supabase
 		const supabase = await createClient();
-		const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
+		const siteUrl = publicEnv.NEXT_PUBLIC_SITE_URL;
 
 		const { error } = await supabase.auth.signUp({
 			email,
@@ -288,7 +289,7 @@ export async function forgotPassword(
 		}
 
 		const supabase = await createClient();
-		const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
+		const siteUrl = publicEnv.NEXT_PUBLIC_SITE_URL;
 
 		// Send reset email -- errors are intentionally swallowed (OWASP)
 		await supabase.auth.resetPasswordForEmail(email, {

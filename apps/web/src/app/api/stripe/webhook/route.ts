@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import type Stripe from "stripe";
+import { env } from "@/lib/env";
 import { apiRateLimit, safeLimit } from "@/lib/rate-limit";
 import {
 	getPlanFromStripeSubscription,
@@ -12,7 +13,7 @@ import { createAdminClient } from "@/lib/supabase/admin";
 export const runtime = "nodejs";
 
 function getWebhookSecret() {
-	const secret = process.env.STRIPE_WEBHOOK_SECRET;
+	const secret = env.STRIPE_WEBHOOK_SECRET;
 	if (!secret) {
 		throw new Error("STRIPE_WEBHOOK_SECRET is not configured.");
 	}

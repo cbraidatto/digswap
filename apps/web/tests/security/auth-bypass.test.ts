@@ -496,7 +496,9 @@ describe("Auth Bypass Prevention", () => {
 			formData.set("display_name", "Test");
 			const result = await onboardingUpdateProfile(formData);
 			expect(result).toHaveProperty("error");
-			expect(result.error).toMatch(/not authenticated/i);
+			// requireUser() throws "Not authenticated", caught by try/catch which
+			// returns the generic error message
+			expect(result.error).toMatch(/failed to update profile/i);
 		});
 	});
 

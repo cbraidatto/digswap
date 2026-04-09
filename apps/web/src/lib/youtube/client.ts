@@ -1,3 +1,5 @@
+import { env } from "@/lib/env";
+
 export interface YouTubeSearchResult {
 	videoId: string;
 	title: string;
@@ -15,7 +17,7 @@ function decodeHtmlEntities(str: string): string {
 }
 
 export async function searchYouTube(query: string): Promise<YouTubeSearchResult[]> {
-	const key = process.env.YOUTUBE_API_KEY;
+	const key = env.YOUTUBE_API_KEY;
 	if (!key) throw new Error("YOUTUBE_API_KEY not set");
 
 	const params = new URLSearchParams({

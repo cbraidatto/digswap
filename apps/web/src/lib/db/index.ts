@@ -1,10 +1,11 @@
 import { drizzle } from "drizzle-orm/postgres-js";
 import postgres from "postgres";
+import { env } from "@/lib/env";
 import * as schema from "./schema";
 
 // Connection pooler URL (transaction mode) -- MUST set prepare: false
 // PgBouncer in transaction mode does not support prepared statements
-const client = postgres(process.env.DATABASE_URL!, {
+const client = postgres(env.DATABASE_URL, {
 	prepare: false,
 	max: 10,
 	idle_timeout: 20,

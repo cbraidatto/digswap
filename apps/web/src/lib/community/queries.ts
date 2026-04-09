@@ -1,5 +1,6 @@
 import { and, count, desc, eq, lt, ne } from "drizzle-orm";
 import { db } from "@/lib/db";
+import { env } from "@/lib/env";
 import { groupInvites } from "@/lib/db/schema/group-invites";
 import { groupMembers, groupPosts, groups } from "@/lib/db/schema/groups";
 import { releases } from "@/lib/db/schema/releases";
@@ -66,7 +67,7 @@ export type ReviewItem = {
 // System user ID for genre groups
 // ---------------------------------------------------------------------------
 
-const SYSTEM_USER_ID = process.env.SYSTEM_USER_ID ?? "00000000-0000-0000-0000-000000000000";
+const SYSTEM_USER_ID = env.SYSTEM_USER_ID || "00000000-0000-0000-0000-000000000000";
 
 // ---------------------------------------------------------------------------
 // Group queries

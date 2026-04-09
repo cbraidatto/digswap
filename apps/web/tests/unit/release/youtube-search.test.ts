@@ -3,11 +3,41 @@ import { beforeEach, describe, expect, test, vi } from "vitest";
 // ---------------------------------------------------------------------------
 // Hoisted mocks (vi.mock factories are hoisted, so we use vi.hoisted)
 // ---------------------------------------------------------------------------
-const { mockGetUser, mockUpdate, mockRateLimitFn, mockFetch } = vi.hoisted(() => ({
+const { mockGetUser, mockUpdate, mockRateLimitFn, mockFetch, mockEnv } = vi.hoisted(() => ({
 	mockGetUser: vi.fn(),
 	mockUpdate: vi.fn(),
 	mockRateLimitFn: vi.fn(),
 	mockFetch: vi.fn(),
+	mockEnv: {
+		DATABASE_URL: "postgresql://test:test@localhost:5432/test",
+		SUPABASE_SERVICE_ROLE_KEY: "test-service-role-key",
+		DISCOGS_CONSUMER_KEY: "test-discogs-key",
+		DISCOGS_CONSUMER_SECRET: "test-discogs-secret",
+		IMPORT_WORKER_SECRET: "test-import-worker-secret",
+		HANDOFF_HMAC_SECRET: "dev-hmac-secret-not-for-production",
+		UPSTASH_REDIS_REST_URL: "",
+		UPSTASH_REDIS_REST_TOKEN: "",
+		RESEND_API_KEY: "",
+		RESEND_FROM_EMAIL: "noreply@digswap.com",
+		STRIPE_WEBHOOK_SECRET: "",
+		YOUTUBE_API_KEY: "test-api-key-123",
+		SYSTEM_USER_ID: "",
+		NODE_ENV: "test",
+	},
+}));
+
+// -- Mock env module (cached at import time, so process.env mutations don't work) --
+vi.mock("@/lib/env", () => ({
+	env: mockEnv,
+	publicEnv: {
+		NEXT_PUBLIC_SUPABASE_URL: "https://test.supabase.co",
+		NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: "test-anon-key",
+		NEXT_PUBLIC_SITE_URL: "http://localhost:3000",
+		NEXT_PUBLIC_APP_URL: "http://localhost:3000",
+		NEXT_PUBLIC_STRIPE_PRICE_MONTHLY: "",
+		NEXT_PUBLIC_STRIPE_PRICE_ANNUAL: "",
+		NEXT_PUBLIC_MIN_DESKTOP_VERSION: "1",
+	},
 }));
 
 // ---------------------------------------------------------------------------
@@ -114,8 +144,8 @@ describe("searchYouTubeForRelease", () => {
 			eq: vi.fn().mockResolvedValue({ data: null, error: null }),
 		});
 
-		// Default: YOUTUBE_API_KEY is set
-		process.env.YOUTUBE_API_KEY = "test-api-key-123";
+		// Default: YOUTUBE_API_KEY is set (reset for tests that clear it)
+		mockEnv.YOUTUBE_API_KEY = "test-api-key-123";
 	});
 
 	test("returns cached videoId without calling YouTube API", async () => {
@@ -210,7 +240,7 @@ describe("searchYouTubeForRelease", () => {
 	});
 
 	test("returns null when YOUTUBE_API_KEY is not set", async () => {
-		delete process.env.YOUTUBE_API_KEY;
+		mockEnv.YOUTUBE_API_KEY = "";
 
 		queryResults = [
 			[

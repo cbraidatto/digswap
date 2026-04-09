@@ -2,6 +2,7 @@
 
 import { cookies } from "next/headers";
 import { deleteTokens, getRequestToken } from "@/lib/discogs/oauth";
+import { env, publicEnv } from "@/lib/env";
 import { discogsRateLimit, safeLimit } from "@/lib/rate-limit";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
@@ -37,7 +38,7 @@ export async function connectDiscogs(): Promise<{ url: string } | { error: strin
 			return { error: "Too many requests. Please wait a moment." };
 		}
 
-		const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
+		const siteUrl = publicEnv.NEXT_PUBLIC_SITE_URL;
 		const callbackUrl = `${siteUrl}/api/discogs/callback`;
 
 		const { token, tokenSecret, authorizeUrl } = await getRequestToken(callbackUrl);
@@ -48,7 +49,7 @@ export async function connectDiscogs(): Promise<{ url: string } | { error: strin
 		const cookieStore = await cookies();
 		cookieStore.set("discogs_oauth", JSON.stringify({ token, tokenSecret }), {
 			httpOnly: true,
-			secure: process.env.NODE_ENV === "production",
+			secure: env.NODE_ENV === "production",
 			sameSite: "lax",
 			maxAge: 600,
 			path: "/",
@@ -122,12 +123,12 @@ export async function triggerSync(): Promise<{
 		}
 
 		// Trigger import worker (fire-and-forget)
-		const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
+		const siteUrl = publicEnv.NEXT_PUBLIC_SITE_URL;
 		fetch(`${siteUrl}/api/discogs/import`, {
 			method: "POST",
 			headers: {
 				"Content-Type": "application/json",
-				Authorization: `Bearer ${process.env.IMPORT_WORKER_SECRET}`,
+				Authorization: `Bearer ${env.IMPORT_WORKER_SECRET}`,
 			},
 			body: JSON.stringify({ jobId: job.id }),
 		}).catch(() => {});
@@ -277,12 +278,12 @@ export async function triggerReimport(): Promise<{
 			.single();
 
 		if (job) {
-			const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
+			const siteUrl = publicEnv.NEXT_PUBLIC_SITE_URL;
 			fetch(`${siteUrl}/api/discogs/import`, {
 				method: "POST",
 				headers: {
 					"Content-Type": "application/json",
-					Authorization: `Bearer ${process.env.IMPORT_WORKER_SECRET}`,
+					Authorization: `Bearer ${env.IMPORT_WORKER_SECRET}`,
 				},
 				body: JSON.stringify({ jobId: job.id }),
 			}).catch(() => {});

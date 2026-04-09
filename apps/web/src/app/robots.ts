@@ -1,7 +1,8 @@
 import type { MetadataRoute } from "next";
+import { publicEnv } from "@/lib/env";
 
 export default function robots(): MetadataRoute.Robots {
-	const baseUrl = process.env.NEXT_PUBLIC_APP_URL ?? "https://digswap.com";
+	const baseUrl = publicEnv.NEXT_PUBLIC_APP_URL ?? "https://digswap.com";
 
 	return {
 		rules: [

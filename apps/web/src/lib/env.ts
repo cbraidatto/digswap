@@ -20,6 +20,10 @@ const serverSchema = z.object({
 			: z.string().optional().default("dev-hmac-secret-not-for-production"),
 	RESEND_API_KEY: z.string().optional().default(""),
 	RESEND_FROM_EMAIL: z.string().optional().default("noreply@digswap.com"),
+	STRIPE_SECRET_KEY:
+		process.env.NODE_ENV === "production"
+			? z.string().min(10, "STRIPE_SECRET_KEY is required in production")
+			: z.string().optional().default(""),
 	STRIPE_WEBHOOK_SECRET:
 		process.env.NODE_ENV === "production"
 			? z.string().min(10, "STRIPE_WEBHOOK_SECRET is required in production")
@@ -36,16 +40,23 @@ const publicSchema = z.object({
 	NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: z
 		.string()
 		.min(1, "NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY is required"),
-	NEXT_PUBLIC_SITE_URL: z.string().optional().default("http://localhost:3000"),
-	NEXT_PUBLIC_APP_URL: z.string().optional().default("http://localhost:3000"),
+	NEXT_PUBLIC_SITE_URL:
+		process.env.NODE_ENV === "production" || process.env.VERCEL
+			? z.string().min(1, "NEXT_PUBLIC_SITE_URL is required in production/Vercel")
+			: z.string().optional().default("http://localhost:3000"),
+	NEXT_PUBLIC_APP_URL:
+		process.env.NODE_ENV === "production" || process.env.VERCEL
+			? z.string().min(1, "NEXT_PUBLIC_APP_URL is required in production/Vercel")
+			: z.string().optional().default("http://localhost:3000"),
 	NEXT_PUBLIC_STRIPE_PRICE_MONTHLY: z.string().optional().default(""),
 	NEXT_PUBLIC_STRIPE_PRICE_ANNUAL: z.string().optional().default(""),
+	NEXT_PUBLIC_SENTRY_DSN: z.string().optional().default(""),
 	NEXT_PUBLIC_MIN_DESKTOP_VERSION: z.string().optional().default("1"),
 });
 
 function validateEnv() {
-	// Server env — only validate on server side
-	if (typeof window === "undefined") {
+	// Server env — validate on server side and in test environments (jsdom has window)
+	if (typeof window === "undefined" || process.env.VITEST) {
 		const result = serverSchema.safeParse(process.env);
 		if (!result.success) {
 			const missing = result.error.issues

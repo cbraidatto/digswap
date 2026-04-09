@@ -1,3 +1,4 @@
+import { env, publicEnv } from "@/lib/env";
 import type { DiscogsProgressPayload } from "./types";
 import { getImportChannelName } from "./types";
 
@@ -12,8 +13,8 @@ export async function broadcastProgress(
 	userId: string,
 	payload: DiscogsProgressPayload,
 ): Promise<void> {
-	const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
-	const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
+	const supabaseUrl = publicEnv.NEXT_PUBLIC_SUPABASE_URL;
+	const serviceKey = env.SUPABASE_SERVICE_ROLE_KEY;
 	const channel = getImportChannelName(userId);
 
 	try {

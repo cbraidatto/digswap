@@ -3,6 +3,7 @@ import { type NextRequest, NextResponse } from "next/server";
 import { broadcastProgress } from "@/lib/discogs/broadcast";
 import { processImportPage, processWantlistPage } from "@/lib/discogs/import-worker";
 import type { ImportJobType } from "@/lib/discogs/types";
+import { env, publicEnv } from "@/lib/env";
 import { awardBadge } from "@/lib/gamification/badge-awards";
 import { getGemInfo } from "@/lib/gems/constants";
 import { detectGemTierChanges } from "@/lib/gems/notifications";
@@ -63,7 +64,7 @@ export async function POST(request: NextRequest) {
 	//    prevent timing attacks that could leak the secret character by character.
 	//    Also guards against the `Bearer undefined` bypass when the env var is unset.
 	const authHeader = request.headers.get("authorization") ?? "";
-	const secret = process.env.IMPORT_WORKER_SECRET;
+	const secret = env.IMPORT_WORKER_SECRET;
 
 	if (!secret) {
 		console.error("[import-worker] IMPORT_WORKER_SECRET is not configured");
@@ -165,8 +166,8 @@ export async function POST(request: NextRequest) {
 	// Stored in Redis with 2h TTL; retrieved on job completion for pre/post comparison.
 	if (currentPage === 1 && (job.type === "collection" || job.type === "sync")) {
 		try {
-			const redisUrl = process.env.UPSTASH_REDIS_REST_URL;
-			const redisToken = process.env.UPSTASH_REDIS_REST_TOKEN;
+			const redisUrl = env.UPSTASH_REDIS_REST_URL;
+			const redisToken = env.UPSTASH_REDIS_REST_TOKEN;
 			if (redisUrl && redisToken) {
 				const preSnapshot = await snapshotGemScores(admin, job.user_id);
 				if (preSnapshot.size > 0) {
@@ -208,7 +209,7 @@ export async function POST(request: NextRequest) {
 	}
 
 	// 5. Handle completion or chain next page
-	const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
+	const siteUrl = publicEnv.NEXT_PUBLIC_SITE_URL;
 
 	if (result.done && !result.error) {
 		// Mark job completed
@@ -277,8 +278,8 @@ export async function POST(request: NextRequest) {
 		// Creates gem_tier_change notifications for records that moved tiers.
 		if (job.type === "collection" || job.type === "sync") {
 			try {
-				const redisUrl = process.env.UPSTASH_REDIS_REST_URL;
-				const redisToken = process.env.UPSTASH_REDIS_REST_TOKEN;
+				const redisUrl = env.UPSTASH_REDIS_REST_URL;
+				const redisToken = env.UPSTASH_REDIS_REST_TOKEN;
 				if (redisUrl && redisToken) {
 					const { Redis } = await import("@upstash/redis");
 					const redis = new Redis({ url: redisUrl, token: redisToken });
@@ -417,7 +418,7 @@ export async function POST(request: NextRequest) {
 					method: "POST",
 					headers: {
 						"Content-Type": "application/json",
-						Authorization: `Bearer ${process.env.IMPORT_WORKER_SECRET}`,
+						Authorization: `Bearer ${env.IMPORT_WORKER_SECRET}`,
 					},
 					body: JSON.stringify({ jobId: wantlistJob.id }),
 				}).catch(() => {
@@ -445,7 +446,7 @@ export async function POST(request: NextRequest) {
 			method: "POST",
 			headers: {
 				"Content-Type": "application/json",
-				Authorization: `Bearer ${process.env.IMPORT_WORKER_SECRET}`,
+				Authorization: `Bearer ${env.IMPORT_WORKER_SECRET}`,
 			},
 			body: JSON.stringify({ jobId }),
 		}).catch(() => {

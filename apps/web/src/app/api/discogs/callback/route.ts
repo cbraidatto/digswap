@@ -2,6 +2,7 @@ import { DiscogsClient } from "@lionralfs/discogs-client";
 import { cookies } from "next/headers";
 import { type NextRequest, NextResponse } from "next/server";
 import { getAccessToken, storeTokens } from "@/lib/discogs/oauth";
+import { env, publicEnv } from "@/lib/env";
 import { authRateLimit, safeLimit } from "@/lib/rate-limit";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
@@ -27,7 +28,7 @@ export async function GET(request: NextRequest) {
 	const ip = request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ?? "unknown";
 	const { success: rlOk } = await safeLimit(authRateLimit, `discogs-cb:${ip}`, true);
 	if (!rlOk) {
-		const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
+		const siteUrl = publicEnv.NEXT_PUBLIC_SITE_URL;
 		return NextResponse.redirect(
 			`${siteUrl}/settings?error=${encodeURIComponent("Too many requests. Please try again later.")}`,
 		);
@@ -35,7 +36,7 @@ export async function GET(request: NextRequest) {
 	const { searchParams } = new URL(request.url);
 	const oauthToken = searchParams.get("oauth_token");
 	const oauthVerifier = searchParams.get("oauth_verifier");
-	const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
+	const siteUrl = publicEnv.NEXT_PUBLIC_SITE_URL;
 
 	if (!oauthToken || !oauthVerifier) {
 		// User denied authorization or error occurred
@@ -96,8 +97,8 @@ export async function GET(request: NextRequest) {
 		const discogsClient = new DiscogsClient({
 			auth: {
 				method: "oauth",
-				consumerKey: process.env.DISCOGS_CONSUMER_KEY!,
-				consumerSecret: process.env.DISCOGS_CONSUMER_SECRET!,
+				consumerKey: env.DISCOGS_CONSUMER_KEY,
+				consumerSecret: env.DISCOGS_CONSUMER_SECRET,
 				accessToken,
 				accessTokenSecret,
 			},
@@ -155,7 +156,7 @@ export async function GET(request: NextRequest) {
 				method: "POST",
 				headers: {
 					"Content-Type": "application/json",
-					Authorization: `Bearer ${process.env.IMPORT_WORKER_SECRET}`,
+					Authorization: `Bearer ${env.IMPORT_WORKER_SECRET}`,
 				},
 				body: JSON.stringify({ jobId: job.id }),
 			}).catch(() => {

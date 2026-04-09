@@ -1,8 +1,9 @@
 import { Ratelimit } from "@upstash/ratelimit";
 import { Redis } from "@upstash/redis";
+import { env } from "@/lib/env";
 
-const redisUrl = process.env.UPSTASH_REDIS_REST_URL ?? "";
-const redisToken = process.env.UPSTASH_REDIS_REST_TOKEN ?? "";
+const redisUrl = env.UPSTASH_REDIS_REST_URL;
+const redisToken = env.UPSTASH_REDIS_REST_TOKEN;
 
 const redisAvailable = redisUrl.length > 0 && redisToken.length > 0;
 
@@ -21,7 +22,7 @@ export async function safeLimit(
 	failClosed = true,
 ): Promise<{ success: boolean }> {
 	if (!limiter) {
-		if (process.env.NODE_ENV === "production") {
+		if (env.NODE_ENV === "production") {
 			if (failClosed) {
 				console.error("[rate-limit] Redis unavailable - failing closed");
 			} else {
@@ -37,7 +38,7 @@ export async function safeLimit(
 	} catch (err) {
 		if (failClosed) {
 			console.error("[rate-limit] Redis error:", err);
-		} else if (process.env.NODE_ENV === "production") {
+		} else if (env.NODE_ENV === "production") {
 			console.warn("[rate-limit] Redis error - allowing request because limiter is fail-open", err);
 		}
 		return { success: !failClosed };

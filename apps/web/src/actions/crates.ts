@@ -2,13 +2,13 @@
 
 import { and, eq, inArray } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
+import { requireUser } from "@/lib/auth/require-user";
 import { getCrates } from "@/lib/crates/queries";
 import type { CrateRow } from "@/lib/crates/types";
 import { db } from "@/lib/db";
 import { collectionItems } from "@/lib/db/schema/collections";
 import { crateItems, crates, sets, setTracks } from "@/lib/db/schema/crates";
 import { wantlistItems } from "@/lib/db/schema/wantlist";
-import { createClient } from "@/lib/supabase/server";
 import {
 	addToCrateSchema,
 	crateItemIdSchema,
@@ -19,18 +19,6 @@ import {
 } from "@/lib/validations/crates";
 
 // ---------------------------------------------------------------------------
-// Helpers
-// ---------------------------------------------------------------------------
-
-async function getAuthUser() {
-	const supabase = await createClient();
-	const {
-		data: { user },
-	} = await supabase.auth.getUser();
-	return user;
-}
-
-// ---------------------------------------------------------------------------
 // Crate mutations
 // ---------------------------------------------------------------------------
 
@@ -38,8 +26,7 @@ export async function createCrate(
 	input: unknown,
 ): Promise<{ success: boolean; data?: { crateId: string }; error?: string }> {
 	try {
-		const user = await getAuthUser();
-		if (!user) return { success: false, error: "Not authenticated" };
+		const user = await requireUser();
 
 		const parsed = createCrateSchema.safeParse(input);
 		if (!parsed.success) {
@@ -70,8 +57,7 @@ export async function createCrate(
 
 export async function updateCrate(input: unknown): Promise<{ success: boolean; error?: string }> {
 	try {
-		const user = await getAuthUser();
-		if (!user) return { success: false, error: "Not authenticated" };
+		const user = await requireUser();
 
 		const parsed = updateCrateSchema.safeParse(input);
 		if (!parsed.success) {
@@ -99,8 +85,7 @@ export async function toggleCrateVisibility(
 	isPublic: boolean,
 ): Promise<{ success: boolean; error?: string }> {
 	try {
-		const user = await getAuthUser();
-		if (!user) return { success: false, error: "Not authenticated" };
+		const user = await requireUser();
 
 		await db
 			.update(crates)
@@ -119,8 +104,7 @@ export async function toggleCrateVisibility(
 
 export async function deleteCrate(crateId: string): Promise<{ success: boolean; error?: string }> {
 	try {
-		const user = await getAuthUser();
-		if (!user) return { success: false, error: "Not authenticated" };
+		const user = await requireUser();
 
 		await db.delete(crates).where(and(eq(crates.id, crateId), eq(crates.userId, user.id)));
 
@@ -140,8 +124,7 @@ export async function addToCrate(
 	input: unknown,
 ): Promise<{ success: boolean; data?: { crateItemId: string }; error?: string }> {
 	try {
-		const user = await getAuthUser();
-		if (!user) return { success: false, error: "Not authenticated" };
+		const user = await requireUser();
 
 		const parsed = addToCrateSchema.safeParse(input);
 		if (!parsed.success) {
@@ -189,8 +172,7 @@ export async function moveToWantlist(
 	crateItemId: string,
 ): Promise<{ success: boolean; data?: { wantlistItemId: string }; error?: string }> {
 	try {
-		const user = await getAuthUser();
-		if (!user) return { success: false, error: "Not authenticated" };
+		const user = await requireUser();
 
 		const parsed = crateItemIdSchema.safeParse({ crateItemId });
 		if (!parsed.success) {
@@ -237,8 +219,7 @@ export async function moveToCollection(
 	crateItemId: string,
 ): Promise<{ success: boolean; data?: { collectionItemId: string }; error?: string }> {
 	try {
-		const user = await getAuthUser();
-		if (!user) return { success: false, error: "Not authenticated" };
+		const user = await requireUser();
 
 		const parsed = crateItemIdSchema.safeParse({ crateItemId });
 		if (!parsed.success) {
@@ -285,8 +266,7 @@ export async function markAsFound(
 	crateItemId: string,
 ): Promise<{ success: boolean; error?: string }> {
 	try {
-		const user = await getAuthUser();
-		if (!user) return { success: false, error: "Not authenticated" };
+		const user = await requireUser();
 
 		const parsed = crateItemIdSchema.safeParse({ crateItemId });
 		if (!parsed.success) {
@@ -319,8 +299,7 @@ export async function removeCrateItem(
 	crateItemId: string,
 ): Promise<{ success: boolean; error?: string }> {
 	try {
-		const user = await getAuthUser();
-		if (!user) return { success: false, error: "Not authenticated" };
+		const user = await requireUser();
 
 		const parsed = crateItemIdSchema.safeParse({ crateItemId });
 		if (!parsed.success) {
@@ -356,8 +335,7 @@ export async function createSet(
 	input: unknown,
 ): Promise<{ success: boolean; data?: { setId: string }; error?: string }> {
 	try {
-		const user = await getAuthUser();
-		if (!user) return { success: false, error: "Not authenticated" };
+		const user = await requireUser();
 
 		const parsed = createSetSchema.safeParse(input);
 		if (!parsed.success) {
@@ -431,8 +409,7 @@ export async function updateSetTracks(
 	input: unknown,
 ): Promise<{ success: boolean; error?: string }> {
 	try {
-		const user = await getAuthUser();
-		if (!user) return { success: false, error: "Not authenticated" };
+		const user = await requireUser();
 
 		const parsed = updateSetTracksSchema.safeParse(input);
 		if (!parsed.success) {
@@ -475,8 +452,7 @@ export async function updateSetTracks(
 
 export async function deleteSet(setId: string): Promise<{ success: boolean; error?: string }> {
 	try {
-		const user = await getAuthUser();
-		if (!user) return { success: false, error: "Not authenticated" };
+		const user = await requireUser();
 
 		// Get crateId for revalidation
 		const [ownedSet] = await db
@@ -507,8 +483,7 @@ export async function getUserCratesAction(): Promise<{
 	error?: string;
 }> {
 	try {
-		const user = await getAuthUser();
-		if (!user) return { success: false, error: "Not authenticated" };
+		const user = await requireUser();
 
 		const data = await getCrates(user.id);
 		return { success: true, data };

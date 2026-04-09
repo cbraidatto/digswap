@@ -3,9 +3,10 @@ import type { MetadataRoute } from "next";
 import { db } from "@/lib/db";
 import { releases } from "@/lib/db/schema/releases";
 import { profiles } from "@/lib/db/schema/users";
+import { publicEnv } from "@/lib/env";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-	const baseUrl = process.env.NEXT_PUBLIC_APP_URL ?? "https://digswap.com";
+	const baseUrl = publicEnv.NEXT_PUBLIC_APP_URL ?? "https://digswap.com";
 
 	// Static pages
 	const staticPages: MetadataRoute.Sitemap = [

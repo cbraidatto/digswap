@@ -4,6 +4,7 @@ import { eq } from "drizzle-orm";
 import { getReviewsForRelease } from "@/lib/community/queries";
 import { db } from "@/lib/db";
 import { releases } from "@/lib/db/schema/releases";
+import { env } from "@/lib/env";
 import { apiRateLimit, safeLimit } from "@/lib/rate-limit";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
@@ -57,7 +58,7 @@ export async function searchYouTubeForRelease(
 		if (release.youtubeVideoId) return { videoId: release.youtubeVideoId };
 
 		// No API key configured -- skip gracefully
-		const apiKey = process.env.YOUTUBE_API_KEY;
+		const apiKey = env.YOUTUBE_API_KEY;
 		if (!apiKey) return { videoId: null };
 
 		// Call YouTube Data API v3 search.list
