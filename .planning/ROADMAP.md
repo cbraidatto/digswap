@@ -447,7 +447,7 @@ Plans:
 **Plans**: 2 plans
 Plans:
 - [x] 24-01-PLAN.md -- Normalize line endings to LF and auto-fix formatting/import/lint issues
-- [ ] 24-02-PLAN.md -- Fix manual a11y lint errors and add biome-ignore for safe patterns
+- [x] 24-02-PLAN.md -- Fix manual a11y lint errors and add biome-ignore for safe patterns
 
 ## Progress
 
