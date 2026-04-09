@@ -1,11 +1,28 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import path from "node:path";
-import fs from "node:fs";
 import fsp from "node:fs/promises";
 import os from "node:os";
 import { createHash } from "node:crypto";
 
-// Module under test — will fail to import until implementation exists
+// ---------- Module-level mocks ----------
+
+vi.mock("node:child_process", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("node:child_process")>();
+  return {
+    ...actual,
+    execFile: vi.fn(),
+  };
+});
+
+vi.mock("music-metadata", () => ({
+  parseFile: vi.fn(),
+}));
+
+// Import mocked modules
+import { execFile } from "node:child_process";
+import { parseFile } from "music-metadata";
+
+// Module under test
 import {
   extractSpecs,
   generatePreview,
@@ -17,21 +34,57 @@ import {
 
 // ---------- helpers ----------
 
+const mockedExecFile = vi.mocked(execFile);
+const mockedParseFile = vi.mocked(parseFile);
+
 let tmpDir: string;
 
 beforeEach(async () => {
   tmpDir = await fsp.mkdtemp(path.join(os.tmpdir(), "ffpipe-test-"));
+  vi.clearAllMocks();
 });
 
 afterEach(async () => {
+  vi.restoreAllMocks();
   await fsp.rm(tmpDir, { recursive: true, force: true }).catch(() => {});
 });
 
 /** Create a small temp file with known content for SHA-256 testing. */
-async function createFixtureFile(name: string, content: string): Promise<string> {
+async function createFixtureFile(
+  name: string,
+  content: string,
+): Promise<string> {
   const filePath = path.join(tmpDir, name);
   await fsp.writeFile(filePath, content, "utf-8");
   return filePath;
+}
+
+/**
+ * Helper to make the mocked execFile invoke its callback with the given result.
+ * Handles both (cmd, args, cb) and (cmd, args, opts, cb) overloads of execFile.
+ */
+function mockExecFileSuccess(stdout: string, stderr = "") {
+  mockedExecFile.mockImplementation(
+    (...args: unknown[]) => {
+      const cb = args[args.length - 1];
+      if (typeof cb === "function") {
+        cb(null, stdout, stderr);
+      }
+      return {} as any;
+    },
+  );
+}
+
+function mockExecFileFailure(error: Error) {
+  mockedExecFile.mockImplementation(
+    (...args: unknown[]) => {
+      const cb = args[args.length - 1];
+      if (typeof cb === "function") {
+        cb(error, "", "");
+      }
+      return {} as any;
+    },
+  );
 }
 
 // ---------- AudioPipelineError ----------
@@ -75,14 +128,6 @@ describe("computeFileSha256", () => {
 
 describe("extractSpecs", () => {
   it("Test 1: returns correct format/bitrate/sampleRate/duration for a valid audio file", async () => {
-    // We mock child_process.execFile to simulate ffprobe JSON output
-    const { execFile } = await import("node:child_process");
-    const execFileMock = vi.spyOn(
-      await import("node:child_process"),
-      "execFile",
-    );
-
-    // Simulate ffprobe returning valid JSON for a 3-min FLAC
     const fakeProbeOutput = JSON.stringify({
       streams: [
         {
@@ -97,14 +142,7 @@ describe("extractSpecs", () => {
       },
     });
 
-    execFileMock.mockImplementation(
-      (_cmd: any, _args: any, _opts: any, callback: any) => {
-        // Handle both (cmd, args, cb) and (cmd, args, opts, cb) signatures
-        const cb = typeof _opts === "function" ? _opts : callback;
-        if (cb) cb(null, fakeProbeOutput, "");
-        return {} as any;
-      },
-    );
+    mockExecFileSuccess(fakeProbeOutput);
 
     const filePath = await createFixtureFile("test.flac", "fake audio");
     const specs = await extractSpecs(filePath);
@@ -113,29 +151,14 @@ describe("extractSpecs", () => {
     expect(specs.bitrate).toBe(1411200);
     expect(specs.sampleRate).toBe(44100);
     expect(specs.duration).toBeCloseTo(180.5, 1);
-
-    execFileMock.mockRestore();
   });
 
   it("Test 2: falls back to music-metadata when FFmpeg probe fails", async () => {
-    const execFileMock = vi.spyOn(
-      await import("node:child_process"),
-      "execFile",
-    );
-
     // Make ffprobe fail
-    execFileMock.mockImplementation(
-      (_cmd: any, _args: any, _opts: any, callback: any) => {
-        const cb = typeof _opts === "function" ? _opts : callback;
-        if (cb) cb(new Error("ffprobe failed"), "", "");
-        return {} as any;
-      },
-    );
+    mockExecFileFailure(new Error("ffprobe failed"));
 
-    // Mock music-metadata parseFile
-    const mmModule = await import("music-metadata");
-    const parseFileMock = vi.spyOn(mmModule, "parseFile");
-    parseFileMock.mockResolvedValue({
+    // Mock music-metadata parseFile success
+    mockedParseFile.mockResolvedValue({
       format: {
         container: "FLAC",
         codec: "FLAC",
@@ -158,17 +181,9 @@ describe("extractSpecs", () => {
     expect(specs.sampleRate).toBe(48000);
     expect(specs.bitrate).toBe(1536000);
     expect(specs.duration).toBeCloseTo(200.0, 1);
-
-    execFileMock.mockRestore();
-    parseFileMock.mockRestore();
   });
 
   it("Test 3: throws AudioPipelineError FILE_TOO_SHORT when duration < 120s", async () => {
-    const execFileMock = vi.spyOn(
-      await import("node:child_process"),
-      "execFile",
-    );
-
     const shortProbeOutput = JSON.stringify({
       streams: [
         { codec_name: "mp3", sample_rate: "44100", bit_rate: "320000" },
@@ -176,51 +191,35 @@ describe("extractSpecs", () => {
       format: { duration: "60.0", bit_rate: "320000" },
     });
 
-    execFileMock.mockImplementation(
-      (_cmd: any, _args: any, _opts: any, callback: any) => {
-        const cb = typeof _opts === "function" ? _opts : callback;
-        if (cb) cb(null, shortProbeOutput, "");
-        return {} as any;
-      },
-    );
+    mockExecFileSuccess(shortProbeOutput);
 
     const filePath = await createFixtureFile("short.mp3", "fake audio");
 
     await expect(extractSpecs(filePath)).rejects.toThrow(AudioPipelineError);
-    await expect(extractSpecs(filePath)).rejects.toMatchObject({
-      code: "FILE_TOO_SHORT",
-    });
-
-    execFileMock.mockRestore();
+    try {
+      await extractSpecs(filePath);
+    } catch (e) {
+      expect(e).toBeInstanceOf(AudioPipelineError);
+      expect((e as AudioPipelineError).code).toBe("FILE_TOO_SHORT");
+    }
   });
 
   it("Test 4: throws AudioPipelineError PROBE_FAILED when both FFmpeg and music-metadata fail", async () => {
-    const execFileMock = vi.spyOn(
-      await import("node:child_process"),
-      "execFile",
-    );
+    // Make ffprobe fail
+    mockExecFileFailure(new Error("ffprobe failed"));
 
-    execFileMock.mockImplementation(
-      (_cmd: any, _args: any, _opts: any, callback: any) => {
-        const cb = typeof _opts === "function" ? _opts : callback;
-        if (cb) cb(new Error("ffprobe failed"), "", "");
-        return {} as any;
-      },
-    );
-
-    const mmModule = await import("music-metadata");
-    const parseFileMock = vi.spyOn(mmModule, "parseFile");
-    parseFileMock.mockRejectedValue(new Error("music-metadata failed"));
+    // Make music-metadata also fail
+    mockedParseFile.mockRejectedValue(new Error("music-metadata failed"));
 
     const filePath = await createFixtureFile("bad.xyz", "not audio");
 
     await expect(extractSpecs(filePath)).rejects.toThrow(AudioPipelineError);
-    await expect(extractSpecs(filePath)).rejects.toMatchObject({
-      code: "PROBE_FAILED",
-    });
-
-    execFileMock.mockRestore();
-    parseFileMock.mockRestore();
+    try {
+      await extractSpecs(filePath);
+    } catch (e) {
+      expect(e).toBeInstanceOf(AudioPipelineError);
+      expect((e as AudioPipelineError).code).toBe("PROBE_FAILED");
+    }
   });
 });
 
@@ -235,17 +234,15 @@ describe("generatePreview", () => {
   };
 
   it("Test 5: calls FFmpeg with -ss <offset> -t 120 -c copy (no transcoding)", async () => {
-    const execFileMock = vi.spyOn(
-      await import("node:child_process"),
-      "execFile",
-    );
-
     let capturedArgs: string[] = [];
-    execFileMock.mockImplementation(
-      (_cmd: any, args: any, _opts: any, callback: any) => {
-        capturedArgs = args as string[];
-        const cb = typeof _opts === "function" ? _opts : callback;
-        if (cb) cb(null, "", "");
+    mockedExecFile.mockImplementation(
+      (...args: unknown[]) => {
+        // args[1] is the arguments array
+        capturedArgs = args[1] as string[];
+        const cb = args[args.length - 1];
+        if (typeof cb === "function") {
+          cb(null, "", "");
+        }
         return {} as any;
       },
     );
@@ -270,55 +267,40 @@ describe("generatePreview", () => {
     expect(Number(offsetStr)).toBeGreaterThan(0);
 
     randomSpy.mockRestore();
-    execFileMock.mockRestore();
   });
 
   it("Test 6: offset is between 10% and 80% of duration", async () => {
-    const execFileMock = vi.spyOn(
-      await import("node:child_process"),
-      "execFile",
-    );
-
     let capturedArgs: string[] = [];
-    execFileMock.mockImplementation(
-      (_cmd: any, args: any, _opts: any, callback: any) => {
-        capturedArgs = args as string[];
-        const cb = typeof _opts === "function" ? _opts : callback;
-        if (cb) cb(null, "", "");
+    mockedExecFile.mockImplementation(
+      (...args: unknown[]) => {
+        capturedArgs = args[1] as string[];
+        const cb = args[args.length - 1];
+        if (typeof cb === "function") {
+          cb(null, "", "");
+        }
         return {} as any;
       },
     );
 
     const inputFile = await createFixtureFile("input2.flac", "fake audio");
 
-    // Test with random = 0 => offset should be 10% of 300 = 30
+    // Test with random = 0 => offset = floor((0 * 0.7 + 0.1) * 300) = floor(30) = 30
     const randomSpy = vi.spyOn(Math, "random").mockReturnValue(0);
     const result = await generatePreview(inputFile, baseSpecs, tmpDir);
     const ssIndex = capturedArgs.indexOf("-ss");
     const offset = Number(capturedArgs[ssIndex + 1]);
 
-    // 10% of 300 = 30
+    // offset should be floor(0.1 * 300) = 30
+    expect(offset).toBe(30);
     expect(offset).toBeGreaterThanOrEqual(Math.floor(0.1 * baseSpecs.duration));
     expect(offset).toBeLessThanOrEqual(Math.floor(0.8 * baseSpecs.duration));
     expect(result.offsetSeconds).toBe(offset);
 
     randomSpy.mockRestore();
-    execFileMock.mockRestore();
   });
 
   it("Test 7: output filename is derived from input basename + _preview + original extension", async () => {
-    const execFileMock = vi.spyOn(
-      await import("node:child_process"),
-      "execFile",
-    );
-
-    execFileMock.mockImplementation(
-      (_cmd: any, _args: any, _opts: any, callback: any) => {
-        const cb = typeof _opts === "function" ? _opts : callback;
-        if (cb) cb(null, "", "");
-        return {} as any;
-      },
-    );
+    mockExecFileSuccess("", "");
 
     const randomSpy = vi.spyOn(Math, "random").mockReturnValue(0.5);
     const inputFile = await createFixtureFile("my-track.flac", "fake audio");
@@ -328,22 +310,10 @@ describe("generatePreview", () => {
     expect(path.dirname(result.previewPath)).toBe(tmpDir);
 
     randomSpy.mockRestore();
-    execFileMock.mockRestore();
   });
 
   it("Test 8: throws AudioPipelineError FFMPEG_FAILED when spawn exits non-zero", async () => {
-    const execFileMock = vi.spyOn(
-      await import("node:child_process"),
-      "execFile",
-    );
-
-    execFileMock.mockImplementation(
-      (_cmd: any, _args: any, _opts: any, callback: any) => {
-        const cb = typeof _opts === "function" ? _opts : callback;
-        if (cb) cb(new Error("ffmpeg exited with code 1"), "", "Error output");
-        return {} as any;
-      },
-    );
+    mockExecFileFailure(new Error("ffmpeg exited with code 1"));
 
     const randomSpy = vi.spyOn(Math, "random").mockReturnValue(0.5);
     const inputFile = await createFixtureFile("fail.flac", "fake audio");
@@ -351,12 +321,15 @@ describe("generatePreview", () => {
     await expect(
       generatePreview(inputFile, baseSpecs, tmpDir),
     ).rejects.toThrow(AudioPipelineError);
-    await expect(
-      generatePreview(inputFile, baseSpecs, tmpDir),
-    ).rejects.toMatchObject({ code: "FFMPEG_FAILED" });
+
+    try {
+      await generatePreview(inputFile, baseSpecs, tmpDir);
+    } catch (e) {
+      expect(e).toBeInstanceOf(AudioPipelineError);
+      expect((e as AudioPipelineError).code).toBe("FFMPEG_FAILED");
+    }
 
     randomSpy.mockRestore();
-    execFileMock.mockRestore();
   });
 
   it("Test 9: rejects when specs.duration < 120", async () => {
@@ -372,8 +345,12 @@ describe("generatePreview", () => {
     await expect(
       generatePreview(inputFile, shortSpecs, tmpDir),
     ).rejects.toThrow(AudioPipelineError);
-    await expect(
-      generatePreview(inputFile, shortSpecs, tmpDir),
-    ).rejects.toMatchObject({ code: "FILE_TOO_SHORT" });
+
+    try {
+      await generatePreview(inputFile, shortSpecs, tmpDir);
+    } catch (e) {
+      expect(e).toBeInstanceOf(AudioPipelineError);
+      expect((e as AudioPipelineError).code).toBe("FILE_TOO_SHORT");
+    }
   });
 });
