@@ -156,10 +156,10 @@
 
 - [x] **TRD-01**: Collection items have visibility states: tradeable, not-trading, private — other users see tradeable/not-trading items but not private
 - [x] **TRD-02**: User can optionally declare audio quality metadata (format, bitrate, sample rate) on any tradeable collection item
-- [ ] **TRD-03**: Side-by-side collection view shows proposer's and recipient's tradeable items for proposal creation
-- [ ] **TRD-04**: Multi-item trade proposals: free tier 1:1, premium tier up to 3:3 items per trade
-- [ ] **TRD-05**: Quality declaration (format, bitrate, condition notes) is mandatory at proposal time
-- [ ] **TRD-06**: Counterproposal system allows ping-pong negotiation up to 10 rounds with full history visible
+- [x] **TRD-03**: Side-by-side collection view shows proposer's and recipient's tradeable items for proposal creation
+- [x] **TRD-04**: Multi-item trade proposals: free tier 1:1, premium tier up to 3:3 items per trade
+- [x] **TRD-05**: Quality declaration (format, bitrate, condition notes) is mandatory at proposal time
+- [x] **TRD-06**: Counterproposal system allows ping-pong negotiation up to 10 rounds with full history visible
 - [ ] **TRD-07**: Both users upload full audio files; desktop extracts specs (format, bitrate, sample rate, duration) and computes SHA-256
 - [ ] **TRD-08**: Preview is a 2-minute random cut from the original file (no compression/transcoding), avoiding start and end of track
 - [ ] **TRD-09**: Minimum track duration is 2 minutes — files shorter than 2 minutes are rejected
