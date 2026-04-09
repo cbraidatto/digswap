@@ -76,7 +76,7 @@ export default async function PublicProfilePage({ params, searchParams }: Public
 	// Parallel data fetch — isFollowing only when authenticated
 	const [items, totalCount, genres, formats, followCounts, isFollowing, ranking, userBadgeData] =
 		await Promise.all([
-			getCollectionPage(targetProfile.id, filters),
+			getCollectionPage(targetProfile.id, filters, { excludePrivate: true }),
 			getCollectionCount(targetProfile.id, filters),
 			getUniqueGenres(targetProfile.id),
 			getUniqueFormats(targetProfile.id),

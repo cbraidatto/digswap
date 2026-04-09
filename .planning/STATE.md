@@ -2,15 +2,15 @@
 gsd_state_version: 1.0
 milestone: v1.1
 milestone_name: Deploy Readiness
-status: verifying
-stopped_at: Completed 25-02-PLAN.md
-last_updated: "2026-04-09T16:30:29.712Z"
+status: executing
+stopped_at: Completed 25-03-PLAN.md
+last_updated: "2026-04-09T16:29:59.064Z"
 last_activity: 2026-04-09
 progress:
-  total_phases: 26
-  completed_phases: 23
-  total_plans: 104
-  completed_plans: 101
+  total_phases: 25
+  completed_phases: 22
+  total_plans: 101
+  completed_plans: 97
   percent: 0
 ---
 
@@ -27,7 +27,7 @@ See: .planning/PROJECT.md (updated 2026-04-06)
 
 Phase: 24 (lint-cleanup) — EXECUTING
 Plan: 2 of 2
-Status: Phase complete — ready for verification
+Status: Ready to execute
 Last activity: 2026-04-09
 
 Progress: [░░░░░░░░░░] 0%
@@ -106,8 +106,7 @@ Progress: [░░░░░░░░░░] 0%
 | Phase 21 P01 | 1min | 1 tasks | 1 files |
 | Phase 22 P01 | 3min | 1 tasks | 5 files |
 | Phase 23-test-fix P01 | 2min | 1 tasks | 1 files |
-| Phase 25 P01 | 3min | 2 tasks | 3 files |
-| Phase 25 P02 | 7min | 2 tasks | 6 files |
+| Phase 25 P03 | 6min | 2 tasks | 11 files |
 
 ## Accumulated Context
 
@@ -239,11 +238,9 @@ Recent decisions affecting current work:
 - [Phase 20]: RANK_TITLES recalibrated to 501/2001/5001 — typical 200-record collection scores ~1030 gem points
 - [Phase 21]: Used standard 'as unknown as T' double-cast pattern for raw SQL results from db.execute()
 - [Phase 22]: Direct devDep vite ^8.0.5 in apps/web to force patched transitive resolution from @vitejs/plugin-react (pnpm overrides caused cross-workspace conflicts)
-- [Phase 25]: Visibility column replaces open_for_trade with three states: tradeable, not_trading, private
-- [Phase 25]: Dual SELECT RLS: owner sees all items, other users see non-private items (tradeable + not_trading)
-- [Phase 25]: Counterproposal chain via trade_proposals.sequence_number + trade_proposal_items junction with offer/want sides
-- [Phase 25]: toggleOpenForTrade delegates to setVisibility internally for zero-disruption backward compat
-- [Phase 25]: excludePrivate option on getCollectionPage for defense-in-depth (Drizzle db bypasses RLS)
+- [Phase 25]: VisibilitySelector uses click-to-cycle pattern for compact card layout
+- [Phase 25]: RecordContextMenu dual-API: onSetVisibility alongside deprecated onToggleTrade for backward compat
+- [Phase 25]: excludePrivate query option as defense-in-depth for Drizzle direct queries bypassing RLS
 
 ### Roadmap Evolution
 
@@ -271,6 +268,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-04-09T16:30:29.690Z
-Stopped at: Completed 25-02-PLAN.md
+Last session: 2026-04-09T16:29:59.049Z
+Stopped at: Completed 25-03-PLAN.md
 Resume file: None
