@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.1
 milestone_name: Deploy Readiness
 status: executing
-stopped_at: Completed 26-01-PLAN.md
-last_updated: "2026-04-09T17:26:10Z"
+stopped_at: Completed 26-03-PLAN.md
+last_updated: "2026-04-09T17:34:58.159Z"
 last_activity: 2026-04-09
 progress:
-  total_phases: 26
+  total_phases: 27
   completed_phases: 24
-  total_plans: 104
-  completed_plans: 103
+  total_plans: 108
+  completed_plans: 104
   percent: 0
 ---
 
@@ -26,8 +26,8 @@ See: .planning/PROJECT.md (updated 2026-04-06)
 ## Current Position
 
 Phase: 26 (trade-proposals-counterproposals) -- EXECUTING
-Plan: 1 of 4
-Status: Executing Phase 26
+Plan: 2 of 4
+Status: Ready to execute
 Last activity: 2026-04-09
 
 Progress: [░░░░░░░░░░] 0%
@@ -108,6 +108,7 @@ Progress: [░░░░░░░░░░] 0%
 | Phase 23-test-fix P01 | 2min | 1 tasks | 1 files |
 | Phase 25 P03 | 6min | 2 tasks | 11 files |
 | Phase 26 P01 | 5min | 2 tasks | 3 files |
+| Phase 26 P03 | 3min | 2 tasks | 3 files |
 
 ## Accumulated Context
 
@@ -245,6 +246,8 @@ Recent decisions affecting current work:
 - [Phase 26]: getUserSubscription + isPremium for tier check (entitlements.ts has no getSubscriptionSnapshot)
 - [Phase 26]: vi.hoisted() pattern for test mock state shared across vi.mock factories
 - [Phase 26]: Non-blocking notification: counterproposal_received failure does not fail the action
+- [Phase 26]: Legacy TradeActionButtons preserved alongside new ProposalActionBar for backward compat with pre-proposal trades
+- [Phase 26]: Counter button links to /trades/new/[counterpartyId]?tradeId=[id] for counterproposal flow entry
 
 ### Roadmap Evolution
 
@@ -272,6 +275,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-04-09T17:26:10Z
-Stopped at: Completed 26-01-PLAN.md
+Last session: 2026-04-09T17:34:58.152Z
+Stopped at: Completed 26-03-PLAN.md
 Resume file: None

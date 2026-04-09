@@ -489,7 +489,7 @@ Plans:
 Plans:
 - [x] 26-01-PLAN.md -- Proposal server actions + query layer + unit tests (createProposalAction, createCounterproposalAction, acceptProposalAction, declineProposalAction)
 - [ ] 26-02-PLAN.md -- Side-by-side proposal creator UI at /trades/new/[userId] with quality declaration
-- [ ] 26-03-PLAN.md -- Trade detail page: ProposalHistoryThread + ProposalActionBar (accept/decline/counter)
+- [x] 26-03-PLAN.md -- Trade detail page: ProposalHistoryThread + ProposalActionBar (accept/decline/counter)
 - [ ] 26-04-PLAN.md -- Counter mode wiring + trade inbox counter badge
 
 ### Phase 27: Desktop Audio Pipeline
@@ -562,7 +562,7 @@ Phases execute in numeric order: 1 → 20 (v1.0), then 21 → 24 (v1.1 Deploy Re
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|----------|
 | 25. Trade Schema + Collection Visibility | 2/3 | Complete    | 2026-04-09 |
-| 26. Trade Proposals + Counterproposals | 1/4 | In Progress|  |
+| 26. Trade Proposals + Counterproposals | 2/4 | In Progress|  |
 | 27. Desktop Audio Pipeline | 0/0 | Not Started |  |
 | 28. Trade Infrastructure + Coordinated Deploy | 0/0 | Not Started |  |
 
