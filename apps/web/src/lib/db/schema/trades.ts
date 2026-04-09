@@ -10,6 +10,7 @@ import {
 	varchar,
 } from "drizzle-orm/pg-core";
 import { authenticatedRole, authUid } from "drizzle-orm/supabase";
+import { collectionItems } from "./collections";
 import { releases } from "./releases";
 
 export const tradeRequests = pgTable(
@@ -232,5 +233,100 @@ export const tradeTransferReceipts = pgTable(
 			to: authenticatedRole,
 			using: sql`false`,
 		}),
+	],
+);
+
+/**
+ * Trade proposals — counterproposal chain for a trade request.
+ * Each proposal captures what one party is offering/wanting at a point in time.
+ * sequence_number increments with each counter-proposal.
+ *
+ * See: Phase 25 / TRD-01, TRD-04
+ */
+export const tradeProposals = pgTable(
+	"trade_proposals",
+	{
+		id: uuid("id").defaultRandom().primaryKey(),
+		tradeId: uuid("trade_id")
+			.references(() => tradeRequests.id, { onDelete: "cascade" })
+			.notNull(),
+		proposerId: uuid("proposer_id").notNull(),
+		sequenceNumber: integer("sequence_number").default(1).notNull(),
+		status: varchar("status", { length: 20 }).default("pending").notNull(), // pending/accepted/rejected/superseded
+		message: text("message"),
+		createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
+		updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow().notNull(),
+	},
+	(table) => [
+		pgPolicy("trade_proposals_select_participant", {
+			for: "select",
+			to: authenticatedRole,
+			using: sql`EXISTS (
+        SELECT 1 FROM trade_requests tr
+        WHERE tr.id = ${table.tradeId}
+          AND (tr.requester_id = ${authUid} OR tr.provider_id = ${authUid})
+      )`,
+		}),
+		pgPolicy("trade_proposals_insert_participant", {
+			for: "insert",
+			to: authenticatedRole,
+			withCheck: sql`${table.proposerId} = ${authUid}
+        AND EXISTS (
+          SELECT 1 FROM trade_requests tr
+          WHERE tr.id = ${table.tradeId}
+            AND (tr.requester_id = ${authUid} OR tr.provider_id = ${authUid})
+        )`,
+		}),
+		index("trade_proposals_trade_id_idx").on(table.tradeId),
+	],
+);
+
+/**
+ * Junction table linking proposals to specific items (offer or want side).
+ * Each row represents one item on one side of a proposal.
+ *
+ * See: Phase 25 / TRD-02
+ */
+export const tradeProposalItems = pgTable(
+	"trade_proposal_items",
+	{
+		id: uuid("id").defaultRandom().primaryKey(),
+		proposalId: uuid("proposal_id")
+			.references(() => tradeProposals.id, { onDelete: "cascade" })
+			.notNull(),
+		side: varchar("side", { length: 10 }).notNull(), // 'offer' or 'want'
+		collectionItemId: uuid("collection_item_id").references(
+			() => collectionItems.id,
+		),
+		releaseId: uuid("release_id").references(() => releases.id),
+		conditionNotes: text("condition_notes"),
+		declaredQuality: varchar("declared_quality", { length: 50 }),
+		createdAt: timestamp("created_at", { withTimezone: true })
+			.defaultNow()
+			.notNull(),
+	},
+	(table) => [
+		pgPolicy("trade_proposal_items_select_participant", {
+			for: "select",
+			to: authenticatedRole,
+			using: sql`EXISTS (
+        SELECT 1 FROM trade_proposals tp
+        JOIN trade_requests tr ON tr.id = tp.trade_id
+        WHERE tp.id = ${table.proposalId}
+          AND (tr.requester_id = ${authUid} OR tr.provider_id = ${authUid})
+      )`,
+		}),
+		pgPolicy("trade_proposal_items_insert_participant", {
+			for: "insert",
+			to: authenticatedRole,
+			withCheck: sql`EXISTS (
+        SELECT 1 FROM trade_proposals tp
+        JOIN trade_requests tr ON tr.id = tp.trade_id
+        WHERE tp.id = ${table.proposalId}
+          AND tp.proposer_id = ${authUid}
+          AND (tr.requester_id = ${authUid} OR tr.provider_id = ${authUid})
+      )`,
+		}),
+		index("trade_proposal_items_proposal_id_idx").on(table.proposalId),
 	],
 );
