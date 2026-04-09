@@ -34,6 +34,7 @@ export interface TradeThreadListItem {
 	counterpartyId: string;
 	counterpartyUsername: string;
 	createdAt: string;
+	hasPendingProposal: boolean;
 	lastMessage: {
 		body: string;
 		createdAt: string;
@@ -42,6 +43,7 @@ export interface TradeThreadListItem {
 		senderId: string;
 	} | null;
 	lastReadAt: string | null;
+	pendingProposalForMe: boolean;
 	status: string;
 	tradeId: string;
 	unreadCount: number;
@@ -213,7 +215,21 @@ export async function listTradeThreads(userId: string): Promise<TradeThreadListI
 		GROUP BY tr.id, tr.requester_id, tr.requester_last_read_at, tr.provider_last_read_at
 	`);
 
-	const [counterpartyRows, latestMessageRows, unreadCountRows] = await Promise.all([
+	// Batch pending proposal flags: check which trades have pending proposals + who proposed
+	const pendingProposalQuery = db.execute(sql`
+		SELECT DISTINCT ON (tp.trade_id)
+			tp.trade_id,
+			tp.proposer_id
+		FROM trade_proposals tp
+		WHERE tp.trade_id = ANY(${sql`ARRAY[${sql.join(
+			tradeIds.map((id) => sql`${id}::uuid`),
+			sql`, `,
+		)}]`})
+			AND tp.status = 'pending'
+		ORDER BY tp.trade_id, tp.sequence_number DESC
+	`);
+
+	const [counterpartyRows, latestMessageRows, unreadCountRows, pendingProposalRows] = await Promise.all([
 		db
 			.select({
 				avatarUrl: profiles.avatarUrl,
@@ -235,6 +251,7 @@ export async function listTradeThreads(userId: string): Promise<TradeThreadListI
 			.where(inArray(tradeMessages.tradeId, tradeIds))
 			.orderBy(tradeMessages.tradeId, desc(tradeMessages.createdAt)),
 		unreadCountQuery,
+		pendingProposalQuery,
 	]);
 
 	const counterpartyById = new Map(
@@ -268,16 +285,29 @@ export async function listTradeThreads(userId: string): Promise<TradeThreadListI
 		]),
 	);
 
+	// Build pending proposal map: trade_id -> proposer_id (of the pending proposal)
+	const pendingProposals = new Map<string, string>(
+		(pendingProposalRows as unknown as { trade_id: string; proposer_id: string }[]).map((row) => [
+			row.trade_id,
+			row.proposer_id,
+		]),
+	);
+
 	return contexts
 		.map((context) => {
 			const counterparty = counterpartyById.get(context.counterpartyId);
+			const pendingProposer = pendingProposals.get(context.tradeId);
+			const hasPendingProposal = !!pendingProposer;
+			const pendingProposalForMe = hasPendingProposal && pendingProposer !== userId;
 			return {
 				counterpartyAvatarUrl: counterparty?.avatarUrl ?? null,
 				counterpartyId: context.counterpartyId,
 				counterpartyUsername: counterparty?.username ?? "Unknown digger",
 				createdAt: context.createdAt,
+				hasPendingProposal,
 				lastMessage: latestMessageByTradeId.get(context.tradeId) ?? null,
 				lastReadAt: context.lastReadAt,
+				pendingProposalForMe,
 				status: context.status,
 				tradeId: context.tradeId,
 				unreadCount: unreadCounts.get(context.tradeId) ?? 0,
