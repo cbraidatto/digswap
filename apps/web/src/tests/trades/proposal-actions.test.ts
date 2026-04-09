@@ -87,8 +87,9 @@ const {
 
 		const mockFrom = vi.fn((table: unknown) => {
 			// Extract table name from Drizzle table object
-			const t = table as { _?: { name?: string }; [Symbol.for("drizzle:Name")]?: string };
-			currentTable = t?._?.name ?? (typeof table === "object" && table !== null ? (table as Record<string | symbol, unknown>)[Symbol.for("drizzle:Name")] as string : null) ?? "unknown";
+			const t = table as Record<string | symbol, unknown>;
+			const drizzleName = Symbol.for("drizzle:Name");
+			currentTable = (t?.[drizzleName] as string) ?? "unknown";
 			return { where: mockWhere, limit: mockLimit, orderBy: mockOrderBy };
 		});
 
