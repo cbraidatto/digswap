@@ -164,7 +164,7 @@
 - [ ] **TRD-08**: Preview is a 2-minute random cut from the original file (no compression/transcoding), avoiding start and end of track
 - [ ] **TRD-09**: Minimum track duration is 2 minutes — files shorter than 2 minutes are rejected
 - [x] **TRD-10**: Preview stored on Supabase Storage with 48h TTL, cleaned by pg_cron
-- [ ] **TRD-11**: Spectral visualizer (Spek-style) displays quality proof for preview clips
+- [x] **TRD-11**: Spectral visualizer (Spek-style) displays quality proof for preview clips
 - [ ] **TRD-12**: Server-side Edge Function validates uploaded preview specs against declared quality
 - [x] **TRD-13**: SHA-256 hash stored immutably on server; receiver verifies after P2P desktop transfer
 - [ ] **TRD-14**: Multi-item P2P transfer on desktop: trade only completes when ALL items have verified receipts

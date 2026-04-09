@@ -170,6 +170,11 @@ export function LobbyScreen({ tradeId, onClose, onTransferStarted }: Props) {
           </p>
         )}
 
+        {/* Audio prep info note */}
+        <p className="text-xs text-[#4a4035] italic text-center">
+          Audio files must be prepared before transfer. Click &quot;Start Transfer&quot; to begin the upload process.
+        </p>
+
         {/* Start Transfer CTA */}
         <button
           type="button"
