@@ -14,13 +14,13 @@ vi.mock("node:child_process", async (importOriginal) => {
   };
 });
 
+const mockParseFile = vi.fn();
 vi.mock("music-metadata", () => ({
-  parseFile: vi.fn(),
+  parseFile: mockParseFile,
 }));
 
 // Import mocked modules
 import { execFile } from "node:child_process";
-import { parseFile } from "music-metadata";
 
 // Module under test
 import {
@@ -35,7 +35,6 @@ import {
 // ---------- helpers ----------
 
 const mockedExecFile = vi.mocked(execFile);
-const mockedParseFile = vi.mocked(parseFile);
 
 let tmpDir: string;
 
@@ -158,7 +157,7 @@ describe("extractSpecs", () => {
     mockExecFileFailure(new Error("ffprobe failed"));
 
     // Mock music-metadata parseFile success
-    mockedParseFile.mockResolvedValue({
+    mockParseFile.mockResolvedValue({
       format: {
         container: "FLAC",
         codec: "FLAC",
@@ -209,7 +208,7 @@ describe("extractSpecs", () => {
     mockExecFileFailure(new Error("ffprobe failed"));
 
     // Make music-metadata also fail
-    mockedParseFile.mockRejectedValue(new Error("music-metadata failed"));
+    mockParseFile.mockRejectedValue(new Error("music-metadata failed"));
 
     const filePath = await createFixtureFile("bad.xyz", "not audio");
 

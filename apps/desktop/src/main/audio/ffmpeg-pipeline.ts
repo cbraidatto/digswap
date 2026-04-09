@@ -167,10 +167,21 @@ async function probeWithFfmpeg(filePath: string): Promise<AudioSpecs> {
 }
 
 async function probeWithMusicMetadata(filePath: string): Promise<AudioSpecs> {
-  const { parseFile } = await import("music-metadata");
-  const metadata = await parseFile(filePath);
+  // music-metadata exports parseFile from its Node entry point (lib/index.js)
+  // but the default export condition (lib/core.d.ts) omits it from types.
+  // At runtime under Node the correct entry resolves, so we cast here.
+  const mm = (await import("music-metadata")) as typeof import("music-metadata") & {
+    parseFile: (path: string) => Promise<{ format: Record<string, unknown> }>;
+  };
+  const metadata = await mm.parseFile(filePath);
 
-  const fmt = metadata.format;
+  const fmt = metadata.format as {
+    codec?: string;
+    container?: string;
+    sampleRate?: number;
+    bitrate?: number;
+    duration?: number;
+  };
 
   if (!fmt.duration) {
     throw new Error("music-metadata could not determine duration");
