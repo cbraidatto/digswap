@@ -488,8 +488,8 @@ Plans:
 **Plans**: 4 plans
 Plans:
 - [x] 26-01-PLAN.md -- Proposal server actions + query layer + unit tests (createProposalAction, createCounterproposalAction, acceptProposalAction, declineProposalAction)
-- [ ] 26-02-PLAN.md -- Side-by-side proposal creator UI at /trades/new/[userId] with quality declaration
-- [x] 26-03-PLAN.md -- Trade detail page: ProposalHistoryThread + ProposalActionBar (accept/decline/counter)
+- [x] 26-02-PLAN.md -- Side-by-side proposal creator UI at /trades/new/[userId] with quality declaration
+- [ ] 26-03-PLAN.md -- Trade detail page: ProposalHistoryThread + ProposalActionBar (accept/decline/counter)
 - [ ] 26-04-PLAN.md -- Counter mode wiring + trade inbox counter badge
 
 ### Phase 27: Desktop Audio Pipeline
