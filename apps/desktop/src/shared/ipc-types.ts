@@ -145,6 +145,23 @@ export interface TradeDetail {
   expiresAt: string | null;
 }
 
+/** Fired by multi-item transfer per chunk within a batch item. */
+export interface MultiItemProgressEvent {
+  tradeId: string;
+  itemIndex: number;       // 0-based
+  totalItems: number;
+  proposalItemId: string;
+  bytesTransferred: number;
+  totalBytes: number;
+}
+
+/** Fired when a multi-item batch transfer completes (all items processed). */
+export interface MultiItemCompleteEvent {
+  tradeId: string;
+  completedItems: Array<{ proposalItemId: string; filePath: string; sha256: string }>;
+  allVerified: boolean;    // true when all items have receipts
+}
+
 /** Fired by onTransferProgress listener as chunks arrive. */
 export interface TransferProgressEvent {
   bytesReceived: number;
@@ -166,20 +183,6 @@ export interface LobbyStateEvent {
   leaseHolder: "me" | "counterparty" | null;
 }
 
-/** Result of the selectAndPrepareAudio IPC call — duplicated from upload-pipeline for renderer-side type access. */
-export interface AudioPrepResult {
-  sourcePath: string;
-  sha256: string;
-  specs: {
-    format: string;
-    bitrate: number;
-    sampleRate: number;
-    duration: number;
-  };
-  previewStoragePath: string;
-  proposalItemId: string;
-}
-
 /** Extend DesktopBridge with trade runtime methods (Codex implements). */
 export interface DesktopBridgeTradeRuntime {
   getTradeDetail(tradeId: string): Promise<TradeDetail>;
@@ -190,7 +193,6 @@ export interface DesktopBridgeTradeRuntime {
   onTransferProgress(listener: (event: TransferProgressEvent) => void): () => void;
   onTransferComplete(listener: (event: TransferCompleteEvent) => void): () => void;
   onLobbyStateChanged(listener: (event: LobbyStateEvent) => void): () => void;
-  selectAndPrepareAudio(tradeId: string, proposalItemId: string): Promise<AudioPrepResult>;
 }
 
 declare global {
