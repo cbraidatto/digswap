@@ -44,7 +44,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 
 ### v1.2 Trade Redesign (Desktop-Only)
 
-- [ ] **Phase 25: Trade Schema + Collection Visibility** - Extend DB schema for multi-item proposals, add collection visibility system (tradeable/not-trading/private), quality metadata on collection items
+- [x] **Phase 25: Trade Schema + Collection Visibility** - Extend DB schema for multi-item proposals, add collection visibility system (tradeable/not-trading/private), quality metadata on collection items (completed 2026-04-09)
 - [ ] **Phase 26: Trade Proposals + Counterproposals** - Side-by-side collection browser, multi-item proposal creation, counterproposal negotiation with history, enhanced trade inbox
 - [ ] **Phase 27: Desktop Audio Pipeline** - File upload with spec extraction via FFmpeg, SHA-256 hashing, 2min preview generation (raw cut, no transcoding), Supabase Storage upload, spectral visualizer
 - [ ] **Phase 28: Trade Infrastructure + Coordinated Deploy** - Supabase Storage bucket + lifecycle, Edge Function preview validation, pg_cron cleanup, version gate, protocol version bump, E2E smoke test
@@ -556,7 +556,7 @@ Phases execute in numeric order: 1 → 20 (v1.0), then 21 → 24 (v1.1 Deploy Re
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|----------|
-| 25. Trade Schema + Collection Visibility | 2/3 | In Progress|  |
+| 25. Trade Schema + Collection Visibility | 2/3 | Complete    | 2026-04-09 |
 | 26. Trade Proposals + Counterproposals | 0/0 | Not Started |  |
 | 27. Desktop Audio Pipeline | 0/0 | Not Started |  |
 | 28. Trade Infrastructure + Coordinated Deploy | 0/0 | Not Started |  |
