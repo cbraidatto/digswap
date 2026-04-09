@@ -3,6 +3,7 @@ import type { SupabaseSession } from "../shared/ipc-types";
 import type { DesktopSupabaseAuth } from "./supabase-auth";
 import type { DesktopSessionStore } from "./session-store";
 import type { DesktopTradeRuntime } from "./trade-runtime";
+import { runAudioUploadPipeline } from "./audio/upload-pipeline";
 import { getTradeWindow } from "./window";
 
 interface RegisterDesktopIpcOptions {
@@ -153,6 +154,41 @@ export function registerDesktopIpc({
   ipcMain.handle("desktop:open-file-in-explorer", (_event, filePath: string) => {
     shell.showItemInFolder(filePath);
   });
+
+  ipcMain.handle(
+    "desktop:select-and-prepare-audio",
+    async (_event, tradeId: string, proposalItemId: string) => {
+      const result = await dialog.showOpenDialog({
+        properties: ["openFile"],
+        filters: [
+          {
+            name: "Audio",
+            extensions: ["flac", "wav", "mp3", "aiff", "ogg"],
+          },
+        ],
+        title: "Select an audio file for this trade",
+      });
+
+      if (result.canceled || result.filePaths.length === 0) {
+        throw new Error("File picker cancelled by user");
+      }
+
+      const session = await authRuntime.getSession();
+      if (!session) {
+        throw new Error("Not authenticated — cannot prepare audio file");
+      }
+
+      const client = authRuntime.getClientOrThrow();
+
+      return runAudioUploadPipeline(
+        client,
+        tradeId,
+        session.user.id,
+        proposalItemId,
+        result.filePaths[0],
+      );
+    },
+  );
 
   authRuntime.onSessionChanged((session: SupabaseSession | null) => {
     sendToTradeWindow("desktop:session-changed", session);

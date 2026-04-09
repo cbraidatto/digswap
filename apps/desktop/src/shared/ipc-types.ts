@@ -166,6 +166,20 @@ export interface LobbyStateEvent {
   leaseHolder: "me" | "counterparty" | null;
 }
 
+/** Result of the selectAndPrepareAudio IPC call — duplicated from upload-pipeline for renderer-side type access. */
+export interface AudioPrepResult {
+  sourcePath: string;
+  sha256: string;
+  specs: {
+    format: string;
+    bitrate: number;
+    sampleRate: number;
+    duration: number;
+  };
+  previewStoragePath: string;
+  proposalItemId: string;
+}
+
 /** Extend DesktopBridge with trade runtime methods (Codex implements). */
 export interface DesktopBridgeTradeRuntime {
   getTradeDetail(tradeId: string): Promise<TradeDetail>;
@@ -176,6 +190,7 @@ export interface DesktopBridgeTradeRuntime {
   onTransferProgress(listener: (event: TransferProgressEvent) => void): () => void;
   onTransferComplete(listener: (event: TransferCompleteEvent) => void): () => void;
   onLobbyStateChanged(listener: (event: LobbyStateEvent) => void): () => void;
+  selectAndPrepareAudio(tradeId: string, proposalItemId: string): Promise<AudioPrepResult>;
 }
 
 declare global {

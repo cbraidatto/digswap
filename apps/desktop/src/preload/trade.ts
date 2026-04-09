@@ -1,5 +1,6 @@
 import { contextBridge, ipcRenderer } from "electron";
 import type {
+  AudioPrepResult,
   AuthProvider,
   DesktopBootstrapState,
   DesktopBridge,
@@ -57,6 +58,8 @@ const desktopBridge: DesktopBridge & DesktopBridgeTradeRuntime = {
     subscribe("desktop:transfer-complete", listener),
   onLobbyStateChanged: (listener: (event: LobbyStateEvent) => void) =>
     subscribe("desktop:lobby-state-changed", listener),
+  selectAndPrepareAudio: (tradeId: string, proposalItemId: string) =>
+    ipcRenderer.invoke("desktop:select-and-prepare-audio", tradeId, proposalItemId) as Promise<AudioPrepResult>,
 };
 
 contextBridge.exposeInMainWorld("desktopBridge", desktopBridge);
