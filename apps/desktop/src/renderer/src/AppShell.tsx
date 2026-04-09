@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import type {
+  AudioPrepResult,
   DesktopProtocolPayload,
   SupabaseSession,
   TransferCompleteEvent,
@@ -8,6 +9,7 @@ import { LoginScreen } from "./LoginScreen";
 import { InboxScreen } from "./InboxScreen";
 import { SettingsScreen } from "./SettingsScreen";
 import { LobbyScreen } from "./LobbyScreen";
+import { AudioPrepScreen } from "./AudioPrepScreen";
 import { TransferScreen } from "./TransferScreen";
 import { CompletionScreen } from "./CompletionScreen";
 
@@ -20,8 +22,9 @@ export function AppShell() {
 
   // Trade overlay state
   const [activeTradeId, setActiveTradeId] = useState<string | null>(null);
-  const [tradePhase, setTradePhase] = useState<"lobby" | "transfer" | "completion">("lobby");
+  const [tradePhase, setTradePhase] = useState<"lobby" | "audio-prep" | "transfer" | "completion">("lobby");
   const [completionEvent, setCompletionEvent] = useState<TransferCompleteEvent | null>(null);
+  const [audioPrepResults, setAudioPrepResults] = useState<AudioPrepResult[]>([]);
 
   useEffect(() => {
     window.desktopBridge
@@ -55,7 +58,19 @@ export function AppShell() {
   }
 
   function handleTransferStarted() {
+    // Route through audio-prep phase before transfer
+    // TODO: Check if trade has items that lack previewStoragePath once TradeDetail
+    // is extended with multi-item data. For now, always show audio-prep for new flow.
+    setTradePhase("audio-prep");
+  }
+
+  function handleAudioPrepComplete(_results: AudioPrepResult[]) {
+    setAudioPrepResults(_results);
     setTradePhase("transfer");
+  }
+
+  function handleAudioPrepCancel() {
+    setTradePhase("lobby");
   }
 
   function handleTransferComplete(event: TransferCompleteEvent) {
@@ -70,6 +85,7 @@ export function AppShell() {
   function handleTradeDone() {
     setActiveTradeId(null);
     setCompletionEvent(null);
+    setAudioPrepResults([]);
   }
 
   if (loading) {
@@ -124,6 +140,15 @@ export function AppShell() {
               tradeId={activeTradeId}
               onClose={handleTradeClose}
               onTransferStarted={handleTransferStarted}
+            />
+          )}
+          {tradePhase === "audio-prep" && (
+            <AudioPrepScreen
+              tradeId={activeTradeId}
+              /* Stub proposalItems: full multi-item data threading comes with Phase 28 TradeDetail extension */
+              proposalItems={[{ id: activeTradeId, title: "Item 1", artist: "" }]}
+              onComplete={handleAudioPrepComplete}
+              onCancel={handleAudioPrepCancel}
             />
           )}
           {tradePhase === "transfer" && (
