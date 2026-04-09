@@ -22,7 +22,11 @@ export const collectionItems = pgTable(
 		conditionGrade: varchar("condition_grade", { length: 10 }), // Mint/VG+/VG/G+/G/F/P
 		notes: text("notes"),
 		addedVia: varchar("added_via", { length: 20 }), // "discogs" or "manual"
-		openForTrade: integer("open_for_trade").default(0).notNull(), // 0 = no, 1 = yes
+		openForTrade: integer("open_for_trade").default(0).notNull(), // @deprecated — use visibility column. Kept for backward compat during migration.
+		visibility: varchar("visibility", { length: 20 }).default("not_trading").notNull(), // 'tradeable', 'not_trading', 'private'
+		audioFormat: varchar("audio_format", { length: 50 }),
+		bitrate: integer("bitrate"),
+		sampleRate: integer("sample_rate"),
 		personalRating: integer("personal_rating"), // 1-5 star rating, null = unrated
 		createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
 		updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow().notNull(),
@@ -32,6 +36,11 @@ export const collectionItems = pgTable(
 			for: "select",
 			to: authenticatedRole,
 			using: sql`${table.userId} = ${authUid}`,
+		}),
+		pgPolicy("collection_items_select_public", {
+			for: "select",
+			to: authenticatedRole,
+			using: sql`${table.visibility} IN ('tradeable', 'not_trading')`,
 		}),
 		pgPolicy("collection_items_insert_own", {
 			for: "insert",
@@ -51,5 +60,6 @@ export const collectionItems = pgTable(
 		}),
 		index("collection_items_user_id_idx").on(table.userId),
 		index("collection_items_release_id_idx").on(table.releaseId),
+		index("collection_items_visibility_idx").on(table.visibility).where(sql`visibility = 'tradeable'`),
 	],
 );
