@@ -467,7 +467,11 @@ Plans:
   4. Quality metadata columns (audio_format, bitrate, sample_rate) exist on collection_items
   5. Existing `open_for_trade` values correctly migrated to visibility enum
   6. Visibility toggle UI works on /perfil collection management
-**Plans**: TBD
+**Plans**: 3 plans
+Plans:
+- [ ] 25-01-PLAN.md -- Schema migration: visibility column, quality metadata, trade proposal tables, RLS, data migration
+- [ ] 25-02-PLAN.md -- Server actions and queries: setVisibility, updateQualityMetadata, updated CollectionItem type
+- [ ] 25-03-PLAN.md -- Visibility UI: VisibilitySelector component, collection card badges, trading tab update
 
 ### Phase 26: Trade Proposals + Counterproposals
 **Goal**: Users can create multi-item trade proposals via side-by-side collection browser and negotiate via counterproposals
