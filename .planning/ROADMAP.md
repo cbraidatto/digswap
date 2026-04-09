@@ -506,8 +506,8 @@ Plans:
   7. Files shorter than 2 minutes rejected at selection time
 **Plans**: 4 plans
 Plans:
-- [ ] 27-01-PLAN.md -- FFmpeg pipeline: spec extraction, SHA-256, 2min raw preview generation (TDD)
-- [ ] 27-02-PLAN.md -- Supabase Storage upload + IPC selectAndPrepareAudio handler
+- [x] 27-01-PLAN.md -- FFmpeg pipeline: spec extraction, SHA-256, 2min raw preview generation (TDD)
+- [x] 27-02-PLAN.md -- Supabase Storage upload + IPC selectAndPrepareAudio handler
 - [ ] 27-03-PLAN.md -- Multi-item batch transfer: sequential per-item, resume from failure (TDD)
 - [ ] 27-04-PLAN.md -- Renderer: SpectralVisualizer + AudioPrepScreen + AppShell integration
 
@@ -568,7 +568,7 @@ Phases execute in numeric order: 1 → 20 (v1.0), then 21 → 24 (v1.1 Deploy Re
 |-------|----------------|--------|----------|
 | 25. Trade Schema + Collection Visibility | 2/3 | Complete    | 2026-04-09 |
 | 26. Trade Proposals + Counterproposals | 2/4 | Complete    | 2026-04-09 |
-| 27. Desktop Audio Pipeline | 0/0 | Not Started |  |
+| 27. Desktop Audio Pipeline | 2/4 | In Progress|  |
 | 28. Trade Infrastructure + Coordinated Deploy | 0/0 | Not Started |  |
 
 ### Phase 19: Security Hardening — Fix 74 audit vulnerabilities

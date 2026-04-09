@@ -2,15 +2,15 @@
 gsd_state_version: 1.0
 milestone: v1.1
 milestone_name: Deploy Readiness
-status: executing
-stopped_at: Completed 27-01-PLAN.md
-last_updated: "2026-04-09T18:03:33.882Z"
+status: verifying
+stopped_at: Completed 27-02-PLAN.md
+last_updated: "2026-04-09T18:11:35.474Z"
 last_activity: 2026-04-09
 progress:
-  total_phases: 25
-  completed_phases: 22
-  total_plans: 101
-  completed_plans: 97
+  total_phases: 28
+  completed_phases: 25
+  total_plans: 112
+  completed_plans: 108
   percent: 0
 ---
 
@@ -27,7 +27,7 @@ See: .planning/PROJECT.md (updated 2026-04-06)
 
 Phase: 24 (lint-cleanup) — EXECUTING
 Plan: 2 of 2
-Status: Ready to execute
+Status: Phase complete — ready for verification
 Last activity: 2026-04-09
 
 Progress: [░░░░░░░░░░] 0%
@@ -107,6 +107,7 @@ Progress: [░░░░░░░░░░] 0%
 | Phase 22 P01 | 3min | 1 tasks | 5 files |
 | Phase 23-test-fix P01 | 2min | 1 tasks | 1 files |
 | Phase 27-desktop-audio-pipeline P01 | 8min | 3 tasks | 5 files |
+| Phase 27 P02 | 4min | 2 tasks | 6 files |
 
 ## Accumulated Context
 
@@ -241,6 +242,9 @@ Recent decisions affecting current work:
 - [Phase 27-desktop-audio-pipeline]: vi.mock factory pattern for node:child_process in Electron main process tests (ESM immutable exports)
 - [Phase 27-desktop-audio-pipeline]: music-metadata parseFile via dynamic import with type cast (Node-only export)
 - [Phase 27-desktop-audio-pipeline]: onlyBuiltDependencies in root package.json for ffmpeg-static binary download
+- [Phase 27]: Supabase Storage upsert:false for first-write-wins semantics on preview uploads
+- [Phase 27]: SHA-256 immutability via .is('file_hash', null) guard -- second calls become no-ops
+- [Phase 27]: AudioPrepResult duplicated in ipc-types.ts for clean renderer/main boundary separation
 
 ### Roadmap Evolution
 
@@ -268,6 +272,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-04-09T18:03:33.875Z
-Stopped at: Completed 27-01-PLAN.md
+Last session: 2026-04-09T18:11:35.467Z
+Stopped at: Completed 27-02-PLAN.md
 Resume file: None
