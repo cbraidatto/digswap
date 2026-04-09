@@ -31,6 +31,18 @@
 			"semicolons": "always"
 		}
 	},
+	"overrides": [
+		{
+			"includes": ["**/tests/**"],
+			"linter": {
+				"rules": {
+					"suspicious": {
+						"noThenProperty": "off"
+					}
+				}
+			}
+		}
+	],
 	"files": {
 		"includes": [
 			"apps/**/*.ts",

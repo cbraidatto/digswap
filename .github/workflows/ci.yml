@@ -26,6 +26,9 @@ env:
   DISCOGS_CONSUMER_KEY: ci-discogs-key
   DISCOGS_CONSUMER_SECRET: ci-discogs-secret
   IMPORT_WORKER_SECRET: ci-import-worker-secret
+  HANDOFF_HMAC_SECRET: ci-handoff-hmac-secret-minimum-32-chars
+  STRIPE_SECRET_KEY: ci-stripe-secret-key
+  STRIPE_WEBHOOK_SECRET: ci-stripe-webhook-secret
 
 jobs:
   lint:
