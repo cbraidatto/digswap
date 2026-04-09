@@ -5,7 +5,8 @@
   "pnpm": {
     "overrides": {
       "@esbuild-kit/core-utils>esbuild": ">=0.25.0"
-    }
+    },
+    "onlyBuiltDependencies": ["ffmpeg-static", "esbuild"]
   },
   "scripts": {
     "dev": "pnpm --filter @digswap/web dev",
