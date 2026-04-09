@@ -297,7 +297,7 @@
 
 ### Quality
 
-- [ ] **QUAL-01**: Lint passa sem erros de formatação CRLF (line endings normalizados para LF)
+- [x] **QUAL-01**: Lint passa sem erros de formatação CRLF (line endings normalizados para LF)
 
 ### Future Requirements
 
@@ -319,7 +319,7 @@ None — this is a focused fix milestone.
 | BUILD-02 | Phase 21: TypeScript Fix | Complete |
 | SEC-08 | Phase 22: Dependency Security | Complete |
 | TEST-01 | Phase 23: Test Fix | Complete |
-| QUAL-01 | Phase 24: Lint Cleanup | Pending |
+| QUAL-01 | Phase 24: Lint Cleanup | Complete |
 
 **Coverage:**
 - v1.1 requirements: 5 total

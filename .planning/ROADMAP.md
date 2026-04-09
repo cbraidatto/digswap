@@ -447,7 +447,7 @@ Plans:
 **Plans**: 2 plans
 Plans:
 - [ ] 24-01-PLAN.md -- Normalize line endings to LF and auto-fix formatting/import/lint issues
-- [ ] 24-02-PLAN.md -- Fix manual a11y lint errors and add biome-ignore for safe patterns
+- [x] 24-02-PLAN.md -- Fix manual a11y lint errors and add biome-ignore for safe patterns
 
 ## Progress
 
@@ -485,7 +485,7 @@ Phases execute in numeric order: 1 → 20 (v1.0), then 21 → 24 (v1.1 Deploy Re
 | 21. TypeScript Fix | 1/1 | Complete    | 2026-04-07 |
 | 22. Dependency Security | 1/1 | Complete    | 2026-04-07 |
 | 23. Test Fix | 1/1 | Complete    | 2026-04-07 |
-| 24. Lint Cleanup | 0/1 | Not started | - |
+| 24. Lint Cleanup | 1/2 | In Progress|  |
 
 ### Phase 19: Security Hardening — Fix 74 audit vulnerabilities
 
