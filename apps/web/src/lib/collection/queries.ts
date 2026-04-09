@@ -1,4 +1,4 @@
-import { and, asc, desc, eq, gte, ilike, lt, or, sql } from "drizzle-orm";
+import { and, asc, desc, eq, gte, ilike, lt, ne, or, sql } from "drizzle-orm";
 import { unstable_cache } from "next/cache";
 import { db } from "@/lib/db";
 import { collectionItems } from "@/lib/db/schema/collections";
@@ -29,6 +29,10 @@ export interface CollectionItem {
 	openForTrade: number;
 	personalRating: number | null;
 	tracklist: { position: string; title: string; duration: string }[] | null;
+	visibility: string;
+	audioFormat: string | null;
+	bitrate: number | null;
+	sampleRate: number | null;
 }
 
 /**
@@ -80,17 +84,30 @@ function buildOrderBy(sort: string) {
 }
 
 /**
+ * Options for collection page queries.
+ */
+export interface CollectionPageOptions {
+	/** When true, excludes items with visibility='private' (for public profile views) */
+	excludePrivate?: boolean;
+}
+
+/**
  * Fetches one page of a user's collection with release data joined.
  */
 export async function getCollectionPage(
 	userId: string,
 	filters: CollectionFilters,
+	options?: CollectionPageOptions,
 ): Promise<CollectionItem[]> {
 	const conditions = buildWhereConditions(userId, filters);
 	const orderBy = buildOrderBy(filters.sort);
 
-	// Base select fields (always available)
-	const baseFields = {
+	// Defense-in-depth: exclude private items for public profile views
+	if (options?.excludePrivate) {
+		conditions.push(ne(collectionItems.visibility, "private"));
+	}
+
+	const selectFields = {
 		id: collectionItems.id,
 		conditionGrade: collectionItems.conditionGrade,
 		addedVia: collectionItems.addedVia,
@@ -107,13 +124,16 @@ export async function getCollectionPage(
 		youtubeVideoId: releases.youtubeVideoId,
 		notes: collectionItems.notes,
 		tracklist: releases.tracklist,
+		openForTrade: collectionItems.openForTrade,
+		personalRating: collectionItems.personalRating,
+		visibility: collectionItems.visibility,
+		audioFormat: collectionItems.audioFormat,
+		bitrate: collectionItems.bitrate,
+		sampleRate: collectionItems.sampleRate,
 	};
 
-	// Use base query without open_for_trade/personal_rating columns
-	// (those columns require migration 20260415 which may not be applied yet)
-	// When migration is applied, uncomment the extended select below.
 	const baseRows = await db
-		.select(baseFields)
+		.select(selectFields)
 		.from(collectionItems)
 		.innerJoin(releases, eq(collectionItems.releaseId, releases.id))
 		.where(and(...conditions))
@@ -124,8 +144,12 @@ export async function getCollectionPage(
 	const rows: CollectionItem[] = baseRows.map((r) => ({
 		...r,
 		notes: r.notes ?? null,
-		openForTrade: 0,
-		personalRating: null,
+		openForTrade: r.openForTrade ?? 0,
+		personalRating: r.personalRating ?? null,
+		visibility: r.visibility ?? "not_trading",
+		audioFormat: r.audioFormat ?? null,
+		bitrate: r.bitrate ?? null,
+		sampleRate: r.sampleRate ?? null,
 		tracklist: Array.isArray(r.tracklist)
 			? (r.tracklist as { position: string; title: string; duration: string }[])
 			: null,

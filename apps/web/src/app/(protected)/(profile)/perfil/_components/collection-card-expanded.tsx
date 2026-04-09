@@ -8,12 +8,12 @@ import { toast } from "sonner";
 import {
 	removeRecordFromCollection,
 	setPersonalRating,
-	toggleOpenForTrade,
 } from "@/actions/collection";
 import { PlayButton } from "@/components/player/play-button";
 import { FormatBadge } from "@/components/ui/format-badge";
 import { GemBadge } from "@/components/ui/gem-badge";
 import { RecordContextMenu } from "@/components/ui/record-context-menu";
+import { VisibilitySelector } from "@/components/ui/visibility-selector";
 import { WaveformDecoration } from "@/components/ui/waveform-decoration";
 import type { CardVariant } from "@/lib/collection/format-utils";
 import type { CollectionItem } from "@/lib/collection/queries";
@@ -122,10 +122,16 @@ export function CollectionCardExpanded({ item, isOwner, variant }: CollectionCar
 						)}
 					</div>
 
-					{/* Trading badge */}
-					{item.openForTrade === 1 && (
+					{/* Visibility badge */}
+					{item.visibility === "tradeable" && (
 						<span className="inline-flex self-start font-mono text-[8px] font-bold bg-primary text-background px-2 py-0.5 rounded-full mt-1">
 							TRADING
+						</span>
+					)}
+					{item.visibility === "private" && (
+						<span className="inline-flex self-start items-center gap-0.5 font-mono text-[8px] font-bold bg-surface-dim/70 text-on-surface-variant/60 px-2 py-0.5 rounded-full mt-1">
+							<span className="material-symbols-outlined text-[10px]">lock</span>
+							PRIVATE
 						</span>
 					)}
 
@@ -172,26 +178,13 @@ export function CollectionCardExpanded({ item, isOwner, variant }: CollectionCar
 						))}
 					</div>
 
-					{/* Trade toggle + remove */}
+					{/* Visibility selector + remove */}
 					<div className="flex items-center gap-0.5">
-						<button
-							type="button"
-							onClick={async () => {
-								const r = await toggleOpenForTrade(item.id, !item.openForTrade);
-								if (r.success) {
-									toast.success(item.openForTrade ? "Removed" : "Open for trade!");
-									router.refresh();
-								}
-							}}
-							className={`p-1 rounded-full transition-colors ${
-								item.openForTrade
-									? "text-primary bg-primary/10"
-									: "text-on-surface-variant/25 hover:text-primary"
-							}`}
-							title={item.openForTrade ? "Remove from trades" : "Open for trade"}
-						>
-							<span className="material-symbols-outlined text-[14px]">swap_horiz</span>
-						</button>
+						<VisibilitySelector
+							itemId={item.id}
+							currentVisibility={item.visibility}
+							compact
+						/>
 						<button
 							type="button"
 							onClick={handleRemove}
@@ -208,7 +201,7 @@ export function CollectionCardExpanded({ item, isOwner, variant }: CollectionCar
 			)}
 
 			{/* Visitor trade badge */}
-			{!isOwner && item.openForTrade === 1 && (
+			{!isOwner && item.visibility === "tradeable" && (
 				<div className="px-3 pb-2.5">
 					<span className="font-mono text-[8px] text-primary bg-primary/8 border border-primary/15 px-1.5 py-0.5 rounded-full">
 						Open for trade

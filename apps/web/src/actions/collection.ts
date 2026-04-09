@@ -398,6 +398,56 @@ export async function toggleOpenForTrade(
 	}
 }
 
+const visibilitySchema = z.enum(["tradeable", "not_trading", "private"]);
+
+/**
+ * Set the visibility state on a collection item.
+ * Replaces the binary open_for_trade toggle with 3-state visibility.
+ */
+export async function setVisibility(
+	collectionItemId: string,
+	visibility: string,
+): Promise<{ success?: boolean; error?: string }> {
+	try {
+		const supabase = await createClient();
+		const {
+			data: { user },
+		} = await supabase.auth.getUser();
+		if (!user) return { error: "Not authenticated" };
+
+		const { success: rlSuccess } = await safeLimit(apiRateLimit, user.id, true);
+		if (!rlSuccess) return { error: "Too many requests." };
+
+		const parsedId = uuidSchema.safeParse(collectionItemId);
+		if (!parsedId.success) return { error: "Invalid ID." };
+
+		const parsedVisibility = visibilitySchema.safeParse(visibility);
+		if (!parsedVisibility.success) return { error: "Invalid visibility value." };
+
+		// Map visibility to openForTrade for backward compat
+		const openForTrade = parsedVisibility.data === "tradeable" ? 1 : 0;
+
+		const admin = createAdminClient();
+		const { data, error } = await admin
+			.from("collection_items")
+			.update({
+				visibility: parsedVisibility.data,
+				open_for_trade: openForTrade,
+				updated_at: new Date().toISOString(),
+			})
+			.eq("id", parsedId.data)
+			.eq("user_id", user.id)
+			.select("id")
+			.maybeSingle();
+
+		if (error || !data) return { error: "Could not update visibility." };
+		return { success: true };
+	} catch (err) {
+		console.error("[setVisibility] error:", err);
+		return { error: "Failed to update visibility. Please try again." };
+	}
+}
+
 /**
  * Update notes on a collection item.
  */

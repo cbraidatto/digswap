@@ -15,10 +15,14 @@ interface RecordContextMenuProps {
 	hideAdd?: boolean;
 	/** Hide "Add to Wantlist" */
 	hideWantlist?: boolean;
-	/** Show "Toggle trade" action */
+	/** @deprecated Use onSetVisibility instead. Show "Toggle trade" action */
 	onToggleTrade?: () => void;
-	/** Current trade status (for label) */
+	/** @deprecated Use currentVisibility instead. Current trade status (for label) */
 	isOpenForTrade?: boolean;
+	/** Set visibility callback (3-state: tradeable/not_trading/private) */
+	onSetVisibility?: (visibility: string) => void;
+	/** Current visibility state */
+	currentVisibility?: string;
 	/** Show "Remove from collection" action */
 	onRemove?: () => void;
 }
@@ -32,6 +36,8 @@ export function RecordContextMenu({
 	hideWantlist = false,
 	onToggleTrade,
 	isOpenForTrade,
+	onSetVisibility,
+	currentVisibility,
 	onRemove,
 }: RecordContextMenuProps) {
 	const [open, setOpen] = useState(false);
@@ -100,6 +106,12 @@ export function RecordContextMenu({
 		setOpen(false);
 	}
 
+	const visibilityItems: { value: string; icon: string; label: string }[] = [
+		{ value: "tradeable", icon: "swap_horiz", label: "Mark as Trading" },
+		{ value: "not_trading", icon: "remove_circle_outline", label: "Not Trading" },
+		{ value: "private", icon: "lock", label: "Make Private" },
+	];
+
 	return (
 		<div ref={menuRef} className="relative">
 			<button
@@ -158,7 +170,46 @@ export function RecordContextMenu({
 						</button>
 					)}
 
-					{onToggleTrade && (
+					{/* New 3-state visibility options */}
+					{onSetVisibility && (
+						<>
+							<div className="border-t border-outline-variant/10 my-1" />
+							{visibilityItems.map((vi) => (
+								<button
+									key={vi.value}
+									type="button"
+									onClick={() => {
+										onSetVisibility(vi.value);
+										setOpen(false);
+									}}
+									className={`flex items-center gap-2.5 px-3 py-2 font-mono text-xs hover:bg-surface-container-high transition-colors w-full ${
+										currentVisibility === vi.value
+											? "text-primary font-semibold"
+											: "text-on-surface"
+									}`}
+								>
+									<span
+										className={`material-symbols-outlined text-[16px] ${
+											currentVisibility === vi.value
+												? "text-primary"
+												: "text-on-surface-variant"
+										}`}
+									>
+										{vi.icon}
+									</span>
+									{vi.label}
+									{currentVisibility === vi.value && (
+										<span className="material-symbols-outlined text-[14px] text-primary ml-auto">
+											check
+										</span>
+									)}
+								</button>
+							))}
+						</>
+					)}
+
+					{/* Legacy toggle (backward compat for consumers that haven't migrated) */}
+					{!onSetVisibility && onToggleTrade && (
 						<button
 							type="button"
 							onClick={() => {

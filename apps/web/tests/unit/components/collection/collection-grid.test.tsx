@@ -37,6 +37,10 @@ function makeItem(overrides: Partial<CollectionItem> = {}): CollectionItem {
 		openForTrade: 0,
 		personalRating: null,
 		tracklist: null,
+		visibility: "not_trading",
+		audioFormat: null,
+		bitrate: null,
+		sampleRate: null,
 		...overrides,
 	};
 }
