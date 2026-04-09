@@ -42,6 +42,13 @@ Decimal phases appear between their surrounding integers in numeric order.
  (completed 2026-04-07)
 - [ ] **Phase 24: Lint Cleanup** - Normalize CRLF line endings to LF so lint passes cleanly
 
+### v1.2 Trade Redesign (Desktop-Only)
+
+- [ ] **Phase 25: Trade Schema + Collection Visibility** - Extend DB schema for multi-item proposals, add collection visibility system (tradeable/not-trading/private), quality metadata on collection items
+- [ ] **Phase 26: Trade Proposals + Counterproposals** - Side-by-side collection browser, multi-item proposal creation, counterproposal negotiation with history, enhanced trade inbox
+- [ ] **Phase 27: Desktop Audio Pipeline** - File upload with spec extraction via FFmpeg, SHA-256 hashing, 2min preview generation (raw cut, no transcoding), Supabase Storage upload, spectral visualizer
+- [ ] **Phase 28: Trade Infrastructure + Coordinated Deploy** - Supabase Storage bucket + lifecycle, Edge Function preview validation, pg_cron cleanup, version gate, protocol version bump, E2E smoke test
+
 ## Phase Details
 
 ### Phase 1: Foundation + Authentication
@@ -449,10 +456,64 @@ Plans:
 - [x] 24-01-PLAN.md -- Normalize line endings to LF and auto-fix formatting/import/lint issues
 - [x] 24-02-PLAN.md -- Fix manual a11y lint errors and add biome-ignore for safe patterns
 
+### Phase 25: Trade Schema + Collection Visibility
+**Goal**: Extend the database to support multi-item trade proposals and give users control over which collection items are visible/tradeable
+**Depends on**: Phase 24
+**Requirements**: TRD-01, TRD-02, TRD-04
+**Success Criteria** (what must be TRUE):
+  1. `collection_items` has `visibility` column (tradeable/not-trading/private) replacing `open_for_trade`
+  2. Other users can see tradeable and not-trading items but NOT private items (RLS enforced)
+  3. `trade_proposals` and `trade_proposal_items` tables exist with proper foreign keys
+  4. Quality metadata columns (audio_format, bitrate, sample_rate) exist on collection_items
+  5. Existing `open_for_trade` values correctly migrated to visibility enum
+  6. Visibility toggle UI works on /perfil collection management
+**Plans**: TBD
+
+### Phase 26: Trade Proposals + Counterproposals
+**Goal**: Users can create multi-item trade proposals via side-by-side collection browser and negotiate via counterproposals
+**Depends on**: Phase 25
+**Requirements**: TRD-03, TRD-05, TRD-06
+**Success Criteria** (what must be TRUE):
+  1. Side-by-side view shows both users' tradeable collections
+  2. Multi-item proposals create correct trade_proposal_items rows (1:1 free, 3:3 premium)
+  3. Quality declaration is mandatory at proposal time
+  4. Counterproposal creates linked proposal with incrementing sequence_number
+  5. Max 10 counterproposal rounds enforced
+  6. Trade inbox shows counterproposal notifications
+  7. Existing 1:1 trade flow still works (backward compatible)
+**Plans**: TBD
+
+### Phase 27: Desktop Audio Pipeline
+**Goal**: Desktop app handles file upload, spec extraction, preview generation, and multi-item P2P transfer
+**Depends on**: Phase 26
+**Requirements**: TRD-07, TRD-08, TRD-09, TRD-10, TRD-11, TRD-13, TRD-14
+**Success Criteria** (what must be TRUE):
+  1. FFmpeg bundled in Electron extracts specs and generates 2min raw preview (no transcoding)
+  2. SHA-256 computed via Node.js crypto, stored immutably in DB
+  3. Preview uploaded to Supabase Storage bucket `trade-previews`
+  4. Spectral visualizer renders Spek-style display for preview clips
+  5. Multi-item P2P transfer completes for 1:1, 2:2, and 3:3 trades
+  6. Trade only completes when ALL items have verified receipts
+  7. Files shorter than 2 minutes rejected at selection time
+**Plans**: TBD
+
+### Phase 28: Trade Infrastructure + Coordinated Deploy
+**Goal**: Infrastructure for preview lifecycle, server-side validation, version gating, and coordinated web+desktop deploy
+**Depends on**: Phase 27
+**Requirements**: TRD-10, TRD-12, TRD-15
+**Success Criteria** (what must be TRUE):
+  1. Supabase Storage bucket `trade-previews` with 48h object lifecycle policy
+  2. Edge Function validates preview specs (duration, format) against declared quality
+  3. pg_cron cleanup job runs hourly for expired previews
+  4. Web blocks handoff to desktop versions below MIN_DESKTOP_VERSION
+  5. TRADE_PROTOCOL_VERSION bumped to 2
+  6. Full E2E: multi-item proposal (web) → accept → handoff → preview (desktop) → transfer → review
+**Plans**: TBD
+
 ## Progress
 
 **Execution Order:**
-Phases execute in numeric order: 1 → 20 (v1.0), then 21 → 24 (v1.1 Deploy Readiness)
+Phases execute in numeric order: 1 → 20 (v1.0), then 21 → 24 (v1.1 Deploy Readiness), then 25 → 28 (v1.2 Trade Redesign)
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
@@ -485,7 +546,16 @@ Phases execute in numeric order: 1 → 20 (v1.0), then 21 → 24 (v1.1 Deploy Re
 | 21. TypeScript Fix | 1/1 | Complete    | 2026-04-07 |
 | 22. Dependency Security | 1/1 | Complete    | 2026-04-07 |
 | 23. Test Fix | 1/1 | Complete    | 2026-04-07 |
-| 24. Lint Cleanup | 1/2 | In Progress|  |
+| 24. Lint Cleanup | 2/2 | Complete | 2026-04-09 |
+
+**v1.2 Trade Redesign:**
+
+| Phase | Plans Complete | Status | Completed |
+|-------|----------------|--------|----------|
+| 25. Trade Schema + Collection Visibility | 0/0 | Not Started |  |
+| 26. Trade Proposals + Counterproposals | 0/0 | Not Started |  |
+| 27. Desktop Audio Pipeline | 0/0 | Not Started |  |
+| 28. Trade Infrastructure + Coordinated Deploy | 0/0 | Not Started |  |
 
 ### Phase 19: Security Hardening — Fix 74 audit vulnerabilities
 
