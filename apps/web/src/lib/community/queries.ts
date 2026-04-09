@@ -95,7 +95,8 @@ export async function getGenreGroups(genreFilter?: string): Promise<GenreGroup[]
 		})
 		.from(groups)
 		.where(and(...conditions))
-		.orderBy(desc(groups.memberCount));
+		.orderBy(desc(groups.memberCount))
+		.limit(200);
 
 	return rows;
 }

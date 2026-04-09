@@ -15,10 +15,8 @@ export function generateCspHeader(nonce: string, isDev: boolean): string {
 	const directives = [
 		"default-src 'self'",
 		`script-src 'self' 'nonce-${nonce}' 'strict-dynamic'${isDev ? " 'unsafe-eval'" : ""}`,
-		// 'unsafe-inline' required: Sonner injects inline style= attributes
-		// which cannot use nonces (nonces only work on <style> tags, not style attributes)
-		`style-src 'self' 'unsafe-inline' https://fonts.googleapis.com`,
-		"img-src 'self' data: https:",
+		`style-src 'self' 'nonce-${nonce}' https://fonts.googleapis.com`,
+		"img-src 'self' data: https://i.discogs.com https://st.discogs.com https://*.supabase.co https://i.ytimg.com",
 		"font-src 'self' https://fonts.gstatic.com https://fonts.googleapis.com",
 		`connect-src 'self' https://${supabaseHost} wss://${supabaseHost}`,
 		"media-src 'self'",

@@ -3,6 +3,29 @@ import { broadcastProgress } from "./broadcast";
 import { computeRarityScore, createDiscogsClient } from "./client";
 import type { ImportJobStatus, ImportJobType } from "./types";
 
+/**
+ * Retry helper with exponential backoff for Discogs API rate limits (HTTP 429).
+ * Only retries on 429 errors; all other errors are thrown immediately.
+ */
+async function withRetry<T>(fn: () => Promise<T>, maxRetries = 3): Promise<T> {
+	for (let attempt = 0; attempt <= maxRetries; attempt++) {
+		try {
+			return await fn();
+		} catch (error: unknown) {
+			const isRateLimit =
+				(error instanceof Error && error.message?.includes("429")) ||
+				(typeof error === "object" &&
+					error !== null &&
+					"statusCode" in error &&
+					(error as { statusCode: number }).statusCode === 429);
+			if (!isRateLimit || attempt === maxRetries) throw error;
+			const delay = Math.min(1000 * 2 ** attempt, 10000);
+			await new Promise((r) => setTimeout(r, delay));
+		}
+	}
+	throw new Error("withRetry: unreachable");
+}
+
 /** Max pages to process before marking job as failed (safety limit: 20,000+ items) */
 const MAX_PAGES = 200;
 
@@ -15,59 +38,76 @@ interface PageResult {
 	reason?: string;
 }
 
-/**
- * Upserts a release into the releases table via admin client and returns its UUID.
- * Uses discogs_id as the conflict key.
- */
-async function upsertRelease(
-	admin: ReturnType<typeof createAdminClient>,
-	item: {
-		basic_information: {
-			id: number;
-			title: string;
-			artists?: Array<{ name: string }>;
-			year?: number;
-			genres?: string[];
-			styles?: string[];
-			formats?: Array<{ name: string }>;
-			cover_image?: string;
-			thumb?: string;
-		};
-		community?: { have?: number; want?: number };
-	},
-): Promise<string | null> {
-	const info = item.basic_information;
-	const have = item.community?.have ?? 0;
-	const want = item.community?.want ?? 0;
-
-	const releaseData = {
-		discogs_id: info.id,
-		title: info.title,
-		artist: info.artists?.[0]?.name ?? "Unknown",
-		year: info.year || null,
-		genre: info.genres || [],
-		style: info.styles || [],
-		format: info.formats?.[0]?.name || null,
-		cover_image_url: info.cover_image || info.thumb || null,
-		discogs_have: have,
-		discogs_want: want,
-		rarity_score: computeRarityScore(have, want),
-		updated_at: new Date().toISOString(),
+/** Shape of a Discogs item used in both collection and wantlist imports */
+interface DiscogsItem {
+	basic_information: {
+		id: number;
+		title: string;
+		artists?: Array<{ name: string }>;
+		year?: number;
+		genres?: string[];
+		styles?: string[];
+		formats?: Array<{ name: string }>;
+		cover_image?: string;
+		thumb?: string;
 	};
+	community?: { have?: number; want?: number };
+}
 
-	// Upsert with RETURNING to get the UUID in one round trip instead of two
-	const { data: releaseRow, error: upsertError } = await admin
-		.from("releases")
-		.upsert(releaseData, { onConflict: "discogs_id" })
-		.select("id")
-		.single();
+/**
+ * Batch upserts releases into the releases table and returns a Map of discogs_id -> UUID.
+ * Processes in batches of BATCH_SIZE to stay within PostgREST limits.
+ */
+const BATCH_SIZE = 50;
 
-	if (upsertError || !releaseRow) {
-		console.error(`Release upsert failed for discogs_id ${info.id}:`, upsertError);
-		return null;
+async function batchUpsertReleases(
+	admin: ReturnType<typeof createAdminClient>,
+	items: DiscogsItem[],
+): Promise<Map<number, string>> {
+	const discogsIdToUuid = new Map<number, string>();
+
+	for (let i = 0; i < items.length; i += BATCH_SIZE) {
+		const batch = items.slice(i, i + BATCH_SIZE);
+		const now = new Date().toISOString();
+
+		const releaseRows = batch.map((item) => {
+			const info = item.basic_information;
+			const have = item.community?.have ?? 0;
+			const want = item.community?.want ?? 0;
+			return {
+				discogs_id: info.id,
+				title: info.title,
+				artist: info.artists?.[0]?.name ?? "Unknown",
+				year: info.year || null,
+				genre: info.genres || [],
+				style: info.styles || [],
+				format: info.formats?.[0]?.name || null,
+				cover_image_url: info.cover_image || info.thumb || null,
+				discogs_have: have,
+				discogs_want: want,
+				rarity_score: computeRarityScore(have, want),
+				updated_at: now,
+			};
+		});
+
+		const { data, error } = await admin
+			.from("releases")
+			.upsert(releaseRows, { onConflict: "discogs_id" })
+			.select("id, discogs_id");
+
+		if (error) {
+			console.error("Batch release upsert failed:", error);
+			continue;
+		}
+
+		if (data) {
+			for (const row of data) {
+				discogsIdToUuid.set(row.discogs_id, row.id);
+			}
+		}
 	}
 
-	return releaseRow.id;
+	return discogsIdToUuid;
 }
 
 /**
@@ -134,32 +174,52 @@ export async function processImportPage(jobId: string): Promise<PageResult> {
 		// Create authenticated Discogs client
 		const client = await createDiscogsClient(job.user_id);
 
-		// Get Discogs identity for username
-		const identity = await client.getIdentity();
+		// Get Discogs identity for username (retry on 429 rate limit)
+		const identity = await withRetry(() => client.getIdentity());
 		const username = identity.data.username;
 
-		// Fetch one page of collection (folder 0 = all items)
-		const response = await client.user().collection().getReleases(username, 0, {
-			page: currentPage,
-			per_page: 100,
-			sort: "added",
-			sort_order: "desc",
-		});
+		// Fetch one page of collection (folder 0 = all items, retry on 429 rate limit)
+		const response = await withRetry(() =>
+			client.user().collection().getReleases(username, 0, {
+				page: currentPage,
+				per_page: 100,
+				sort: "added",
+				sort_order: "desc",
+			}),
+		);
 
 		const releases = response.data.releases ?? [];
 		const pagination = response.data.pagination;
 		let processed = job.processed_items ?? 0;
 		let lastItemTitle: string | null = null;
 
-		// Process each release in the page
+		// Batch upsert all releases in the page (reduces N queries to ceil(N/50))
+		const releaseIdMap = await batchUpsertReleases(admin, releases);
+
+		// Process collection_items per-item: partial unique index
+		// (WHERE discogs_instance_id IS NOT NULL) is incompatible with PostgREST
+		// upsert, so we must select-then-insert/update individually.
 		for (const item of releases) {
-			const releaseId = await upsertRelease(admin, item);
+			const releaseId = releaseIdMap.get(item.basic_information.id) ?? null;
 
 			if (releaseId) {
-				// Upsert collection item — unique partial index on (user_id, discogs_instance_id)
-				// handles concurrent imports and resume without a select-then-insert race.
-				await admin.from("collection_items").upsert(
-					{
+				const { data: existing } = await admin
+					.from("collection_items")
+					.select("id")
+					.eq("user_id", job.user_id)
+					.eq("discogs_instance_id", item.instance_id)
+					.maybeSingle();
+
+				if (existing) {
+					await admin
+						.from("collection_items")
+						.update({
+							release_id: releaseId,
+							updated_at: new Date().toISOString(),
+						})
+						.eq("id", existing.id);
+				} else {
+					await admin.from("collection_items").insert({
 						user_id: job.user_id,
 						release_id: releaseId,
 						discogs_instance_id: item.instance_id,
@@ -167,9 +227,8 @@ export async function processImportPage(jobId: string): Promise<PageResult> {
 						created_at:
 							(item as unknown as { date_added?: string }).date_added || new Date().toISOString(),
 						updated_at: new Date().toISOString(),
-					},
-					{ onConflict: "user_id,discogs_instance_id", ignoreDuplicates: false },
-				);
+					});
+				}
 			}
 
 			processed++;
@@ -295,47 +354,71 @@ export async function processWantlistPage(jobId: string): Promise<PageResult> {
 		// Create authenticated Discogs client
 		const client = await createDiscogsClient(job.user_id);
 
-		// Get Discogs identity for username
-		const identity = await client.getIdentity();
+		// Get Discogs identity for username (retry on 429 rate limit)
+		const identity = await withRetry(() => client.getIdentity());
 		const username = identity.data.username;
 
-		// Fetch one page of wantlist
-		const response = await client
-			.user()
-			.wantlist()
-			.getReleases(username, { page: currentPage, per_page: 100 });
+		// Fetch one page of wantlist (retry on 429 rate limit)
+		const response = await withRetry(() =>
+			client.user().wantlist().getReleases(username, { page: currentPage, per_page: 100 }),
+		);
 
 		const wants = response.data.wants ?? [];
 		const pagination = response.data.pagination;
 		let processed = job.processed_items ?? 0;
 		let lastItemTitle: string | null = null;
 
-		// Process each wantlist item
-		for (const item of wants) {
-			const releaseId = await upsertRelease(admin, item);
+		// Batch upsert all releases in the page (reduces N queries to ceil(N/50))
+		const releaseIdMap = await batchUpsertReleases(admin, wants);
 
-			if (releaseId) {
-				// Check for existing wantlist item to avoid duplicates
-				const { data: existing } = await admin
-					.from("wantlist_items")
-					.select("id")
-					.eq("user_id", job.user_id)
-					.eq("release_id", releaseId)
-					.maybeSingle();
+		// Collect release IDs that were successfully upserted
+		const resolvedReleaseIds = [...releaseIdMap.values()];
 
-				if (!existing) {
-					await admin.from("wantlist_items").insert({
-						user_id: job.user_id,
-						release_id: releaseId,
-						added_via: "discogs",
-						priority: 0,
-						created_at: new Date().toISOString(),
-					});
+		// Batch check: find which wantlist_items already exist for this user
+		const existingWantlistSet = new Set<string>();
+		if (resolvedReleaseIds.length > 0) {
+			const { data: existingItems } = await admin
+				.from("wantlist_items")
+				.select("release_id")
+				.eq("user_id", job.user_id)
+				.in("release_id", resolvedReleaseIds);
+
+			if (existingItems) {
+				for (const row of existingItems) {
+					existingWantlistSet.add(row.release_id);
 				}
 			}
+		}
 
+		// Batch insert new wantlist items (skip duplicates)
+		const now = new Date().toISOString();
+		const newWantlistItems: Array<{
+			user_id: string;
+			release_id: string;
+			added_via: string;
+			priority: number;
+			created_at: string;
+		}> = [];
+
+		for (const item of wants) {
+			const releaseId = releaseIdMap.get(item.basic_information.id) ?? null;
+			if (releaseId && !existingWantlistSet.has(releaseId)) {
+				newWantlistItems.push({
+					user_id: job.user_id,
+					release_id: releaseId,
+					added_via: "discogs",
+					priority: 0,
+					created_at: now,
+				});
+			}
 			processed++;
 			lastItemTitle = `${item.basic_information.title} -- ${item.basic_information.artists?.[0]?.name ?? "Unknown"}`;
+		}
+
+		// Insert in batches of BATCH_SIZE
+		for (let i = 0; i < newWantlistItems.length; i += BATCH_SIZE) {
+			const batch = newWantlistItems.slice(i, i + BATCH_SIZE);
+			await admin.from("wantlist_items").insert(batch);
 		}
 
 		// Update job progress

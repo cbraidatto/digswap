@@ -110,7 +110,8 @@ export async function searchRecords(term: string, limit = 20): Promise<SearchRes
 		})
 		.from(collectionItems)
 		.innerJoin(profiles, eq(collectionItems.userId, profiles.id))
-		.where(inArray(collectionItems.releaseId, releaseIds));
+		.where(inArray(collectionItems.releaseId, releaseIds))
+		.limit(500);
 
 	// Group owners by releaseId
 	const ownersByRelease = new Map<string, RecordOwner[]>();
@@ -191,7 +192,8 @@ export async function browseRecords(
 	}
 
 	if (country) {
-		conditions.push(ilike(releases.country, `%${country}%`));
+		const sanitizedCountry = country.replace(/[%_\\]/g, "\\$&");
+		conditions.push(ilike(releases.country, `%${sanitizedCountry}%`));
 	}
 
 	if (label) {

@@ -12,10 +12,9 @@ describe("Content Security Policy", () => {
 			expect(csp).toMatch(/script-src[^;]*'nonce-/);
 		});
 
-		it("uses unsafe-inline in style-src (required for Sonner inline style= attrs)", () => {
-			// style= attributes cannot use nonces — only <style> tags can.
-			// Sonner injects inline style= at runtime, so unsafe-inline is required here.
-			expect(csp).toMatch(/style-src[^;]*'unsafe-inline'/);
+		it("uses nonce in style-src (no unsafe-inline)", () => {
+			expect(csp).toMatch(/style-src[^;]*'nonce-/);
+			expect(csp).not.toMatch(/style-src[^;]*'unsafe-inline'/);
 		});
 
 		it("does not include unsafe-inline in script-src", () => {

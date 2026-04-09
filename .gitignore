@@ -85,3 +85,10 @@ tmp/
 
 # ── GSD baseline (auto-generated) ──
 .gsd-id
+
+# Playwright MCP artifacts
+.playwright-mcp/
+
+# Loose screenshots/audit images
+*.png
+!apps/web/public/*.png
