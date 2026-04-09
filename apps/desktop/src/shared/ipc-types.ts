@@ -145,6 +145,23 @@ export interface TradeDetail {
   expiresAt: string | null;
 }
 
+/** Fired by multi-item transfer per chunk within a batch item. */
+export interface MultiItemProgressEvent {
+  tradeId: string;
+  itemIndex: number;       // 0-based
+  totalItems: number;
+  proposalItemId: string;
+  bytesTransferred: number;
+  totalBytes: number;
+}
+
+/** Fired when a multi-item batch transfer completes (all items processed). */
+export interface MultiItemCompleteEvent {
+  tradeId: string;
+  completedItems: Array<{ proposalItemId: string; filePath: string; sha256: string }>;
+  allVerified: boolean;    // true when all items have receipts
+}
+
 /** Fired by onTransferProgress listener as chunks arrive. */
 export interface TransferProgressEvent {
   bytesReceived: number;
