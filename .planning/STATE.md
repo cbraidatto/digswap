@@ -2,15 +2,15 @@
 gsd_state_version: 1.0
 milestone: v1.1
 milestone_name: Deploy Readiness
-status: executing
-stopped_at: Completed 25-01-PLAN.md
-last_updated: "2026-04-09T16:19:55.169Z"
+status: verifying
+stopped_at: Completed 25-02-PLAN.md
+last_updated: "2026-04-09T16:30:29.712Z"
 last_activity: 2026-04-09
 progress:
   total_phases: 26
-  completed_phases: 22
+  completed_phases: 23
   total_plans: 104
-  completed_plans: 98
+  completed_plans: 101
   percent: 0
 ---
 
@@ -27,7 +27,7 @@ See: .planning/PROJECT.md (updated 2026-04-06)
 
 Phase: 24 (lint-cleanup) — EXECUTING
 Plan: 2 of 2
-Status: Ready to execute
+Status: Phase complete — ready for verification
 Last activity: 2026-04-09
 
 Progress: [░░░░░░░░░░] 0%
@@ -107,6 +107,7 @@ Progress: [░░░░░░░░░░] 0%
 | Phase 22 P01 | 3min | 1 tasks | 5 files |
 | Phase 23-test-fix P01 | 2min | 1 tasks | 1 files |
 | Phase 25 P01 | 3min | 2 tasks | 3 files |
+| Phase 25 P02 | 7min | 2 tasks | 6 files |
 
 ## Accumulated Context
 
@@ -241,6 +242,8 @@ Recent decisions affecting current work:
 - [Phase 25]: Visibility column replaces open_for_trade with three states: tradeable, not_trading, private
 - [Phase 25]: Dual SELECT RLS: owner sees all items, other users see non-private items (tradeable + not_trading)
 - [Phase 25]: Counterproposal chain via trade_proposals.sequence_number + trade_proposal_items junction with offer/want sides
+- [Phase 25]: toggleOpenForTrade delegates to setVisibility internally for zero-disruption backward compat
+- [Phase 25]: excludePrivate option on getCollectionPage for defense-in-depth (Drizzle db bypasses RLS)
 
 ### Roadmap Evolution
 
@@ -268,6 +271,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-04-09T16:19:55.162Z
-Stopped at: Completed 25-01-PLAN.md
+Last session: 2026-04-09T16:30:29.690Z
+Stopped at: Completed 25-02-PLAN.md
 Resume file: None

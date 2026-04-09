@@ -154,8 +154,8 @@
 
 ### Trade Redesign (Desktop-Only)
 
-- [ ] **TRD-01**: Collection items have visibility states: tradeable, not-trading, private — other users see tradeable/not-trading items but not private
-- [ ] **TRD-02**: User can optionally declare audio quality metadata (format, bitrate, sample rate) on any tradeable collection item
+- [x] **TRD-01**: Collection items have visibility states: tradeable, not-trading, private — other users see tradeable/not-trading items but not private
+- [x] **TRD-02**: User can optionally declare audio quality metadata (format, bitrate, sample rate) on any tradeable collection item
 - [ ] **TRD-03**: Side-by-side collection view shows proposer's and recipient's tradeable items for proposal creation
 - [ ] **TRD-04**: Multi-item trade proposals: free tier 1:1, premium tier up to 3:3 items per trade
 - [ ] **TRD-05**: Quality declaration (format, bitrate, condition notes) is mandatory at proposal time
