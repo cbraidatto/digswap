@@ -504,7 +504,12 @@ Plans:
   5. Multi-item P2P transfer completes for 1:1, 2:2, and 3:3 trades
   6. Trade only completes when ALL items have verified receipts
   7. Files shorter than 2 minutes rejected at selection time
-**Plans**: TBD
+**Plans**: 4 plans
+Plans:
+- [ ] 27-01-PLAN.md -- FFmpeg pipeline: spec extraction, SHA-256, 2min raw preview generation (TDD)
+- [ ] 27-02-PLAN.md -- Supabase Storage upload + IPC selectAndPrepareAudio handler
+- [ ] 27-03-PLAN.md -- Multi-item batch transfer: sequential per-item, resume from failure (TDD)
+- [ ] 27-04-PLAN.md -- Renderer: SpectralVisualizer + AudioPrepScreen + AppShell integration
 
 ### Phase 28: Trade Infrastructure + Coordinated Deploy
 **Goal**: Infrastructure for preview lifecycle, server-side validation, version gating, and coordinated web+desktop deploy
