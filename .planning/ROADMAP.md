@@ -509,7 +509,7 @@ Plans:
 - [x] 27-01-PLAN.md -- FFmpeg pipeline: spec extraction, SHA-256, 2min raw preview generation (TDD)
 - [x] 27-02-PLAN.md -- Supabase Storage upload + IPC selectAndPrepareAudio handler
 - [ ] 27-03-PLAN.md -- Multi-item batch transfer: sequential per-item, resume from failure (TDD)
-- [ ] 27-04-PLAN.md -- Renderer: SpectralVisualizer + AudioPrepScreen + AppShell integration
+- [x] 27-04-PLAN.md -- Renderer: SpectralVisualizer + AudioPrepScreen + AppShell integration
 
 ### Phase 28: Trade Infrastructure + Coordinated Deploy
 **Goal**: Infrastructure for preview lifecycle, server-side validation, version gating, and coordinated web+desktop deploy
@@ -568,7 +568,7 @@ Phases execute in numeric order: 1 → 20 (v1.0), then 21 → 24 (v1.1 Deploy Re
 |-------|----------------|--------|----------|
 | 25. Trade Schema + Collection Visibility | 2/3 | Complete    | 2026-04-09 |
 | 26. Trade Proposals + Counterproposals | 2/4 | Complete    | 2026-04-09 |
-| 27. Desktop Audio Pipeline | 2/4 | In Progress|  |
+| 27. Desktop Audio Pipeline | 3/4 | In Progress|  |
 | 28. Trade Infrastructure + Coordinated Deploy | 0/0 | Not Started |  |
 
 ### Phase 19: Security Hardening — Fix 74 audit vulnerabilities
