@@ -32,6 +32,9 @@ export function getDecadeRange(decade: string): { start: number; end: number } |
 	return { start: entry.startYear, end: entry.startYear + 10 };
 }
 
+export const VISIBILITY_OPTIONS = ["tradeable", "not_trading", "private"] as const;
+export type VisibilityOption = (typeof VISIBILITY_OPTIONS)[number];
+
 export const collectionFilterSchema = z.object({
 	genre: z.string().optional(),
 	decade: z.string().optional(),
@@ -39,5 +42,6 @@ export const collectionFilterSchema = z.object({
 	sort: z.enum(["rarity", "date", "alpha", "rating"]).default("rarity"),
 	search: z.string().max(200).optional(),
 	page: z.coerce.number().int().min(1).default(1),
+	visibility: z.enum(["tradeable", "not_trading", "private", "all"]).optional(),
 });
 export type CollectionFilters = z.infer<typeof collectionFilterSchema>;
