@@ -11,14 +11,10 @@ import { env, publicEnv } from "@/lib/env";
  * Only use in Server Actions, API routes, and server-side utilities.
  */
 export function createAdminClient() {
-	return createClient(
-		publicEnv.NEXT_PUBLIC_SUPABASE_URL,
-		env.SUPABASE_SERVICE_ROLE_KEY,
-		{
-			auth: {
-				autoRefreshToken: false,
-				persistSession: false,
-			},
+	return createClient(publicEnv.NEXT_PUBLIC_SUPABASE_URL, env.SUPABASE_SERVICE_ROLE_KEY, {
+		auth: {
+			autoRefreshToken: false,
+			persistSession: false,
 		},
-	);
+	});
 }

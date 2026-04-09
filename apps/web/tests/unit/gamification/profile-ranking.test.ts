@@ -1,4 +1,4 @@
-import { describe, test, expect, vi, beforeEach } from "vitest";
+import { beforeEach, describe, expect, test, vi } from "vitest";
 
 // ---------------------------------------------------------------------------
 // DB mock with thenable chain (project pattern)
@@ -88,11 +88,11 @@ vi.mock("drizzle-orm", () => ({
 	count: vi.fn(),
 }));
 
+import { computeGlobalScore } from "@/lib/gamification/constants";
 // ---------------------------------------------------------------------------
 // Import after mocks
 // ---------------------------------------------------------------------------
 import { getUserRanking, type UserRanking } from "@/lib/gamification/queries";
-import { computeGlobalScore } from "@/lib/gamification/constants";
 
 describe("getUserRanking", () => {
 	beforeEach(() => {
@@ -143,8 +143,7 @@ describe("profile ranking display logic", () => {
 		}
 
 		// When getUserRanking returns null, profile uses fallbacks
-		const { title, globalRank, gemScore, contributionScore } =
-			getRankingDisplay(null);
+		const { title, globalRank, gemScore, contributionScore } = getRankingDisplay(null);
 
 		expect(title).toBe("Vinyl Rookie");
 		expect(globalRank).toBeNull();

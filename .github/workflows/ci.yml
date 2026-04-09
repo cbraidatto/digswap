@@ -1,0 +1,103 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  # Dummy env vars for build/test (Next.js needs NEXT_PUBLIC_ at build time,
+  # server vars must pass Zod validation in env.ts during build)
+  NEXT_PUBLIC_SUPABASE_URL: https://placeholder.supabase.co
+  NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: placeholder-key
+  NEXT_PUBLIC_SITE_URL: http://localhost:3000
+  NEXT_PUBLIC_APP_URL: http://localhost:3000
+  NEXT_PUBLIC_STRIPE_PRICE_MONTHLY: price_placeholder
+  NEXT_PUBLIC_STRIPE_PRICE_ANNUAL: price_placeholder
+  NEXT_PUBLIC_MIN_DESKTOP_VERSION: "1"
+  # Server-side dummy vars (required by Zod schema during next build)
+  DATABASE_URL: postgresql://ci:ci@localhost:5432/ci
+  SUPABASE_SERVICE_ROLE_KEY: ci-service-role-key
+  DISCOGS_CONSUMER_KEY: ci-discogs-key
+  DISCOGS_CONSUMER_SECRET: ci-discogs-secret
+  IMPORT_WORKER_SECRET: ci-import-worker-secret
+  HANDOFF_HMAC_SECRET: ci-handoff-hmac-secret-minimum-32-chars
+  STRIPE_SECRET_KEY: ci-stripe-secret-key
+  STRIPE_WEBHOOK_SECRET: ci-stripe-webhook-secret
+
+jobs:
+  lint:
+    name: Lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm --filter @digswap/web lint
+
+  typecheck:
+    name: Typecheck
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm --filter @digswap/trade-domain typecheck
+      - run: pnpm --filter @digswap/web typecheck
+      - run: pnpm --filter @digswap/desktop typecheck
+
+  test:
+    name: Test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm --filter @digswap/trade-domain test
+      - run: pnpm --filter @digswap/web test
+
+  build-web:
+    name: Build Web
+    runs-on: ubuntu-latest
+    needs: [typecheck]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm --filter @digswap/web build
+
+  build-desktop:
+    name: Build Desktop
+    runs-on: ubuntu-latest
+    needs: [typecheck]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      # electron-vite build compiles main/preload/renderer without needing a display
+      - run: pnpm --filter @digswap/desktop build
