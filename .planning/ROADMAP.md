@@ -469,7 +469,7 @@ Plans:
   6. Visibility toggle UI works on /perfil collection management
 **Plans**: 3 plans
 Plans:
-- [ ] 25-01-PLAN.md -- Schema migration: visibility column, quality metadata, trade proposal tables, RLS, data migration
+- [x] 25-01-PLAN.md -- Schema migration: visibility column, quality metadata, trade proposal tables, RLS, data migration
 - [ ] 25-02-PLAN.md -- Server actions and queries: setVisibility, updateQualityMetadata, updated CollectionItem type
 - [ ] 25-03-PLAN.md -- Visibility UI: VisibilitySelector component, collection card badges, trading tab update
 
@@ -556,7 +556,7 @@ Phases execute in numeric order: 1 → 20 (v1.0), then 21 → 24 (v1.1 Deploy Re
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|----------|
-| 25. Trade Schema + Collection Visibility | 0/0 | Not Started |  |
+| 25. Trade Schema + Collection Visibility | 1/3 | In Progress|  |
 | 26. Trade Proposals + Counterproposals | 0/0 | Not Started |  |
 | 27. Desktop Audio Pipeline | 0/0 | Not Started |  |
 | 28. Trade Infrastructure + Coordinated Deploy | 0/0 | Not Started |  |
