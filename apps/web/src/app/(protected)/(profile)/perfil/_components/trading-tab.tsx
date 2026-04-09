@@ -3,41 +3,41 @@ import type { CollectionItem } from "@/lib/collection/queries";
 import { CollectionGrid } from "./collection-grid";
 
 interface TradingTabProps {
-	openForTradeItems: CollectionItem[];
+	tradeableItems: CollectionItem[];
 	activeTradeCount: number;
 }
 
-export function TradingTab({ openForTradeItems, activeTradeCount }: TradingTabProps) {
+export function TradingTab({ tradeableItems, activeTradeCount }: TradingTabProps) {
 	return (
 		<div className="space-y-8">
-			{/* Open for trade */}
+			{/* Tradeable items */}
 			<section>
 				<div className="flex items-center justify-between mb-4">
 					<div className="flex items-center gap-2">
 						<span className="material-symbols-outlined text-[16px] text-primary">storefront</span>
 						<h3 className="font-mono text-xs text-on-surface-variant uppercase tracking-widest">
-							Open for trade
+							Tradeable
 						</h3>
 						<span className="font-mono text-[10px] text-primary/60">
-							{openForTradeItems.length}
+							{tradeableItems.length}
 						</span>
 					</div>
 				</div>
 
-				{openForTradeItems.length === 0 ? (
+				{tradeableItems.length === 0 ? (
 					<div className="rounded-xl border border-dashed border-outline-variant/20 p-10 text-center">
 						<span className="material-symbols-outlined text-2xl text-on-surface-variant/15 block mb-2">
 							swap_horiz
 						</span>
 						<p className="font-mono text-xs text-on-surface-variant/50">
-							No records marked for trade yet
+							No records marked as tradeable yet
 						</p>
 						<p className="font-mono text-[10px] text-on-surface-variant/30 mt-1">
-							Toggle the trade icon on your collection cards to mark records as available
+							Use the visibility selector on your collection cards to mark records as tradeable
 						</p>
 					</div>
 				) : (
-					<CollectionGrid items={openForTradeItems} isOwner={true} />
+					<CollectionGrid items={tradeableItems} isOwner={true} />
 				)}
 			</section>
 

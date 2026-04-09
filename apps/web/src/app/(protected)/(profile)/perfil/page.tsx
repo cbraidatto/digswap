@@ -161,8 +161,8 @@ export default async function PerfilPage({ searchParams }: PerfilPageProps) {
 		? (releaseById[profile.showcaseFavoriteId] ?? null)
 		: null;
 
-	// Open for trade items (for Trading tab)
-	const openForTradeItems = items.filter((i) => i.openForTrade === 1);
+	// Tradeable items (for Trading tab) — uses visibility field
+	const tradeableItems = items.filter((i) => i.visibility === "tradeable");
 
 	// Heatmap data — count records added per day (last 140 days)
 	const heatmapData: Record<string, number> = {};
@@ -199,7 +199,7 @@ export default async function PerfilPage({ searchParams }: PerfilPageProps) {
 						activeTab={activeTab}
 						collectionCount={totalCount}
 						wantlistCount={wantlistTotal}
-						tradeCount={openForTradeItems.length}
+						tradeCount={tradeableItems.length}
 						actionButtons={
 							<>
 								<EditProfileModal
@@ -262,7 +262,7 @@ export default async function PerfilPage({ searchParams }: PerfilPageProps) {
 							/* ── Trading Tab ── */
 							trading: (
 								<TradingTab
-									openForTradeItems={openForTradeItems}
+									tradeableItems={tradeableItems}
 									activeTradeCount={activeTradeCount}
 								/>
 							),
