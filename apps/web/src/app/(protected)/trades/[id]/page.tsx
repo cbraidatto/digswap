@@ -1,10 +1,16 @@
+import { eq } from "drizzle-orm";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { markTradeThreadRead } from "@/actions/trade-messages";
+import { db } from "@/lib/db";
+import { profiles } from "@/lib/db/schema/users";
 import { createClient } from "@/lib/supabase/server";
 import { getTradeParticipantContext, getTradeThread } from "@/lib/trades/messages";
 import { deriveTradePresence } from "@/lib/trades/presence";
+import { getProposalHistory } from "@/lib/trades/proposal-queries";
+import { ProposalActionBar } from "./_components/ProposalActionBar";
+import { ProposalHistoryThread } from "./_components/ProposalHistoryThread";
 import { TradeActionButtons } from "./_components/TradeActionButtons";
 import { TradeDetailHeader } from "./_components/TradeDetailHeader";
 import { TradeMessageComposer } from "./_components/TradeMessageComposer";
@@ -32,10 +38,19 @@ export default async function TradeDetailPage({ params }: Props) {
 
 	let thread: Awaited<ReturnType<typeof getTradeThread>>;
 	let participantContext: Awaited<ReturnType<typeof getTradeParticipantContext>>;
+	let proposalHistory: Awaited<ReturnType<typeof getProposalHistory>>;
+	let currentProfile: { username: string | null; avatarUrl: string | null } | undefined;
 	try {
-		[thread, participantContext] = await Promise.all([
+		[thread, participantContext, proposalHistory, currentProfile] = await Promise.all([
 			getTradeThread(id, user.id),
 			getTradeParticipantContext(id, user.id),
+			getProposalHistory(id, user.id),
+			db
+				.select({ username: profiles.username, avatarUrl: profiles.avatarUrl })
+				.from(profiles)
+				.where(eq(profiles.id, user.id))
+				.limit(1)
+				.then((rows) => rows[0]),
 		]);
 	} catch {
 		notFound();
@@ -64,7 +79,7 @@ export default async function TradeDetailPage({ params }: Props) {
 
 			<TradeDetailHeader thread={thread} />
 
-			{/* Trade action buttons (accept/decline/cancel) */}
+			{/* Trade action buttons (accept/decline/cancel) — legacy flow */}
 			<div className="mb-4">
 				<TradeActionButtons
 					tradeId={thread.tradeId}
@@ -72,6 +87,38 @@ export default async function TradeDetailPage({ params }: Props) {
 					isProvider={isProvider}
 				/>
 			</div>
+
+			{/* Proposal history thread — shown only for trades with proposals */}
+			{proposalHistory.length > 0 && (
+				<div className="mb-4">
+					<ProposalHistoryThread
+						proposals={proposalHistory}
+						currentUserId={user.id}
+						counterpartyUsername={thread.counterpartyUsername}
+						counterpartyAvatarUrl={thread.counterpartyAvatarUrl}
+						currentUserUsername={currentProfile?.username ?? "You"}
+						currentUserAvatarUrl={currentProfile?.avatarUrl ?? null}
+					/>
+				</div>
+			)}
+
+			{/* Proposal action bar — accept/decline/counter for pending proposal */}
+			{(() => {
+				const pendingProposal = proposalHistory.findLast(
+					(p) => p.status === "pending",
+				);
+				if (!pendingProposal) return null;
+				return (
+					<div className="mb-4">
+						<ProposalActionBar
+							proposal={pendingProposal}
+							tradeId={thread.tradeId}
+							currentUserId={user.id}
+							counterpartyId={thread.counterpartyId}
+						/>
+					</div>
+				);
+			})()}
 
 			{/* Presence indicator */}
 			{presence && (
