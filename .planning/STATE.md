@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.1
 milestone_name: Deploy Readiness
 status: executing
-stopped_at: Completed 26-02-PLAN.md (awaiting human-verify checkpoint)
-last_updated: "2026-04-09T17:35:48.156Z"
+stopped_at: Completed 26-04-PLAN.md
+last_updated: "2026-04-09T17:41:48.110Z"
 last_activity: 2026-04-09
 progress:
-  total_phases: 27
-  completed_phases: 24
-  total_plans: 108
-  completed_plans: 104
+  total_phases: 25
+  completed_phases: 22
+  total_plans: 101
+  completed_plans: 97
   percent: 0
 ---
 
@@ -21,12 +21,12 @@ progress:
 See: .planning/PROJECT.md (updated 2026-04-06)
 
 **Core value:** A digger opens the app and immediately finds who has the record they've been hunting -- and sees where they stand in the community.
-**Current focus:** Phase 26 — trade-proposals-counterproposals
+**Current focus:** Phase 24 — lint-cleanup
 
 ## Current Position
 
-Phase: 26 (trade-proposals-counterproposals) -- EXECUTING
-Plan: 2 of 4
+Phase: 24 (lint-cleanup) — EXECUTING
+Plan: 2 of 2
 Status: Ready to execute
 Last activity: 2026-04-09
 
@@ -106,9 +106,7 @@ Progress: [░░░░░░░░░░] 0%
 | Phase 21 P01 | 1min | 1 tasks | 1 files |
 | Phase 22 P01 | 3min | 1 tasks | 5 files |
 | Phase 23-test-fix P01 | 2min | 1 tasks | 1 files |
-| Phase 25 P03 | 6min | 2 tasks | 11 files |
-| Phase 26 P01 | 5min | 2 tasks | 3 files |
-| Phase 26 P02 | 4min | 2 tasks | 5 files |
+| Phase 26 P04 | 3min | 2 tasks | 4 files |
 
 ## Accumulated Context
 
@@ -240,13 +238,7 @@ Recent decisions affecting current work:
 - [Phase 20]: RANK_TITLES recalibrated to 501/2001/5001 — typical 200-record collection scores ~1030 gem points
 - [Phase 21]: Used standard 'as unknown as T' double-cast pattern for raw SQL results from db.execute()
 - [Phase 22]: Direct devDep vite ^8.0.5 in apps/web to force patched transitive resolution from @vitejs/plugin-react (pnpm overrides caused cross-workspace conflicts)
-- [Phase 25]: VisibilitySelector uses click-to-cycle pattern for compact card layout
-- [Phase 25]: RecordContextMenu dual-API: onSetVisibility alongside deprecated onToggleTrade for backward compat
-- [Phase 25]: excludePrivate query option as defense-in-depth for Drizzle direct queries bypassing RLS
-- [Phase 26]: getUserSubscription + isPremium for tier check (entitlements.ts has no getSubscriptionSnapshot)
-- [Phase 26]: vi.hoisted() pattern for test mock state shared across vi.mock factories
-- [Phase 26]: Non-blocking notification: counterproposal_received failure does not fail the action
-- [Phase 26]: Used project Dialog components from @/components/ui/dialog instead of raw Base UI import for QualityDeclarationModal
+- [Phase 26]: Batch DISTINCT ON query for pending proposals (performance consistency with unread count batch pattern)
 
 ### Roadmap Evolution
 
@@ -274,6 +266,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-04-09T17:35:48.149Z
-Stopped at: Completed 26-02-PLAN.md (awaiting human-verify checkpoint)
+Last session: 2026-04-09T17:41:48.102Z
+Stopped at: Completed 26-04-PLAN.md
 Resume file: None

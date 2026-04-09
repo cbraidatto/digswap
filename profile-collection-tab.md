@@ -1,0 +1,40 @@
+- generic [active] [ref=e1]:
+  - link "Skip to content" [ref=e2] [cursor=pointer]:
+    - /url: "#main-content"
+  - generic [ref=e3]:
+    - banner [ref=e5]:
+      - generic [ref=e6]:
+        - link "DIGSWAP" [ref=e7] [cursor=pointer]:
+          - /url: /feed
+          - generic [ref=e8]: DIGSWAP
+        - navigation [ref=e9]:
+          - link "home Feed" [ref=e10] [cursor=pointer]:
+            - /url: /feed
+          - link "explore Explore" [ref=e13] [cursor=pointer]:
+            - /url: /explorar
+          - link "swap_horiz Trades" [ref=e16] [cursor=pointer]:
+            - /url: /trades
+          - link "group Community" [ref=e19] [cursor=pointer]:
+            - /url: /comunidade
+          - link "person Profile" [ref=e22] [cursor=pointer]:
+            - /url: /perfil
+        - generic [ref=e27]:
+          - generic [ref=e28]: search
+          - searchbox "Global search" [ref=e29]
+        - generic [ref=e30]:
+          - link "How to use DigSwap" [ref=e31] [cursor=pointer]:
+            - /url: /como-usar
+          - button "Open chat" [ref=e33]
+          - button "Notifications" [ref=e35]
+    - main [ref=e37]:
+      - generic [ref=e38]:
+        - generic [ref=e39]:
+          - generic [ref=e40]
+          - generic [ref=e44]
+        - generic [ref=e157]:
+          - tablist "Profile sections" [ref=e158]
+          - tabpanel [ref=e170]
+  - region "Notifications alt+T"
+  - button "Open Next.js Dev Tools" [ref=e231] [cursor=pointer]:
+    - img [ref=e232]
+  - alert [ref=e235]

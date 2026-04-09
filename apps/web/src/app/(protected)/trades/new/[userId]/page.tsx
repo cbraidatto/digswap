@@ -15,10 +15,13 @@ export const metadata: Metadata = {
 
 interface NewTradePageProps {
 	params: Promise<{ userId: string }>;
+	searchParams: Promise<Record<string, string | string[] | undefined>>;
 }
 
-export default async function NewTradePage({ params }: NewTradePageProps) {
+export default async function NewTradePage({ params, searchParams }: NewTradePageProps) {
 	const { userId: targetUserId } = await params;
+	const rawSearch = await searchParams;
+	const tradeId = typeof rawSearch.tradeId === "string" ? rawSearch.tradeId : undefined;
 
 	const supabase = await createClient();
 	const {
@@ -59,6 +62,7 @@ export default async function NewTradePage({ params }: NewTradePageProps) {
 				targetUsername={targetUsername}
 				isPremium={quotaStatus.isPremium}
 				currentUserId={user.id}
+				tradeId={tradeId}
 			/>
 		</div>
 	);

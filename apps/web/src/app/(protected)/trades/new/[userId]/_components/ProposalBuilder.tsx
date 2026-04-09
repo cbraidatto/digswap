@@ -4,7 +4,7 @@ import { useCallback, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
-import { createProposalAction } from "@/actions/trade-proposals";
+import { createProposalAction, createCounterproposalAction } from "@/actions/trade-proposals";
 import type { TradeableItem } from "@/lib/trades/proposal-queries";
 import { CollectionColumn } from "./CollectionColumn";
 import { QualityDeclarationModal } from "./QualityDeclarationModal";
@@ -22,6 +22,7 @@ interface ProposalBuilderProps {
 	targetUsername: string;
 	isPremium: boolean;
 	currentUserId: string;
+	tradeId?: string;
 }
 
 export function ProposalBuilder({
@@ -30,9 +31,11 @@ export function ProposalBuilder({
 	targetUserId,
 	targetUsername,
 	isPremium,
+	tradeId,
 }: ProposalBuilderProps) {
 	const router = useRouter();
 	const maxItems = isPremium ? 3 : 1;
+	const isCounterMode = !!tradeId;
 
 	// State
 	const [pendingItem, setPendingItem] = useState<{
@@ -110,34 +113,54 @@ export function ProposalBuilder({
 		setError(null);
 
 		try {
-			const result = await createProposalAction({
-				targetUserId,
-				offerItems: offerBasket.map((b) => ({
-					collectionItemId: b.item.id,
-					releaseId: b.item.releaseId,
-					declaredQuality: b.declaredQuality,
-					conditionNotes: b.conditionNotes,
-				})),
-				wantItems: wantBasket.map((b) => ({
-					collectionItemId: b.item.id,
-					releaseId: b.item.releaseId,
-					declaredQuality: b.declaredQuality,
-					conditionNotes: b.conditionNotes,
-				})),
-				message: message.trim() || undefined,
-			});
+			const offerItems = offerBasket.map((b) => ({
+				collectionItemId: b.item.id,
+				releaseId: b.item.releaseId,
+				declaredQuality: b.declaredQuality,
+				conditionNotes: b.conditionNotes,
+			}));
+			const wantItems = wantBasket.map((b) => ({
+				collectionItemId: b.item.id,
+				releaseId: b.item.releaseId,
+				declaredQuality: b.declaredQuality,
+				conditionNotes: b.conditionNotes,
+			}));
 
-			if ("error" in result) {
-				setError(result.error);
+			if (isCounterMode && tradeId) {
+				// Counter mode: use createCounterproposalAction
+				const result = await createCounterproposalAction({
+					tradeId,
+					offerItems,
+					wantItems,
+					message: message.trim() || undefined,
+				});
+
+				if ("error" in result) {
+					setError(result.error);
+				} else {
+					router.push(`/trades/${tradeId}`);
+				}
 			} else {
-				router.push(`/trades/${result.tradeId}`);
+				// Normal mode: use createProposalAction
+				const result = await createProposalAction({
+					targetUserId,
+					offerItems,
+					wantItems,
+					message: message.trim() || undefined,
+				});
+
+				if ("error" in result) {
+					setError(result.error);
+				} else {
+					router.push(`/trades/${result.tradeId}`);
+				}
 			}
 		} catch {
 			setError("Something went wrong. Please try again.");
 		} finally {
 			setIsSubmitting(false);
 		}
-	}, [offerBasket, wantBasket, message, targetUserId, router]);
+	}, [offerBasket, wantBasket, message, targetUserId, router, isCounterMode, tradeId]);
 
 	const canSubmit =
 		offerBasket.length > 0 && wantBasket.length > 0 && !isSubmitting;
@@ -147,20 +170,34 @@ export function ProposalBuilder({
 			{/* Page header */}
 			<div>
 				<Link
-					href="/trades"
+					href={isCounterMode ? `/trades/${tradeId}` : "/trades"}
 					className="text-xs text-muted-foreground hover:text-foreground transition-colors inline-flex items-center gap-1 mb-3"
 				>
 					<span className="material-symbols-outlined text-sm">
 						arrow_back
 					</span>
-					Back to Trades
+					{isCounterMode ? "Back to Trade" : "Back to Trades"}
 				</Link>
 				<h1 className="font-heading text-xl font-bold text-foreground">
-					New Trade with{" "}
-					<span className="text-primary">{targetUsername}</span>
+					{isCounterMode ? (
+						<>
+							Counter Proposal{" "}
+							<span className="text-muted-foreground text-base font-normal">
+								with
+							</span>{" "}
+							<span className="text-primary">{targetUsername}</span>
+						</>
+					) : (
+						<>
+							New Trade with{" "}
+							<span className="text-primary">{targetUsername}</span>
+						</>
+					)}
 				</h1>
 				<p className="text-muted-foreground text-xs mt-1">
-					Select records to offer and request, then submit your proposal.
+					{isCounterMode
+						? "Select records to offer and request in your counteroffer."
+						: "Select records to offer and request, then submit your proposal."}
 				</p>
 			</div>
 
@@ -187,7 +224,7 @@ export function ProposalBuilder({
 			{/* Proposal Summary */}
 			<div className="border border-outline-variant rounded-xl p-4 bg-surface-container-lowest space-y-4">
 				<h2 className="font-heading text-base font-bold text-foreground">
-					Proposal Summary
+					{isCounterMode ? "Counteroffer Summary" : "Proposal Summary"}
 				</h2>
 
 				{/* Tier badge */}
@@ -266,7 +303,11 @@ export function ProposalBuilder({
 					<textarea
 						value={message}
 						onChange={(e) => setMessage(e.target.value.slice(0, 1000))}
-						placeholder="Add a message to your trade proposal..."
+						placeholder={
+							isCounterMode
+								? "Add a message to your counteroffer..."
+								: "Add a message to your trade proposal..."
+						}
 						rows={2}
 						maxLength={1000}
 						className="w-full rounded border border-outline-variant bg-surface-container-lowest px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground/40 focus:outline-none focus:border-primary transition-colors resize-none"
@@ -306,7 +347,7 @@ export function ProposalBuilder({
 							<span className="material-symbols-outlined text-base">
 								send
 							</span>
-							Send Proposal
+							{isCounterMode ? "Send Counteroffer" : "Send Proposal"}
 						</span>
 					)}
 				</button>
@@ -324,7 +365,7 @@ export function ProposalBuilder({
 }
 
 // ---------------------------------------------------------------------------
-// BasketItemRow — inline sub-component for basket display
+// BasketItemRow -- inline sub-component for basket display
 // ---------------------------------------------------------------------------
 
 function BasketItemRow({
@@ -364,12 +405,12 @@ function BasketItemRow({
 					{item.title}
 				</p>
 				<p className="text-[10px] text-muted-foreground truncate">
-					{item.artist} \u00b7{" "}
+					{item.artist} {"\u00b7"}{" "}
 					<span className="font-mono">{declaredQuality}</span>
 					{conditionNotes && (
 						<span className="text-muted-foreground/50">
 							{" "}
-							\u2014 {conditionNotes}
+							{"\u2014"} {conditionNotes}
 						</span>
 					)}
 				</p>
