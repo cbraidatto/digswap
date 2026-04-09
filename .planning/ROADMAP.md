@@ -485,7 +485,12 @@ Plans:
   5. Max 10 counterproposal rounds enforced
   6. Trade inbox shows counterproposal notifications
   7. Existing 1:1 trade flow still works (backward compatible)
-**Plans**: TBD
+**Plans**: 4 plans
+Plans:
+- [ ] 26-01-PLAN.md -- Proposal server actions + query layer + unit tests (createProposalAction, createCounterproposalAction, acceptProposalAction, declineProposalAction)
+- [ ] 26-02-PLAN.md -- Side-by-side proposal creator UI at /trades/new/[userId] with quality declaration
+- [ ] 26-03-PLAN.md -- Trade detail page: ProposalHistoryThread + ProposalActionBar (accept/decline/counter)
+- [ ] 26-04-PLAN.md -- Counter mode wiring + trade inbox counter badge
 
 ### Phase 27: Desktop Audio Pipeline
 **Goal**: Desktop app handles file upload, spec extraction, preview generation, and multi-item P2P transfer
