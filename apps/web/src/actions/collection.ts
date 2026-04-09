@@ -361,12 +361,15 @@ export async function removeRecordFromCollection(
 	}
 }
 
+const visibilitySchema = z.enum(["tradeable", "not_trading", "private"]);
+
 /**
- * Toggle the "open for trade" flag on a collection item.
+ * Set the visibility state on a collection item.
+ * Replaces the binary open_for_trade with three-state visibility.
  */
-export async function toggleOpenForTrade(
+export async function setVisibility(
 	collectionItemId: string,
-	openForTrade: boolean,
+	visibility: string,
 ): Promise<{ success?: boolean; error?: string }> {
 	try {
 		const supabase = await createClient();
@@ -378,24 +381,103 @@ export async function toggleOpenForTrade(
 		const { success: rlSuccess } = await safeLimit(apiRateLimit, user.id, true);
 		if (!rlSuccess) return { error: "Too many requests." };
 
-		const parsed = uuidSchema.safeParse(collectionItemId);
-		if (!parsed.success) return { error: "Invalid ID." };
+		const parsedId = uuidSchema.safeParse(collectionItemId);
+		if (!parsedId.success) return { error: "Invalid ID." };
+
+		const parsedVis = visibilitySchema.safeParse(visibility);
+		if (!parsedVis.success) return { error: "Invalid visibility value." };
 
 		const admin = createAdminClient();
 		const { data, error } = await admin
 			.from("collection_items")
-			.update({ open_for_trade: openForTrade ? 1 : 0, updated_at: new Date().toISOString() })
-			.eq("id", parsed.data)
+			.update({
+				visibility: parsedVis.data,
+				updated_at: new Date().toISOString(),
+			})
+			.eq("id", parsedId.data)
 			.eq("user_id", user.id)
 			.select("id")
 			.maybeSingle();
 
-		if (error || !data) return { error: "Could not update." };
+		if (error) return { error: "Could not update visibility." };
+		if (!data) return { error: "Not found" };
 		return { success: true };
 	} catch (err) {
-		console.error("[toggleOpenForTrade] error:", err);
-		return { error: "Failed to update. Please try again." };
+		console.error("[setVisibility] error:", err);
+		return { error: "Failed to update visibility. Please try again." };
 	}
+}
+
+const qualityMetadataSchema = z.object({
+	audioFormat: z.string().max(50).nullable().optional(),
+	bitrate: z.number().int().positive().max(9999).nullable().optional(),
+	sampleRate: z.number().int().positive().max(384000).nullable().optional(),
+});
+
+/**
+ * Update audio quality metadata on a collection item.
+ * Used for trade proposals to declare file quality.
+ */
+export async function updateQualityMetadata(
+	collectionItemId: string,
+	metadata: { audioFormat?: string | null; bitrate?: number | null; sampleRate?: number | null },
+): Promise<{ success?: boolean; error?: string }> {
+	try {
+		const supabase = await createClient();
+		const {
+			data: { user },
+		} = await supabase.auth.getUser();
+		if (!user) return { error: "Not authenticated" };
+
+		const { success: rlSuccess } = await safeLimit(apiRateLimit, user.id, true);
+		if (!rlSuccess) return { error: "Too many requests." };
+
+		const parsedId = uuidSchema.safeParse(collectionItemId);
+		if (!parsedId.success) return { error: "Invalid ID." };
+
+		const parsedMeta = qualityMetadataSchema.safeParse(metadata);
+		if (!parsedMeta.success) return { error: "Invalid quality metadata." };
+
+		const updatePayload: Record<string, unknown> = {
+			updated_at: new Date().toISOString(),
+		};
+		if (parsedMeta.data.audioFormat !== undefined) {
+			updatePayload.audio_format = parsedMeta.data.audioFormat;
+		}
+		if (parsedMeta.data.bitrate !== undefined) {
+			updatePayload.bitrate = parsedMeta.data.bitrate;
+		}
+		if (parsedMeta.data.sampleRate !== undefined) {
+			updatePayload.sample_rate = parsedMeta.data.sampleRate;
+		}
+
+		const admin = createAdminClient();
+		const { data, error } = await admin
+			.from("collection_items")
+			.update(updatePayload)
+			.eq("id", parsedId.data)
+			.eq("user_id", user.id)
+			.select("id")
+			.maybeSingle();
+
+		if (error) return { error: "Could not update quality metadata." };
+		if (!data) return { error: "Not found" };
+		return { success: true };
+	} catch (err) {
+		console.error("[updateQualityMetadata] error:", err);
+		return { error: "Failed to update quality metadata. Please try again." };
+	}
+}
+
+/**
+ * Toggle the "open for trade" flag on a collection item.
+ * @deprecated Use setVisibility() directly. This delegates internally for backward compat.
+ */
+export async function toggleOpenForTrade(
+	collectionItemId: string,
+	openForTrade: boolean,
+): Promise<{ success?: boolean; error?: string }> {
+	return setVisibility(collectionItemId, openForTrade ? "tradeable" : "not_trading");
 }
 
 /**

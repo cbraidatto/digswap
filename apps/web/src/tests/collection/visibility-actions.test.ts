@@ -5,8 +5,8 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 // ---------------------------------------------------------------------------
 // Constants
 // ---------------------------------------------------------------------------
-const USER_ID = "user-1111-1111-1111-111111111111";
-const ITEM_ID = "item-2222-2222-2222-222222222222";
+const USER_ID = "11111111-1111-4111-8111-111111111111";
+const ITEM_ID = "22222222-2222-4222-8222-222222222222";
 
 let mockAuthUser: { id: string; email?: string } | null = { id: USER_ID };
 
