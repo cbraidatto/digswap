@@ -102,7 +102,7 @@ export default async function PublicProfilePage({ params, searchParams }: Public
 			{!user && (
 				<div className="mb-6 p-4 bg-surface-container-low border border-outline-variant/20 rounded font-mono text-xs">
 					<span className="text-tertiary">[VISITOR]</span>
-					<span className="text-on-surface-variant"> // </span>
+					<span className="text-on-surface-variant">{" // "}</span>
 					<span className="text-on-surface">
 						Create an account to follow this digger and initiate trades.
 					</span>

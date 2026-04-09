@@ -64,10 +64,7 @@ export function getRankTitleFromScore(score: number): string {
  *   (Diamante=100, Safira=35, Esmeralda=20, Rubi=8, Ambar=3, Quartzo=1)
  * @param contributionScore - Sum of community contribution points
  */
-export function computeGlobalScore(
-	gemScore: number,
-	contributionScore: number,
-): number {
+export function computeGlobalScore(gemScore: number, contributionScore: number): number {
 	return gemScore * 0.7 + contributionScore * 0.3;
 }
 

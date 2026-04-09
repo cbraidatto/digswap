@@ -89,7 +89,7 @@ export default async function RadarPage({ searchParams }: RadarPageProps) {
 				{/* Match list */}
 				{matches.length === 0 ? (
 					<div className="font-mono text-xs text-on-surface-variant py-12 text-center">
-						[NO_MATCHES] // No wantlist matches found
+						{"[NO_MATCHES] // No wantlist matches found"}
 						{rarityTier ? ` in [${rarityTier.toUpperCase()}] tier` : ""}.
 					</div>
 				) : (

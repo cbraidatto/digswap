@@ -54,7 +54,7 @@ export function CoverBanner({ initialCoverUrl, initialPositionY, isOwner }: Cove
 	const onDragMove = useCallback((clientY: number) => {
 		if (!dragRef.current || !imgRef.current) return;
 		const imgH = imgRef.current.naturalHeight || 1;
-		const frameH = 280; // banner height in px
+		const frameH = 180; // banner height in px
 		// How many % does 1px of drag translate to?
 		const scale = (frameH / imgH) * 100;
 		const delta = (clientY - dragRef.current.startY) * scale * 0.8;
@@ -128,7 +128,7 @@ export function CoverBanner({ initialCoverUrl, initialPositionY, isOwner }: Cove
 	return (
 		<>
 			{/* Main banner */}
-			<div className="relative w-full h-[280px] bg-surface-container-low overflow-hidden group">
+			<div className="relative w-full h-[180px] bg-surface-container-low overflow-hidden group">
 				{coverUrl ? (
 					<Image
 						src={coverUrl}
@@ -183,7 +183,7 @@ export function CoverBanner({ initialCoverUrl, initialPositionY, isOwner }: Cove
 						{/* Header */}
 						<div className="flex items-center justify-between mb-4">
 							<span className="font-mono text-xs uppercase tracking-[0.2em] text-on-surface-variant">
-								// arraste para reposicionar
+								{"// arraste para reposicionar"}
 							</span>
 							<div className="flex gap-3">
 								<button
@@ -207,11 +207,26 @@ export function CoverBanner({ initialCoverUrl, initialPositionY, isOwner }: Cove
 
 						{/* Preview frame */}
 						<div
-							className="relative w-full h-[280px] overflow-hidden rounded cursor-ns-resize select-none border border-outline/20"
+							role="slider"
+							tabIndex={0}
+							aria-label="Reposition cover image"
+							aria-valuemin={0}
+							aria-valuemax={100}
+							aria-valuenow={Math.round(pendingPositionY)}
+							className="relative w-full h-[180px] overflow-hidden rounded cursor-ns-resize select-none border border-outline/20"
 							onMouseDown={onMouseDown}
 							onTouchStart={onTouchStart}
 							onTouchMove={onTouchMove}
 							onTouchEnd={onTouchEnd}
+							onKeyDown={(e) => {
+								if (e.key === "ArrowUp") {
+									e.preventDefault();
+									setPendingPositionY((prev) => Math.min(100, prev + 2));
+								} else if (e.key === "ArrowDown") {
+									e.preventDefault();
+									setPendingPositionY((prev) => Math.max(0, prev - 2));
+								}
+							}}
 						>
 							{/* eslint-disable-next-line @next/next/no-img-element */}
 							<img

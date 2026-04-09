@@ -10,6 +10,7 @@ export default function NotificationsLoading() {
 			<div className="space-y-2">
 				{Array.from({ length: 8 }).map((_, i) => (
 					<div
+						// biome-ignore lint/suspicious/noArrayIndexKey: static list
 						key={i}
 						className="flex items-start gap-3 p-3 bg-surface-container-low border border-outline-variant/10 rounded"
 					>

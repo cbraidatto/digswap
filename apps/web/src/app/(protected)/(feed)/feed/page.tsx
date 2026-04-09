@@ -41,7 +41,7 @@ export default async function FeedPage({
 		getFollowCounts(user.id),
 	]);
 
-	let initialItems;
+	let initialItems: Awaited<ReturnType<typeof getExploreFeed>>;
 	if (isExplore) {
 		initialItems = await getExploreFeed(user.id, null, 20);
 	} else {

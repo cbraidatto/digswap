@@ -10,10 +10,8 @@ import type { GemTier } from "./constants";
  * Uses SQL CASE expression to classify each record's rarity_score into
  * gem tiers at query time — avoids storing derived tier data.
  */
-export async function getGemDistribution(
-  userId: string,
-): Promise<Record<GemTier, number>> {
-  const rows = await db.execute(sql`
+export async function getGemDistribution(userId: string): Promise<Record<GemTier, number>> {
+	const rows = await db.execute(sql`
     SELECT
       CASE
         WHEN COALESCE(r.rarity_score, 0) >= 6.0 THEN 'diamond'
@@ -30,25 +28,25 @@ export async function getGemDistribution(
     GROUP BY gem_tier
   `);
 
-  // Start with all tiers at 0
-  const distribution: Record<GemTier, number> = {
-    quartz: 0,
-    amethyst: 0,
-    emerald: 0,
-    ruby: 0,
-    sapphire: 0,
-    diamond: 0,
-  };
+	// Start with all tiers at 0
+	const distribution: Record<GemTier, number> = {
+		quartz: 0,
+		amethyst: 0,
+		emerald: 0,
+		ruby: 0,
+		sapphire: 0,
+		diamond: 0,
+	};
 
-  // Fill in counts from query results
-  for (const row of rows as unknown as Array<{ gem_tier: string; count: string }>) {
-    const tier = row.gem_tier as GemTier;
-    if (tier in distribution) {
-      distribution[tier] = parseInt(row.count, 10) || 0;
-    }
-  }
+	// Fill in counts from query results
+	for (const row of rows as unknown as Array<{ gem_tier: string; count: string }>) {
+		const tier = row.gem_tier as GemTier;
+		if (tier in distribution) {
+			distribution[tier] = parseInt(row.count, 10) || 0;
+		}
+	}
 
-  return distribution;
+	return distribution;
 }
 
 /**
@@ -58,7 +56,7 @@ export async function getGemDistribution(
  * Uses the same CASE expression thresholds as getGemDistribution.
  */
 export async function getGemScoreForUser(userId: string): Promise<number> {
-  const rows = await db.execute(sql`
+	const rows = await db.execute(sql`
     SELECT
       SUM(
         CASE
@@ -75,7 +73,7 @@ export async function getGemScoreForUser(userId: string): Promise<number> {
     WHERE ci.user_id = ${userId}
   `);
 
-  const result = rows as unknown as Array<{ gem_score: string | null }>;
-  if (!result.length || !result[0].gem_score) return 0;
-  return parseInt(result[0].gem_score, 10) || 0;
+	const result = rows as unknown as Array<{ gem_score: string | null }>;
+	if (!result.length || !result[0].gem_score) return 0;
+	return parseInt(result[0].gem_score, 10) || 0;
 }

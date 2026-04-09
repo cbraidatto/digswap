@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
 
-import { useBackupCode } from "@/actions/mfa";
+import { useBackupCode as consumeBackupCode } from "@/actions/mfa";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -31,7 +31,7 @@ export function BackupCodeInput({ onBack }: { onBack: () => void }) {
 		setError(null);
 		setLastCodeWarning(false);
 
-		const result = await useBackupCode(code);
+		const result = await consumeBackupCode(code);
 
 		if (!result.success) {
 			if (result.error.includes("Too many attempts")) {

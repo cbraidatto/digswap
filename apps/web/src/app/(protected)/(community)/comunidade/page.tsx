@@ -25,7 +25,7 @@ export default async function ComunidadePage() {
 						COMMUNITY_HUB
 					</span>
 					<p className="font-mono text-xs text-on-surface-variant mt-1">
-						// {totalGroups} active groups
+						{/* // */} {totalGroups} active groups
 					</p>
 				</div>
 				<Link

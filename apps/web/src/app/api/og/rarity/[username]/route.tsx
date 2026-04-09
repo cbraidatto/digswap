@@ -6,12 +6,12 @@ export const runtime = "edge";
 /**
  * Verify HMAC signature on OG image query params.
  * Prevents fake stat cards — only the server can generate valid signatures.
- * sig = HMAC-SHA256(username:total:ultra:avg, secret).slice(0, 16)
+ * sig = HMAC-SHA256(username:total:gems:avg, secret).slice(0, 16)
  */
 async function verifyOgSignature(
 	username: string,
 	total: string,
-	ultra: string,
+	gems: string,
 	avg: string,
 	sig: string | null,
 ): Promise<boolean> {
@@ -27,7 +27,7 @@ async function verifyOgSignature(
 		false,
 		["sign"],
 	);
-	const data = encoder.encode(`${username}:${total}:${ultra}:${avg}`);
+	const data = encoder.encode(`${username}:${total}:${gems}:${avg}`);
 	const signature = await crypto.subtle.sign("HMAC", key, data);
 	const expected = Array.from(new Uint8Array(signature))
 		.map((b) => b.toString(16).padStart(2, "0"))
@@ -85,7 +85,7 @@ export async function GET(request: Request, context: { params: Promise<{ usernam
 	const sigValid = await verifyOgSignature(
 		username,
 		searchParams.get("total") ?? "0",
-		searchParams.get("ultra") ?? "0",
+		searchParams.get("gems") ?? "0",
 		searchParams.get("avg") ?? "0",
 		sig,
 	);
@@ -95,10 +95,10 @@ export async function GET(request: Request, context: { params: Promise<{ usernam
 
 	const displayName = String(searchParams.get("name") ?? username).slice(0, 60);
 	const rawTotal = parseInt(searchParams.get("total") ?? "0", 10);
-	const rawUltra = parseInt(searchParams.get("ultra") ?? "0", 10);
+	const rawGems = parseInt(searchParams.get("gems") ?? "0", 10);
 	const rawAvg = parseFloat(searchParams.get("avg") ?? "0");
 	const totalRecords = isNaN(rawTotal) || rawTotal < 0 ? 0 : Math.min(rawTotal, 999999);
-	const ultraRareCount = isNaN(rawUltra) || rawUltra < 0 ? 0 : Math.min(rawUltra, 999999);
+	const gemScore = isNaN(rawGems) || rawGems < 0 ? 0 : Math.min(rawGems, 999999);
 	const avgRarity = isNaN(rawAvg) || rawAvg < 0 ? 0 : Math.min(rawAvg, 100);
 	const obscurityPercentile = Math.min(99, Math.round(avgRarity));
 	const avgDisplay = avgRarity > 0 ? avgRarity.toFixed(1) : "-";
@@ -118,7 +118,7 @@ export async function GET(request: Request, context: { params: Promise<{ usernam
 		>
 			<div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
 				<div style={{ color: "#6fdd78", fontSize: "14px", letterSpacing: "0.2em" }}>
-					[RARITY_SCORE_CARD]
+					[GEM_SCORE_CARD]
 				</div>
 				<div style={{ color: "#dfe2eb", fontSize: "48px", fontWeight: 700 }}>{displayName}</div>
 				<div style={{ color: "#8a9099", fontSize: "16px" }}>@{username}</div>
@@ -146,10 +146,10 @@ export async function GET(request: Request, context: { params: Promise<{ usernam
 					</div>
 					<div style={{ display: "flex", flexDirection: "column", gap: "2px" }}>
 						<div style={{ color: "#ffb689", fontSize: "28px", fontWeight: 600 }}>
-							{String(ultraRareCount)}
+							{String(gemScore)}
 						</div>
 						<div style={{ color: "#8a9099", fontSize: "11px", letterSpacing: "0.12em" }}>
-							ULTRA-RARE RECORDS
+							GEM SCORE
 						</div>
 					</div>
 					<div style={{ display: "flex", flexDirection: "column", gap: "2px" }}>
@@ -162,7 +162,7 @@ export async function GET(request: Request, context: { params: Promise<{ usernam
 			</div>
 
 			<div style={{ color: "#8a9099", fontSize: "14px", letterSpacing: "0.1em" }}>
-				digswap.com // find who has your Holy Grails
+				{"digswap.com // find who has your Holy Grails"}
 			</div>
 		</div>,
 		{ width: 1200, height: 630 },

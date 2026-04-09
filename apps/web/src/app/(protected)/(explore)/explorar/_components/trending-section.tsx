@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useEffect, useState, useTransition } from "react";
 import { getTrendingAction } from "@/actions/discovery";
 import { CoverArt } from "@/components/ui/cover-art";
-import { RarityPill } from "@/components/ui/rarity-pill";
+import { GemBadge } from "@/components/ui/gem-badge";
 import { RecordContextMenu } from "@/components/ui/record-context-menu";
 import type { TrendingRecord } from "@/lib/discovery/queries";
 
@@ -38,6 +38,7 @@ export function TrendingSection() {
 				<div className="flex gap-3 overflow-hidden">
 					{Array.from({ length: 5 }).map((_, i) => (
 						<div
+							// biome-ignore lint/suspicious/noArrayIndexKey: static list
 							key={i}
 							className="w-36 h-52 rounded-xl bg-surface-container-high animate-pulse flex-shrink-0"
 						/>
@@ -84,11 +85,7 @@ export function TrendingSection() {
 									<span className="font-mono text-[9px] text-primary font-semibold">
 										+{record.addCount}
 									</span>
-									<RarityPill
-										score={record.rarityScore}
-										showScore={false}
-										className="text-[8px] px-1.5"
-									/>
+									<GemBadge score={record.rarityScore} className="text-[8px] px-1.5" />
 								</div>
 							</div>
 						</div>

@@ -20,6 +20,7 @@ export function ManageButton() {
 
 	return (
 		<button
+			type="button"
 			onClick={handleManage}
 			disabled={isPending}
 			className="w-full bg-surface-container-low border border-outline-variant text-muted-foreground font-mono text-xs py-3 rounded hover:border-outline transition-colors disabled:opacity-50"

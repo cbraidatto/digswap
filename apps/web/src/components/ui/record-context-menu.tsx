@@ -15,6 +15,12 @@ interface RecordContextMenuProps {
 	hideAdd?: boolean;
 	/** Hide "Add to Wantlist" */
 	hideWantlist?: boolean;
+	/** Show "Toggle trade" action */
+	onToggleTrade?: () => void;
+	/** Current trade status (for label) */
+	isOpenForTrade?: boolean;
+	/** Show "Remove from collection" action */
+	onRemove?: () => void;
 }
 
 export function RecordContextMenu({
@@ -24,6 +30,9 @@ export function RecordContextMenu({
 	artist,
 	hideAdd = false,
 	hideWantlist = false,
+	onToggleTrade,
+	isOpenForTrade,
+	onRemove,
 }: RecordContextMenuProps) {
 	const [open, setOpen] = useState(false);
 	const [pending, setPending] = useState(false);
@@ -149,6 +158,22 @@ export function RecordContextMenu({
 						</button>
 					)}
 
+					{onToggleTrade && (
+						<button
+							type="button"
+							onClick={() => {
+								onToggleTrade();
+								setOpen(false);
+							}}
+							className="flex items-center gap-2.5 px-3 py-2 font-mono text-xs text-on-surface hover:bg-surface-container-high transition-colors w-full"
+						>
+							<span className="material-symbols-outlined text-[16px] text-on-surface-variant">
+								swap_horiz
+							</span>
+							{isOpenForTrade ? "Remove from trades" : "Open for trade"}
+						</button>
+					)}
+
 					<button
 						type="button"
 						onClick={handleShare}
@@ -159,6 +184,20 @@ export function RecordContextMenu({
 						</span>
 						Share
 					</button>
+
+					{onRemove && (
+						<button
+							type="button"
+							onClick={() => {
+								onRemove();
+								setOpen(false);
+							}}
+							className="flex items-center gap-2.5 px-3 py-2 font-mono text-xs text-destructive hover:bg-surface-container-high transition-colors w-full"
+						>
+							<span className="material-symbols-outlined text-[16px]">delete</span>
+							Remove
+						</button>
+					)}
 				</div>
 			)}
 		</div>

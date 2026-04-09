@@ -63,6 +63,7 @@ export default async function RootLayout({
 				<script
 					nonce={nonce}
 					suppressHydrationWarning
+					// biome-ignore lint/security/noDangerouslySetInnerHtml: theme flash prevention with static string, no user input
 					dangerouslySetInnerHTML={{
 						__html: `try{var t=localStorage.getItem('app-theme');if(t)document.documentElement.setAttribute('data-theme',t)}catch(e){}`,
 					}}

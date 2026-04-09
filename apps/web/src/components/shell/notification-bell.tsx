@@ -184,6 +184,7 @@ export function NotificationBell({ userId }: NotificationBellProps) {
 				{unreadCount > 0 && (
 					<span
 						className="absolute -top-0.5 -right-0.5 bg-destructive text-destructive-foreground text-xs font-mono font-semibold rounded-full min-w-[18px] h-[18px] flex items-center justify-center px-1"
+						role="img"
 						aria-label={`${unreadCount} unread notifications`}
 					>
 						{unreadCount > 9 ? "9+" : unreadCount}
@@ -205,20 +206,20 @@ export function NotificationBell({ userId }: NotificationBellProps) {
 				</div>
 
 				{/* Notification list */}
-				<div role="list">
+				<ul>
 					{recentNotifications.length === 0 ? (
-						<div className="p-4 text-sm text-on-surface-variant text-center font-mono">
+						<li className="p-4 text-sm text-on-surface-variant text-center font-mono list-none">
 							No notifications yet
-						</div>
+						</li>
 					) : (
 						recentNotifications.map((notification, index) => (
-							<div key={notification.id}>
+							<li key={notification.id} className="list-none">
 								{index > 0 && <Separator className="border-outline-variant/10" />}
 								<NotificationRow notification={notification} onClick={handleNotificationClick} />
-							</div>
+							</li>
 						))
 					)}
-				</div>
+				</ul>
 
 				{/* Footer */}
 				<div className="flex items-center justify-between p-4 border-t border-outline-variant/10">

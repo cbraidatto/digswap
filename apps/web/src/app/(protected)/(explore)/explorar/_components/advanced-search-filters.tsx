@@ -239,10 +239,14 @@ export function AdvancedSearchFilters() {
 			<div className="flex flex-wrap gap-3 items-end">
 				{/* Label */}
 				<div className="flex flex-col gap-1 min-w-[140px]">
-					<label className="font-mono text-[10px] text-on-surface-variant uppercase tracking-widest">
+					<label
+						htmlFor="filter-label"
+						className="font-mono text-[10px] text-on-surface-variant uppercase tracking-widest"
+					>
 						Label
 					</label>
 					<input
+						id="filter-label"
 						type="text"
 						value={activeLabel}
 						onChange={handleLabelChange}
@@ -253,10 +257,14 @@ export function AdvancedSearchFilters() {
 
 				{/* Country */}
 				<div className="flex flex-col gap-1 min-w-[120px]">
-					<label className="font-mono text-[10px] text-on-surface-variant uppercase tracking-widest">
+					<label
+						htmlFor="filter-country"
+						className="font-mono text-[10px] text-on-surface-variant uppercase tracking-widest"
+					>
 						Country
 					</label>
 					<input
+						id="filter-country"
 						type="text"
 						value={activeCountry}
 						onChange={handleCountryChange}
@@ -267,10 +275,14 @@ export function AdvancedSearchFilters() {
 
 				{/* Format */}
 				<div className="flex flex-col gap-1 min-w-[100px]">
-					<label className="font-mono text-[10px] text-on-surface-variant uppercase tracking-widest">
+					<label
+						htmlFor="filter-format"
+						className="font-mono text-[10px] text-on-surface-variant uppercase tracking-widest"
+					>
 						Format
 					</label>
 					<select
+						id="filter-format"
 						value={activeFormat}
 						onChange={handleFormatChange}
 						className="bg-surface-container-low border border-outline-variant/20 rounded px-2 py-1 font-mono text-xs text-on-surface focus:outline-none focus:border-primary/50"
@@ -285,10 +297,14 @@ export function AdvancedSearchFilters() {
 
 				{/* Sort */}
 				<div className="flex flex-col gap-1 min-w-[100px]">
-					<label className="font-mono text-[10px] text-on-surface-variant uppercase tracking-widest">
+					<label
+						htmlFor="filter-sort"
+						className="font-mono text-[10px] text-on-surface-variant uppercase tracking-widest"
+					>
 						Sort by
 					</label>
 					<select
+						id="filter-sort"
 						value={activeSort}
 						onChange={handleSortChange}
 						className="bg-surface-container-low border border-outline-variant/20 rounded px-2 py-1 font-mono text-xs text-on-surface focus:outline-none focus:border-primary/50"
@@ -303,10 +319,14 @@ export function AdvancedSearchFilters() {
 
 				{/* Year range */}
 				<div className="flex flex-col gap-1 min-w-[100px]">
-					<label className="font-mono text-[10px] text-on-surface-variant uppercase tracking-widest">
+					<label
+						htmlFor="filter-year-from"
+						className="font-mono text-[10px] text-on-surface-variant uppercase tracking-widest"
+					>
 						Year from
 					</label>
 					<input
+						id="filter-year-from"
 						type="number"
 						value={activeYearFrom}
 						onChange={handleYearFromChange}
@@ -317,10 +337,14 @@ export function AdvancedSearchFilters() {
 					/>
 				</div>
 				<div className="flex flex-col gap-1 min-w-[100px]">
-					<label className="font-mono text-[10px] text-on-surface-variant uppercase tracking-widest">
+					<label
+						htmlFor="filter-year-to"
+						className="font-mono text-[10px] text-on-surface-variant uppercase tracking-widest"
+					>
 						Year to
 					</label>
 					<input
+						id="filter-year-to"
 						type="number"
 						value={activeYearTo}
 						onChange={handleYearToChange}
@@ -333,10 +357,14 @@ export function AdvancedSearchFilters() {
 
 				{/* Min Rarity */}
 				<div className="flex flex-col gap-1 min-w-[140px]">
-					<label className="font-mono text-[10px] text-on-surface-variant uppercase tracking-widest">
+					<label
+						htmlFor="filter-min-rarity"
+						className="font-mono text-[10px] text-on-surface-variant uppercase tracking-widest"
+					>
 						Min Rarity: <span className="text-primary">{activeMinRarity}</span>
 					</label>
 					<input
+						id="filter-min-rarity"
 						type="range"
 						min={0}
 						max={100}

@@ -1,16 +1,16 @@
-import { getGemTier, getGemWeight, type GemTier } from "./constants";
+import { type GemTier, getGemTier, getGemWeight } from "./constants";
 
 /**
  * Describes a single gem tier change for a release.
  */
 export interface GemTierChange {
-  releaseId: string;
-  releaseTitle: string;
-  discogsId: number | null;
-  oldTier: GemTier;
-  newTier: GemTier;
-  oldWeight: number;
-  newWeight: number;
+	releaseId: string;
+	releaseTitle: string;
+	discogsId: number | null;
+	oldTier: GemTier;
+	newTier: GemTier;
+	oldWeight: number;
+	newWeight: number;
 }
 
 /**
@@ -24,42 +24,36 @@ export interface GemTierChange {
  * - No side effects, no database access.
  */
 export function detectGemTierChanges(
-  oldScores: Map<
-    string,
-    { score: number; title: string; discogsId: number | null }
-  >,
-  newScores: Map<
-    string,
-    { score: number; title: string; discogsId: number | null }
-  >,
+	oldScores: Map<string, { score: number; title: string; discogsId: number | null }>,
+	newScores: Map<string, { score: number; title: string; discogsId: number | null }>,
 ): GemTierChange[] {
-  const changes: GemTierChange[] = [];
+	const changes: GemTierChange[] = [];
 
-  for (const [releaseId, newEntry] of newScores) {
-    const oldEntry = oldScores.get(releaseId);
+	for (const [releaseId, newEntry] of newScores) {
+		const oldEntry = oldScores.get(releaseId);
 
-    // Skip new records (not in old snapshot) — prevents first-sync flood
-    if (!oldEntry) continue;
+		// Skip new records (not in old snapshot) — prevents first-sync flood
+		if (!oldEntry) continue;
 
-    const oldTier = getGemTier(oldEntry.score);
-    const newTier = getGemTier(newEntry.score);
+		const oldTier = getGemTier(oldEntry.score);
+		const newTier = getGemTier(newEntry.score);
 
-    // Skip if either tier is null (shouldn't happen with valid scores)
-    if (!oldTier || !newTier) continue;
+		// Skip if either tier is null (shouldn't happen with valid scores)
+		if (!oldTier || !newTier) continue;
 
-    // Skip if tier didn't change
-    if (oldTier === newTier) continue;
+		// Skip if tier didn't change
+		if (oldTier === newTier) continue;
 
-    changes.push({
-      releaseId,
-      releaseTitle: newEntry.title,
-      discogsId: newEntry.discogsId,
-      oldTier,
-      newTier,
-      oldWeight: getGemWeight(oldTier),
-      newWeight: getGemWeight(newTier),
-    });
-  }
+		changes.push({
+			releaseId,
+			releaseTitle: newEntry.title,
+			discogsId: newEntry.discogsId,
+			oldTier,
+			newTier,
+			oldWeight: getGemWeight(oldTier),
+			newWeight: getGemWeight(newTier),
+		});
+	}
 
-  return changes;
+	return changes;
 }

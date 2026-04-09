@@ -12,7 +12,11 @@ export default function RadarLoading() {
 				{/* Filter chips skeleton */}
 				<div className="flex gap-2 mb-6">
 					{Array.from({ length: 4 }).map((_, i) => (
-						<SkeletonLine key={i} className="h-8 w-24 rounded-full" />
+						<SkeletonLine
+							// biome-ignore lint/suspicious/noArrayIndexKey: static list
+							key={i}
+							className="h-8 w-24 rounded-full"
+						/>
 					))}
 				</div>
 
@@ -20,6 +24,7 @@ export default function RadarLoading() {
 				<div className="space-y-2">
 					{Array.from({ length: 8 }).map((_, i) => (
 						<div
+							// biome-ignore lint/suspicious/noArrayIndexKey: static list
 							key={i}
 							className="flex items-center gap-3 p-3 bg-surface-container-low border border-outline-variant/10 rounded"
 						>

@@ -15,6 +15,7 @@ export function CratesHeader() {
 				</div>
 				{!isCreating && (
 					<button
+						type="button"
 						onClick={() => setIsCreating(true)}
 						className="font-mono text-xs px-3 py-1.5 rounded border border-primary/40 text-primary hover:bg-primary/10 transition-colors"
 					>

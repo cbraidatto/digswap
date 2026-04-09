@@ -5,30 +5,16 @@ import { useEffect, useState } from "react";
 import { getReviewCountAction } from "@/actions/community";
 import { AddToCrateButton } from "@/components/crates/add-to-crate-button";
 import { CoverArt } from "@/components/ui/cover-art";
-import { getRarityTier } from "@/lib/collection/rarity";
+import { GemBadge } from "@/components/ui/gem-badge";
 import type { SearchResult } from "@/lib/discovery/queries";
 import { OwnersList } from "./owners-list";
 import { ReviewsPanel } from "./reviews-panel";
-
-function getRarityColors(tier: string | null): string {
-	switch (tier) {
-		case "Ultra Rare":
-			return "text-tertiary border-tertiary";
-		case "Rare":
-			return "text-secondary border-secondary";
-		case "Common":
-			return "text-on-surface-variant border-outline-variant";
-		default:
-			return "";
-	}
-}
 
 interface RecordSearchCardProps {
 	release: SearchResult;
 }
 
 export function RecordSearchCard({ release }: RecordSearchCardProps) {
-	const rarityTier = getRarityTier(release.rarityScore);
 	const [isReviewsExpanded, setIsReviewsExpanded] = useState(false);
 	const [reviewCount, setReviewCount] = useState<number | null>(null);
 
@@ -48,13 +34,7 @@ export function RecordSearchCard({ release }: RecordSearchCardProps) {
 						<span className="font-heading font-semibold text-on-surface group-hover:text-primary transition-colors truncate text-sm">
 							{release.title}
 						</span>
-						{rarityTier && (
-							<span
-								className={`text-xs font-mono px-1.5 py-0.5 rounded border ${getRarityColors(rarityTier)}`}
-							>
-								[{rarityTier.toUpperCase()}]
-							</span>
-						)}
+						<GemBadge score={release.rarityScore} />
 					</div>
 					<div className="flex flex-wrap items-center gap-3 text-xs text-on-surface-variant font-mono">
 						<span>{release.artist}</span>

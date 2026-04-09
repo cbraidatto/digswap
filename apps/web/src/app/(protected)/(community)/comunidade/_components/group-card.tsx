@@ -48,25 +48,15 @@ export function GroupCard({
 			{creatorUsername && (
 				<div className="mt-2 font-mono text-xs text-on-surface-variant">
 					Created by{" "}
-					<span
+					<a
+						href={`/perfil/${creatorUsername}`}
 						className="hover:text-primary transition-colors"
 						onClick={(e) => {
-							e.preventDefault();
 							e.stopPropagation();
-							window.location.href = `/perfil/${creatorUsername}`;
 						}}
-						onKeyDown={(e) => {
-							if (e.key === "Enter" || e.key === " ") {
-								e.preventDefault();
-								e.stopPropagation();
-								window.location.href = `/perfil/${creatorUsername}`;
-							}
-						}}
-						role="link"
-						tabIndex={0}
 					>
 						@{creatorUsername}
-					</span>
+					</a>
 				</div>
 			)}
 		</Link>

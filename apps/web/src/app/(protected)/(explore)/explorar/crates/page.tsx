@@ -61,7 +61,11 @@ export default async function ExplorarCratesPage() {
 								{Array.from({ length: 4 }).map((_, i) => {
 									const cover = crate.previewCovers[i];
 									return (
-										<div key={i} className="relative bg-surface-container-high overflow-hidden">
+										<div
+											// biome-ignore lint/suspicious/noArrayIndexKey: static list
+											key={i}
+											className="relative bg-surface-container-high overflow-hidden"
+										>
 											{cover ? (
 												<Image
 													src={cover}
@@ -94,7 +98,8 @@ export default async function ExplorarCratesPage() {
 										person
 									</span>
 									{crate.ownerUsername ? (
-										<span
+										<button
+											type="button"
 											className="font-mono text-xs text-on-surface-variant truncate hover:text-primary transition-colors"
 											onClick={(e) => {
 												e.preventDefault();
@@ -102,7 +107,7 @@ export default async function ExplorarCratesPage() {
 											}}
 										>
 											{crate.ownerDisplayName ?? crate.ownerUsername}
-										</span>
+										</button>
 									) : (
 										<span className="font-mono text-xs text-on-surface-variant/50">unknown</span>
 									)}

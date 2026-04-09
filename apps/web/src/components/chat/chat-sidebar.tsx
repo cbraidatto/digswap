@@ -52,11 +52,11 @@ export function ChatSidebar() {
 	return (
 		<>
 			{/* Backdrop on mobile */}
-			<div
+			<button
+				type="button"
 				className="fixed inset-0 bg-black/30 z-40 lg:hidden"
 				onClick={close}
 				onKeyDown={(e) => e.key === "Escape" && close()}
-				role="button"
 				tabIndex={-1}
 				aria-label="Close chat"
 			/>

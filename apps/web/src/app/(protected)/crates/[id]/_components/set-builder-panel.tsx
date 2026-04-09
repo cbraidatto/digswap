@@ -161,8 +161,14 @@ export function SetBuilderPanel({ crateId, items, onClose }: SetBuilderPanelProp
 			{/* Event metadata */}
 			<div className="flex gap-3">
 				<div className="flex-1">
-					<label className="block font-mono text-xs text-on-surface-variant mb-1">DATE</label>
+					<label
+						htmlFor="set-event-date"
+						className="block font-mono text-xs text-on-surface-variant mb-1"
+					>
+						DATE
+					</label>
 					<input
+						id="set-event-date"
 						type="date"
 						value={eventDate}
 						onChange={(e) => setEventDate(e.target.value)}
@@ -170,8 +176,14 @@ export function SetBuilderPanel({ crateId, items, onClose }: SetBuilderPanelProp
 					/>
 				</div>
 				<div className="flex-1">
-					<label className="block font-mono text-xs text-on-surface-variant mb-1">VENUE</label>
+					<label
+						htmlFor="set-venue-name"
+						className="block font-mono text-xs text-on-surface-variant mb-1"
+					>
+						VENUE
+					</label>
 					<input
+						id="set-venue-name"
 						type="text"
 						value={venueName}
 						onChange={(e) => setVenueName(e.target.value)}

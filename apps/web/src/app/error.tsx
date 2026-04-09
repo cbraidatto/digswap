@@ -1,5 +1,6 @@
 "use client";
 
+import * as Sentry from "@sentry/nextjs";
 import { useEffect } from "react";
 
 export default function GlobalError({
@@ -10,6 +11,7 @@ export default function GlobalError({
 	reset: () => void;
 }) {
 	useEffect(() => {
+		Sentry.captureException(error);
 		// SECURITY: Only log error message in production, not full stack trace
 		if (process.env.NODE_ENV === "development") {
 			console.error("[DigSwap] Unhandled error:", error);

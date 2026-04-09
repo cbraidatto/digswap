@@ -19,7 +19,16 @@ export function FollowEventCard({ item }: { item: FeedItem }) {
 	const followedUsername = (item.metadata?.username as string) ?? "unknown";
 
 	return (
-		<div className="bg-surface-container-low/50 rounded-lg px-4 py-3 flex items-center gap-3 border border-outline-variant/5">
+		<div className="bg-surface-container-low/60 rounded-xl px-5 py-3.5 flex items-center gap-3.5 border border-outline-variant/8 hover:border-outline-variant/15 transition-all">
+			<div className="w-8 h-8 rounded-lg bg-secondary/10 flex items-center justify-center flex-shrink-0">
+				<span
+					className="material-symbols-outlined text-base text-secondary"
+					style={{ fontVariationSettings: "'FILL' 1" }}
+				>
+					person_add
+				</span>
+			</div>
+
 			<Avatar size="sm">
 				{item.avatarUrl && <AvatarImage src={item.avatarUrl} alt={item.username ?? ""} />}
 				<AvatarFallback className="font-mono text-xs">
@@ -27,23 +36,23 @@ export function FollowEventCard({ item }: { item: FeedItem }) {
 				</AvatarFallback>
 			</Avatar>
 
-			<span className="font-mono text-sm text-on-surface-variant">
+			<span className="font-mono text-sm text-on-surface-variant flex-1 min-w-0">
 				<Link
 					href={`/perfil/${item.username}`}
-					className="text-on-surface hover:text-primary transition-colors"
+					className="text-on-surface font-semibold hover:text-primary transition-colors"
 				>
 					{item.username}
 				</Link>
-				{" started following "}
+				{" followed "}
 				<Link
 					href={`/perfil/${followedUsername}`}
-					className="text-on-surface hover:text-primary transition-colors"
+					className="text-on-surface font-semibold hover:text-primary transition-colors"
 				>
 					{followedUsername}
 				</Link>
 			</span>
 
-			<span className="font-mono text-xs text-outline ml-auto flex-shrink-0">
+			<span className="font-mono text-[11px] text-on-surface-variant/40 flex-shrink-0">
 				{formatRelativeTime(item.createdAt)}
 			</span>
 		</div>

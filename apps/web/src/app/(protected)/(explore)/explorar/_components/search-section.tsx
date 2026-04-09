@@ -52,7 +52,6 @@ export function SearchSection() {
 					onChange={handleInputChange}
 					className="w-full bg-transparent border-none focus:ring-0 text-on-surface font-mono text-lg placeholder:text-on-surface-variant/40 outline-none"
 					placeholder="Search by username..."
-					role="searchbox"
 					aria-label="Search diggers by username"
 				/>
 				<span className="w-3 h-8 bg-primary blink ml-2" />
@@ -64,11 +63,10 @@ export function SearchSection() {
 					<div className="font-mono text-xs text-on-surface-variant mt-4 mb-4">
 						RESULTS: {results.length} diggers found
 					</div>
-					<div className="space-y-3" role="list">
+					<ul className="space-y-3">
 						{results.map((result) => (
-							<div
+							<li
 								key={result.id}
-								role="listitem"
 								className="bg-surface-container-low rounded-lg p-4 flex items-center gap-4 hover:bg-surface-container transition-colors"
 							>
 								{/* Avatar 40px */}
@@ -114,9 +112,9 @@ export function SearchSection() {
 									initialIsFollowing={result.isFollowing}
 									initialFollowerCount={result.followerCount}
 								/>
-							</div>
+							</li>
 						))}
-					</div>
+					</ul>
 				</>
 			)}
 

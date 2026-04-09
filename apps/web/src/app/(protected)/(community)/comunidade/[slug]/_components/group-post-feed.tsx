@@ -65,18 +65,18 @@ export function GroupPostFeed({ groupId, initialPosts }: GroupPostFeedProps) {
 	return (
 		<div>
 			{/* Post list */}
-			<div role="list">
+			<ul>
 				{posts.map((post, index) => (
-					<div key={post.id} role="listitem">
+					<li key={post.id}>
 						{index > 0 && <hr className="border-t border-outline-variant/10 my-0" />}
 						{post.reviewId !== null ? (
 							<ReviewPostCard post={post} />
 						) : (
 							<GroupPostCard post={post} />
 						)}
-					</div>
+					</li>
 				))}
-			</div>
+			</ul>
 
 			{/* Loading skeletons */}
 			{isPending && (

@@ -183,10 +183,14 @@ export function EditProfileModal({ initial }: EditProfileModalProps) {
 
 							{/* Display Name */}
 							<div>
-								<label className="block font-mono text-xs uppercase tracking-[0.2em] text-on-surface-variant mb-2">
+								<label
+									htmlFor="edit-display-name"
+									className="block font-mono text-xs uppercase tracking-[0.2em] text-on-surface-variant mb-2"
+								>
 									Display Name
 								</label>
 								<input
+									id="edit-display-name"
 									type="text"
 									value={displayName}
 									onChange={(e) => setDisplayName(e.target.value)}
@@ -198,7 +202,10 @@ export function EditProfileModal({ initial }: EditProfileModalProps) {
 
 							{/* Username */}
 							<div>
-								<label className="block font-mono text-xs uppercase tracking-[0.2em] text-on-surface-variant mb-2">
+								<label
+									htmlFor="edit-username"
+									className="block font-mono text-xs uppercase tracking-[0.2em] text-on-surface-variant mb-2"
+								>
 									Username
 								</label>
 								<div className="relative">
@@ -206,6 +213,7 @@ export function EditProfileModal({ initial }: EditProfileModalProps) {
 										@
 									</span>
 									<input
+										id="edit-username"
 										type="text"
 										value={username}
 										onChange={(e) =>
@@ -223,10 +231,14 @@ export function EditProfileModal({ initial }: EditProfileModalProps) {
 
 							{/* Location */}
 							<div>
-								<label className="block font-mono text-xs uppercase tracking-[0.2em] text-on-surface-variant mb-2">
+								<label
+									htmlFor="edit-location"
+									className="block font-mono text-xs uppercase tracking-[0.2em] text-on-surface-variant mb-2"
+								>
 									Location
 								</label>
 								<input
+									id="edit-location"
 									type="text"
 									value={location}
 									onChange={(e) => setLocation(e.target.value)}
@@ -238,10 +250,14 @@ export function EditProfileModal({ initial }: EditProfileModalProps) {
 
 							{/* Bio */}
 							<div>
-								<label className="block font-mono text-xs uppercase tracking-[0.2em] text-on-surface-variant mb-2">
+								<label
+									htmlFor="edit-bio"
+									className="block font-mono text-xs uppercase tracking-[0.2em] text-on-surface-variant mb-2"
+								>
 									Bio
 								</label>
 								<textarea
+									id="edit-bio"
 									value={bio}
 									onChange={(e) => setBio(e.target.value)}
 									maxLength={300}

@@ -67,19 +67,13 @@ export function NotificationRow({ notification, onClick }: NotificationRowProps)
 	const relativeTime = getRelativeTime(notification.createdAt);
 
 	return (
-		<div
+		<button
+			type="button"
 			className={cn(
-				"flex gap-3 p-4 cursor-pointer hover:bg-surface-container-high transition-colors",
+				"flex gap-3 p-4 cursor-pointer hover:bg-surface-container-high transition-colors w-full text-left",
 				!notification.read && "border-l-2 border-primary",
 			)}
 			onClick={() => onClick?.(notification.id)}
-			onKeyDown={(e) => {
-				if (e.key === "Enter" || e.key === " ") {
-					e.preventDefault();
-					onClick?.(notification.id);
-				}
-			}}
-			role="listitem"
 		>
 			<span className={cn("material-symbols-outlined shrink-0 mt-0.5", iconClassName)}>{icon}</span>
 			<div className="flex flex-col gap-0.5 min-w-0 flex-1">
@@ -89,6 +83,6 @@ export function NotificationRow({ notification, onClick }: NotificationRowProps)
 				)}
 				<div className="font-mono text-xs text-on-surface-variant">{relativeTime}</div>
 			</div>
-		</div>
+		</button>
 	);
 }

@@ -68,13 +68,12 @@ export function GlobalSearch() {
 					search
 				</span>
 				<input
-					type="text"
+					type="search"
 					value={query}
 					onChange={handleChange}
 					onFocus={() => results && setIsOpen(true)}
 					placeholder="Search records, artists, diggers..."
 					className="bg-transparent border-none outline-none font-mono text-xs text-on-surface placeholder:text-on-surface-variant/40 w-full"
-					role="searchbox"
 					aria-label="Global search"
 				/>
 				{isPending && (

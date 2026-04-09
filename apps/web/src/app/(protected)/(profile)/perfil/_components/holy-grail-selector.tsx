@@ -31,7 +31,7 @@ export function HolyGrailSelector({ wantlistItems, currentHolyGrailIds }: HolyGr
 	return (
 		<div className="space-y-2">
 			<div className="font-mono text-xs text-on-surface-variant tracking-[0.15em]">
-				[HOLY_GRAILS] // Select up to 3 records from your wantlist
+				{"[HOLY_GRAILS] // Select up to 3 records from your wantlist"}
 			</div>
 			{wantlistItems.length === 0 ? (
 				<p className="font-mono text-xs text-outline/60">Add items to your wantlist first.</p>

@@ -19,7 +19,12 @@ export function ThemeSwitcher() {
 
 			{open && (
 				<>
-					<div className="fixed inset-0 z-40" onClick={() => setOpen(false)} />
+					<button
+						type="button"
+						className="fixed inset-0 z-40"
+						onClick={() => setOpen(false)}
+						aria-label="Close theme picker"
+					/>
 					<div className="absolute right-0 top-8 z-50 bg-surface-container border border-outline/20 rounded-lg p-3 flex flex-col gap-2 min-w-[160px] shadow-xl">
 						<p className="font-mono text-[9px] uppercase tracking-[0.2em] text-outline mb-1">
 							Theme

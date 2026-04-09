@@ -59,6 +59,7 @@ export function DnaRadarChart({ genres }: DnaRadarChartProps) {
 			<div className="flex items-center gap-6">
 				{/* SVG radar */}
 				<svg width={SIZE} height={SIZE} viewBox={`0 0 ${SIZE} ${SIZE}`} className="flex-shrink-0">
+					<title>Digger DNA radar chart</title>
 					{/* Grid rings */}
 					{Array.from({ length: LEVELS }).map((_, i) => {
 						const r = (RADIUS / LEVELS) * (i + 1);
@@ -66,6 +67,7 @@ export function DnaRadarChart({ genres }: DnaRadarChartProps) {
 						const ringPath = `${ringPoints.map((p, j) => `${j === 0 ? "M" : "L"}${p[0]},${p[1]}`).join(" ")}Z`;
 						return (
 							<path
+								// biome-ignore lint/suspicious/noArrayIndexKey: static list
 								key={i}
 								d={ringPath}
 								fill="none"
@@ -81,6 +83,7 @@ export function DnaRadarChart({ genres }: DnaRadarChartProps) {
 						const [x, y] = polarToCartesian(i * angleStep, RADIUS);
 						return (
 							<line
+								// biome-ignore lint/suspicious/noArrayIndexKey: static list
 								key={`axis-${i}`}
 								x1={CENTER}
 								y1={CENTER}
@@ -104,15 +107,25 @@ export function DnaRadarChart({ genres }: DnaRadarChartProps) {
 					/>
 
 					{/* Data points */}
-					{points.map((p, i) => (
-						<circle key={`point-${i}`} cx={p[0]} cy={p[1]} r={3} fill="var(--primary)" />
-					))}
+					{points.map((p, i) => {
+						return (
+							<circle
+								// biome-ignore lint/suspicious/noArrayIndexKey: static list
+								key={`point-${i}`}
+								cx={p[0]}
+								cy={p[1]}
+								r={3}
+								fill="var(--primary)"
+							/>
+						);
+					})}
 
 					{/* Labels */}
 					{top.map((g, i) => {
 						const [x, y] = polarToCartesian(i * angleStep, RADIUS + 18);
 						return (
 							<text
+								// biome-ignore lint/suspicious/noArrayIndexKey: static list
 								key={`label-${i}`}
 								x={x}
 								y={y}

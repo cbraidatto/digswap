@@ -9,6 +9,12 @@ vi.mock("@/app/(protected)/(profile)/perfil/_components/collection-card", () => 
 	),
 }));
 
+vi.mock("@/app/(protected)/(profile)/perfil/_components/collection-card-expanded", () => ({
+	CollectionCardExpanded: ({ item }: { item: CollectionItem; isOwner: boolean }) => (
+		<div data-testid={`card-expanded-${item.id}`}>{item.title}</div>
+	),
+}));
+
 import { CollectionGrid } from "@/app/(protected)/(profile)/perfil/_components/collection-grid";
 
 function makeItem(overrides: Partial<CollectionItem> = {}): CollectionItem {
@@ -30,6 +36,7 @@ function makeItem(overrides: Partial<CollectionItem> = {}): CollectionItem {
 		notes: null,
 		openForTrade: 0,
 		personalRating: null,
+		tracklist: null,
 		...overrides,
 	};
 }

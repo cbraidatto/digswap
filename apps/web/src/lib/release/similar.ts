@@ -39,6 +39,20 @@ export async function getSimilarRecords(releaseId: string, limit = 8): Promise<S
 
 	if (genreArr.length === 0 && styleArr.length === 0) return [];
 
+	// Build safe PostgreSQL array literals using ARRAY[] constructor
+	// (Drizzle's sql`${jsArray}::text[]` passes as flat string, not a PG array)
+	const genreArraySql = sql`ARRAY[${sql.join(
+		genreArr.map((g) => sql`${g}`),
+		sql`, `,
+	)}]::text[]`;
+	const styleArraySql =
+		styleArr.length > 0
+			? sql`ARRAY[${sql.join(
+					styleArr.map((s) => sql`${s}`),
+					sql`, `,
+				)}]::text[]`
+			: null;
+
 	// Build similarity score using array overlap
 	// cardinality(array(select unnest(a) intersect select unnest(b))) counts overlap
 	const rows = await db
@@ -51,8 +65,8 @@ export async function getSimilarRecords(releaseId: string, limit = 8): Promise<S
 			rarityScore: releases.rarityScore,
 			year: releases.year,
 			similarity: sql<number>`(
-				coalesce(cardinality(ARRAY(SELECT unnest(${releases.genre}) INTERSECT SELECT unnest(${genreArr}::text[]))), 0) * 2
-				+ coalesce(cardinality(ARRAY(SELECT unnest(${releases.style}) INTERSECT SELECT unnest(${styleArr}::text[]))), 0)
+				coalesce(cardinality(ARRAY(SELECT unnest(${releases.genre}) INTERSECT SELECT unnest(${genreArraySql}))), 0) * 2
+				+ ${styleArraySql ? sql`coalesce(cardinality(ARRAY(SELECT unnest(${releases.style}) INTERSECT SELECT unnest(${styleArraySql}))), 0)` : sql`0`}
 				+ CASE WHEN ${releases.year} IS NOT NULL AND ${source.year ?? 0} > 0
 					THEN GREATEST(0, 5 - ABS(${releases.year} - ${source.year ?? 0}) / 2)
 					ELSE 0
@@ -63,7 +77,7 @@ export async function getSimilarRecords(releaseId: string, limit = 8): Promise<S
 		.where(
 			and(
 				ne(releases.id, releaseId),
-				sql`${releases.genre} && ${genreArr}::text[]`, // at least one genre overlap (uses GIN index)
+				sql`${releases.genre} && ${genreArraySql}`, // at least one genre overlap (uses GIN index)
 			),
 		)
 		.orderBy(desc(sql`similarity`))

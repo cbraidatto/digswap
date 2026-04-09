@@ -11,6 +11,7 @@ export default function TradesLoading() {
 			<div className="flex flex-col gap-2">
 				{Array.from({ length: 5 }).map((_, i) => (
 					<div
+						// biome-ignore lint/suspicious/noArrayIndexKey: static list
 						key={i}
 						className="bg-surface-container-lowest border border-outline-variant rounded p-4"
 					>

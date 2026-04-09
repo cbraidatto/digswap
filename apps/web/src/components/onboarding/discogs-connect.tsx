@@ -66,8 +66,10 @@ export function DiscogsConnect({ onSkip }: { onSkip?: () => void }) {
 				)}
 
 				<p className="font-mono text-xs text-on-surface-variant text-center mt-2">
-					<span className="text-tertiary">[OPTIONAL]</span> // Connect Discogs to activate the
-					Radar. Without Discogs, the Radar is blind.
+					<span className="text-tertiary">[OPTIONAL]</span>{" "}
+					<span>
+						{"// "}Connect Discogs to activate the Radar. Without Discogs, the Radar is blind.
+					</span>
 				</p>
 			</div>
 		</div>

@@ -1,6 +1,6 @@
 "use server";
 
-import { and, count, eq, gte, sql } from "drizzle-orm";
+import { and, count, eq, gte, lt } from "drizzle-orm";
 import { db } from "@/lib/db";
 import { collectionItems } from "@/lib/db/schema/collections";
 import { releases } from "@/lib/db/schema/releases";
@@ -49,7 +49,7 @@ export async function generateWrapped(userId: string, year?: number): Promise<Wr
 				and(
 					eq(collectionItems.userId, userId),
 					gte(collectionItems.createdAt, startDate),
-					sql`${collectionItems.createdAt} < ${endDate}`,
+					lt(collectionItems.createdAt, endDate),
 				),
 			);
 
@@ -63,7 +63,7 @@ export async function generateWrapped(userId: string, year?: number): Promise<Wr
 				and(
 					eq(reviews.userId, userId),
 					gte(reviews.createdAt, startDate),
-					sql`${reviews.createdAt} < ${endDate}`,
+					lt(reviews.createdAt, endDate),
 				),
 			);
 
@@ -75,7 +75,7 @@ export async function generateWrapped(userId: string, year?: number): Promise<Wr
 				and(
 					eq(follows.followingId, userId),
 					gte(follows.createdAt, startDate),
-					sql`${follows.createdAt} < ${endDate}`,
+					lt(follows.createdAt, endDate),
 				),
 			);
 

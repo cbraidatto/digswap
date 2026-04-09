@@ -19,11 +19,7 @@ interface StepIndicatorProps {
  */
 export function StepIndicator({ currentStep, totalSteps = 3 }: StepIndicatorProps) {
 	return (
-		<div
-			className="flex items-center justify-center gap-3"
-			role="navigation"
-			aria-label="Onboarding progress"
-		>
+		<nav className="flex items-center justify-center gap-3" aria-label="Onboarding progress">
 			{Array.from({ length: totalSteps }, (_, i) => {
 				const step = i + 1;
 				const isCompleted = step < currentStep;
@@ -38,6 +34,7 @@ export function StepIndicator({ currentStep, totalSteps = 3 }: StepIndicatorProp
 								isCurrent && "border-primary bg-primary text-primary-foreground",
 								!isCompleted && !isCurrent && "border-muted-foreground/30 text-muted-foreground/30",
 							)}
+							role="img"
 							aria-current={isCurrent ? "step" : undefined}
 							aria-label={`Step ${step}${isCompleted ? " (completed)" : isCurrent ? " (current)" : ""}`}
 						>
@@ -58,6 +55,6 @@ export function StepIndicator({ currentStep, totalSteps = 3 }: StepIndicatorProp
 					</div>
 				);
 			})}
-		</div>
+		</nav>
 	);
 }

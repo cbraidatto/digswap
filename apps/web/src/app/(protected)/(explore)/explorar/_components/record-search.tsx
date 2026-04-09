@@ -51,7 +51,6 @@ export function RecordSearch() {
 					onChange={handleInputChange}
 					className="w-full bg-transparent border-none focus:ring-0 text-on-surface font-mono text-lg placeholder:text-on-surface-variant/40 outline-none"
 					placeholder="Search by record or artist..."
-					role="searchbox"
 					aria-label="Search records by name or artist"
 				/>
 				<span className="w-3 h-8 bg-primary blink ml-2" />

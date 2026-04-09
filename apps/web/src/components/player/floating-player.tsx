@@ -41,9 +41,11 @@ export function FloatingPlayer() {
 		<>
 			{/* Backdrop when expanded */}
 			{expanded && (
-				<div
+				<button
+					type="button"
 					className="fixed inset-0 bg-black/50 z-40 md:hidden"
 					onClick={() => setExpanded(false)}
+					aria-label="Collapse player"
 				/>
 			)}
 

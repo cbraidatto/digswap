@@ -1,8 +1,14 @@
 import Image from "next/image";
+import { TrustStrip } from "@/components/trust/trust-strip";
 import { PremiumBadge } from "@/components/ui/PremiumBadge";
 import type { UserBadge } from "@/lib/gamification/queries";
+import { BadgeRow } from "./badge-row";
+import { CoverBanner } from "./cover-banner";
 import { EditProfileModal } from "./edit-profile-modal";
+import { FollowList } from "./follow-list";
 import { NowSpinning } from "./now-spinning";
+import { RankCard } from "./rank-card";
+import { ShowcaseCards } from "./showcase-cards";
 import { SocialLinks } from "./social-links";
 
 interface ProfileHeroProps {
@@ -28,172 +34,263 @@ interface ProfileHeroProps {
 		followerCount: number;
 		globalRank: number | null;
 		rankTitle: string;
+		gemScore: number;
+		contributionScore: number;
+		weeklyAdds: number;
+		tradesThisWeek: number;
+		wantlistFound: number;
+	};
+	topGenres: { genre: string; count: number }[];
+	showcase: {
+		searching: unknown;
+		rarest: unknown;
+		favorite: unknown;
 	};
 	badges: UserBadge[];
 	isOwner: boolean;
 }
 
-export function ProfileHero({ profile, stats, badges, isOwner }: ProfileHeroProps) {
+export function ProfileHero({
+	profile,
+	stats,
+	topGenres,
+	showcase,
+	badges,
+	isOwner,
+}: ProfileHeroProps) {
 	const displayName = profile.displayName || "DIGGER";
 	const isPremium =
 		profile.subscriptionTier === "premium_monthly" || profile.subscriptionTier === "premium_annual";
-	const coverY = Number(profile.coverPositionY ?? 50);
 
 	return (
-		<div className="relative mb-8">
-			{/* Cover image / fallback gradient */}
-			<div className="h-36 md:h-44 rounded-xl overflow-hidden relative">
-				{/* Always show gradient base — image overlays on top */}
-				<div className="absolute inset-0 bg-gradient-to-br from-primary/20 via-surface-container-high to-secondary/15" />
-				<div
-					className="absolute inset-0 opacity-15 mix-blend-overlay"
-					style={{
-						backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")`,
-					}}
-				/>
-				{profile.coverUrl && (
-					<Image
-						src={profile.coverUrl}
-						alt=""
-						fill
-						className="object-cover"
-						style={{ objectPosition: `center ${coverY}%` }}
-						priority
-						unoptimized
-					/>
-				)}
-				<div className="absolute inset-0 bg-gradient-to-t from-surface-dim via-surface-dim/40 to-transparent" />
-			</div>
+		<div className="mb-8">
+			{/* Cover Banner — full bleed */}
+			<CoverBanner
+				initialCoverUrl={profile.coverUrl}
+				initialPositionY={Number(profile.coverPositionY ?? 50)}
+				isOwner={isOwner}
+			/>
 
-			{/* Profile info — overlaps the cover with glassmorphism */}
-			<div className="relative -mt-16 px-4 md:px-6">
-				<div className="flex items-end gap-4 md:gap-5">
-					{/* Avatar with glow */}
-					<div className="relative flex-shrink-0">
-						<div className="w-24 h-24 md:w-28 md:h-28 rounded-xl border-4 border-surface-dim overflow-hidden bg-surface-container-high shadow-lg shadow-primary/20 ring-2 ring-primary/10">
-							{profile.avatarUrl ? (
-								<Image
-									src={profile.avatarUrl}
-									alt={displayName}
-									width={112}
-									height={112}
-									unoptimized
-									className="w-full h-full object-cover"
-								/>
-							) : (
-								<div className="w-full h-full flex items-center justify-center">
-									<span className="text-3xl font-heading font-bold text-primary">
+			{/* Bento Grid Header */}
+			<section className="grid grid-cols-1 md:grid-cols-12 gap-6 mt-6">
+				{/* ── Identity Card (left) ── */}
+				<div className="md:col-span-4 bg-surface-container-low p-6 rounded-lg relative overflow-hidden">
+					<div className="relative z-10">
+						{/* Avatar + name */}
+						<div className="flex items-start gap-4 mb-4">
+							<div className="w-16 h-16 flex-shrink-0 bg-surface-container-high rounded border-2 border-primary/20 overflow-hidden flex items-center justify-center">
+								{profile.avatarUrl ? (
+									<Image
+										src={profile.avatarUrl}
+										alt={displayName}
+										width={64}
+										height={64}
+										unoptimized
+										className="w-full h-full object-cover rounded"
+									/>
+								) : (
+									<span className="text-2xl font-mono font-bold text-primary">
 										{displayName.charAt(0).toUpperCase()}
 									</span>
-								</div>
-							)}
-						</div>
-					</div>
-
-					{/* Name + meta */}
-					<div className="flex-1 min-w-0 pb-1">
-						<div className="flex items-center gap-2 flex-wrap">
-							<h1 className="font-heading text-xl md:text-2xl font-extrabold text-on-surface leading-tight truncate">
-								{displayName}
-							</h1>
-							{isPremium && <PremiumBadge />}
-							{stats.globalRank && (
-								<span className="font-mono text-[10px] text-secondary bg-secondary/10 border border-secondary/20 px-1.5 py-0.5 rounded-full">
-									#{stats.globalRank}
-								</span>
-							)}
-						</div>
-						{profile.username && (
-							<p className="font-mono text-xs text-on-surface-variant/60 mt-0.5">
-								@{profile.username}
-								{profile.location && (
-									<span className="text-on-surface-variant/40"> · {profile.location}</span>
 								)}
-							</p>
-						)}
-					</div>
-				</div>
+							</div>
+							<div className="flex-1 min-w-0 pt-0.5">
+								<div className="flex items-center gap-2 mb-0.5">
+									<h1 className="text-2xl font-bold tracking-tight font-heading leading-none truncate">
+										{displayName.toUpperCase()}
+									</h1>
+									{isPremium && <PremiumBadge />}
+								</div>
+								{profile.username && (
+									<p className="font-mono text-xs text-primary/60 mb-0.5">@{profile.username}</p>
+								)}
+								{profile.location && (
+									<div className="flex items-center gap-1.5 font-mono text-xs text-on-surface-variant">
+										<span className="material-symbols-outlined text-sm leading-none">
+											location_on
+										</span>
+										{profile.location}
+									</div>
+								)}
+							</div>
+						</div>
 
-				{/* Stats + actions row */}
-				<div className="mt-3 flex items-center justify-between flex-wrap gap-2">
-					{/* Stats inline */}
-					<div className="flex items-center gap-3 font-mono text-[11px]">
-						<span>
-							<span className="text-on-surface font-bold">{stats.collectionCount}</span>
-							<span className="text-on-surface-variant/40 ml-1">records</span>
-						</span>
-						<span className="text-outline-variant/15">·</span>
-						<span>
-							<span className="text-on-surface font-bold">{stats.followerCount}</span>
-							<span className="text-on-surface-variant/40 ml-1">followers</span>
-						</span>
-						<span className="text-outline-variant/15">·</span>
-						<span>
-							<span className="text-on-surface font-bold">{stats.followingCount}</span>
-							<span className="text-on-surface-variant/40 ml-1">following</span>
-						</span>
-					</div>
-
-					{/* Actions — single edit button */}
-					{isOwner && (
-						<EditProfileModal
-							initial={{
-								displayName: profile.displayName ?? "",
-								username: profile.username ?? "",
-								location: profile.location ?? "",
-								bio: profile.bio ?? "",
-								youtubeUrl: profile.youtubeUrl ?? "",
-								instagramUrl: profile.instagramUrl ?? "",
-								soundcloudUrl: profile.soundcloudUrl ?? "",
-								discogsUrl: profile.discogsUrl ?? "",
-								beatportUrl: profile.beatportUrl ?? "",
-								avatarUrl: profile.avatarUrl ?? null,
-							}}
+						{/* Rank Card */}
+						<RankCard
+							title={stats.rankTitle}
+							globalRank={stats.globalRank}
+							gemScore={stats.gemScore}
+							contributionScore={stats.contributionScore}
 						/>
-					)}
-				</div>
 
-				{/* Bio */}
-				{profile.bio && (
-					<p className="mt-2 font-mono text-xs text-on-surface-variant/60 leading-relaxed max-w-lg">
-						{profile.bio}
-					</p>
-				)}
+						{/* Badge Row */}
+						<BadgeRow badges={badges} />
 
-				{/* Now Spinning status */}
-				<div className="mt-2">
-					<NowSpinning />
-				</div>
+						{/* Trust Strip */}
+						<div className="mt-3">
+							<TrustStrip userId={profile.id} variant="full" />
+						</div>
 
-				{/* Social links + badges — compact row */}
-				<div className="mt-3 flex items-center gap-3 flex-wrap">
-					<SocialLinks
-						youtube={profile.youtubeUrl}
-						instagram={profile.instagramUrl}
-						soundcloud={profile.soundcloudUrl}
-						discogs={profile.discogsUrl}
-						beatport={profile.beatportUrl}
-					/>
-					{badges.length > 0 && (
-						<div className="flex items-center gap-1">
-							{badges.slice(0, 4).map((b) => (
-								<span
-									key={b.slug}
-									className="font-mono text-[9px] text-primary/70 bg-primary/8 border border-primary/12 px-1.5 py-0.5 rounded"
-									title={b.description ?? undefined}
-								>
-									{b.name}
-								</span>
-							))}
-							{badges.length > 4 && (
-								<span className="font-mono text-[9px] text-on-surface-variant/40">
-									+{badges.length - 4}
-								</span>
+						{/* Divider */}
+						<div className="border-t border-outline/10 my-4" />
+
+						{/* Follow counts + Edit */}
+						<div className="flex items-center justify-between mb-3">
+							<div className="flex items-center gap-3 font-mono text-xs">
+								<FollowList userId={profile.id} type="following" count={stats.followingCount} />
+								<span className="text-outline">&middot;</span>
+								<FollowList userId={profile.id} type="followers" count={stats.followerCount} />
+							</div>
+							{isOwner && (
+								<EditProfileModal
+									initial={{
+										displayName: profile.displayName ?? "",
+										username: profile.username ?? "",
+										location: profile.location ?? "",
+										bio: profile.bio ?? "",
+										youtubeUrl: profile.youtubeUrl ?? "",
+										instagramUrl: profile.instagramUrl ?? "",
+										soundcloudUrl: profile.soundcloudUrl ?? "",
+										discogsUrl: profile.discogsUrl ?? "",
+										beatportUrl: profile.beatportUrl ?? "",
+										avatarUrl: profile.avatarUrl ?? null,
+									}}
+								/>
 							)}
 						</div>
-					)}
+
+						{/* Social links */}
+						<SocialLinks
+							youtube={profile.youtubeUrl}
+							instagram={profile.instagramUrl}
+							soundcloud={profile.soundcloudUrl}
+							discogs={profile.discogsUrl}
+							beatport={profile.beatportUrl}
+						/>
+
+						{/* Bio */}
+						{profile.bio && (
+							<div
+								className="mt-3 rounded border border-outline/15 bg-black/40 px-3 py-2.5 max-h-[180px] overflow-y-auto"
+								style={{
+									scrollbarWidth: "thin",
+									scrollbarColor: "rgba(255,255,255,0.15) transparent",
+								}}
+							>
+								<p className="font-mono text-xs text-on-surface-variant leading-relaxed break-words whitespace-pre-wrap">
+									{profile.bio}
+								</p>
+							</div>
+						)}
+
+						{/* Now Spinning */}
+						<div className="mt-3">
+							<NowSpinning />
+						</div>
+					</div>
+
+					{/* Decorative dot grid */}
+					<div
+						className="absolute inset-0 opacity-5 pointer-events-none"
+						style={{
+							backgroundImage: "radial-gradient(var(--primary) 1px, transparent 1px)",
+							backgroundSize: "20px 20px",
+						}}
+					/>
 				</div>
-			</div>
+
+				{/* ── Digging Activity (right) ── */}
+				<div className="md:col-span-8 bg-surface-container-low p-6 rounded-lg flex flex-col gap-5">
+					<h3 className="text-xs font-mono uppercase tracking-[0.2em] text-tertiary">
+						Digging Activity
+					</h3>
+
+					{/* Stats row */}
+					<div className="grid grid-cols-2 gap-3">
+						{/* Week activity */}
+						<div className="bg-surface-container-high rounded-lg border border-outline/[0.07] flex flex-col">
+							<p className="font-mono text-[9px] uppercase tracking-[0.18em] text-on-surface-variant px-4 pt-3 flex items-center gap-1.5">
+								<span className="material-symbols-outlined text-[13px] text-tertiary">
+									calendar_month
+								</span>
+								Week Activity
+							</p>
+							<div className="flex divide-x divide-outline/[0.07] flex-1">
+								<div className="flex-1 p-4 flex flex-col items-center justify-center gap-1 text-center">
+									<span className="material-symbols-outlined text-base text-primary">
+										playlist_add
+									</span>
+									<p className="text-3xl font-bold font-heading text-primary leading-none">
+										{stats.weeklyAdds}
+									</p>
+									<p className="font-mono text-[9px] uppercase tracking-widest text-outline">
+										Added
+									</p>
+								</div>
+								<div className="flex-1 p-4 flex flex-col items-center justify-center gap-1 text-center">
+									<span className="material-symbols-outlined text-base text-tertiary">
+										swap_horiz
+									</span>
+									<p className="text-3xl font-bold font-heading text-tertiary leading-none">
+										{stats.tradesThisWeek}
+									</p>
+									<p className="font-mono text-[9px] uppercase tracking-widest text-outline">
+										Trades
+									</p>
+								</div>
+								<div className="flex-1 p-4 flex flex-col items-center justify-center gap-1 text-center">
+									<span className="material-symbols-outlined text-base text-secondary">
+										task_alt
+									</span>
+									<p className="text-3xl font-bold font-heading text-secondary leading-none">
+										{stats.wantlistFound}
+									</p>
+									<p className="font-mono text-[9px] uppercase tracking-widest text-outline">
+										Found
+									</p>
+								</div>
+							</div>
+						</div>
+
+						{/* Top genres */}
+						<div className="bg-surface-container-high rounded-lg p-4 border border-outline/[0.07]">
+							<p className="font-mono text-[9px] uppercase tracking-[0.18em] text-on-surface-variant mb-2 flex items-center gap-1.5">
+								<span className="material-symbols-outlined text-[13px] text-secondary">
+									queue_music
+								</span>
+								Top Genres
+							</p>
+							{topGenres.length > 0 ? (
+								<ol className="space-y-1.5">
+									{topGenres.map((g, i) => (
+										<li key={g.genre} className="flex items-center gap-2 min-w-0">
+											<span className="font-mono text-[9px] text-outline w-2.5 flex-shrink-0">
+												{i + 1}
+											</span>
+											<span className="font-mono text-xs text-on-surface truncate flex-1">
+												{g.genre}
+											</span>
+											<span className="font-mono text-xs text-secondary flex-shrink-0">
+												{g.count}
+											</span>
+										</li>
+									))}
+								</ol>
+							) : (
+								<p className="font-mono text-xs text-outline/60 italic">no data yet</p>
+							)}
+						</div>
+					</div>
+
+					{/* Showcase */}
+					<ShowcaseCards
+						searching={showcase.searching as any}
+						rarest={showcase.rarest as any}
+						favorite={showcase.favorite as any}
+						isOwner={isOwner}
+					/>
+				</div>
+			</section>
 		</div>
 	);
 }

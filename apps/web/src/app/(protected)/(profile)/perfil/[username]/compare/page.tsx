@@ -2,7 +2,7 @@ import { eq } from "drizzle-orm";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
-import { getRarityTier } from "@/lib/collection/rarity";
+import { GemBadge } from "@/components/ui/gem-badge";
 import { db } from "@/lib/db";
 import { collectionItems } from "@/lib/db/schema/collections";
 import { profiles } from "@/lib/db/schema/users";
@@ -37,7 +37,7 @@ function ComparisonColumn({
 				: "bg-tertiary/10";
 
 	return (
-		<div role="region" aria-label={`Records ${label.toLowerCase().replace(/_/g, " ")}`}>
+		<section aria-label={`Records ${label.toLowerCase().replace(/_/g, " ")}`}>
 			{/* Header */}
 			<div className="flex items-center justify-between mb-4">
 				<span className={`font-mono text-xs uppercase tracking-[0.2em] ${accentColor}`}>
@@ -54,32 +54,23 @@ function ComparisonColumn({
 						{emptyText}
 					</div>
 				) : (
-					items.map((item) => {
-						const tier = getRarityTier(item.rarityScore);
-						const rarityColor =
-							tier === "Ultra Rare"
-								? "text-tertiary"
-								: tier === "Rare"
-									? "text-secondary"
-									: "text-primary";
-						return (
-							<div
-								key={item.releaseId}
-								className="px-4 py-3 border-b border-outline-variant/5 last:border-0"
-							>
-								<div className="font-mono text-xs text-on-surface-variant">{item.artist}</div>
-								<div className="font-heading text-sm font-bold text-on-surface truncate">
-									{item.title}
-								</div>
-								<div className={`font-mono text-xs mt-1 ${rarityColor}`}>
-									RARITY: {item.rarityScore !== null ? item.rarityScore.toFixed(1) : "--"}
-								</div>
+					items.map((item) => (
+						<div
+							key={item.releaseId}
+							className="px-4 py-3 border-b border-outline-variant/5 last:border-0"
+						>
+							<div className="font-mono text-xs text-on-surface-variant">{item.artist}</div>
+							<div className="font-heading text-sm font-bold text-on-surface truncate">
+								{item.title}
 							</div>
-						);
-					})
+							<div className="mt-1">
+								<GemBadge score={item.rarityScore} showScore={true} />
+							</div>
+						</div>
+					))
 				)}
 			</div>
-		</div>
+		</section>
 	);
 }
 

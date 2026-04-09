@@ -76,6 +76,7 @@ export function CrateItemRow({ item }: CrateItemRowProps) {
 				) : (
 					<>
 						<button
+							type="button"
 							onClick={handleMoveToWantlist}
 							disabled={isMoving}
 							className="font-mono text-xs px-2 py-1 rounded border border-outline-variant/20 text-on-surface-variant hover:bg-surface-container-high transition-colors disabled:opacity-50"
@@ -83,6 +84,7 @@ export function CrateItemRow({ item }: CrateItemRowProps) {
 							[→ WANTLIST]
 						</button>
 						<button
+							type="button"
 							onClick={handleMoveToCollection}
 							disabled={isMoving}
 							className="font-mono text-xs px-2 py-1 rounded border border-outline-variant/20 text-on-surface-variant hover:bg-surface-container-high transition-colors disabled:opacity-50"
@@ -90,6 +92,7 @@ export function CrateItemRow({ item }: CrateItemRowProps) {
 							[→ COLLECTION]
 						</button>
 						<button
+							type="button"
 							onClick={async () => {
 								setIsMoving(true);
 								try {

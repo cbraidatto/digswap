@@ -14,6 +14,7 @@ export default function FeedLoading() {
 					<div className="flex gap-3 overflow-hidden">
 						{Array.from({ length: 4 }).map((_, i) => (
 							<div
+								// biome-ignore lint/suspicious/noArrayIndexKey: static list
 								key={i}
 								className="w-20 h-20 rounded-full bg-surface-container-high animate-pulse flex-shrink-0"
 							/>
@@ -24,7 +25,10 @@ export default function FeedLoading() {
 				{/* Feed items skeleton */}
 				<div className="space-y-4">
 					{Array.from({ length: 5 }).map((_, i) => (
-						<SkeletonFeedItem key={i} />
+						<SkeletonFeedItem
+							// biome-ignore lint/suspicious/noArrayIndexKey: static list
+							key={i}
+						/>
 					))}
 				</div>
 			</main>

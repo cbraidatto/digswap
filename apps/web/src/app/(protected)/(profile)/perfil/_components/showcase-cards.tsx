@@ -19,6 +19,7 @@ interface ShowcaseCardsProps {
 	rarest: ShowcaseRelease | null;
 	favorite: ShowcaseRelease | null;
 	isOwner: boolean;
+	compact?: boolean;
 }
 
 const SLOT_META: Record<
@@ -52,11 +53,13 @@ function ShowcaseCard({
 	release,
 	isOwner,
 	onEdit,
+	compact = false,
 }: {
 	slot: ShowcaseSlot;
 	release: ShowcaseRelease | null;
 	isOwner: boolean;
 	onEdit: (slot: ShowcaseSlot) => void;
+	compact?: boolean;
 }) {
 	const meta = SLOT_META[slot];
 
@@ -66,7 +69,9 @@ function ShowcaseCard({
 			style={{ perspective: "800px" }}
 		>
 			{/* Cover — fixed height */}
-			<div className="relative h-36 w-full overflow-hidden bg-surface-container flex-shrink-0">
+			<div
+				className={`relative ${compact ? "h-20" : "h-36"} w-full overflow-hidden bg-surface-container flex-shrink-0`}
+			>
 				<CoverArt
 					src={release?.coverImageUrl ?? null}
 					alt={release?.title ?? meta.label}
@@ -108,27 +113,37 @@ function ShowcaseCard({
 			</div>
 
 			{/* Info */}
-			<div className="px-3 py-2.5 flex flex-col gap-0.5">
+			<div className={`${compact ? "px-2 py-1.5" : "px-3 py-2.5"} flex flex-col gap-0.5`}>
 				<div className="flex items-center gap-1">
-					<span className={`material-symbols-outlined text-xs leading-none ${meta.color}`}>
+					<span
+						className={`material-symbols-outlined ${compact ? "text-[10px]" : "text-xs"} leading-none ${meta.color}`}
+					>
 						{meta.icon}
 					</span>
-					<span className={`font-mono text-[9px] uppercase tracking-[0.15em] ${meta.color}`}>
+					<span
+						className={`font-mono ${compact ? "text-[7px]" : "text-[9px]"} uppercase tracking-[0.15em] ${meta.color}`}
+					>
 						{meta.label}
 					</span>
 				</div>
 				{release ? (
 					<>
-						<p className="font-heading font-bold text-[13px] text-on-surface truncate leading-tight">
+						<p
+							className={`font-heading font-bold ${compact ? "text-[10px]" : "text-[13px]"} text-on-surface truncate leading-tight`}
+						>
 							{release.title}
 						</p>
-						<p className="font-mono text-xs text-on-surface-variant truncate">
-							{release.artist}
-							{release.year ? ` · ${release.year}` : ""}
-						</p>
+						{!compact && (
+							<p className="font-mono text-xs text-on-surface-variant truncate">
+								{release.artist}
+								{release.year ? ` · ${release.year}` : ""}
+							</p>
+						)}
 					</>
 				) : (
-					<p className="font-mono text-xs text-outline/50 italic">not set yet</p>
+					<p className={`font-mono ${compact ? "text-[9px]" : "text-xs"} text-outline/50 italic`}>
+						not set yet
+					</p>
 				)}
 			</div>
 		</div>
@@ -262,7 +277,13 @@ function ShowcasePicker({
 
 // ─── Main component ───────────────────────────────────────────────────────────
 
-export function ShowcaseCards({ searching, rarest, favorite, isOwner }: ShowcaseCardsProps) {
+export function ShowcaseCards({
+	searching,
+	rarest,
+	favorite,
+	isOwner,
+	compact = false,
+}: ShowcaseCardsProps) {
 	const router = useRouter();
 	const [activeSlot, setActiveSlot] = useState<ShowcaseSlot | null>(null);
 	const [isSaving, startSaving] = useTransition();
@@ -280,16 +301,29 @@ export function ShowcaseCards({ searching, rarest, favorite, isOwner }: Showcase
 	return (
 		<>
 			<div
-				className={`grid grid-cols-3 gap-3 transition-opacity ${isSaving ? "opacity-50 pointer-events-none" : ""}`}
+				className={`grid grid-cols-3 ${compact ? "gap-1.5" : "gap-3"} transition-opacity ${isSaving ? "opacity-50 pointer-events-none" : ""}`}
 			>
 				<ShowcaseCard
 					slot="searching"
 					release={searching}
 					isOwner={isOwner}
 					onEdit={setActiveSlot}
+					compact={compact}
 				/>
-				<ShowcaseCard slot="rarest" release={rarest} isOwner={isOwner} onEdit={setActiveSlot} />
-				<ShowcaseCard slot="favorite" release={favorite} isOwner={isOwner} onEdit={setActiveSlot} />
+				<ShowcaseCard
+					slot="rarest"
+					release={rarest}
+					isOwner={isOwner}
+					onEdit={setActiveSlot}
+					compact={compact}
+				/>
+				<ShowcaseCard
+					slot="favorite"
+					release={favorite}
+					isOwner={isOwner}
+					onEdit={setActiveSlot}
+					compact={compact}
+				/>
 			</div>
 
 			{activeSlot && (

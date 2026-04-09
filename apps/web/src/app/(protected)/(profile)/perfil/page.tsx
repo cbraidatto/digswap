@@ -1,4 +1,4 @@
-import { and, count, eq, inArray, or } from "drizzle-orm";
+import { and, count, eq, gte, inArray, isNotNull, or } from "drizzle-orm";
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 
@@ -17,22 +17,28 @@ import {
 	PAGE_SIZE,
 } from "@/lib/collection/queries";
 import { db } from "@/lib/db";
+import { collectionItems } from "@/lib/db/schema/collections";
 import { releases } from "@/lib/db/schema/releases";
 import { tradeRequests } from "@/lib/db/schema/trades";
 import { profiles } from "@/lib/db/schema/users";
+import { wantlistItems } from "@/lib/db/schema/wantlist";
 import { getUserBadges, getUserRanking } from "@/lib/gamification/queries";
+import { getGemDistribution, getGemScoreForUser } from "@/lib/gems/queries";
 import { getFollowCounts } from "@/lib/social/queries";
 import { createClient } from "@/lib/supabase/server";
 import { getWantlistPage, getWantlistTotalCount, WANTLIST_PAGE_SIZE } from "@/lib/wantlist/queries";
 import { AboutTab } from "./_components/about-tab";
 import { AddRecordButton } from "./_components/add-record-button";
 import { CollectionSectionClient } from "./_components/collection-section-client";
+import { CoverBanner } from "./_components/cover-banner";
+import { EditProfileModal } from "./_components/edit-profile-modal";
 import { ExportCollectionButton } from "./_components/export-collection-button";
 import { FilterBar } from "./_components/filter-bar";
 import { Pagination } from "./_components/pagination";
 // Components
-import { ProfileHero } from "./_components/profile-hero";
+import { ProfileSidebar } from "./_components/profile-sidebar";
 import { type ProfileTab, ProfileTabs } from "./_components/profile-tabs";
+import { ShareProfileButton } from "./_components/share-profile-button";
 import { TradingTab } from "./_components/trading-tab";
 import { WantlistTab } from "./_components/wantlist-tab";
 
@@ -56,7 +62,7 @@ export default async function PerfilPage({ searchParams }: PerfilPageProps) {
 
 	if (!profile) redirect("/onboarding");
 
-	const _weekAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
+	const weekAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
 
 	// Showcase release IDs
 	const showcaseIds = [
@@ -80,6 +86,11 @@ export default async function PerfilPage({ searchParams }: PerfilPageProps) {
 		userBadgeData,
 		[{ tradesTotal }],
 		[{ activeTradeCount }],
+		gemDistribution,
+		gemScore,
+		[{ weeklyAdds }],
+		[{ tradesThisWeek }],
+		[{ wantlistFound }],
 	] = await Promise.all([
 		getCollectionPage(user.id, filters),
 		getCollectionCount(user.id, filters),
@@ -117,6 +128,25 @@ export default async function PerfilPage({ searchParams }: PerfilPageProps) {
 					eq(tradeRequests.status, "pending"),
 				),
 			),
+		getGemDistribution(user.id),
+		getGemScoreForUser(user.id),
+		db
+			.select({ weeklyAdds: count() })
+			.from(collectionItems)
+			.where(and(eq(collectionItems.userId, user.id), gte(collectionItems.createdAt, weekAgo))),
+		db
+			.select({ tradesThisWeek: count() })
+			.from(tradeRequests)
+			.where(
+				and(
+					or(eq(tradeRequests.requesterId, user.id), eq(tradeRequests.providerId, user.id)),
+					gte(tradeRequests.createdAt, weekAgo),
+				),
+			),
+		db
+			.select({ wantlistFound: count() })
+			.from(wantlistItems)
+			.where(and(eq(wantlistItems.userId, user.id), isNotNull(wantlistItems.foundAt))),
 	]);
 
 	const totalPages = Math.ceil(totalCount / PAGE_SIZE);
@@ -153,123 +183,163 @@ export default async function PerfilPage({ searchParams }: PerfilPageProps) {
 		}));
 
 	return (
-		<div className="max-w-5xl mx-auto px-4 md:px-6 py-6">
-			{/* Hero header */}
-			<ProfileHero
-				profile={{
-					id: user.id,
-					displayName: profile.displayName,
-					username: profile.username,
-					avatarUrl: profile.avatarUrl,
-					bio: profile.bio,
-					location: profile.location,
-					coverUrl: profile.coverUrl,
-					coverPositionY: profile.coverPositionY,
-					subscriptionTier: profile.subscriptionTier,
-					youtubeUrl: profile.youtubeUrl,
-					instagramUrl: profile.instagramUrl,
-					soundcloudUrl: profile.soundcloudUrl,
-					discogsUrl: profile.discogsUrl,
-					beatportUrl: profile.beatportUrl,
-				}}
-				stats={{
-					collectionCount: totalCount,
-					followingCount: followCounts.followingCount,
-					followerCount: followCounts.followerCount,
-					globalRank: ranking?.globalRank ?? null,
-					rankTitle: ranking?.title ?? "Vinyl Rookie",
-				}}
-				badges={userBadgeData}
+		<div className="max-w-7xl mx-auto px-4 md:px-6 py-6">
+			{/* Compact Cover Banner */}
+			<CoverBanner
+				initialCoverUrl={profile.coverUrl}
+				initialPositionY={Number(profile.coverPositionY ?? 50)}
 				isOwner={true}
 			/>
 
-			{/* Tabs */}
-			<ProfileTabs
-				activeTab={activeTab}
-				collectionCount={totalCount}
-				wantlistCount={wantlistTotal}
-				tradeCount={openForTradeItems.length}
-			>
-				{{
-					/* ── Collection Tab ── */
-					collection: (
-						<div>
-							<div className="flex items-center justify-between mb-4">
-								<h2 className="font-heading text-lg font-bold text-on-surface">Collection</h2>
-								<div className="flex items-center gap-2">
-									<ExportCollectionButton />
-									<AddRecordButton />
-								</div>
-							</div>
-							<FilterBar
-								genres={genres}
-								formats={formats}
-								currentFilters={filters}
-								basePath="/perfil"
-							/>
-							<CollectionSectionClient items={items} />
-							{totalPages > 1 && (
-								<Pagination
-									currentPage={filters.page}
-									totalPages={totalPages}
-									baseUrl="/perfil"
-									searchParams={rawSearchParams as Record<string, string>}
+			{/* Two-column layout: Content + Sidebar */}
+			<div className="grid grid-cols-1 lg:grid-cols-12 gap-6 mt-2">
+				{/* Main content — left */}
+				<main className="lg:col-span-7 xl:col-span-8 min-w-0">
+					<ProfileTabs
+						activeTab={activeTab}
+						collectionCount={totalCount}
+						wantlistCount={wantlistTotal}
+						tradeCount={openForTradeItems.length}
+						actionButtons={
+							<>
+								<EditProfileModal
+									initial={{
+										displayName: profile.displayName ?? "",
+										username: profile.username ?? "",
+										location: profile.location ?? "",
+										bio: profile.bio ?? "",
+										youtubeUrl: profile.youtubeUrl ?? "",
+										instagramUrl: profile.instagramUrl ?? "",
+										soundcloudUrl: profile.soundcloudUrl ?? "",
+										discogsUrl: profile.discogsUrl ?? "",
+										beatportUrl: profile.beatportUrl ?? "",
+										avatarUrl: profile.avatarUrl ?? null,
+									}}
 								/>
-							)}
-						</div>
-					),
+								<ShareProfileButton username={profile.username} />
+							</>
+						}
+					>
+						{{
+							/* ── Collection Tab ── */
+							collection: (
+								<div>
+									<div className="flex items-center justify-between mb-4">
+										<h2 className="font-heading text-lg font-bold text-on-surface">Collection</h2>
+										<div className="flex items-center gap-2">
+											<ExportCollectionButton />
+											<AddRecordButton />
+										</div>
+									</div>
+									<FilterBar
+										genres={genres}
+										formats={formats}
+										currentFilters={filters}
+										basePath="/perfil"
+									/>
+									<CollectionSectionClient items={items} />
+									{totalPages > 1 && (
+										<Pagination
+											currentPage={filters.page}
+											totalPages={totalPages}
+											baseUrl="/perfil"
+											searchParams={rawSearchParams as Record<string, string>}
+										/>
+									)}
+								</div>
+							),
 
-					/* ── Wantlist Tab ── */
-					wantlist: (
-						<WantlistTab
-							items={wantlistData}
-							total={wantlistTotal}
-							pageSize={WANTLIST_PAGE_SIZE}
-							isOwner={true}
-						/>
-					),
+							/* ── Wantlist Tab ── */
+							wantlist: (
+								<WantlistTab
+									items={wantlistData}
+									total={wantlistTotal}
+									pageSize={WANTLIST_PAGE_SIZE}
+									isOwner={true}
+								/>
+							),
 
-					/* ── Trading Tab ── */
-					trading: (
-						<TradingTab openForTradeItems={openForTradeItems} activeTradeCount={activeTradeCount} />
-					),
+							/* ── Trading Tab ── */
+							trading: (
+								<TradingTab
+									openForTradeItems={openForTradeItems}
+									activeTradeCount={activeTradeCount}
+								/>
+							),
 
-					/* ── About Tab ── */
-					about: (
-						<AboutTab
-							userId={user.id}
+							/* ── About Tab ── */
+							about: (
+								<AboutTab
+									userId={user.id}
+									profile={{
+										username: profile.username,
+										displayName: profile.displayName,
+										holyGrailIds: profile.holyGrailIds as string[] | null,
+									}}
+									stats={{
+										collectionCount: totalCount,
+										globalRank: ranking?.globalRank ?? null,
+										rankTitle: ranking?.title ?? "Vinyl Rookie",
+										gemScore: ranking?.gemScore ?? 0,
+										contributionScore: ranking?.contributionScore ?? 0,
+										totalTrades: tradesTotal,
+									}}
+									wantlistItems={wantlistData.map((item) => ({
+										id: item.id,
+										releaseTitle: item.title ?? null,
+										releaseArtist: item.artist ?? null,
+									}))}
+									topGenres={topGenres}
+									badges={userBadgeData}
+									gemDistribution={gemDistribution}
+									totalGemScore={gemScore}
+									heatmapData={heatmapData}
+									recentlyAdded={recentlyAdded}
+									isOwner={true}
+								/>
+							),
+						}}
+					</ProfileTabs>
+				</main>
+
+				{/* Sidebar — right */}
+				<div className="lg:col-span-5 xl:col-span-4 min-w-0">
+					<div className="lg:sticky lg:top-20">
+						<ProfileSidebar
 							profile={{
-								username: profile.username,
+								id: user.id,
 								displayName: profile.displayName,
-								holyGrailIds: profile.holyGrailIds as string[] | null,
+								username: profile.username,
+								avatarUrl: profile.avatarUrl,
+								bio: profile.bio,
+								location: profile.location,
+								subscriptionTier: profile.subscriptionTier,
+								youtubeUrl: profile.youtubeUrl,
+								instagramUrl: profile.instagramUrl,
+								soundcloudUrl: profile.soundcloudUrl,
+								discogsUrl: profile.discogsUrl,
+								beatportUrl: profile.beatportUrl,
 							}}
 							stats={{
 								collectionCount: totalCount,
+								followingCount: followCounts.followingCount,
+								followerCount: followCounts.followerCount,
 								globalRank: ranking?.globalRank ?? null,
 								rankTitle: ranking?.title ?? "Vinyl Rookie",
 								gemScore: ranking?.gemScore ?? 0,
 								contributionScore: ranking?.contributionScore ?? 0,
-								totalTrades: tradesTotal,
 							}}
 							showcase={{
 								searching: showcaseSearching,
 								rarest: showcaseRarest,
 								favorite: showcaseFavorite,
 							}}
-							wantlistItems={wantlistData.map((item) => ({
-								id: item.id,
-								releaseTitle: item.title ?? null,
-								releaseArtist: item.artist ?? null,
-							}))}
-							topGenres={topGenres}
 							badges={userBadgeData}
-							heatmapData={heatmapData}
-							recentlyAdded={recentlyAdded}
 							isOwner={true}
 						/>
-					),
-				}}
-			</ProfileTabs>
+					</div>
+				</div>
+			</div>
 		</div>
 	);
 }

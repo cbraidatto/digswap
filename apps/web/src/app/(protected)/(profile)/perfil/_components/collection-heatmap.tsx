@@ -40,20 +40,23 @@ export function CollectionHeatmap({ data }: HeatmapProps) {
 				Digging Activity
 			</h3>
 			<div className="flex gap-[3px]">
-				{Array.from({ length: WEEKS }).map((_, w) => (
-					<div key={w} className="flex flex-col gap-[3px]">
-						{Array.from({ length: DAYS }).map((_, d) => {
-							const cell = cells[w * DAYS + d];
-							return (
-								<div
-									key={cell.date}
-									className={`w-2.5 h-2.5 rounded-sm ${getColor(cell.count)} transition-colors`}
-									title={`${cell.date}: ${cell.count} record${cell.count !== 1 ? "s" : ""} added`}
-								/>
-							);
-						})}
-					</div>
-				))}
+				{Array.from({ length: WEEKS }).map((_, w) => {
+					return (
+						// biome-ignore lint/suspicious/noArrayIndexKey: static list
+						<div key={w} className="flex flex-col gap-[3px]">
+							{Array.from({ length: DAYS }).map((_, d) => {
+								const cell = cells[w * DAYS + d];
+								return (
+									<div
+										key={cell.date}
+										className={`w-2.5 h-2.5 rounded-sm ${getColor(cell.count)} transition-colors`}
+										title={`${cell.date}: ${cell.count} record${cell.count !== 1 ? "s" : ""} added`}
+									/>
+								);
+							})}
+						</div>
+					);
+				})}
 			</div>
 			{/* Legend */}
 			<div className="flex items-center gap-2 mt-2">

@@ -16,15 +16,22 @@ export default async function ProtectedLayout({ children }: { children: React.Re
 		redirect("/signin");
 	}
 
-	const [profile] = await db
-		.select({
-			displayName: profiles.displayName,
-			avatarUrl: profiles.avatarUrl,
-			subscriptionTier: profiles.subscriptionTier,
-		})
-		.from(profiles)
-		.where(eq(profiles.id, user.id))
-		.limit(1);
+	let profile:
+		| { displayName: string | null; avatarUrl: string | null; subscriptionTier: string }
+		| undefined;
+	try {
+		[profile] = await db
+			.select({
+				displayName: profiles.displayName,
+				avatarUrl: profiles.avatarUrl,
+				subscriptionTier: profiles.subscriptionTier,
+			})
+			.from(profiles)
+			.where(eq(profiles.id, user.id))
+			.limit(1);
+	} catch (err) {
+		console.error("[ProtectedLayout] Failed to fetch profile:", err);
+	}
 
 	return (
 		<AppShell

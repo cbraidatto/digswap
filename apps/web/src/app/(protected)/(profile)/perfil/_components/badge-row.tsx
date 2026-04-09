@@ -10,7 +10,7 @@ export function BadgeRow({ badges }: BadgeRowProps) {
 	if (badges.length === 0) return null;
 
 	return (
-		<div className="flex flex-wrap gap-2 mt-3" aria-label="Earned badges">
+		<div className="flex flex-wrap gap-2 mt-3" role="img" aria-label="Earned badges">
 			{badges.map((badge) => (
 				<span
 					key={badge.slug}

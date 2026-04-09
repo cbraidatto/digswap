@@ -97,7 +97,7 @@ export function FeedShowcase() {
 				<span className="font-mono text-xs uppercase tracking-[0.2em] text-on-surface-variant">
 					featured
 				</span>
-				<span className="font-mono text-xs text-outline">// feed showcase</span>
+				<span className="font-mono text-xs text-outline">{"// feed showcase"}</span>
 			</div>
 
 			{/* Edge fade mask */}
@@ -111,6 +111,7 @@ export function FeedShowcase() {
 				}}
 			>
 				{/* Draggable scroll container */}
+				{/* biome-ignore lint/a11y/noStaticElementInteractions: drag-to-scroll carousel */}
 				<div
 					ref={scrollRef}
 					className="overflow-x-auto scrollbar-none cursor-grab active:cursor-grabbing select-none"

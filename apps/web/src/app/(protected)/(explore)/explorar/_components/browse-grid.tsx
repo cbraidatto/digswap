@@ -3,8 +3,8 @@
 import { useEffect, useState, useTransition } from "react";
 import { browseRecordsAction } from "@/actions/discovery";
 import { CoverArt } from "@/components/ui/cover-art";
+import { GemBadge } from "@/components/ui/gem-badge";
 import { PlayOverlay } from "@/components/ui/play-overlay";
-import { RarityPill } from "@/components/ui/rarity-pill";
 import { RecordContextMenu } from "@/components/ui/record-context-menu";
 import { RecordLink } from "@/components/ui/record-link";
 import type { BrowseResult } from "@/lib/discovery/queries";
@@ -99,6 +99,7 @@ export function BrowseGrid({
 			<div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
 				{Array.from({ length: 8 }).map((_, i) => (
 					<div
+						// biome-ignore lint/suspicious/noArrayIndexKey: static list
 						key={`skeleton-browse-${i}`}
 						className="bg-surface-container-low rounded-xl h-56 animate-pulse"
 					/>
@@ -165,7 +166,7 @@ export function BrowseGrid({
 							{record.artist}
 						</p>
 						<div className="flex items-center justify-between mt-2">
-							<RarityPill score={record.rarityScore} showScore={false} />
+							<GemBadge score={record.rarityScore} />
 							<span className="font-mono text-[9px] text-on-surface-variant/50">
 								{record.ownerCount} {record.ownerCount === 1 ? "owner" : "owners"}
 							</span>

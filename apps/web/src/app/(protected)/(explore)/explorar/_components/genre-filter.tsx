@@ -26,8 +26,7 @@ export function GenreFilter({ activeGenre, onGenreChange, disabled }: GenreFilte
 			{/* GLOBAL chip */}
 			<button
 				type="button"
-				role="radio"
-				aria-checked={activeGenre === null}
+				aria-pressed={activeGenre === null}
 				onClick={() => onGenreChange(null)}
 				className={`${chipBase} ${activeGenre === null ? chipActive : chipInactive}`}
 			>
@@ -39,8 +38,7 @@ export function GenreFilter({ activeGenre, onGenreChange, disabled }: GenreFilte
 				<button
 					key={genre}
 					type="button"
-					role="radio"
-					aria-checked={activeGenre === genre}
+					aria-pressed={activeGenre === genre}
 					onClick={() => onGenreChange(genre)}
 					className={`${chipBase} ${activeGenre === genre ? chipActive : chipInactive}`}
 				>

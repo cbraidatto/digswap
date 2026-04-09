@@ -36,10 +36,14 @@ export function TradeLimitModal({ open, onClose, tradesUsed, tradesLimit = 5 }: 
 	}
 
 	return (
+		// biome-ignore lint/a11y/useKeyWithClickEvents: backdrop dismiss pattern
+		// biome-ignore lint/a11y/noStaticElementInteractions: backdrop dismiss pattern
 		<div
 			className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm"
 			onClick={onClose}
 		>
+			{/* biome-ignore lint/a11y/useKeyWithClickEvents: stopPropagation prevents backdrop dismiss */}
+			{/* biome-ignore lint/a11y/noStaticElementInteractions: modal content wrapper */}
 			<div
 				className="bg-[#111008] border border-[#c8914a]/30 rounded w-full max-w-sm p-6 space-y-4"
 				onClick={(e) => e.stopPropagation()}
@@ -62,6 +66,7 @@ export function TradeLimitModal({ open, onClose, tradesUsed, tradesLimit = 5 }: 
 
 				<div className="flex flex-col gap-2">
 					<button
+						type="button"
 						onClick={handleUpgrade}
 						disabled={isPending}
 						className="w-full bg-[#c8914a] text-[#0d0d0d] font-mono text-xs font-bold py-2.5 rounded hover:brightness-110 transition-all disabled:opacity-50"
@@ -75,6 +80,7 @@ export function TradeLimitModal({ open, onClose, tradesUsed, tradesLimit = 5 }: 
 						See all plans
 					</Link>
 					<button
+						type="button"
 						onClick={onClose}
 						className="w-full text-[#2a2218] hover:text-[#4a4035] font-mono text-xs py-1 transition-colors"
 					>

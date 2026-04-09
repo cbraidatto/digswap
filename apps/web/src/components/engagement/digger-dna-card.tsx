@@ -10,15 +10,24 @@ interface DiggerDnaProps {
 }
 
 const profileLabels: Record<string, { label: string; color: string; icon: string }> = {
-	ultra_rare_hunter: { label: "Ultra Rare Hunter", color: "text-tertiary", icon: "diamond" },
-	deep_cutter: { label: "Deep Cutter", color: "text-secondary", icon: "psychology" },
-	balanced_digger: { label: "Balanced Digger", color: "text-primary", icon: "balance" },
-	mainstream_maven: {
-		label: "Mainstream Maven",
+	diamond_chaser: { label: "Diamond Chaser", color: "text-tertiary", icon: "diamond" },
+	ruby_hunter: { label: "Ruby Hunter", color: "text-secondary", icon: "psychology" },
+	emerald_seeker: { label: "Emerald Seeker", color: "text-primary", icon: "balance" },
+	quartz_collector: {
+		label: "Quartz Collector",
 		color: "text-on-surface-variant",
 		icon: "trending_up",
 	},
 	newcomer: { label: "Newcomer", color: "text-on-surface-variant", icon: "waving_hand" },
+	// Legacy labels (for cached DB values before gem migration)
+	ultra_rare_hunter: { label: "Diamond Chaser", color: "text-tertiary", icon: "diamond" },
+	deep_cutter: { label: "Ruby Hunter", color: "text-secondary", icon: "psychology" },
+	balanced_digger: { label: "Emerald Seeker", color: "text-primary", icon: "balance" },
+	mainstream_maven: {
+		label: "Quartz Collector",
+		color: "text-on-surface-variant",
+		icon: "trending_up",
+	},
 };
 
 function PercentageBar({

@@ -11,6 +11,7 @@ export default function ProtectedLoading() {
 				<div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
 					{Array.from({ length: 8 }).map((_, i) => (
 						<div
+							// biome-ignore lint/suspicious/noArrayIndexKey: static skeleton list
 							key={i}
 							className="bg-surface-container-low rounded-lg overflow-hidden border border-outline-variant/10"
 						>

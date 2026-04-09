@@ -1,8 +1,10 @@
 import Image from "next/image";
 import type { ReactNode } from "react";
 import { PlayButton } from "@/components/player/play-button";
+import { getCardVariant } from "@/lib/collection/format-utils";
 import type { CollectionItem } from "@/lib/collection/queries";
 import { CollectionCard } from "./collection-card";
+import { CollectionCardExpanded } from "./collection-card-expanded";
 
 export type ViewMode = "grid" | "list";
 
@@ -100,12 +102,20 @@ export function CollectionGrid({
 		);
 	}
 
-	// ── List view: full cards (original layout) ─────────────────────────────
+	// ── List view: full cards with format-based variants ──────────────────
 	return (
 		<div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-			{displayItems.map((item) => (
-				<CollectionCard key={item.id} item={item} isOwner={isOwner} />
-			))}
+			{displayItems.map((item) => {
+				const variant = getCardVariant(item.format, item.tracklist);
+				if (variant !== "compact") {
+					return (
+						<div key={item.id} className="col-span-2">
+							<CollectionCardExpanded item={item} isOwner={isOwner} variant={variant} />
+						</div>
+					);
+				}
+				return <CollectionCard key={item.id} item={item} isOwner={isOwner} />;
+			})}
 		</div>
 	);
 }

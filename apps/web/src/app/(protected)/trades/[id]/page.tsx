@@ -30,8 +30,8 @@ export default async function TradeDetailPage({ params }: Props) {
 	} = await supabase.auth.getUser();
 	if (!user) redirect("/signin");
 
-	let thread;
-	let participantContext;
+	let thread: Awaited<ReturnType<typeof getTradeThread>>;
+	let participantContext: Awaited<ReturnType<typeof getTradeParticipantContext>>;
 	try {
 		[thread, participantContext] = await Promise.all([
 			getTradeThread(id, user.id),

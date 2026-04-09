@@ -11,7 +11,11 @@ const BADGE_ICONS: Record<string, { icon: string; color: string }> = {
 const ALL_BADGES = [
 	{ slug: "first_dig", name: "First Dig", description: "Added your first record" },
 	{ slug: "century_club", name: "Century Club", description: "100 records in collection" },
-	{ slug: "rare_find", name: "Rare Find", description: "Added a Safira or Diamante gem to your collection" },
+	{
+		slug: "rare_find",
+		name: "Rare Find",
+		description: "Added a Safira or Diamante gem to your collection",
+	},
 	{ slug: "crew_member", name: "Crew Member", description: "Joined a community group" },
 	{ slug: "critic", name: "Critic", description: "Wrote your first review" },
 ];

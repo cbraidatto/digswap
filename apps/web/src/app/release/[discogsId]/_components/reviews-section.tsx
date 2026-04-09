@@ -42,6 +42,7 @@ function StarRating({ rating }: { rating: number }) {
 		<div className="flex items-center gap-0.5">
 			{Array.from({ length: 5 }, (_, i) => (
 				<span
+					// biome-ignore lint/suspicious/noArrayIndexKey: static list
 					key={i}
 					className={`material-symbols-outlined text-[14px] ${
 						i < rating ? "text-secondary" : "text-on-surface-variant/30"

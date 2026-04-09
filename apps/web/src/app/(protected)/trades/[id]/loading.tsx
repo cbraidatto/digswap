@@ -20,7 +20,11 @@ export default function TradeDetailLoading() {
 			{/* Messages skeleton */}
 			<div className="space-y-3 min-h-[300px]">
 				{Array.from({ length: 4 }).map((_, i) => (
-					<div key={i} className={`flex ${i % 2 === 0 ? "justify-start" : "justify-end"}`}>
+					<div
+						// biome-ignore lint/suspicious/noArrayIndexKey: static list
+						key={i}
+						className={`flex ${i % 2 === 0 ? "justify-start" : "justify-end"}`}
+					>
 						<SkeletonLine className={`h-12 rounded-lg ${i % 2 === 0 ? "w-2/3" : "w-1/2"}`} />
 					</div>
 				))}

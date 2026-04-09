@@ -5,6 +5,7 @@ export function StarRating({ rating, maxStars = 5 }: { rating: number; maxStars?
 	return (
 		<span
 			className="font-mono text-sm inline-flex"
+			role="img"
 			aria-label={`${filled} out of ${maxStars} stars`}
 		>
 			<span className="text-tertiary">{"\u2605".repeat(filled)}</span>

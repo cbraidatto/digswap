@@ -45,10 +45,14 @@ export function DeleteAccountSection() {
 			) : (
 				<div className="space-y-3">
 					<div>
-						<label className="font-mono text-[10px] text-on-surface-variant uppercase tracking-widest block mb-1">
+						<label
+							htmlFor="delete-account-confirmation"
+							className="font-mono text-[10px] text-on-surface-variant uppercase tracking-widest block mb-1"
+						>
 							Type DELETE MY ACCOUNT to confirm
 						</label>
 						<input
+							id="delete-account-confirmation"
 							type="text"
 							value={confirmation}
 							onChange={(e) => setConfirmation(e.target.value)}

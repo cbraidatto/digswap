@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { CoverArt } from "@/components/ui/cover-art";
-import { RarityPill } from "@/components/ui/rarity-pill";
+import { GemBadge } from "@/components/ui/gem-badge";
 import { getSimilarRecords } from "@/lib/release/similar";
 
 interface SimilarSectionProps {
@@ -42,11 +42,7 @@ export async function SimilarSection({ releaseId }: SimilarSectionProps) {
 								{record.artist}
 							</p>
 							<div className="mt-1">
-								<RarityPill
-									score={record.rarityScore}
-									showScore={false}
-									className="text-[8px] px-1.5"
-								/>
+								<GemBadge score={record.rarityScore} className="text-[8px] px-1.5" />
 							</div>
 						</div>
 					</Link>

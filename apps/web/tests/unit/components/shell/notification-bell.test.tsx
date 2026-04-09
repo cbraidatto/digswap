@@ -203,9 +203,12 @@ describe("NotificationBell", () => {
 			expect(screen.getByText("3")).toBeInTheDocument();
 		});
 
-		// Click the first (unread) notification row
-		const notificationRows = screen.getAllByRole("listitem");
-		fireEvent.click(notificationRows[0]);
+		// Click the first (unread) notification row button
+		const notificationButtons = screen.getAllByRole("button");
+		const notifButton = notificationButtons.find((btn) =>
+			btn.textContent?.includes("Wantlist match found!"),
+		);
+		fireEvent.click(notifButton!);
 
 		// Wait for the async markNotificationRead to resolve
 		await waitFor(() => {

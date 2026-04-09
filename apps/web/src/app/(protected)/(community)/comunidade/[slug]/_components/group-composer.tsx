@@ -125,8 +125,7 @@ export function GroupComposer({ groupId, groupName, onPostCreated }: GroupCompos
 							<button
 								key={star}
 								type="button"
-								role="radio"
-								aria-checked={rating === star}
+								aria-pressed={rating === star}
 								aria-label={`Rating: ${star} out of 5 stars`}
 								onClick={() => handleStarClick(star)}
 								className={`text-sm font-mono transition-colors ${

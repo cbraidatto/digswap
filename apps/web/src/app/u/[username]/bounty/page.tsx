@@ -122,7 +122,8 @@ export default async function BountyPage({ params }: BountyPageProps) {
 				{/* Holy Grail records */}
 				{grailItems.length === 0 ? (
 					<div className="text-center font-mono text-xs text-on-surface-variant py-8">
-						[NO_GRAILS_SET] // {username} hasn&apos;t selected their Holy Grails yet.
+						{"[NO_GRAILS_SET] // "}
+						{username} hasn&apos;t selected their Holy Grails yet.
 					</div>
 				) : (
 					<div className="space-y-4 mb-8">

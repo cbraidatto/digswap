@@ -28,6 +28,7 @@ export function TracklistSection({ tracklist }: TracklistSectionProps) {
 			<div className="bg-surface-container-low rounded border border-outline-variant/10 divide-y divide-outline-variant/5">
 				{tracklist.map((track, idx) => (
 					<div
+						// biome-ignore lint/suspicious/noArrayIndexKey: static list
 						key={`${track.position}-${idx}`}
 						className="flex items-center gap-3 px-4 py-2.5 hover:bg-surface-container-high/50 transition-colors"
 					>

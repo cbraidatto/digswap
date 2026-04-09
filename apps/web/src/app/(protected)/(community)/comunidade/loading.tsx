@@ -12,6 +12,7 @@ export default function ComunidadeLoading() {
 			<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
 				{Array.from({ length: 6 }).map((_, i) => (
 					<div
+						// biome-ignore lint/suspicious/noArrayIndexKey: static list
 						key={i}
 						className="bg-surface-container-low rounded-lg border border-outline-variant/10 p-4 space-y-3"
 					>

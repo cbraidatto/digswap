@@ -165,6 +165,7 @@ export function PricingCards({ currentPlan, monthlyPriceId, annualPriceId }: Pro
 					<div>
 						{isPremium ? (
 							<button
+								type="button"
 								onClick={handleManage}
 								disabled={isPending}
 								className="w-full bg-surface-container-low border border-outline-variant text-muted-foreground font-mono text-xs py-2.5 rounded hover:border-outline transition-colors disabled:opacity-50"
@@ -180,6 +181,7 @@ export function PricingCards({ currentPlan, monthlyPriceId, annualPriceId }: Pro
 							</a>
 						) : (
 							<button
+								type="button"
 								onClick={handleUpgrade}
 								disabled={isPending}
 								className="w-full bg-primary text-background font-mono text-xs font-bold py-2.5 rounded hover:brightness-110 transition-all disabled:opacity-50"

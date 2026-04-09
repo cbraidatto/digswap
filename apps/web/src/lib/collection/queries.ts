@@ -28,6 +28,7 @@ export interface CollectionItem {
 	notes: string | null;
 	openForTrade: number;
 	personalRating: number | null;
+	tracklist: { position: string; title: string; duration: string }[] | null;
 }
 
 /**
@@ -105,6 +106,7 @@ export async function getCollectionPage(
 		rarityScore: releases.rarityScore,
 		youtubeVideoId: releases.youtubeVideoId,
 		notes: collectionItems.notes,
+		tracklist: releases.tracklist,
 	};
 
 	// Use base query without open_for_trade/personal_rating columns
@@ -124,6 +126,9 @@ export async function getCollectionPage(
 		notes: r.notes ?? null,
 		openForTrade: 0,
 		personalRating: null,
+		tracklist: Array.isArray(r.tracklist)
+			? (r.tracklist as { position: string; title: string; duration: string }[])
+			: null,
 	}));
 
 	return rows;

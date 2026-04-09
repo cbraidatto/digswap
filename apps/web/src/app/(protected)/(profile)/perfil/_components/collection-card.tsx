@@ -11,10 +11,11 @@ import {
 	toggleOpenForTrade,
 } from "@/actions/collection";
 import { PlayButton } from "@/components/player/play-button";
-import { RarityPill } from "@/components/ui/rarity-pill";
+import { FormatBadge } from "@/components/ui/format-badge";
+import { GemBadge } from "@/components/ui/gem-badge";
 import { RecordContextMenu } from "@/components/ui/record-context-menu";
 import type { CollectionItem } from "@/lib/collection/queries";
-import { getRarityTier } from "@/lib/collection/rarity";
+import { getGemTier } from "@/lib/gems/constants";
 
 interface CollectionCardProps {
 	item: CollectionItem;
@@ -22,9 +23,9 @@ interface CollectionCardProps {
 }
 
 export function CollectionCard({ item, isOwner }: CollectionCardProps) {
-	const tier = getRarityTier(item.rarityScore);
+	const tier = getGemTier(item.rarityScore);
 	const router = useRouter();
-	const [isRemoving, startRemoveTransition] = useTransition();
+	const [_isRemoving, startRemoveTransition] = useTransition();
 
 	function handleRemove() {
 		if (!confirm("Remove this record from your collection?")) return;
@@ -39,11 +40,11 @@ export function CollectionCard({ item, isOwner }: CollectionCardProps) {
 	}
 
 	return (
-		<div className="group bg-surface-container-low rounded-xl overflow-hidden border border-outline-variant/5 hover:border-outline-variant/15 hover:shadow-lg hover:shadow-black/5 transition-all">
+		<div className="group relative bg-surface-container-low rounded-xl border border-outline-variant/5 hover:border-outline-variant/15 hover:shadow-lg hover:shadow-black/5 transition-all">
 			{/* ── Cover ── */}
 			<Link
 				href={item.discogsId ? `/release/${item.discogsId}` : "#"}
-				className="block relative aspect-square bg-surface-container-high"
+				className="block relative aspect-square bg-surface-container-high overflow-hidden rounded-t-xl"
 			>
 				{item.coverImageUrl ? (
 					<Image
@@ -67,7 +68,7 @@ export function CollectionCard({ item, isOwner }: CollectionCardProps) {
 				{/* Rarity — always visible bottom-left */}
 				{tier && (
 					<div className="absolute bottom-2 left-2 z-10">
-						<RarityPill score={item.rarityScore} showScore={false} />
+						<GemBadge score={item.rarityScore} />
 					</div>
 				)}
 
@@ -100,14 +101,14 @@ export function CollectionCard({ item, isOwner }: CollectionCardProps) {
 			</Link>
 
 			{/* ── Info ── */}
-			<div className="px-3 pt-2.5 pb-2">
+			<div className="px-3 pt-2.5 pb-2.5 space-y-1.5">
 				{/* Row 1: Title + menu */}
-				<div className="flex items-start justify-between gap-1">
+				<div className="flex items-start justify-between gap-1.5">
 					<Link
 						href={item.discogsId ? `/release/${item.discogsId}` : "#"}
 						className="min-w-0 flex-1"
 					>
-						<h3 className="font-heading text-[13px] font-bold text-on-surface group-hover:text-primary transition-colors line-clamp-1 leading-tight">
+						<h3 className="font-heading text-sm font-bold text-on-surface group-hover:text-primary transition-colors line-clamp-2 leading-snug">
 							{item.title}
 						</h3>
 					</Link>
@@ -117,82 +118,63 @@ export function CollectionCard({ item, isOwner }: CollectionCardProps) {
 						artist={item.artist}
 						hideAdd
 						hideWantlist
+						onToggleTrade={
+							isOwner
+								? async () => {
+										const r = await toggleOpenForTrade(item.id, !item.openForTrade);
+										if (r.success) {
+											toast.success(item.openForTrade ? "Removed" : "Open for trade!");
+											router.refresh();
+										}
+									}
+								: undefined
+						}
+						isOpenForTrade={!!item.openForTrade}
+						onRemove={isOwner ? handleRemove : undefined}
 					/>
 				</div>
 
-				{/* Row 2: Artist */}
-				<p className="font-mono text-[10px] text-on-surface-variant/70 truncate mt-0.5">
-					{item.artist}
-				</p>
+				{/* Row 2: Artist + format */}
+				<div className="flex items-center gap-2">
+					<p className="font-mono text-[11px] text-primary/50 truncate">{item.artist}</p>
+					<FormatBadge format={item.format} />
+				</div>
 
-				{/* Row 3: Owner actions — single compact row */}
+				{/* Divider */}
+				<div className="border-t border-outline-variant/8" />
+
+				{/* Row 3: Star rating */}
 				{isOwner && (
-					<div className="flex items-center justify-between mt-2">
-						{/* Stars */}
-						<div className="flex items-center gap-px">
-							{[1, 2, 3, 4, 5].map((star) => (
-								<button
-									key={star}
-									type="button"
-									onClick={async () => {
-										const r = await setPersonalRating(
-											item.id,
-											item.personalRating === star ? null : star,
-										);
-										if (r.success) router.refresh();
-									}}
-									className={`transition-colors ${
-										star <= (item.personalRating ?? 0)
-											? "text-primary"
-											: "text-on-surface-variant/15 hover:text-primary/40"
-									}`}
-								>
-									<span className="material-symbols-outlined text-[14px]">
-										{star <= (item.personalRating ?? 0) ? "star" : "star_border"}
-									</span>
-								</button>
-							))}
-						</div>
-
-						{/* Trade toggle + remove */}
-						<div className="flex items-center gap-0.5">
+					<div className="flex items-center">
+						{[1, 2, 3, 4, 5].map((star) => (
 							<button
+								key={star}
 								type="button"
 								onClick={async () => {
-									const r = await toggleOpenForTrade(item.id, !item.openForTrade);
-									if (r.success) {
-										toast.success(item.openForTrade ? "Removed" : "Open for trade!");
-										router.refresh();
-									}
+									const r = await setPersonalRating(
+										item.id,
+										item.personalRating === star ? null : star,
+									);
+									if (r.success) router.refresh();
 								}}
-								className={`p-1 rounded-full transition-colors ${
-									item.openForTrade
-										? "text-primary bg-primary/10"
-										: "text-on-surface-variant/25 hover:text-primary"
+								className={`transition-colors ${
+									star <= (item.personalRating ?? 0)
+										? "text-amber-400"
+										: "text-on-surface-variant/20 hover:text-amber-400/50"
 								}`}
-								title={item.openForTrade ? "Remove from trades" : "Open for trade"}
-							>
-								<span className="material-symbols-outlined text-[14px]">swap_horiz</span>
-							</button>
-							<button
-								type="button"
-								onClick={handleRemove}
-								disabled={isRemoving}
-								className="p-1 rounded-full text-on-surface-variant/15 hover:text-destructive transition-colors disabled:opacity-50"
-								title="Remove from collection"
 							>
 								<span className="material-symbols-outlined text-[14px]">
-									{isRemoving ? "hourglass_top" : "delete"}
+									{star <= (item.personalRating ?? 0) ? "star" : "star_border"}
 								</span>
 							</button>
-						</div>
+						))}
 					</div>
 				)}
 
 				{/* Notes — compact, owner only */}
 				{isOwner && item.notes && (
 					<p
-						className="font-mono text-[9px] text-on-surface-variant/40 truncate mt-1"
+						className="font-mono text-[9px] text-on-surface-variant/40 truncate"
 						title={item.notes}
 					>
 						📝 {item.notes}
@@ -201,11 +183,9 @@ export function CollectionCard({ item, isOwner }: CollectionCardProps) {
 
 				{/* Visitor: trade badge */}
 				{!isOwner && item.openForTrade === 1 && (
-					<div className="mt-2">
-						<span className="font-mono text-[8px] text-primary bg-primary/8 border border-primary/15 px-1.5 py-0.5 rounded-full">
-							Open for trade
-						</span>
-					</div>
+					<span className="inline-block font-mono text-[9px] text-primary bg-primary/8 border border-primary/15 px-2 py-0.5 rounded-full">
+						Open for trade
+					</span>
 				)}
 			</div>
 		</div>

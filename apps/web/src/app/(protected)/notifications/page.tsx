@@ -76,6 +76,7 @@ export default function NotificationsPage() {
 				<div className="space-y-0">
 					{Array.from({ length: 5 }).map((_, i) => (
 						<div
+							// biome-ignore lint/suspicious/noArrayIndexKey: static list
 							key={`skeleton-${i}`}
 							className="h-16 bg-surface-container-low animate-pulse border-b border-outline-variant/10"
 						/>
@@ -90,13 +91,13 @@ export default function NotificationsPage() {
 				</div>
 			) : (
 				<>
-					<div role="list">
+					<ul>
 						{notifications.map((notification) => (
-							<div key={notification.id} className="border-b border-outline-variant/10">
+							<li key={notification.id} className="border-b border-outline-variant/10">
 								<NotificationRow notification={notification} onClick={handleNotificationClick} />
-							</div>
+							</li>
 						))}
-					</div>
+					</ul>
 
 					{/* Pagination */}
 					<div className="flex items-center justify-between mt-6">
