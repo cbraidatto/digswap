@@ -74,6 +74,11 @@ function TradeCard({ thread }: { thread: TradeThreadListItem }) {
 							{thread.unreadCount}
 						</span>
 					)}
+					{thread.pendingProposalForMe && (
+						<span className="bg-secondary/10 text-secondary border border-secondary/30 text-xs px-1.5 py-0.5 rounded">
+							Counter needed
+						</span>
+					)}
 					<span className={`text-xs px-1.5 py-0.5 rounded border ${status.className}`}>
 						{status.label}
 					</span>
@@ -82,7 +87,11 @@ function TradeCard({ thread }: { thread: TradeThreadListItem }) {
 
 			<div className="flex items-end justify-between gap-2">
 				<p className="text-muted-foreground text-xs truncate flex-1">
-					{thread.lastMessage ? thread.lastMessage.body : "No messages yet"}
+					{thread.lastMessage
+						? thread.lastMessage.body
+						: thread.pendingProposalForMe
+							? "New proposal waiting for your response"
+							: "No messages yet"}
 				</p>
 				<span className="text-muted-foreground/60 text-xs flex-shrink-0">
 					{formatRelativeTime(timestamp)}
