@@ -2,12 +2,15 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 
 // ---------- Module-level mocks ----------
 
-const mockParseFile = vi.fn();
+const { mockParseFile, mockInferFromPath } = vi.hoisted(() => ({
+  mockParseFile: vi.fn(),
+  mockInferFromPath: vi.fn(),
+}));
+
 vi.mock("music-metadata", () => ({
   parseFile: mockParseFile,
 }));
 
-const mockInferFromPath = vi.fn();
 vi.mock("./folder-inference", () => ({
   inferFromPath: mockInferFromPath,
 }));
