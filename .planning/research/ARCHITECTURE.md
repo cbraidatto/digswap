@@ -1,896 +1,623 @@
-# Architecture Research
+# Architecture: Local Library Integration
 
-**Domain:** Social network with P2P file transfer, external API sync, gamification, and real-time notifications
-**Researched:** 2026-03-25
-**Confidence:** HIGH (core patterns well-documented; WebRTC file transfer specifics MEDIUM)
+**Domain:** Local folder scan, AI metadata, system tray daemon, file watcher, collection sync
+**Researched:** 2026-04-13
+**Confidence:** HIGH (existing patterns well-established, new components follow proven Electron idioms)
 
-## System Overview
+## Existing Architecture Summary
 
-```
-                          ┌─────────────────────────────┐
-                          │        CDN / Static Host     │
-                          │   (Frontend SPA - React/Next)│
-                          └──────────────┬──────────────┘
-                                         │ HTTPS
-                          ┌──────────────▼──────────────┐
-                          │       API Gateway / Server   │
-                          │   (Node.js + Express/Fastify)│
-                          │                              │
-                          │  ┌────────┐ ┌─────────────┐ │
-                          │  │REST API│ │  WebSocket   │ │
-                          │  │        │ │  (Signaling  │ │
-                          │  │        │ │  + SSE/WS    │ │
-                          │  │        │ │  Notifs)     │ │
-                          │  └───┬────┘ └──────┬──────┘ │
-                          └──────┼─────────────┼────────┘
-                                 │             │
-                ┌────────────────┼─────────────┼────────────────┐
-                │                │             │                │
-        ┌───────▼──────┐ ┌──────▼───┐ ┌───────▼──────┐ ┌──────▼──────┐
-        │  PostgreSQL  │ │  Redis   │ │   BullMQ     │ │  Discogs    │
-        │  (Primary DB)│ │  (Cache, │ │  (Job Queue) │ │  API        │
-        │              │ │  Ranks,  │ │              │ │  (External) │
-        │  Users       │ │  Sessions│ │  Import jobs │ │             │
-        │  Collections │ │  Leaderb.│ │  Rank recalc │ │  OAuth 1.0a │
-        │  Wantlists   │ │  Pub/Sub)│ │  Wantlist    │ │  60 req/min │
-        │  Activities  │ │          │ │  matching    │ │             │
-        │  Trades      │ │          │ │              │ │             │
-        └──────────────┘ └──────────┘ └──────────────┘ └─────────────┘
-
-                    ┌──────────────────────────────┐
-                    │    P2P Layer (Browser-side)   │
-                    │                              │
-                    │  ┌────────┐    ┌────────┐    │
-                    │  │Peer A  │◄──►│Peer B  │    │
-                    │  │Browser │    │Browser │    │
-                    │  └───┬────┘    └────┬───┘    │
-                    │      │   WebRTC     │        │
-                    │      │  DataChannel │        │
-                    │      │  (encrypted) │        │
-                    │      └──────────────┘        │
-                    │              │                │
-                    │     ┌───────▼───────┐        │
-                    │     │ STUN / TURN   │        │
-                    │     │ (NAT travers.)│        │
-                    │     └───────────────┘        │
-                    └──────────────────────────────┘
-```
-
-### Component Responsibilities
-
-| Component | Responsibility | Implementation |
-|-----------|----------------|----------------|
-| **API Server** | REST endpoints, authentication, business logic, rate limiting | Node.js + Fastify (or Express). Single deployable process |
-| **WebSocket Server** | WebRTC signaling relay, real-time notifications to connected clients | Socket.IO on same Node.js process (shared port, namespace separation) |
-| **PostgreSQL** | Persistent storage: users, collections, wantlists, activities, trades, reviews, subscriptions | PostgreSQL 16+ with JSONB for flexible release metadata |
-| **Redis** | Session store, leaderboard sorted sets, caching Discogs data, BullMQ backing store, pub/sub for notifications | Redis 7+ (single instance sufficient at launch) |
-| **BullMQ** | Background job processing: Discogs imports, wantlist matching, rank recalculation, notification dispatch | BullMQ workers in same Node.js process or separate worker process |
-| **Discogs API Client** | OAuth 1.0a authentication, collection/wantlist fetching, rate-limit-aware request queue | Custom client wrapping `node-fetch` with token bucket rate limiting |
-| **P2P Module (Client)** | WebRTC peer connection, DataChannel file transfer with chunking, progress tracking | `simple-peer` library in browser, chunked file transfer over DataChannel |
-| **STUN/TURN** | NAT traversal for WebRTC peers behind firewalls/symmetric NATs | Managed service (Metered.ca or Twilio) -- not self-hosted |
-| **Feature Gate** | Freemium/premium entitlement checking, trade counting, feature access control | Middleware layer checking user subscription tier against action limits |
-
-## Recommended Project Structure
+The desktop app follows a clean separation:
 
 ```
-vinyldig/
-├── apps/
-│   ├── web/                    # Frontend (Next.js or Vite + React)
-│   │   ├── src/
-│   │   │   ├── components/     # UI components (retro/analog design system)
-│   │   │   ├── features/       # Feature modules (collection, trading, rankings)
-│   │   │   ├── hooks/          # Custom hooks (useWebRTC, useNotifications)
-│   │   │   ├── lib/            # Utilities, API client, WebRTC wrapper
-│   │   │   ├── pages/          # Route pages
-│   │   │   └── stores/         # Client state (Zustand or similar)
-│   │   └── public/
-│   └── server/                 # Backend (Node.js)
-│       ├── src/
-│       │   ├── routes/         # REST API route handlers
-│       │   ├── services/       # Business logic (collection, matching, ranking)
-│       │   ├── jobs/           # BullMQ job processors
-│       │   ├── ws/             # WebSocket handlers (signaling, notifications)
-│       │   ├── middleware/     # Auth, feature gates, rate limiting
-│       │   ├── db/             # Database queries, migrations
-│       │   │   ├── migrations/
-│       │   │   └── queries/
-│       │   ├── integrations/   # Discogs API client
-│       │   └── lib/            # Shared utilities
-│       └── tests/
-├── packages/
-│   └── shared/                 # Shared types, constants, validation schemas
-├── docker-compose.yml          # Local dev: PostgreSQL + Redis
-└── package.json                # Monorepo root (pnpm workspaces)
+index.ts (app lifecycle)
+  -> DesktopSessionStore (electron-store, encrypted vault)
+  -> DesktopSupabaseAuth (auth runtime)
+  -> DesktopTradeRuntime (trade lifecycle, WebRTC)
+  -> registerDesktopIpc() (IPC handler registration)
+  -> createMainWindow() (BrowserWindow, remote/local shell)
+
+Preload (trade.ts):
+  -> contextBridge exposes desktopBridge + desktopShell
+  -> All IPC via ipcRenderer.invoke / ipcRenderer.on
+
+Renderer (AppShell):
+  -> React screens: Login, Inbox, Lobby, AudioPrep, Transfer, Completion, Settings
+  -> Calls window.desktopBridge.* methods
 ```
 
-### Structure Rationale
+**Key patterns already established:**
+- Runtime classes in main process (DesktopTradeRuntime pattern)
+- IPC registration via a single `registerDesktopIpc()` function
+- Bridge interfaces typed in `shared/ipc-types.ts`
+- electron-store for persistent local state
+- music-metadata already a dependency (used in ffmpeg-pipeline)
+- `addedVia` field on collection_items supports multiple sources ("discogs", "manual", "crate", "youtube")
 
-- **Monorepo with `apps/` and `packages/`:** Keeps frontend and backend in one repo with shared types. pnpm workspaces for dependency management. Solo developer does not need separate repos -- one repo, one deploy pipeline.
-- **`features/` in frontend:** Groups UI by domain (collection, trading, rankings) rather than by type (components, pages). Each feature is self-contained.
-- **`services/` in backend:** Pure business logic separated from HTTP/WS transport. Services are testable without spinning up a server.
-- **`jobs/` in backend:** BullMQ processors isolated from request handling. Can run in-process or as a separate worker when scaling is needed.
-- **`integrations/`:** Discogs API client isolated behind an interface. If Discogs changes their API or rate limits, changes are contained here.
+## Recommended Architecture
 
-## Architectural Patterns
-
-### Pattern 1: Monolith-First with Modular Boundaries
-
-**What:** Single deployable Node.js process serving REST API, WebSocket signaling, and background jobs. Internally organized as distinct modules with clean interfaces between them.
-
-**When to use:** Solo developer, pre-product-market-fit, under 10K users. Always start here.
-
-**Trade-offs:** Simple deployment and debugging. No inter-service latency. Easy to refactor. Cannot independently scale components -- but that does not matter until thousands of concurrent users.
-
-**Why this over microservices:** A solo developer maintaining multiple services, message brokers, and service meshes will spend more time on infrastructure than product. The modular monolith gives you the organizational benefits of services without the operational burden. Extract services only when a specific bottleneck demands it (the BullMQ worker is the first candidate for extraction).
+### New Components Overview
 
 ```
-// Server entry point -- everything in one process
-import { createApp } from './app';
-import { createSignalingServer } from './ws/signaling';
-import { createNotificationServer } from './ws/notifications';
-import { startWorkers } from './jobs/workers';
+apps/desktop/src/main/
+  index.ts                    [MODIFY] -- add tray, library runtime init, close-to-tray
+  ipc.ts                      [MODIFY] -- register library IPC channels
+  window.ts                   [MODIFY] -- close-to-tray behavior
+  tray.ts                     [NEW]    -- system tray icon + context menu
+  library/
+    library-runtime.ts        [NEW]    -- orchestrates scan, watch, sync (like TradeRuntime)
+    folder-scanner.ts         [NEW]    -- recursive audio file discovery
+    metadata-extractor.ts     [NEW]    -- music-metadata tag reading + filename parsing
+    ai-metadata.ts            [NEW]    -- Gemini Flash API for ambiguous metadata
+    file-watcher.ts           [NEW]    -- chokidar watcher for real-time changes
+    local-index.ts            [NEW]    -- electron-store based file index (hash -> metadata)
+    sync-engine.ts            [NEW]    -- diff local index vs server, push changes
+    youtube-search.ts         [NEW]    -- YouTube Data API v3 search per release
 
-const app = createApp();          // REST API
-createSignalingServer(app.server); // WebSocket signaling (same HTTP server)
-createNotificationServer(app.server); // SSE or WS notifications
-startWorkers();                    // BullMQ job processors (in-process)
+apps/desktop/src/shared/
+  ipc-types.ts                [MODIFY] -- add library bridge types
+
+apps/desktop/src/preload/
+  trade.ts                    [MODIFY] -- expose library bridge methods
+
+apps/desktop/src/renderer/src/
+  LibraryScreen.tsx           [NEW]    -- folder selection, scan progress, file list
+  SettingsScreen.tsx          [MODIFY] -- add library folder, auto-start, tray settings
+
+apps/web/src/
+  lib/db/schema/
+    collections.ts            [NO CHANGE] -- addedVia "local" just a new string value
+    releases.ts               [NO CHANGE] -- discogsId already nullable
+  actions/
+    library-sync.ts           [NEW]    -- server action to receive local collection batch upserts
+  app/api/desktop/
+    library-sync/route.ts     [NEW]    -- API route for batch sync from desktop
 ```
 
-### Pattern 2: Queue-Driven Discogs Import Pipeline
+### Component Boundaries
 
-**What:** Discogs collection/wantlist imports are never synchronous API calls. Every import request creates a BullMQ job. The job processor fetches paginated data from Discogs at a controlled rate, stores results incrementally, and emits progress events.
+| Component | Responsibility | Communicates With |
+|-----------|---------------|-------------------|
+| `LibraryRuntime` | Orchestrates scan/watch/sync lifecycle, holds state | FolderScanner, FileWatcher, MetadataExtractor, AiMetadata, SyncEngine, LocalIndex |
+| `FolderScanner` | Recursive directory walk, discovers audio files | LibraryRuntime (returns file list) |
+| `MetadataExtractor` | Reads ID3/Vorbis tags + parses filename/path structure | LibraryRuntime (returns structured metadata) |
+| `AiMetadata` | Calls Gemini Flash for ambiguous/missing metadata | MetadataExtractor (enriches failed extractions) |
+| `FileWatcher` | Monitors folders for add/remove/rename events | LibraryRuntime (emits change events) |
+| `LocalIndex` | Persists file index to electron-store (path, hash, metadata, lastModified) | LibraryRuntime, SyncEngine |
+| `SyncEngine` | Diffs local index against server, pushes batch upserts | LibraryRuntime, Supabase client |
+| `TrayManager` | System tray icon, context menu, notifications | index.ts lifecycle |
+| `YouTubeSearch` | Finds YouTube video for identified releases | SyncEngine (enriches before push) |
 
-**When to use:** Always, for any external API integration with rate limits.
+### Data Flow
 
-**Trade-offs:** More complex than direct API calls. But prevents: request timeouts on large collections (some users have 10K+ records), rate limit violations, and poor UX (user sees progress instead of spinner).
-
-**Critical design detail -- Discogs rate limits:**
-- Authenticated: 60 requests/minute (OAuth 1.0a)
-- Unauthenticated: 25 requests/minute
-- Collection endpoint returns max 100 items per page
-- A user with 5,000 records = 50 pages = 50 API calls = ~50 seconds minimum
-- A user with 20,000 records = 200 pages = 200 API calls = ~3.3 minutes minimum
-- Multiple users importing simultaneously share the same rate limit if using app-level OAuth
-
-**Implementation approach:**
-```
-User clicks "Import"
-    → POST /api/import/collection
-    → Create BullMQ job { userId, discogsUsername, type: 'collection' }
-    → Return 202 Accepted + jobId
-    → Client polls job status or receives SSE progress updates
-
-BullMQ Worker processes job:
-    → Fetch page 1 of collection (100 items)
-    → Store/upsert releases into PostgreSQL
-    → Check rate limit headers (X-Discogs-Ratelimit-Remaining)
-    → If remaining < 5, delay next request
-    → Emit progress event (page 3 of 50)
-    → Repeat until all pages fetched
-    → Run wantlist matching job on completion
-    → Mark job complete
-```
-
-**Rate limiting strategy:** BullMQ has built-in rate limiting (`limiter: { max: 50, duration: 60000 }`). Configure the Discogs import queue to process at most 50 jobs per minute globally, leaving headroom below the 60 req/min ceiling. Use Discogs response headers to dynamically back off when approaching limits.
-
-### Pattern 3: Event-Driven Activity Feed (Fan-Out on Read)
-
-**What:** When a user performs an action (adds a record, completes a trade, earns a badge), write an immutable activity event to the `activities` table. When a user loads their feed, query activities from users they follow, sorted by timestamp. No pre-materialized feeds.
-
-**When to use:** Under 100K users with reasonable follow counts. Fan-out on read is simpler to implement and maintain than fan-out on write.
-
-**Trade-offs:**
-- Simpler: No feed materialization pipeline, no stale feed problems, no complex fan-out logic.
-- Slower reads: Feed query joins activities with the follow graph. With proper indexes and pagination (cursor-based, not offset), this performs well up to ~100K users.
-- If performance degrades later: Add Redis-cached feed lists (fan-out on write) as an optimization, not a rewrite.
-
-**Why NOT fan-out on write for VinylDig:**
-Fan-out on write (push model) pre-computes feeds by copying each activity to every follower's feed list. This is what Twitter/X does at scale. For a solo developer at launch, this adds enormous complexity (write amplification, consistency problems, storage overhead) for zero benefit at low user counts. Start with fan-out on read. Optimize later with evidence.
-
-```sql
--- Activity feed query (fan-out on read)
-SELECT a.*, u.username, u.avatar_url
-FROM activities a
-JOIN follows f ON f.following_id = a.user_id
-JOIN users u ON u.id = a.user_id
-WHERE f.follower_id = $currentUserId
-  AND a.created_at < $cursor
-ORDER BY a.created_at DESC
-LIMIT 20;
-```
-
-### Pattern 4: Redis Sorted Sets for Rankings
-
-**What:** Maintain leaderboard scores in Redis sorted sets. When a user's score changes (new rare record added, trade completed, review written), update their score in Redis with `ZINCRBY` or `ZADD`. Query rankings with `ZREVRANGE` (top N) or `ZREVRANK` (user's position).
-
-**When to use:** Any time you need ranked lists with real-time updates.
-
-**Trade-offs:** Extremely fast reads (O(log N) for rank lookup). Requires Redis. Scores must be numeric. For composite scores (rarity + contribution), compute a single weighted numeric score.
-
-**Ranking computation model for VinylDig:**
+#### Initial Scan
 
 ```
-Total Score = (Rarity Score * 0.6) + (Contribution Score * 0.4)
-
-Rarity Score = SUM over collection of: want_count / have_count for each release
-  (normalized to 0-1000 range)
-
-Contribution Score = (trades_completed * 10)
-                   + (reviews_written * 5)
-                   + (quality_rating_avg * 20)  // reputation from trade partners
-                   + (days_active * 0.5)
-
-Redis keys:
-  leaderboard:global        → ZSET of userId:totalScore
-  leaderboard:genre:{id}    → ZSET of userId:genreScore (optional, later)
+User clicks "Add Folder" in LibraryScreen
+  -> IPC: desktop:library-select-folder
+  -> dialog.showOpenDialog (main process)
+  -> LibraryRuntime.addFolder(path)
+    -> FolderScanner.scan(path)
+      -> Walks directory tree, filters audio extensions
+      -> Returns: { path, size, mtime }[]
+    -> For each file:
+      -> MetadataExtractor.extract(filePath)
+        -> music-metadata.parseFile() for ID3/Vorbis tags
+        -> If tags incomplete: parse filename (Artist - Album - Track.flac)
+        -> If still ambiguous: queue for AI
+      -> If AI queue non-empty:
+        -> AiMetadata.inferBatch(items)
+          -> Gemini Flash structured output: { artist, album, track, year, genre }
+      -> LocalIndex.upsert(path, hash, metadata)
+    -> SyncEngine.pushBatch(newItems)
+      -> POST /api/desktop/library-sync
+      -> Upserts releases + collection_items with addedVia="local"
+    -> IPC event: desktop:library-scan-progress { scanned, total, current }
+    -> IPC event: desktop:library-scan-complete { added, updated, errors }
+  -> FileWatcher.watch(path) starts
 ```
 
-**Recalculation strategy:** Do NOT recalculate all scores on every action. Instead:
-1. **Incremental updates:** When a user adds a record, compute only that record's rarity contribution and `ZINCRBY` the delta.
-2. **Periodic full recalc:** BullMQ scheduled job runs nightly to recalculate all scores from source data (PostgreSQL). This corrects drift from Discogs want/have ratio changes. This is the authoritative recalc; incremental updates provide real-time responsiveness.
-3. **Rarity cache:** Cache Discogs want/have ratios in PostgreSQL (refreshed during periodic sync). Do not hit Discogs API for every rarity lookup.
-
-## Data Flow
-
-### Flow 1: Discogs Import Pipeline
+#### Real-time File Watch (Tray Mode)
 
 ```
-User (Browser)
-    │ POST /api/import/collection { discogsUsername }
-    ▼
-API Server
-    │ Validate auth, check subscription tier (free: 1 import/day)
-    │ Create BullMQ job
-    │ Return 202 + jobId
-    ▼
-BullMQ Queue: "discogs-import"
-    │
-    ▼
-BullMQ Worker
-    │ ┌─────────────────────────────────────────┐
-    │ │ FOR each page of Discogs collection:    │
-    │ │   1. GET /users/{name}/collection/...   │
-    │ │   2. Check X-Discogs-Ratelimit-Remaining│
-    │ │   3. Upsert releases into PostgreSQL    │
-    │ │   4. Emit progress via Redis pub/sub    │
-    │ │   5. If rate limit low, delay next page │
-    │ └─────────────────────────────────────────┘
-    │ On complete:
-    │   1. Trigger wantlist-matching job
-    │   2. Trigger rarity-score-recalc job
-    │   3. Create activity event: "imported N records"
-    ▼
-PostgreSQL
-    │ releases, user_collections, user_wantlists updated
-    ▼
-Redis pub/sub → SSE/WebSocket → User sees progress bar + completion
+chokidar detects file add/unlink/change
+  -> FileWatcher emits "file-added" | "file-removed" | "file-changed"
+  -> LibraryRuntime handles event:
+    - file-added: extract metadata, index, queue sync
+    - file-removed: mark removed in index, queue sync (delete from server)
+    - file-changed: re-extract metadata if mtime changed, queue sync
+  -> SyncEngine debounces (5s window) then pushes batch
+  -> If window is open: IPC event desktop:library-file-changed
 ```
 
-### Flow 2: WebRTC P2P File Transfer
+#### Startup Diff Scan
 
 ```
-User A (Wants to send file) ──────────────────── User B (Wants to receive)
-    │                                                    │
-    │ 1. POST /api/trades/initiate { targetUserId }      │
-    │    → Server creates trade record, returns tradeId  │
-    │    → Server notifies User B via WebSocket          │
-    │                                                    │
-    │ 2. User B accepts trade (via WebSocket)            │
-    │                                                    │
-    │ 3. SIGNALING PHASE (via WebSocket server):         │
-    │    A creates RTCPeerConnection                     │
-    │    A creates offer (SDP) ──→ Server ──→ B          │
-    │    B creates answer (SDP) ──→ Server ──→ A         │
-    │    ICE candidates exchanged via Server             │
-    │    (STUN resolves public IPs)                      │
-    │    (TURN relays if direct fails)                   │
-    │                                                    │
-    │ 4. P2P DATACHANNEL ESTABLISHED                     │
-    │    ◄═══════════════════════════════════════►       │
-    │    Encrypted DTLS connection, no server relay      │
-    │                                                    │
-    │ 5. FILE TRANSFER:                                  │
-    │    A reads file via File API                       │
-    │    A chunks file into 64KB segments                │
-    │    A sends chunks via DataChannel                  │
-    │    A monitors bufferedAmount for backpressure      │
-    │    B reassembles chunks into Blob                  │
-    │    B triggers download via URL.createObjectURL     │
-    │                                                    │
-    │ 6. POST-TRANSFER:                                  │
-    │    Both peers notify server: transfer complete     │
-    │    Server updates trade record                     │
-    │    Server prompts quality review                   │
-    │    Score updates: ZINCRBY leaderboard:global       │
-    │    Activity event created                          │
-    ▼                                                    ▼
-   Server NEVER touches the file. "Mere conduit" preserved.
+app.whenReady()
+  -> LibraryRuntime.initialize()
+    -> Load persisted watched folders from LocalIndex
+    -> For each folder:
+      -> FolderScanner.scan(path)
+      -> Diff against LocalIndex:
+        - New files (path not in index): extract, index, queue add
+        - Removed files (in index but not on disk): queue delete
+        - Changed files (mtime differs): re-extract, queue update
+      -> SyncEngine.pushBatch(changes)
+    -> FileWatcher.watch(allFolders) -- resume watching
 ```
 
-### Flow 3: Wantlist Matching + Notification
+## New IPC Channels
 
-```
-Trigger: User A imports collection (or adds a record manually)
-    │
-    ▼
-BullMQ Job: "wantlist-match"
-    │
-    │ Query: Find all users whose wantlist contains
-    │        any release that User A just added to their collection
-    │
-    │ SQL:
-    │   SELECT uw.user_id, uw.release_id, r.title
-    │   FROM user_wantlists uw
-    │   JOIN user_collections uc ON uc.release_id = uw.release_id
-    │   JOIN releases r ON r.id = uw.release_id
-    │   WHERE uc.user_id = $importingUserId
-    │     AND uc.release_id = ANY($newlyAddedReleaseIds)
-    │     AND uw.user_id != $importingUserId
-    │
-    ▼
-For each match:
-    │ 1. Create notification record in PostgreSQL
-    │ 2. Publish to Redis channel: notifications:{matchedUserId}
-    │ 3. If user is online (has active SSE/WS connection):
-    │       → Push real-time notification
-    │    Else:
-    │       → Notification waits in DB, shown on next login
-    │       → (Optional: email digest via separate job)
-    ▼
-Matched User sees: "UserA has [Record Title] from your wantlist!"
-```
+### Invoke (renderer -> main, returns Promise)
 
-### Flow 4: Ranking Score Update
+| Channel | Args | Returns | Purpose |
+|---------|------|---------|---------|
+| `desktop:library-select-folder` | none | `string \| null` | Native folder picker dialog |
+| `desktop:library-add-folder` | `folderPath: string` | `void` | Start scanning + watching a folder |
+| `desktop:library-remove-folder` | `folderPath: string` | `void` | Stop watching, optionally remove items |
+| `desktop:library-get-folders` | none | `WatchedFolder[]` | List all watched folders with stats |
+| `desktop:library-get-items` | `{ offset, limit, folder? }` | `LocalLibraryItem[]` | Paginated local index items |
+| `desktop:library-rescan` | `folderPath?: string` | `void` | Force rescan (one folder or all) |
+| `desktop:library-get-sync-status` | none | `LibrarySyncStatus` | Last sync time, pending count, errors |
+| `desktop:tray-get-settings` | none | `TraySettings` | Close-to-tray, auto-start prefs |
+| `desktop:tray-set-settings` | `Partial<TraySettings>` | `void` | Update tray preferences |
 
-```
-Trigger: Any score-affecting action
-    │ (record added, trade completed, review written, quality rating received)
-    ▼
-Action Handler (in service layer)
-    │ 1. Persist action to PostgreSQL
-    │ 2. Compute score delta
-    │ 3. ZINCRBY leaderboard:global userId scoreDelta
-    │ 4. (Optional) Create activity event
-    ▼
-Redis Sorted Set updated in real-time
-    │
-    ▼
-Nightly BullMQ Cron Job: "recalc-all-scores"
-    │ 1. For each user: recalculate total score from PostgreSQL
-    │ 2. ZADD leaderboard:global userId newTotalScore (overwrite)
-    │ 3. Refresh rarity scores from cached Discogs data
-    │ This corrects any drift between incremental and true scores
-```
+### Events (main -> renderer, push via webContents.send)
 
-## WebRTC Signaling Architecture (Detailed)
+| Channel | Payload | Purpose |
+|---------|---------|---------|
+| `desktop:library-scan-progress` | `{ folder, scanned, total, currentFile }` | Scan progress bar |
+| `desktop:library-scan-complete` | `{ folder, added, updated, removed, errors }` | Scan finished |
+| `desktop:library-file-changed` | `{ type, path, metadata? }` | Real-time file change notification |
+| `desktop:library-sync-status` | `LibrarySyncStatus` | Sync state changed |
+| `desktop:library-ai-progress` | `{ processed, total, current }` | AI metadata inference progress |
 
-### Signaling Server Design
-
-The signaling server is NOT a separate service. It is a Socket.IO namespace on the same Node.js server, using a dedicated namespace (`/signaling`) to isolate signaling traffic from other WebSocket uses (notifications use `/notifications` namespace or SSE).
-
-**Why Socket.IO over raw WebSocket for signaling:**
-- Auto-reconnection with exponential backoff (critical when peers drop mid-negotiation)
-- Room/namespace support out of the box (each trade session = a room)
-- Fallback to long-polling if WebSocket fails (rare but handles corporate proxies)
-- The performance overhead is negligible for signaling (small, infrequent messages)
-- Solo developer: Socket.IO saves significant boilerplate
-
-**Signaling message flow:**
-
-```
-Namespace: /signaling
-Rooms: trade:{tradeId}
-
-Events:
-  Client → Server:
-    "join-trade"    { tradeId }           // Join signaling room
-    "offer"         { tradeId, sdp }      // SDP offer
-    "answer"        { tradeId, sdp }      // SDP answer
-    "ice-candidate" { tradeId, candidate} // ICE candidate
-    "transfer-done" { tradeId, status }   // Transfer completion
-
-  Server → Client:
-    "peer-joined"   { peerId }            // Other peer joined room
-    "offer"         { sdp }               // Relay SDP offer
-    "answer"        { sdp }               // Relay SDP answer
-    "ice-candidate" { candidate }         // Relay ICE candidate
-    "peer-left"     { peerId }            // Peer disconnected
-```
-
-**Server-side signaling handler (conceptual):**
+## New IPC Types (ipc-types.ts additions)
 
 ```typescript
-io.of('/signaling').on('connection', (socket) => {
-  socket.on('join-trade', async ({ tradeId }) => {
-    // Verify user is participant of this trade
-    // Verify trade is in 'accepted' state
-    // Verify user subscription allows P2P (check trade count)
-    socket.join(`trade:${tradeId}`);
-    socket.to(`trade:${tradeId}`).emit('peer-joined', { peerId: socket.userId });
-  });
+export interface WatchedFolder {
+  path: string;
+  fileCount: number;
+  lastScannedAt: string | null;
+  watching: boolean;
+}
 
-  socket.on('offer', ({ tradeId, sdp }) => {
-    socket.to(`trade:${tradeId}`).emit('offer', { sdp });
-  });
+export interface LocalLibraryItem {
+  filePath: string;
+  fileHash: string;
+  fileSizeBytes: number;
+  lastModified: string;
+  metadata: LocalAudioMetadata;
+  syncedAt: string | null;
+  serverCollectionItemId: string | null;
+}
 
-  socket.on('answer', ({ tradeId, sdp }) => {
-    socket.to(`trade:${tradeId}`).emit('answer', { sdp });
-  });
+export interface LocalAudioMetadata {
+  artist: string | null;
+  album: string | null;
+  title: string | null;
+  trackNumber: number | null;
+  year: number | null;
+  genre: string[];
+  format: string;                 // codec: flac, mp3, etc.
+  bitrate: number;
+  sampleRate: number;
+  duration: number;
+  source: "tags" | "filename" | "ai";
+  confidence: number;             // 0-1, 1 = from clean tags
+}
 
-  socket.on('ice-candidate', ({ tradeId, candidate }) => {
-    socket.to(`trade:${tradeId}`).emit('ice-candidate', { candidate });
-  });
-});
-```
+export interface LibrarySyncStatus {
+  lastSyncAt: string | null;
+  pendingAdds: number;
+  pendingDeletes: number;
+  pendingUpdates: number;
+  syncing: boolean;
+  lastError: string | null;
+}
 
-### STUN/TURN Strategy
+export interface TraySettings {
+  closeToTray: boolean;
+  autoStartOnLogin: boolean;
+  showNotifications: boolean;
+}
 
-**Use a managed TURN service. Do not self-host coturn.**
+export interface LibraryScanProgress {
+  folder: string;
+  scanned: number;
+  total: number;
+  currentFile: string;
+}
 
-Rationale for solo developer:
-- Self-hosted coturn requires: server provisioning, TLS cert management, UDP/TCP port management, security patching, DDoS mitigation, monitoring, capacity planning.
-- Managed services handle all of this for $0.40-$0.60/GB (Twilio) or ~$99/mo flat (Metered.ca).
-- At launch with low traffic, costs are minimal. STUN (free, via Google's public servers) resolves ~80% of connections. TURN only activates for symmetric NATs (~15-20% of connections).
+export interface LibraryScanComplete {
+  folder: string;
+  added: number;
+  updated: number;
+  removed: number;
+  errors: string[];
+}
 
-**Recommended setup:**
-
-```typescript
-const iceServers = [
-  { urls: 'stun:stun.l.google.com:19302' },           // Free STUN
-  { urls: 'stun:stun1.l.google.com:19302' },          // Free STUN backup
-  {
-    urls: 'turn:turn.metered.ca:443?transport=tcp',    // Managed TURN
-    username: process.env.TURN_USERNAME,                // Time-limited credentials
-    credential: process.env.TURN_CREDENTIAL,           // rotated server-side
-  },
-];
-```
-
-**TURN credential security:** Generate time-limited TURN credentials server-side using HMAC-based authentication. Client requests credentials from API before initiating WebRTC. Credentials expire after the trade session. This prevents abuse of TURN bandwidth.
-
-### Client-Side WebRTC Implementation
-
-**Use `simple-peer` over PeerJS.**
-
-Rationale:
-- simple-peer: ~25KB, minimal abstraction over RTCPeerConnection. You provide your own signaling (which you already have with Socket.IO). ~400K weekly npm downloads. Well-suited for 1:1 file transfer.
-- PeerJS: Bundles its own signaling server (PeerServer). Since VinylDig already has signaling via Socket.IO, PeerJS's bundled signaling is redundant complexity. PeerJS is better for prototypes where you want zero-config signaling.
-
-**File transfer implementation (client-side):**
-
-```typescript
-// Sender side (conceptual)
-const CHUNK_SIZE = 64 * 1024; // 64KB chunks
-
-async function sendFile(peer: SimplePeer, file: File) {
-  const totalChunks = Math.ceil(file.size / CHUNK_SIZE);
-
-  // Send metadata first
-  peer.send(JSON.stringify({
-    type: 'file-meta',
-    name: file.name,
-    size: file.size,
-    totalChunks
-  }));
-
-  for (let i = 0; i < totalChunks; i++) {
-    const start = i * CHUNK_SIZE;
-    const chunk = file.slice(start, start + CHUNK_SIZE);
-    const buffer = await chunk.arrayBuffer();
-
-    // Backpressure: wait if buffer is full
-    while (peer._channel.bufferedAmount > CHUNK_SIZE * 4) {
-      await new Promise(resolve => {
-        peer._channel.onbufferedamountlow = resolve;
-        peer._channel.bufferedAmountLowThreshold = CHUNK_SIZE * 2;
-      });
-    }
-
-    peer.send(new Uint8Array(buffer));
-    onProgress(i / totalChunks); // Update progress bar
-  }
-
-  peer.send(JSON.stringify({ type: 'file-complete' }));
+export interface DesktopBridgeLibrary {
+  librarySelectFolder(): Promise<string | null>;
+  libraryAddFolder(folderPath: string): Promise<void>;
+  libraryRemoveFolder(folderPath: string): Promise<void>;
+  libraryGetFolders(): Promise<WatchedFolder[]>;
+  libraryGetItems(opts: { offset: number; limit: number; folder?: string }): Promise<LocalLibraryItem[]>;
+  libraryRescan(folderPath?: string): Promise<void>;
+  libraryGetSyncStatus(): Promise<LibrarySyncStatus>;
+  trayGetSettings(): Promise<TraySettings>;
+  traySetSettings(settings: Partial<TraySettings>): Promise<void>;
+  onLibraryScanProgress(listener: (event: LibraryScanProgress) => void): () => void;
+  onLibraryScanComplete(listener: (event: LibraryScanComplete) => void): () => void;
+  onLibraryFileChanged(listener: (event: { type: string; path: string }) => void): () => void;
+  onLibrarySyncStatus(listener: (event: LibrarySyncStatus) => void): () => void;
 }
 ```
 
-## Database Schema Considerations
+## DB Schema Changes
 
-### Core Tables
+### collection_items -- NO migration needed
 
-```sql
--- Users and authentication
-CREATE TABLE users (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  username VARCHAR(50) UNIQUE NOT NULL,
-  email VARCHAR(255) UNIQUE NOT NULL,
-  password_hash VARCHAR(255) NOT NULL,
-  discogs_username VARCHAR(100),
-  discogs_oauth_token TEXT,          -- Encrypted at rest
-  discogs_oauth_secret TEXT,         -- Encrypted at rest
-  avatar_url TEXT,
-  bio TEXT,
-  subscription_tier VARCHAR(20) DEFAULT 'free', -- 'free' | 'premium'
-  subscription_expires_at TIMESTAMPTZ,
-  created_at TIMESTAMPTZ DEFAULT NOW(),
-  updated_at TIMESTAMPTZ DEFAULT NOW()
-);
+The `addedVia` column is `varchar(20)`. Adding "local" as a value is just a new string. Existing RLS policies work unchanged (they check `userId = auth.uid()`).
 
--- Releases (cached from Discogs, source of truth for display)
-CREATE TABLE releases (
-  id BIGINT PRIMARY KEY,             -- Discogs release ID (their primary key)
-  title VARCHAR(500) NOT NULL,
-  artist VARCHAR(500),
-  year SMALLINT,
-  genres TEXT[],                      -- PostgreSQL array
-  styles TEXT[],                      -- PostgreSQL array
-  thumb_url TEXT,
-  discogs_url TEXT,
-  have_count INT DEFAULT 0,          -- From Discogs (refreshed periodically)
-  want_count INT DEFAULT 0,          -- From Discogs (refreshed periodically)
-  rarity_score NUMERIC(10,4),        -- Computed: want_count / NULLIF(have_count, 0)
-  data JSONB,                        -- Full Discogs metadata (flexible storage)
-  last_synced_at TIMESTAMPTZ,
-  created_at TIMESTAMPTZ DEFAULT NOW()
-);
-CREATE INDEX idx_releases_rarity ON releases (rarity_score DESC);
-CREATE INDEX idx_releases_genres ON releases USING GIN (genres);
+### releases table -- NO migration needed
 
--- User collections (junction table)
-CREATE TABLE user_collections (
-  user_id UUID REFERENCES users(id) ON DELETE CASCADE,
-  release_id BIGINT REFERENCES releases(id),
-  date_added TIMESTAMPTZ DEFAULT NOW(),
-  notes TEXT,
-  condition VARCHAR(20),             -- Mint, NM, VG+, etc.
-  PRIMARY KEY (user_id, release_id)
-);
-CREATE INDEX idx_user_collections_release ON user_collections (release_id);
+The `discogsId` column is already nullable. Local-only releases can be created with `discogsId = null`. The `youtubeVideoId` column is also nullable and ready for YouTube search results.
 
--- User wantlists (junction table)
-CREATE TABLE user_wantlists (
-  user_id UUID REFERENCES users(id) ON DELETE CASCADE,
-  release_id BIGINT REFERENCES releases(id),
-  date_added TIMESTAMPTZ DEFAULT NOW(),
-  notes TEXT,
-  priority SMALLINT DEFAULT 3,       -- 1=highest, 5=lowest
-  PRIMARY KEY (user_id, release_id)
-);
-CREATE INDEX idx_user_wantlists_release ON user_wantlists (release_id);
+### Local file index -- electron-store (NOT PostgreSQL)
 
--- Social graph
-CREATE TABLE follows (
-  follower_id UUID REFERENCES users(id) ON DELETE CASCADE,
-  following_id UUID REFERENCES users(id) ON DELETE CASCADE,
-  created_at TIMESTAMPTZ DEFAULT NOW(),
-  PRIMARY KEY (follower_id, following_id)
-);
-CREATE INDEX idx_follows_following ON follows (following_id);
-
--- Activity events (immutable log)
-CREATE TABLE activities (
-  id BIGSERIAL PRIMARY KEY,
-  user_id UUID REFERENCES users(id) ON DELETE CASCADE,
-  type VARCHAR(50) NOT NULL,         -- 'collection_add', 'trade_complete',
-                                      -- 'review_written', 'badge_earned', etc.
-  data JSONB NOT NULL,               -- Flexible payload per activity type
-  release_id BIGINT REFERENCES releases(id), -- Optional, for release-related activities
-  created_at TIMESTAMPTZ DEFAULT NOW()
-);
-CREATE INDEX idx_activities_user_time ON activities (user_id, created_at DESC);
-CREATE INDEX idx_activities_time ON activities (created_at DESC);
-
--- Trades
-CREATE TABLE trades (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  initiator_id UUID REFERENCES users(id),
-  recipient_id UUID REFERENCES users(id),
-  release_id BIGINT REFERENCES releases(id),
-  status VARCHAR(20) DEFAULT 'pending',  -- pending, accepted, active, completed, cancelled
-  initiator_review JSONB,            -- { quality: 1-5, comment: "..." }
-  recipient_review JSONB,
-  created_at TIMESTAMPTZ DEFAULT NOW(),
-  completed_at TIMESTAMPTZ
-);
-CREATE INDEX idx_trades_users ON trades (initiator_id, recipient_id);
-CREATE INDEX idx_trades_status ON trades (status) WHERE status IN ('pending', 'active');
-
--- Reviews (for releases/pressings)
-CREATE TABLE reviews (
-  id BIGSERIAL PRIMARY KEY,
-  user_id UUID REFERENCES users(id) ON DELETE CASCADE,
-  release_id BIGINT REFERENCES releases(id),
-  rating SMALLINT CHECK (rating BETWEEN 1 AND 5),
-  content TEXT,
-  pressing_notes TEXT,               -- Specific to vinyl pressing quality
-  created_at TIMESTAMPTZ DEFAULT NOW(),
-  UNIQUE (user_id, release_id)
-);
-
--- Notifications (persistent store)
-CREATE TABLE notifications (
-  id BIGSERIAL PRIMARY KEY,
-  user_id UUID REFERENCES users(id) ON DELETE CASCADE,
-  type VARCHAR(50) NOT NULL,         -- 'wantlist_match', 'trade_request', 'badge_earned'
-  data JSONB NOT NULL,
-  read BOOLEAN DEFAULT FALSE,
-  created_at TIMESTAMPTZ DEFAULT NOW()
-);
-CREATE INDEX idx_notifications_user_unread
-  ON notifications (user_id, created_at DESC) WHERE read = FALSE;
-
--- Badges (definition table)
-CREATE TABLE badges (
-  id SERIAL PRIMARY KEY,
-  slug VARCHAR(50) UNIQUE NOT NULL,
-  name VARCHAR(100) NOT NULL,
-  description TEXT,
-  icon_url TEXT,
-  criteria JSONB                     -- Machine-readable unlock criteria
-);
-
--- User badges (junction)
-CREATE TABLE user_badges (
-  user_id UUID REFERENCES users(id) ON DELETE CASCADE,
-  badge_id INT REFERENCES badges(id),
-  earned_at TIMESTAMPTZ DEFAULT NOW(),
-  PRIMARY KEY (user_id, badge_id)
-);
-```
-
-### Schema Design Rationale
-
-**Why PostgreSQL over MongoDB/NoSQL:**
-- Collections and wantlists are inherently relational (user HAS many releases, release IN many collections). Junction tables with foreign keys enforce data integrity.
-- Wantlist matching is a JOIN operation across two junction tables. This is what relational databases are built for.
-- PostgreSQL JSONB gives NoSQL flexibility where needed (release metadata, activity payloads, badge criteria) without sacrificing relational integrity.
-- PostgreSQL GIN indexes on arrays enable efficient genre-based queries.
-- Solo developer: one database technology to learn, operate, and backup. PostgreSQL handles all data patterns in this application.
-
-**Why releases use Discogs IDs as primary keys:**
-- Discogs release IDs are globally unique integers. Using them directly avoids a mapping table and simplifies the import pipeline.
-- When two users import the same release, it resolves to the same row. Collection/wantlist matching becomes a simple integer comparison.
-
-**Why JSONB `data` column on releases:**
-- Discogs release metadata is rich and variable (tracklist, labels, formats, credits). Modeling all of this in columns would create dozens of rarely-queried columns.
-- Store the full Discogs response in JSONB. Query it when needed. Index specific JSONB paths if query patterns emerge.
-
-**Why activities use JSONB `data`:**
-- Each activity type has different payload requirements. A `collection_add` includes release info, a `trade_complete` includes both users and quality ratings, a `badge_earned` includes the badge details.
-- JSONB avoids a polymorphic table structure or multiple nullable columns.
-
-## Freemium Gating Architecture
-
-### Implementation Pattern: Middleware + Entitlements Table
-
-Feature gating lives in middleware, not in business logic. Features stay pure; billing logic is centralized.
+The local file index lives on the user's machine. Only resolved metadata is synced to the server.
 
 ```typescript
-// Entitlements definition (config, not database)
-const TIER_LIMITS = {
-  free: {
-    trades_per_month: 3,
-    imports_per_day: 1,
-    collection_analytics: false,
-    priority_matching: false,
-    exclusive_groups: false,
-  },
-  premium: {
-    trades_per_month: Infinity,
-    imports_per_day: Infinity,
-    collection_analytics: true,
-    priority_matching: true,
-    exclusive_groups: true,
-  },
-};
+// PersistedDesktopState additions in session-store.ts
+interface PersistedDesktopState {
+  // ... existing fields ...
+  watchedFolders: string[];
+  localFileIndex: Record<string, LocalFileIndexEntry>;  // keyed by file path
+  traySettings: TraySettings;
+}
 
-// Middleware (applied to routes that need gating)
-async function requireEntitlement(entitlement: string) {
-  return async (req, res, next) => {
-    const user = req.user;
-    const limits = TIER_LIMITS[user.subscription_tier];
+interface LocalFileIndexEntry {
+  fileSizeBytes: number;
+  lastModified: number;        // mtime as epoch ms
+  metadata: LocalAudioMetadata;
+  serverReleaseId: string | null;
+  serverCollectionItemId: string | null;
+  syncedAt: string | null;
+}
+```
 
-    if (entitlement === 'trade') {
-      const monthlyCount = await getTradeCountThisMonth(user.id);
-      if (monthlyCount >= limits.trades_per_month) {
-        return res.status(403).json({
-          error: 'trade_limit_reached',
-          limit: limits.trades_per_month,
-          upgrade_url: '/pricing',
-        });
-      }
-    }
+**Performance note:** For large collections (5000+ files), electron-store serializes to a single JSON file. If performance degrades, migrate to `better-sqlite3`. Start with electron-store -- it is proven in this codebase and sufficient for typical vinyl collections (most diggers have 500-3000 files).
 
-    next();
+### New API endpoint: POST /api/desktop/library-sync
+
+```typescript
+interface LibrarySyncRequest {
+  items: LibrarySyncItem[];
+  deletedItemIds: string[];     // server collection_item IDs to remove
+}
+
+interface LibrarySyncItem {
+  localPath: string;            // dedup key (per-user unique)
+  metadata: {
+    artist: string;
+    album: string;
+    title: string | null;
+    year: number | null;
+    genre: string[];
+    format: string;
+    country: string | null;
+  };
+  audioSpecs: {
+    codec: string;
+    bitrate: number;
+    sampleRate: number;
+    duration: number;
   };
 }
 
-// Route usage
-app.post('/api/trades/initiate',
-  requireAuth,
-  requireEntitlement('trade'),
-  tradeController.initiate
-);
+interface LibrarySyncResponse {
+  synced: number;
+  created: number;
+  updated: number;
+  deleted: number;
+  items: Array<{ localPath: string; releaseId: string; collectionItemId: string }>;
+  errors: Array<{ path: string; error: string }>;
+}
 ```
 
-### Gating Points
+**Sync logic on the server:**
+1. For each item, match release: exact match on `artist + title + year` in `releases` table
+2. No match: create new release (`discogsId = null`)
+3. Upsert `collection_items` with `addedVia = 'local'`, audio specs in existing columns
+4. Return server IDs so desktop can update its local index
+5. Batch limit: 100 items per request
 
-| Feature | Free | Premium | Gate Location |
-|---------|------|---------|---------------|
-| P2P trades | 3/month | Unlimited | API middleware on trade initiation |
-| Discogs imports | 1/day | Unlimited | API middleware on import trigger |
-| Collection analytics | Hidden | Visible | Frontend conditional render + API guard |
-| Priority wantlist matching | Standard queue | Priority queue | BullMQ job priority setting |
-| Exclusive groups | Cannot join | Can join | API middleware on group join |
+## System Tray Integration
 
-### Key Principle: Gate at Workflow Start
+### tray.ts (new file)
 
-Do not let a free user start a trade and then block them mid-transfer. Check entitlements when the user initiates the action. Show upgrade prompts before the gate, not after hitting it. Display remaining quota ("2 of 3 trades used this month") to create natural upgrade pressure.
+```typescript
+import { Tray, Menu, nativeImage, app } from "electron";
 
-## Scaling Considerations
+export class TrayManager {
+  private tray: Tray | null = null;
 
-| Scale | Architecture Adjustments |
-|-------|--------------------------|
-| 0-1K users | Monolith on a single VPS (4GB RAM). PostgreSQL + Redis on same machine. BullMQ workers in-process. Managed TURN service. This handles everything comfortably. |
-| 1K-10K users | Separate PostgreSQL to a managed database (e.g., Supabase, Neon, or managed Postgres). Add read replicas if feed queries slow down. Move BullMQ workers to a separate process. Consider CDN for static assets. |
-| 10K-100K users | Separate Redis to managed instance. Add connection pooling (PgBouncer). Introduce feed caching (Redis-backed materialized feeds). Consider horizontal scaling of API server behind a load balancer (Socket.IO with Redis adapter for sticky sessions). |
-| 100K+ users | Re-evaluate. This is a good problem to have. Consider extracting the import pipeline and ranking service into separate services. Shard leaderboards by genre/region. This scale is far from day-one concerns. |
+  create(iconPath: string, callbacks: {
+    onShow: () => void;
+    onRescan: () => void;
+    onQuit: () => void;
+  }) {
+    const icon = nativeImage.createFromPath(iconPath);
+    this.tray = new Tray(icon.resize({ width: 16, height: 16 }));
+    
+    const contextMenu = Menu.buildFromTemplate([
+      { label: "Open DigSwap", click: callbacks.onShow },
+      { type: "separator" },
+      { label: "Library: watching 0 folders", enabled: false, id: "status" },
+      { label: "Rescan Now", click: callbacks.onRescan },
+      { type: "separator" },
+      { label: "Quit", click: callbacks.onQuit },
+    ]);
+    
+    this.tray.setToolTip("DigSwap Desktop");
+    this.tray.setContextMenu(contextMenu);
+    this.tray.on("double-click", callbacks.onShow);
+  }
 
-### Scaling Priorities (What Breaks First)
+  updateStatus(folderCount: number, fileCount: number) {
+    // Rebuild context menu with updated status label
+  }
 
-1. **Discogs import pipeline:** First bottleneck. Shared rate limit across all users. At 100+ users importing simultaneously, the queue grows. Mitigation: per-user import cooldown, batch scheduling, potentially multiple Discogs API keys (if ToS allows).
+  destroy() {
+    this.tray?.destroy();
+    this.tray = null;
+  }
+}
+```
 
-2. **Activity feed reads:** Second bottleneck. Fan-out-on-read joins slow as follow graphs grow. Mitigation: cursor-based pagination (already recommended), Redis-cached hot feeds.
+### index.ts modifications
 
-3. **WebRTC signaling:** Unlikely bottleneck. Signaling messages are small and infrequent (handful per trade session). Socket.IO handles thousands of concurrent connections on a single Node.js process.
+```typescript
+// In app.whenReady():
+const trayManager = new TrayManager();
+const libraryRuntime = new LibraryRuntime(sessionStore, authRuntime);
+await libraryRuntime.initialize();
 
-4. **TURN bandwidth costs:** As P2P usage grows, TURN relay costs increase. Mitigation: monitor TURN usage metrics, ensure STUN resolves most connections, set bandwidth quotas per user.
+// Create tray after window
+trayManager.create(trayIconPath, {
+  onShow: () => focusMainWindow(),
+  onRescan: () => libraryRuntime.rescanAll(),
+  onQuit: () => { app.isQuitting = true; app.quit(); },
+});
 
-## Anti-Patterns
+// Pass libraryRuntime to registerDesktopIpc
+registerDesktopIpc({ authRuntime, sessionStore, tradeRuntime, libraryRuntime });
 
-### Anti-Pattern 1: Storing Files on Server "Temporarily"
+// Modify window-all-closed:
+app.on("window-all-closed", () => {
+  const traySettings = sessionStore.getTraySettings();
+  if (traySettings.closeToTray) return; // Stay alive in tray
+  if (process.platform !== "darwin") app.quit();
+});
 
-**What people do:** Cache transferred files on the server for "reliability" or "resume support."
-**Why it is wrong:** Destroys the legal "mere conduit" defense. Even temporary storage creates liability. Also creates storage costs, security surface, and DMCA exposure.
-**Do this instead:** Files exist only in browser memory during transfer. If transfer fails, users reinitiate. The WebRTC DataChannel is reliable (ordered, retransmitted). For resume support, implement chunk acknowledgment at the application layer -- the sender tracks which chunks were ACKed and resumes from the last ACKed chunk on reconnection.
+// Auto-start:
+app.setLoginItemSettings({
+  openAtLogin: sessionStore.getTraySettings().autoStartOnLogin,
+  openAsHidden: true,
+});
 
-### Anti-Pattern 2: Synchronous Discogs API Calls in Request Handlers
+// Shutdown:
+app.on("before-quit", () => {
+  libraryRuntime.shutdown();
+  trayManager.destroy();
+});
+```
 
-**What people do:** User clicks "Import" and the server makes 50+ Discogs API calls within the HTTP request, returning the result when done.
-**Why it is wrong:** Request times out (30-60 seconds). Blocks the Node.js event loop. Hits rate limits. Poor UX (no progress feedback). If the connection drops, the entire import is lost.
-**Do this instead:** Queue-driven pipeline (Pattern 2 above). Return 202 immediately. Process asynchronously. Stream progress via SSE/WebSocket.
+### window.ts modifications
 
-### Anti-Pattern 3: Realtime Score Recalculation from Scratch
+```typescript
+// In createMainBrowserWindow, add close interception:
+window.on("close", (event) => {
+  if (sessionStore.getTraySettings().closeToTray && !app.isQuitting) {
+    event.preventDefault();
+    window.hide();
+  }
+});
+```
 
-**What people do:** Every time any user's score changes, recalculate scores for all users from scratch.
-**Why it is wrong:** O(users * collection_size) computation on every action. At 10K users with average 500 records each, this is 5 million rows to scan per score-affecting action.
-**Do this instead:** Incremental updates (Pattern 4). Compute only the delta. Full recalc runs nightly as a background job to correct drift.
+## Patterns to Follow
 
-### Anti-Pattern 4: Self-Hosting STUN/TURN as a Solo Developer
+### Pattern 1: Runtime Class (established by TradeRuntime)
 
-**What people do:** Deploy coturn on a VPS to save money.
-**Why it is wrong:** Operational burden is enormous: firewall rules for UDP ranges, TLS certificate rotation, DDoS protection, monitoring, OS patching, capacity planning. One misconfiguration and WebRTC connections silently fail (hard to debug). Cost savings are minimal at low scale ($5-20/month for managed vs. $150+/month for a capable self-hosted instance).
-**Do this instead:** Use Google's free STUN servers + Metered.ca or Twilio for TURN. Budget $0-100/month at launch. Self-host only if monthly TURN bandwidth exceeds $500+.
+`LibraryRuntime` follows the exact same shape as `DesktopTradeRuntime`:
+- Constructor takes `sessionStore` + `authRuntime`
+- `initialize()` called during app startup
+- `shutdown()` called during app quit
+- Event emitter methods: `onScanProgress()`, `onScanComplete()`, `onSyncStatus()`
+- Registered in `registerDesktopIpc()` alongside trade runtime
 
-### Anti-Pattern 5: Premature Microservices
+### Pattern 2: IPC Registration (single point)
 
-**What people do:** Create separate services for auth, collections, trading, notifications, rankings from day one.
-**Why it is wrong:** Solo developer now maintains 5+ deployment pipelines, inter-service communication, service discovery, distributed tracing, and eventual consistency problems. Productivity drops to near zero.
-**Do this instead:** Modular monolith. Clean module boundaries within a single process. Extract services only when a specific scaling bottleneck demands it (and you have evidence, not speculation).
+All library IPC handlers go in `registerDesktopIpc()` in `ipc.ts`, not in a separate file. This keeps the single-point registration pattern.
 
-## Integration Points
+### Pattern 3: Debounced Batch Sync
 
-### External Services
+```typescript
+// In SyncEngine
+private syncTimer: NodeJS.Timeout | null = null;
+private pendingChanges: Map<string, "add" | "update" | "delete"> = new Map();
 
-| Service | Integration Pattern | Gotchas |
-|---------|---------------------|---------|
-| **Discogs API** | OAuth 1.0a, rate-limited queue via BullMQ, paginated collection fetch (100/page) | 60 req/min authenticated. OAuth 1.0a (not 2.0). Some endpoints return sparse data -- need additional per-release fetches for full metadata. Large collections (20K+) take minutes to import. |
-| **STUN (Google)** | Static ICE server config, no auth needed | Free, no SLA. Occasionally slow. Include multiple STUN servers for redundancy. |
-| **TURN (Metered/Twilio)** | Time-limited HMAC credentials generated server-side, credential API endpoint | Costs per GB relayed. Monitor usage. Rotate credentials per session. |
-| **Payment processor (Stripe)** | Stripe Checkout for subscription, webhooks for status changes | Webhook signature verification critical. Handle failed payments gracefully (grace period before downgrade). |
-| **Email (optional)** | Transactional email for auth, digest notifications | Defer email until after core features work. Use SendGrid/Resend free tier. |
+queueChange(path: string, type: "add" | "update" | "delete") {
+  this.pendingChanges.set(path, type);
+  if (this.syncTimer) clearTimeout(this.syncTimer);
+  this.syncTimer = setTimeout(() => this.flush(), 5_000);
+}
+```
 
-### Internal Boundaries
+## Anti-Patterns to Avoid
 
-| Boundary | Communication | Notes |
-|----------|---------------|-------|
-| API routes <-> Services | Direct function calls | Services are imported, not called over network. Type-safe interfaces. |
-| Services <-> Database | Query builder (Kysely or Drizzle) | No raw SQL strings in services. Migrations managed separately. |
-| Services <-> BullMQ | Job creation via queue.add() | Services create jobs; workers process them. Shared job type definitions in `packages/shared`. |
-| API <-> WebSocket | Shared Socket.IO instance | Same HTTP server, different namespaces. Auth middleware shared. |
-| Frontend <-> Backend | REST API + SSE/WebSocket | REST for CRUD, WebSocket for signaling, SSE for notifications and live updates. |
-| Frontend <-> WebRTC | simple-peer library | Wrapper hook (`useWebRTC`) encapsulates connection lifecycle, chunking, progress. |
+### Anti-Pattern 1: Computing SHA-256 for every file during scan
 
-## Suggested Build Order
+**Why bad:** SHA-256 of a 50MB FLAC takes ~200ms. 5000 files = 17 minutes.
+**Instead:** Use `mtime + size` as the fast change detection key. Only compute full hash when needed for trade integrity (existing pipeline already does this).
 
-Based on architectural dependencies, the following build order minimizes blocked work and delivers value incrementally:
+### Anti-Pattern 2: Syncing on every file event
 
-### Phase 1: Foundation (No External Dependencies)
-- Database schema + migrations
-- User authentication (register, login, sessions)
-- Core API scaffolding
-- Basic frontend shell with retro/analog design system
+**Why bad:** Copying 500 files triggers 500 events in seconds.
+**Instead:** Debounce with 5s window, batch into single API call (max 100 items).
 
-**Rationale:** Everything else depends on auth and data storage.
+### Anti-Pattern 3: Calling Gemini Flash for every file
 
-### Phase 2: Discogs Integration
-- Discogs OAuth 1.0a flow
-- BullMQ setup + import pipeline
-- Collection and wantlist import
-- Release data caching in PostgreSQL
+**Why bad:** Wasteful API calls for files with clean tags.
+**Instead:** Only invoke AI when no ID3 tags present AND filename parsing produced low confidence (<0.5).
 
-**Rationale:** The entire product value proposition starts with "import your Discogs library." This is the cold-start hook and must work reliably before anything else.
+### Anti-Pattern 4: Watching system directories or unbounded depth
 
-### Phase 3: Social Layer
-- User profiles with collection display
-- Follow system
-- Activity feed (fan-out on read)
-- Collection search across all users
-- Collection comparison
+**Why bad:** CPU/memory exhaustion, inotify limits on Linux.
+**Instead:** Limit depth to 10 levels, ignore non-audio files, only watch user-selected folders.
 
-**Rationale:** Once data exists (from Phase 2), the social layer makes it visible and discoverable. Activity feed and follows create the social loop.
+### Anti-Pattern 5: Creating a separate BrowserWindow for library UI
 
-### Phase 4: Wantlist Matching + Notifications
-- Wantlist matching engine (BullMQ job)
-- Notification system (database + SSE/WebSocket delivery)
-- Real-time "someone has your want" alerts
+**Why bad:** Contradicts existing AppShell pattern, adds complexity.
+**Instead:** Add LibraryScreen as a new screen within AppShell (same as Settings, Inbox, etc.).
 
-**Rationale:** Depends on Phase 2 (wantlists must be imported) and Phase 3 (user profiles must exist for "who has it"). This is the core "magic moment" -- the reason users return.
+## AI Metadata Pipeline
 
-### Phase 5: P2P Trading
-- WebRTC signaling server (Socket.IO namespace)
-- simple-peer integration + file chunking
-- STUN/TURN configuration
-- Trade flow (initiate, accept, transfer, review)
-- Post-trade quality reviews
+### When to invoke AI
 
-**Rationale:** Depends on Phase 3 (discovery of who has what) and Phase 4 (matching drives trade initiation). This is the most technically complex feature and should be built on a solid foundation.
+```
+1. ID3v2 / Vorbis / FLAC tags (via music-metadata)  -> confidence: 1.0  -> NO AI
+2. ID3v1 tags (minimal)                               -> confidence: 0.8  -> NO AI
+3. Filename pattern matching successful                -> confidence: 0.6  -> NO AI
+4. Filename parsing + folder structure                 -> confidence: 0.5  -> MAYBE AI
+5. No tags, no parseable filename                      -> confidence: 0.1  -> YES AI
+```
 
-### Phase 6: Gamification
-- Rarity score computation
-- Redis leaderboards
-- Badges and achievements
-- Ranking display on profiles
-- Nightly recalculation job
+Only items with confidence < 0.5 get queued for AI. Batch up to 20 items per Gemini Flash call.
 
-**Rationale:** Depends on Phase 2 (collection data for rarity), Phase 5 (trade data for contribution scores). Gamification is a retention layer that amplifies existing behaviors -- it must come after the behaviors exist.
+### Gemini Flash configuration
 
-### Phase 7: Monetization + Hardening
-- Freemium gating middleware
-- Stripe integration for premium subscriptions
-- Security hardening (OWASP Top 10)
-- Penetration testing
-- Rate limiting on all public endpoints
+```typescript
+import { GoogleGenAI } from "@google/genai";
 
-**Rationale:** Gating requires all gated features to exist first. Security hardening is a pass over the entire system, best done when the system is feature-complete.
+const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
+
+// Use structured output (responseMimeType: "application/json")
+// Model: gemini-2.5-flash (cheapest, fastest)
+// Cost: ~$0.075/1M input tokens
+// 20 files per batch = ~2000 tokens = ~$0.00015 per batch
+// 10,000 files worst case = ~$0.075 total
+```
+
+**New dependency:** `@google/genai` -- add to desktop package.json.
+**New env var:** `GEMINI_API_KEY` -- add to desktop config resolution.
+
+## File Watcher Configuration
+
+### chokidar v4
+
+```typescript
+import { watch } from "chokidar";
+
+const AUDIO_EXTENSIONS = /\.(flac|wav|mp3|aiff|aif|ogg|opus|m4a|wma|ape|wv)$/i;
+
+const watcher = watch(folderPath, {
+  ignored: [
+    /(^|[\/\\])\../,           // dotfiles
+    (path: string) => !AUDIO_EXTENSIONS.test(path) && !isDirectory(path),
+  ],
+  persistent: true,
+  depth: 10,
+  ignoreInitial: true,          // we do our own initial scan
+  awaitWriteFinish: {
+    stabilityThreshold: 2000,   // wait 2s after last write
+    pollInterval: 500,
+  },
+  usePolling: false,
+});
+```
+
+**New dependency:** `chokidar@^4.0.0` -- add to desktop package.json.
+
+## YouTube Search Integration
+
+The `releases` table already has a `youtubeVideoId` column. YouTube search slots directly in.
+
+```
+YouTube Data API v3: 10,000 units/day free
+Search costs 100 units = 100 searches/day
+Strategy: Queue searches, 1 per 2s, cache results
+Most vinyl releases will have YouTube matches
+```
+
+**New env var:** `YOUTUBE_API_KEY` -- add to desktop config resolution.
+
+## New Dependencies Summary
+
+| Package | Version | Purpose |
+|---------|---------|---------|
+| `chokidar` | `^4.0.0` | File watching |
+| `@google/genai` | `^1.48.0` | Gemini Flash AI metadata |
+
+Both added to `apps/desktop/package.json`. No new dependencies for the web app.
+
+## Scalability Considerations
+
+| Concern | 100 files | 5,000 files | 50,000 files |
+|---------|-----------|-------------|--------------|
+| Scan time | < 5s | ~30s | ~5min |
+| Local index | electron-store OK | electron-store OK (~2MB) | Consider better-sqlite3 |
+| AI calls | ~5 items | ~500 items (25 batches) | ~5000 items (queue overnight) |
+| Server sync | 1 API call | 50 calls | 500 calls (throttle 2/sec) |
+| chokidar memory | Negligible | ~10MB | ~50MB |
+
+## Build Order
+
+### Phase 1: Local Index + Folder Scanner (no server, no AI)
+1. `local-index.ts` -- electron-store wrapper for file index
+2. `metadata-extractor.ts` -- music-metadata tag reading + filename parsing
+3. `folder-scanner.ts` -- recursive walk + metadata extraction
+4. IPC channels: select-folder, add-folder, get-folders, get-items
+5. `LibraryScreen.tsx` -- folder picker, scan progress, file list display
+6. **Testable:** Scan a folder, read tags, display in UI
+
+### Phase 2: Sync Engine (server integration)
+1. `POST /api/desktop/library-sync` API route + server action
+2. `sync-engine.ts` -- batch upsert to server
+3. Extend LibraryScreen to show sync status
+4. **Testable:** Local items appear on web collection page with addedVia="local"
+
+### Phase 3: File Watcher + Tray
+1. `file-watcher.ts` -- chokidar integration
+2. `tray.ts` -- system tray icon + context menu
+3. Modify `index.ts` -- close-to-tray, tray lifecycle
+4. Modify `window.ts` -- hide on close
+5. Startup diff scan in LibraryRuntime.initialize()
+6. **Testable:** Add file to watched folder, appears in collection. Close to tray, app runs.
+
+### Phase 4: AI Metadata + YouTube
+1. `ai-metadata.ts` -- Gemini Flash integration
+2. Extend MetadataExtractor with AI fallback
+3. `youtube-search.ts` -- YouTube Data API
+4. **Testable:** Files with no tags get AI-inferred metadata. Releases get YouTube links.
+
+### Phase 5: Auto-Start + Polish
+1. `app.setLoginItemSettings()` for Windows auto-start
+2. Tray notifications for wantlist matches
+3. Settings UI for all new preferences
+4. Error handling, retry logic
+5. **Testable:** App starts with Windows, watches folders, syncs silently
+
+**Rationale:** Phase 1 delivers visible value (see local files). Phase 2 connects to existing collection system. Phase 3 adds daemon behavior. Phase 4 enhances with AI. Phase 5 polishes UX.
 
 ## Sources
 
-- [MDN WebRTC Signaling and Video Calling](https://developer.mozilla.org/en-US/docs/Web/API/WebRTC_API/Signaling_and_video_calling)
-- [MDN WebRTC Protocols (STUN/TURN/ICE)](https://developer.mozilla.org/en-US/docs/Web/API/WebRTC_API/Protocols)
-- [WebRTC.ventures: Self-Hosted STUN/TURN Servers](https://webrtc.ventures/2025/01/how-to-set-up-self-hosted-stun-turn-servers-for-webrtc-applications/)
-- [VideoSDK: TURN Server Guide 2025](https://www.videosdk.live/developer-hub/webrtc/turn-server-for-webrtc)
-- [TURN Server Costs Guide](https://dev.to/alakkadshaw/turn-server-costs-a-complete-guide-1c4b)
-- [PkgPulse: simple-peer vs PeerJS vs mediasoup 2026](https://www.pkgpulse.com/blog/simple-peer-vs-peerjs-vs-mediasoup-webrtc-libraries-nodejs-2026)
-- [web.dev: WebRTC Data Channels](https://web.dev/articles/webrtc-datachannels)
-- [Mozilla: Large Data Channel Messages](https://blog.mozilla.org/webrtc/large-data-channel-messages/)
-- [MDN: RTCDataChannel bufferedAmount](https://developer.mozilla.org/en-US/docs/Web/API/RTCDataChannel/bufferedAmount)
-- [Discogs API Documentation](https://www.discogs.com/developers)
-- [Discogs Forum: API Rate Limits](https://www.discogs.com/forum/thread/1104957)
-- [Redis Leaderboards Solution](https://redis.io/solutions/leaderboards/)
-- [SystemDesign.one: Leaderboard System Design](https://systemdesign.one/leaderboard-system-design/)
-- [OneUpTime: Gaming Leaderboards with Redis Sorted Sets](https://oneuptime.com/blog/post/2026-01-27-gaming-leaderboards-redis-sorted-sets/view)
-- [BullMQ Rate Limiting Documentation](https://docs.bullmq.io/guide/rate-limiting)
-- [BullMQ Rate Limit Recipes](https://blog.taskforce.sh/rate-limit-recipes-in-nodejs-using-bullmq/)
-- [GetStream: Scalable Activity Feed Architecture](https://getstream.io/blog/scalable-activity-feed-architecture/)
-- [Java Tech Online: Social Media Feed System Design](https://javatechonline.com/social-media-feed-system-design/)
-- [MDN: Server-Sent Events](https://developer.mozilla.org/en-US/docs/Web/API/Server-sent_events/Using_server-sent_events)
-- [Shopify Engineering: SSE for Data Streaming](https://shopify.engineering/server-sent-events-data-streaming)
-- [DEV Community: Feature Gating for Freemium SaaS](https://dev.to/aniefon_umanah_ac5f21311c/feature-gating-how-we-built-a-freemium-saas-without-duplicating-components-1lo6)
-- [Ably: Socket.IO vs WebSocket](https://ably.com/topic/socketio-vs-websocket)
-- [RFC 8831: WebRTC Data Channels](https://datatracker.ietf.org/doc/html/rfc8831)
-- [LogRocket: WebRTC Signaling with WebSocket and Node.js](https://blog.logrocket.com/webrtc-signaling-websocket-node-js/)
-
----
-*Architecture research for: VinylDig -- vinyl digger social network*
-*Researched: 2026-03-25*
+- [Chokidar v4 GitHub](https://github.com/paulmillr/chokidar) -- HIGH confidence
+- [Electron Tray API](https://www.electronjs.org/docs/latest/api/tray) -- HIGH confidence
+- [Electron app.setLoginItemSettings](https://www.electronjs.org/docs/latest/api/app) -- HIGH confidence
+- [Electron minimize to tray](https://dev.to/jenueldev/electronjs-how-to-minimizeclose-window-to-system-tray-or-in-the-background-11c6) -- MEDIUM confidence
+- [@google/genai npm](https://www.npmjs.com/package/@google/genai) -- HIGH confidence
+- [Gemini API docs](https://ai.google.dev/gemini-api/docs/quickstart) -- HIGH confidence
+- [music-metadata npm](https://www.npmjs.com/package/music-metadata) -- HIGH confidence, already in use
+- [YouTube Data API v3](https://developers.google.com/youtube/v3) -- HIGH confidence
+- [Chokidar and Electron integration](https://www.hendrik-erz.de/post/electron-chokidar-and-native-nodejs-modules-a-horror-story-from-integration-hell) -- MEDIUM confidence
