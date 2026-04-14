@@ -21,7 +21,7 @@ export default defineConfig({
 		setupFiles: ["tests/setup.ts"],
 		coverage: {
 			provider: "v8",
-			include: ["src/actions/**", "src/lib/**"],
+			include: ["src/actions/**", "src/lib/**", "src/components/**"],
 			exclude: [
 				"src/lib/db/schema/**",
 				"src/lib/supabase/**",
@@ -29,6 +29,12 @@ export default defineConfig({
 			],
 			reporter: ["text", "html", "json-summary"],
 			reportsDirectory: "./coverage",
+			thresholds: {
+				statements: 40,
+				branches: 35,
+				functions: 35,
+				lines: 40,
+			},
 		},
 	},
 	resolve: {
