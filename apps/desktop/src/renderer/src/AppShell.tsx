@@ -19,7 +19,7 @@ type Tab = "inbox" | "settings" | "library";
 export function AppShell() {
   const [loading, setLoading] = useState(true);
   const [session, setSession] = useState<SupabaseSession | null>(null);
-  const [activeTab, setActiveTab] = useState<Tab>("inbox");
+  const [activeTab, setActiveTab] = useState<Tab>("library");
 
   // Trade overlay state
   const [activeTradeId, setActiveTradeId] = useState<string | null>(null);

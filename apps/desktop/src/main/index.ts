@@ -9,9 +9,7 @@ import { DesktopSupabaseAuth } from "./supabase-auth";
 import { DesktopTradeRuntime } from "./trade-runtime";
 import {
   createMainWindow,
-  createTradeWindow,
   focusMainWindow,
-  focusTradeWindow,
   getMainWindow,
 } from "./window";
 
@@ -52,11 +50,9 @@ function resolveDesktopSiteUrl() {
 async function publishProtocolPayload(payload: DesktopProtocolPayload) {
   sessionStore?.setLastProtocolPayload(payload);
 
-  if (payload.kind === "trade-handoff") {
-    const tradeWindow = await createTradeWindow();
-    tradeWindow.webContents.send("desktop:protocol-payload", payload);
-    focusTradeWindow();
-    return;
+  const mainWin = getMainWindow();
+  if (mainWin && !mainWin.isDestroyed()) {
+    mainWin.webContents.send("desktop:protocol-payload", payload);
   }
 
   focusMainWindow();

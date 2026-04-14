@@ -87,12 +87,14 @@ export interface DesktopShellSessionPayload {
 export interface DesktopMainShellBridge {
   isDesktop(): boolean;
   getAppVersion(): Promise<string>;
-  /**
-   * Handoff-code flow: the web app sends a single-use code (30s TTL)
-   * instead of raw tokens. The desktop exchanges it server-side via
-   * POST /api/desktop/session/exchange, keeping tokens out of the browser.
-   */
   syncHandoffCode(code: string | null): Promise<void>;
+  openLibrary(): Promise<void>;
+  // Library methods — used by /biblioteca page
+  selectLibraryFolder(): Promise<string | null>;
+  startScan(folderPath: string, mode: "incremental" | "full"): Promise<ScanResult>;
+  getLibraryTracks(): Promise<LibraryTrack[]>;
+  getLibraryRoot(): Promise<string | null>;
+  onScanProgress(listener: (event: ScanProgressEvent) => void): () => void;
 }
 
 /**

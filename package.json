@@ -6,7 +6,7 @@
     "overrides": {
       "@esbuild-kit/core-utils>esbuild": ">=0.25.0"
     },
-    "onlyBuiltDependencies": ["ffmpeg-static", "esbuild"]
+    "onlyBuiltDependencies": ["ffmpeg-static", "esbuild", "better-sqlite3"]
   },
   "scripts": {
     "dev": "pnpm --filter @digswap/web dev",

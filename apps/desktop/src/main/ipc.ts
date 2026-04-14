@@ -5,7 +5,7 @@ import type { DesktopSessionStore } from "./session-store";
 import type { DesktopTradeRuntime } from "./trade-runtime";
 import { runAudioUploadPipeline } from "./audio/upload-pipeline";
 import { registerLibraryIpc } from "./library/library-ipc";
-import { getTradeWindow } from "./window";
+import { getMainWindow } from "./window";
 
 interface RegisterDesktopIpcOptions {
   authRuntime: DesktopSupabaseAuth;
@@ -13,13 +13,13 @@ interface RegisterDesktopIpcOptions {
   tradeRuntime: DesktopTradeRuntime;
 }
 
-function sendToTradeWindow<TPayload>(channel: string, payload: TPayload) {
-  const tradeWindow = getTradeWindow();
-  if (!tradeWindow || tradeWindow.isDestroyed()) {
+function sendToMainWindow<TPayload>(channel: string, payload: TPayload) {
+  const mainWindow = getMainWindow();
+  if (!mainWindow || mainWindow.isDestroyed()) {
     return;
   }
 
-  tradeWindow.webContents.send(channel, payload);
+  mainWindow.webContents.send(channel, payload);
 }
 
 export function registerDesktopIpc({
@@ -192,21 +192,22 @@ export function registerDesktopIpc({
   );
 
   authRuntime.onSessionChanged((session: SupabaseSession | null) => {
-    sendToTradeWindow("desktop:session-changed", session);
+    sendToMainWindow("desktop:session-changed", session);
   });
 
   tradeRuntime.onLobbyStateChanged((event) => {
-    sendToTradeWindow("desktop:lobby-state-changed", event);
+    sendToMainWindow("desktop:lobby-state-changed", event);
   });
 
   tradeRuntime.onTransferProgress((event) => {
-    sendToTradeWindow("desktop:transfer-progress", event);
+    sendToMainWindow("desktop:transfer-progress", event);
   });
 
   tradeRuntime.onTransferComplete((event) => {
-    sendToTradeWindow("desktop:transfer-complete", event);
+    sendToMainWindow("desktop:transfer-complete", event);
   });
 
   // Library IPC handlers (Phase 29)
-  registerLibraryIpc(sendToTradeWindow);
+  registerLibraryIpc(sendToMainWindow);
+
 }

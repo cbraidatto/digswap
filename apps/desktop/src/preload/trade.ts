@@ -83,3 +83,4 @@ const desktopBridge: DesktopBridge & DesktopBridgeTradeRuntime & DesktopBridgeLi
 };
 
 contextBridge.exposeInMainWorld("desktopBridge", desktopBridge);
+

@@ -15,10 +15,10 @@ export function registerLibraryIpc(
     return result.filePaths[0] ?? null;
   });
 
-  ipcMain.handle("desktop:start-scan", async (_event, folderPath: string): Promise<ScanResult> => {
+  ipcMain.handle("desktop:start-scan", async (_event, folderPath: string, mode: "incremental" | "full"): Promise<ScanResult> => {
     return scanFolder(folderPath, (progress: ScanProgressEvent) => {
       sendToMainWindow("desktop:scan-progress", progress);
-    }, { incremental: false });
+    }, { incremental: mode === "incremental" });
   });
 
   ipcMain.handle("desktop:start-incremental-scan", async (): Promise<ScanResult> => {

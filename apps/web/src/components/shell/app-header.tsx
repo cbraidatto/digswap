@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { ChatToggleButton } from "@/components/chat/chat-toggle-button";
@@ -22,7 +23,7 @@ interface AppHeaderProps {
 	userId: string;
 }
 
-export function AppHeader({ userId }: AppHeaderProps) {
+export function AppHeader({ userId, avatarUrl, displayName }: AppHeaderProps) {
 	const pathname = usePathname();
 
 	return (
@@ -60,6 +61,19 @@ export function AppHeader({ userId }: AppHeaderProps) {
 							</Link>
 						);
 					})}
+						{typeof window !== "undefined" && (window as { desktopShell?: { isDesktop?: () => boolean } }).desktopShell?.isDesktop?.() && (
+							<Link
+								href="/biblioteca"
+								className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full font-mono text-[11px] uppercase tracking-wider transition-all duration-200 ${
+									pathname.startsWith("/biblioteca")
+										? "bg-primary/15 text-primary font-semibold"
+										: "text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high/80"
+								}`}
+							>
+								<span className="material-symbols-outlined text-[16px]">library_music</span>
+								<span className="hidden xl:inline">Biblioteca</span>
+							</Link>
+						)}
 				</nav>
 
 				{/* ── Search — centered, takes available space ── */}
@@ -79,6 +93,28 @@ export function AppHeader({ userId }: AppHeaderProps) {
 					</Link>
 					<ChatToggleButton />
 					<NotificationBell userId={userId} />
+					<Link
+						href="/perfil"
+						aria-label="My profile"
+						className="ml-1 w-8 h-8 rounded-full overflow-hidden border-2 border-outline-variant/30 hover:border-primary/60 transition-colors flex-shrink-0"
+					>
+						{avatarUrl ? (
+							<Image
+								src={avatarUrl}
+								alt={displayName ?? "Profile"}
+								width={32}
+								height={32}
+								unoptimized
+								className="w-full h-full object-cover"
+							/>
+						) : (
+							<div className="w-full h-full bg-surface-container-high flex items-center justify-center">
+								<span className="material-symbols-outlined text-[16px] text-on-surface-variant">
+									person
+								</span>
+							</div>
+						)}
+					</Link>
 				</div>
 			</div>
 		</header>

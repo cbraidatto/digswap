@@ -34,16 +34,16 @@ export async function extractTrackMetadata(
   const tagYear = metadata.common.year ?? null;
   const tagTrackNumber = metadata.common.track?.no ?? null;
 
-  // Format specs (always from file, always high confidence)
-  const format =
-    metadata.format.codec ?? metadata.format.container ?? "unknown";
+  // Format: use file extension (WAV, FLAC, AIFF) instead of codec name (PCM)
+  const path = await import("node:path");
+  const ext = path.extname(filePath).slice(1).toUpperCase();
+  const format = ext || (metadata.format.container ?? "unknown");
   const bitrate = metadata.format.bitrate ?? 0;
   const sampleRate = metadata.format.sampleRate ?? 0;
   const bitDepth = metadata.format.bitsPerSample ?? null;
   const duration = metadata.format.duration ?? 0;
 
   // Folder inference for missing fields
-  const path = await import("node:path");
   const relativePath = path.relative(rootPath, filePath);
   const inferred: InferredMetadata | null = inferFromPath(relativePath);
 

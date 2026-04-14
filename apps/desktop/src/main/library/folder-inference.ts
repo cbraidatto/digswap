@@ -38,5 +38,19 @@ export function inferFromPath(relativePath: string): InferredMetadata | null {
       };
     }
   }
+
+  // Fallback: extract title from filename, artist from parent folder
+  const parts = normalized.split("/");
+  const filename = parts[parts.length - 1];
+  const titleFromFile = filename.replace(/\.\w+$/, "").replace(/^\d+[\s._-]+/, "").trim();
+  const parentFolder = parts.length >= 2 ? parts[parts.length - 2]?.trim() : undefined;
+
+  if (titleFromFile) {
+    return {
+      title: titleFromFile,
+      artist: parentFolder || undefined,
+    };
+  }
+
   return null;
 }
