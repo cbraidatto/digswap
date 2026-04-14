@@ -1,12 +1,14 @@
 {
   "name": "@digswap/desktop",
-  "version": "0.2.0",
+  "version": "0.1.0",
   "private": true,
   "main": "out/main/index.js",
   "scripts": {
     "dev": "electron-vite dev",
     "build": "electron-vite build",
     "preview": "electron-vite preview",
+    "rebuild": "electron-rebuild -f -w better-sqlite3",
+    "postinstall": "electron-rebuild -f -w better-sqlite3",
     "test": "vitest run",
     "test:watch": "vitest",
     "typecheck": "tsc --noEmit -p tsconfig.json"
@@ -14,15 +16,16 @@
   "dependencies": {
     "@digswap/trade-domain": "workspace:*",
     "@supabase/supabase-js": "^2.101.0",
+    "better-sqlite3": "^12.9.0",
     "electron-store": "^8.2.0",
-    "ffmpeg-static": "^5.2.0",
-    "music-metadata": "^10.0.0",
     "peerjs": "^1.5.4",
     "react": "^19",
     "react-dom": "^19"
   },
   "devDependencies": {
+    "@electron/rebuild": "^4.0.3",
     "@tailwindcss/vite": "^4.2.2",
+    "@types/better-sqlite3": "^7.6.13",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
