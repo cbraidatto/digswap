@@ -2,41 +2,41 @@
 gsd_state_version: 1.0
 milestone: v1.3
 milestone_name: Local Library
-status: defining_requirements
-stopped_at: Milestone v1.3 started — defining requirements
-last_updated: "2026-04-14T04:00:00.000Z"
-last_activity: 2026-04-14
+status: roadmap_complete
+stopped_at: Roadmap created — 4 phases (29-32) covering 17 requirements
+last_updated: "2026-04-13T12:00:00.000Z"
+last_activity: 2026-04-13
 progress:
-  total_phases: 28
+  total_phases: 32
   completed_phases: 27
   total_plans: 112
   completed_plans: 112
-  percent: 96
+  percent: 0
 ---
 
 # Project State
 
 ## Project Reference
 
-See: .planning/PROJECT.md (updated 2026-04-06)
+See: .planning/PROJECT.md (updated 2026-04-14)
 
 **Core value:** A digger opens the app and immediately finds who has the record they've been hunting -- and sees where they stand in the community.
-**Current focus:** Phase 28 — Trade Infrastructure + Coordinated Deploy
+**Current focus:** v1.3 Local Library — Phase 29: Local Index + Folder Scanner
 
 ## Current Position
 
-Phase: Not started (defining requirements)
+Phase: 29 — Local Index + Folder Scanner
 Plan: —
-Status: Defining requirements for milestone v1.3
-Last activity: 2026-04-14
+Status: Roadmap complete, awaiting plan-phase
+Last activity: 2026-04-13
 
-Progress: [░░░░░░░░░░] 0%
+Progress: [░░░░░░░░░░] 0% (v1.3: 0/4 phases)
 
 ## Performance Metrics
 
 **Velocity:**
 
-- Total plans completed: 0
+- Total plans completed: 0 (v1.3)
 - Average duration: -
 - Total execution time: 0 hours
 
@@ -117,142 +117,15 @@ Progress: [░░░░░░░░░░] 0%
 Decisions are logged in PROJECT.md Key Decisions table.
 Recent decisions affecting current work:
 
-- [Roadmap]: 11-phase structure derived from 69 requirements with fine granularity
-- [Roadmap]: P2P deferred to Phase 9 (requires DMCA compliance infrastructure first)
-- [Roadmap]: Security hardening as final Phase 11 (pen test over complete system)
-- [Roadmap]: Discogs integration in Phase 3 (cold-start hook, early delivery)
-- [Phase 01]: Biome v2 (2.4.8) config schema used instead of v1 -- installed version requires v2 format
-- [Phase 01]: React 19.1.0 bundled by create-next-app@15.5.14 -- using what the framework ships
-- [Phase 01]: Dark-only theme at :root with no .dark class -- single OKLCH variable set per D-01
-- [Phase 01]: supabaseAuthAdminRole for service-managed tables (releases, subscriptions, user_badges)
-- [Phase 01]: Backup codes use invalidation (used=true) not deletion -- audit trail and timing-attack prevention
-- [Phase 01]: Middleware uses getUser() for JWT validation + auto-refresh (getClaims was too strict, caused session expiry bugs on router.refresh())
-- [Phase 01]: Password complexity: min 8 chars, 1 uppercase, 1 number, 1 special char (per D-18)
-- [Phase 01]: Rate limiter windows: auth=5/60s, reset=3/15m, totp=5/5m (per D-16)
-- [Phase 01]: Password reset redirectTo uses /api/auth/callback?next=/reset-password for PKCE flow consistency
-- [Phase 01]: OWASP email enumeration prevention: forgotPassword always returns success regardless of email existence
-- [Phase 01]: Custom SVG icons for Google/GitHub OAuth -- lucide-react v1.6.x removed Github export
-- [Phase 01]: Admin client for session tracking to enforce max 3 sessions (D-13) across all user sessions
-- [Phase 01]: bcryptjs for backup code hashing (pure JS, no native deps, serverless compatible)
-- [Phase 01]: Backup code charset omits O/0/1/I for readability
-- [Phase 01]: Discogs Connect step intentionally disabled as Phase 3 placeholder in onboarding
-- [Phase 01]: Security header tests use static analysis of next.config.ts (no running server needed)
-- [Phase 01]: Playwright configured Chromium-only for solo dev speed; multi-browser testing deferred to Phase 11
-- [Phase 02]: AppShell uses client-side pathname checking for conditional shell rendering (excludes /onboarding, /settings)
-- [Phase 02]: Protected layout fetches profile via Drizzle, passes to client AppShell -- server/client composition pattern
-- [Phase 02]: All redirect chains updated from "/" to "/feed" as default authenticated landing page
-- [Phase 02]: Mock UserAvatarMenu in AppHeader tests to avoid Base UI jsdom complexity
-- [Phase 02]: E2E tests use test.fixme() pending auth storageState fixture (Phase 3+)
-- [Phase 03]: Vault-first token storage with discogs_tokens table fallback for local dev without Vault
-- [Phase 03]: httpOnly cookie (sameSite: lax, maxAge: 600) for OAuth request token across Discogs redirect
-- [Phase 03]: Admin client (not Drizzle) in callback for RLS bypass consistency with import worker pattern
-- [Phase 02]: @vitejs/plugin-react added for JSX transform in vitest (jsx: preserve in tsconfig)
-- [Phase 03]: AppShell banner prop slot for full-width rendering above constrained content area
-- [Phase 03]: Separate Realtime channel instances for ImportBanner (-banner suffix) to avoid conflicts
-- [Phase 03]: Admin client (not Drizzle) for settings page profile fetch -- consistency with import worker pattern
-- [Phase 03]: Badge Connected uses inline style for success color at 10% opacity per UI-SPEC
-- [Phase 03]: OAuth error on settings page displayed as static server-rendered banner from searchParams
-- [Phase 03]: All 42 tests use vi.mock() for full module isolation -- no real DB or API calls
-- [Phase 03]: Human verification confirmed full OAuth-to-disconnect flow functional
-- [Phase 04]: Uncapped rarity formula: removed Math.min(1.0) to allow scores >= 2.0 for Ultra Rare tier
-- [Phase 04]: Username column nullable initially, with one-time migration script for existing profiles
-- [Phase 04]: IDOR prevention in updateConditionGrade via .eq(user_id, user.id) ownership check
-- [Phase 04]: Collection queries use Drizzle db client with innerJoin, not Supabase client
-- [Phase 04]: FAB positioned with calc(64px+16px+safe-area) for BottomBar clearance, lg:bottom-6 for desktop
-- [Phase 04]: 300ms debounce on Discogs search using useCallback + setTimeout/clearTimeout ref pattern
-- [Phase 04]: ConditionEditor integration into CollectionCard deferred to merge -- parallel worktree constraint
-- [Phase 04.5]: Bottom bar FAB removed entirely -- /trades/new is Phase 9, no replacement until then (D-04)
-- [Phase 04.5]: Comunidade page collapses to single column -- right column was all fake data, removed (D-13)
-- [Phase 04.5]: Feed page right sidebar removed entirely -- Trending_Repos and System_Logs are GitHub metaphors (D-10)
-- [Phase 04.5-template-alignment]: Rewrote feed/comunidade as complete files — fake data was too pervasive for surgical edits; used phase badges to communicate roadmap honestly
-- [Phase 04.5-template-alignment]: Removed ADD_RECORD Link from perfil/page.tsx (broken /settings destination); FAB is now sole add-record entry point
-- [Phase 05]: useOptimistic from React 19 for follow/unfollow instant UI toggle with automatic revert on error
-- [Phase 05]: Server action wrappers (fetchFollowersList/fetchFollowingList) for client component access to query functions
-- [Phase 05]: Empty collection check before calling getCollectionComparison to avoid unnecessary DB queries
-- [Phase 06]: Tab bar defaults to DIGGERS preserving Phase 5 behavior; ?tab=records deep-link enables direct RECORDS access
-- [Phase 06]: BrowseGrid renders nothing with no filters selected to avoid unnecessary API calls on mount
-- [Phase 06]: 50-notification cap per import to prevent Resend rate limit issues on large collections
-- [Phase 06]: Mock Popover/Radix UI components for jsdom compatibility in NotificationBell tests
-- [Phase 06]: Pre-existing integration test failures (Resend missing API key at module load) deferred — fix requires lazy Resend initialization in email.ts
-- [Phase 07]: Slug conflict resolution uses -2, -3 suffix pattern for community groups
-- [Phase 07]: Review upsert via onConflictDoUpdate on (userId, releaseId) unique constraint
-- [Phase 07]: Personal feed CASE WHEN SQL filter for group_post membership gating (D-06)
-- [Phase 07]: ReviewsPanel renders at 0 reviews for discovery; GroupFeedCard shared for group_post + wrote_review
-- [Phase 07]: Tests for server actions mock full dependency chain: supabase/server auth + drizzle db thenable chain + logActivity -- all in same pattern as existing discovery/notification tests
-- [Phase 08]: computeGlobalScore extracted as standalone pure function (not inline in queries) for shared use across ranking system
-- [Phase 08]: Genre leaderboard uses raw SQL via db.execute for ROW_NUMBER() window function and array containment operator
-- [Phase 08]: Badge award uses Supabase admin client (consistency with existing community.ts notification pattern)
-- [Phase 08]: window.history.replaceState for tab URL updates on explorar (avoids re-render vs router.replace)
-- [Phase 08]: RankCard and BadgeRow are server components receiving data as props from server pages
-- [Phase 08]: Used createQueryChain helper pattern for Supabase admin client testing in badge-awards tests
-- [Phase 08]: Accessed Drizzle mock chain via db import (not top-level const) to avoid vi.mock hoisting issues
-- [Phase 09]: Lazy chunk accessor: sliceFileIntoChunks returns getChunk() to avoid loading full file into memory
-- [Phase 09]: Check-on-read month rollover for trade quota: getTradeCountThisMonth resets counter on month change
-- [Phase 09]: TURN credential fallback: returns Google STUN servers when Metered.ca env vars missing (dev mode)
-- [Phase 09]: Dynamic Resend import in trade email to avoid module-load-time failures when RESEND_API_KEY missing
-- [Phase 09]: renderAction slot pattern on CollectionGrid/CollectionCard for extensible per-card actions (P2P button without tight coupling)
-- [Phase 09]: NotificationRow metadata field for wantlist_match trade URL construction (matchUserId + releaseId)
-- [Phase 09]: Zustand store for received file blob persistence across lobby-to-review navigation
-- [Phase 09]: Freemium gate renders after first spectrogram analysis, premium users get re-analyze button
-- [Phase 09]: CONTRIBUTION_POINTS.trade_completed constant used directly for +15 pts display
-- [Phase 09]: isP2PEnabledClient reads NEXT_PUBLIC_P2P_ENABLED for client components
-- [Phase quick-260328-a21]: Removed trade_requests UPDATE and user_rankings UPDATE RLS policies entirely -- all mutations via admin client Server Actions
-- [Phase 10]: Public profile route moved to src/app/perfil/ outside (protected) group -- layout-level auth redirect bypass
-- [Phase 10]: Feed showcase uses Material Symbols icons as Ghost Protocol placeholders instead of picsum.photos external images
-- [Phase 10]: Removed p2pEnabled/currentUserId prop chain from OwnersList through ExplorarPage after REQUEST_TRADE removal
-- [Phase 10]: Used SWR (not TanStack Query) for useDiggerMemory -- simpler API for single-key fetching
-- [Phase 10]: Base UI render prop for PopoverTrigger instead of Radix asChild -- project uses @base-ui/react
-- [Phase 10]: TrustStrip uses providerId (actual schema) instead of recipientId (plan spec) for trade queries
-- [Phase 10]: FeedShowcase replaced by RadarSection/RadarEmptyState -- real wantlist matching replaces placeholder showcase
-- [Phase 10]: mutualCount deferred to 0 in RadarMatch -- reverse wantlist join adds complexity without core Radar value
-- [Phase 10]: Node.js runtime for OG image route (postgres driver not edge-compatible)
-- [Phase 10]: TrustStrip replaces trade stat line in both protected and public profile headers (consistency)
-- [Phase 10-positioning-radar-workspace]: ProfileCollectionSection as client wrapper: server page passes items+intersections as props, client component owns filterIds state -- avoids making profile page a client component
-- [Phase 11]: Nonce-based CSP replaces static unsafe-inline/unsafe-eval in next.config.ts
-- [Phase 11]: totp-setup.tsx nonce wiring deferred (Client Component, dangerouslySetInnerHTML on div not script/style)
-- [Phase 11]: Three rate limit tiers (api 30/60s, trade 10/60s, discogs 5/60s) matching action sensitivity
-- [Phase 11]: escapeHtml inline in each email file rather than shared utility for minimal coupling
-- [Phase 12]: Used vi.hoisted() pattern for YouTube search test mocks to avoid vi.mock hoisting issues
-- [Phase 12]: RadarSection uses album icon (not VIEW_RELEASE text) for compact actions area layout
-- [Phase 13 P01]: Drizzle check() constraint for sessionType and status enums (no prior usage in schema — confirmed available in pg-core)
-- [Phase 13 P01]: Two-query + JS assembly pattern for getSetsForCrate (avoids complex multi-level join)
-- [Phase 13 P01]: ZodError.issues[0] not .errors[0] — TypeScript type only exposes .issues, auto-fixed during verification
-- [Phase 14 planning]: Trade V2 executes after a preflight blocker batch; 14-02 and 14-03 are serialized; Trade V2 remains asymmetric with proposer implicit terms acceptance
-- [Phase 14]: Supabase Presence on channel trade:${tradeId} for real-time online detection (not postgres_changes)
-- [Phase 14]: Multi-phase lobby state machine initializes from DB status on mount for page reload resilience
-- [Phase 14]: Inline Web Worker for SHA-256 via URL.createObjectURL(Blob) pattern (no separate worker file)
-- [Phase 14]: Preview transfer uses distinct preview-chunk/preview-done message types separate from full transfer
-- [Phase 14]: Bilateral timestamp gate: all 4 timestamps non-null before advancing to transferring status (D-07)
-- [Phase 14 / Architectural]: Web P2P trade layer removed (commit 096b3be) — web = discovery/social only, desktop = trade runtime (Electron). See ADR-002-desktop-trade-runtime.md
-- [Phase 17]: handoffTokens RLS blocks all direct authenticated access (sql false) — server actions use Drizzle db client directly which bypasses RLS
-- [Phase 17]: OpenInDesktop uses styled anchor tags for download CTAs (not Button asChild) — Base UI button component does not expose asChild prop
-- [Phase 17-desktop-trade-runtime]: DesktopBridge interface is the sole IPC contract — renderer never imports Electron directly
-- [Phase 17-desktop-trade-runtime]: InboxScreen polls getPendingTrades every 30s — Supabase Realtime not bridged to renderer
-- [Phase 17-desktop-trade-runtime]: Navigation state owned by AppShell via prop-callbacks; screens are stateless about routing
-- [Phase 17-desktop-trade-runtime]: IPC trade runtime types (DesktopBridgeTradeRuntime) defined by renderer, implemented by Codex in main process
-- [Phase 08]: social.ts not modified for gamification — follows captured by pg_cron batch (D-12)
-- [Phase 08]: Trade points excluded from ranking CTE until Phase 9 completes trade tracking
-- [Phase 19]: parentPort closure narrowing: const reassignment after null check for type safety in utilityProcess worker
-- [Phase 19]: challenge_entries_update_own WITH CHECK added to match 20260411 migration (discovered during schema spot-check)
-- [Phase 20]: Gem colors declared theme-independently in :root (not per-theme) for brand consistency across all themes
-- [Phase 20]: Gem distribution computed at SQL query time via CASE expression -- no derived column on releases table
-- [Phase 20]: Reuse rarity_score DB column for gem scores — semantic rename at TypeScript layer only (UserRanking.gemScore)
-- [Phase 20]: RANK_TITLES recalibrated to 501/2001/5001 — typical 200-record collection scores ~1030 gem points
-- [Phase 21]: Used standard 'as unknown as T' double-cast pattern for raw SQL results from db.execute()
-- [Phase 22]: Direct devDep vite ^8.0.5 in apps/web to force patched transitive resolution from @vitejs/plugin-react (pnpm overrides caused cross-workspace conflicts)
-- [Phase 27-desktop-audio-pipeline]: vi.mock factory pattern for node:child_process in Electron main process tests (ESM immutable exports)
-- [Phase 27-desktop-audio-pipeline]: music-metadata parseFile via dynamic import with type cast (Node-only export)
-- [Phase 27-desktop-audio-pipeline]: onlyBuiltDependencies in root package.json for ffmpeg-static binary download
-- [Phase 27]: Supabase Storage upsert:false for first-write-wins semantics on preview uploads
-- [Phase 27]: SHA-256 immutability via .is('file_hash', null) guard -- second calls become no-ops
-- [Phase 27]: AudioPrepResult duplicated in ipc-types.ts for clean renderer/main boundary separation
-- [Phase 27]: Static FFT analysis via OfflineAudioContext for consistent spectral rendering without real-time playback
-- [Phase 27]: Specs text summary instead of Supabase URL for preview in renderer -- avoids env var threading
-- [Phase 27]: Stub proposalItems in AppShell with single-item fallback until Phase 28 TradeDetail extension
+- [v1.3 Roadmap]: 4-phase structure derived from 17 requirements — scan/index first, sync second, daemon third, AI last
+- [v1.3 Roadmap]: SCAN-05 (diff scan on startup) placed in Phase 31 with daemon — requires persistent index + tray mode to be meaningful
+- [v1.3 Roadmap]: AI Metadata (Phase 32) depends only on Phase 29 (local index), not on daemon or sync — can theoretically parallelize
+- [v1.3 Roadmap]: Phase numbering continues from v1.2 (28 → 29)
 
 ### Roadmap Evolution
 
 - Phase 19 added: Security Hardening — Fix 74 audit vulnerabilities (2026-04-03)
+- v1.3 Local Library: 4 phases (29-32) added (2026-04-13)
 
 ### Pending Todos
 
@@ -276,6 +149,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-04-09T18:18:38.138Z
-Stopped at: Completed 27-04-PLAN.md
+Last session: 2026-04-13
+Stopped at: v1.3 roadmap created — 4 phases (29-32), 17 requirements mapped
 Resume file: None

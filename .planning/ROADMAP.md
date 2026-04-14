@@ -49,6 +49,13 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [ ] **Phase 27: Desktop Audio Pipeline** - File upload with spec extraction via FFmpeg, SHA-256 hashing, 2min preview generation (raw cut, no transcoding), Supabase Storage upload, spectral visualizer
 - [ ] **Phase 28: Trade Infrastructure + Coordinated Deploy** - Supabase Storage bucket + lifecycle, Edge Function preview validation, pg_cron cleanup, version gate, protocol version bump, E2E smoke test
 
+### v1.3 Local Library
+
+- [ ] **Phase 29: Local Index + Folder Scanner** - Native folder picker, recursive audio scan with progress, metadata extraction from tags and filename/folder inference
+- [ ] **Phase 30: Sync Engine** - Upload local library to Supabase as collection items, Discogs dedup, deletion sync, incremental-only transfers
+- [ ] **Phase 31: Tray Daemon + File Watcher** - Minimize to tray, chokidar file watching, diff scan on startup, auto-start with Windows, single-instance lock
+- [ ] **Phase 32: AI Metadata Enrichment** - Gemini Flash inference for poorly-tagged files, confidence scoring, user correction persistence
+
 ## Phase Details
 
 ### Phase 1: Foundation + Authentication
@@ -524,10 +531,56 @@ Plans:
   6. Full E2E: multi-item proposal (web) → accept → handoff → preview (desktop) → transfer → review
 **Plans**: TBD
 
+
+### v1.3 Local Library
+
+### Phase 29: Local Index + Folder Scanner
+**Goal**: Desktop app can scan a local folder and build a metadata-rich index of all audio files
+**Depends on**: Phase 28
+**Requirements**: SCAN-01, SCAN-02, SCAN-03, SCAN-04
+**Success Criteria** (what must be TRUE):
+  1. User can select a folder via native OS picker and see it registered as their music library root
+  2. User can trigger a recursive scan and see real-time progress (files found, files processed)
+  3. Each scanned audio file shows extracted metadata: artist, album, title, year, track number, format, bitrate, duration
+  4. Files with missing or incomplete tags display metadata inferred from filename and folder structure
+**Plans**: TBD
+
+### Phase 30: Sync Engine
+**Goal**: Local library items appear in the web app as part of the user's collection, deduplicated against Discogs imports
+**Depends on**: Phase 29
+**Requirements**: SYNC-01, SYNC-02, SYNC-03, SYNC-04
+**Success Criteria** (what must be TRUE):
+  1. Scanned local items appear on the user's web profile as collection items with source "local"
+  2. A local release that matches an existing Discogs-imported release links to the same release instead of creating a duplicate
+  3. When a file is deleted from the local folder and a sync runs, the corresponding web collection item is removed
+  4. Sync sends only changed items to the server, not the entire library (observable via network or progress indicator)
+**Plans**: TBD
+
+### Phase 31: Tray Daemon + File Watcher
+**Goal**: Desktop app runs persistently in the background, watching for file changes and keeping the index current
+**Depends on**: Phase 30
+**Requirements**: DAEMON-01, DAEMON-02, DAEMON-03, DAEMON-04, DAEMON-05, SCAN-05
+**Success Criteria** (what must be TRUE):
+  1. Clicking the window close button minimizes the app to system tray instead of quitting
+  2. Tray icon shows a context menu with Open, Pause Watching, and Quit options
+  3. Adding or removing an audio file in the watched folder is detected within seconds and the index updates automatically
+  4. On app startup, a diff scan compares stored index vs current folder state and reconciles additions, removals, and modifications
+  5. User can enable auto-start with Windows from settings, and the app launches minimized to tray on boot
+**Plans**: TBD
+
+### Phase 32: AI Metadata Enrichment
+**Goal**: Poorly-tagged files get AI-inferred metadata with confidence scoring and user override protection
+**Depends on**: Phase 29
+**Requirements**: AI-01, AI-02, AI-03
+**Success Criteria** (what must be TRUE):
+  1. Files with missing or low-quality tags are sent to Gemini Flash API for metadata inference
+  2. AI-inferred metadata displays a confidence indicator -- low confidence items are visually flagged for user review
+  3. User can manually correct any metadata field, and those corrections persist through subsequent AI re-inference runs
+**Plans**: TBD
 ## Progress
 
 **Execution Order:**
-Phases execute in numeric order: 1 → 20 (v1.0), then 21 → 24 (v1.1 Deploy Readiness), then 25 → 28 (v1.2 Trade Redesign)
+Phases execute in numeric order: 1 → 20 (v1.0), then 21 → 24 (v1.1 Deploy Readiness), then 25 → 28 (v1.2 Trade Redesign), then 29 → 32 (v1.3 Local Library)
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
@@ -570,6 +623,15 @@ Phases execute in numeric order: 1 → 20 (v1.0), then 21 → 24 (v1.1 Deploy Re
 | 26. Trade Proposals + Counterproposals | 2/4 | Complete    | 2026-04-09 |
 | 27. Desktop Audio Pipeline | 3/4 | In Progress|  |
 | 28. Trade Infrastructure + Coordinated Deploy | 0/0 | Not Started |  |
+
+**v1.3 Local Library:**
+
+| Phase | Plans Complete | Status | Completed |
+|-------|----------------|--------|----------|
+| 29. Local Index + Folder Scanner | 0/0 | Not Started |  |
+| 30. Sync Engine | 0/0 | Not Started |  |
+| 31. Tray Daemon + File Watcher | 0/0 | Not Started |  |
+| 32. AI Metadata Enrichment | 0/0 | Not Started |  |
 
 ### Phase 19: Security Hardening — Fix 74 audit vulnerabilities
 

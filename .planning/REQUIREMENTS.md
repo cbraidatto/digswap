@@ -394,29 +394,29 @@ None — this is a focused fix milestone.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| SCAN-01 | TBD | Pending |
-| SCAN-02 | TBD | Pending |
-| SCAN-03 | TBD | Pending |
-| SCAN-04 | TBD | Pending |
-| SCAN-05 | TBD | Pending |
-| AI-01 | TBD | Pending |
-| AI-02 | TBD | Pending |
-| AI-03 | TBD | Pending |
-| DAEMON-01 | TBD | Pending |
-| DAEMON-02 | TBD | Pending |
-| DAEMON-03 | TBD | Pending |
-| DAEMON-04 | TBD | Pending |
-| DAEMON-05 | TBD | Pending |
-| SYNC-01 | TBD | Pending |
-| SYNC-02 | TBD | Pending |
-| SYNC-03 | TBD | Pending |
-| SYNC-04 | TBD | Pending |
+| SCAN-01 | Phase 29: Local Index + Folder Scanner | Pending |
+| SCAN-02 | Phase 29: Local Index + Folder Scanner | Pending |
+| SCAN-03 | Phase 29: Local Index + Folder Scanner | Pending |
+| SCAN-04 | Phase 29: Local Index + Folder Scanner | Pending |
+| SCAN-05 | Phase 31: Tray Daemon + File Watcher | Pending |
+| AI-01 | Phase 32: AI Metadata Enrichment | Pending |
+| AI-02 | Phase 32: AI Metadata Enrichment | Pending |
+| AI-03 | Phase 32: AI Metadata Enrichment | Pending |
+| DAEMON-01 | Phase 31: Tray Daemon + File Watcher | Pending |
+| DAEMON-02 | Phase 31: Tray Daemon + File Watcher | Pending |
+| DAEMON-03 | Phase 31: Tray Daemon + File Watcher | Pending |
+| DAEMON-04 | Phase 31: Tray Daemon + File Watcher | Pending |
+| DAEMON-05 | Phase 31: Tray Daemon + File Watcher | Pending |
+| SYNC-01 | Phase 30: Sync Engine | Pending |
+| SYNC-02 | Phase 30: Sync Engine | Pending |
+| SYNC-03 | Phase 30: Sync Engine | Pending |
+| SYNC-04 | Phase 30: Sync Engine | Pending |
 
 **Coverage:**
 - v1.3 requirements: 17 total
-- Mapped to phases: 0 (awaiting roadmap)
-- Unmapped: 17
+- Mapped to phases: 17
+- Unmapped: 0
 
 ---
 *Requirements defined: 2026-03-25*
-*Last updated: 2026-04-14 — v1.3 Local Library requirements added*
+*Last updated: 2026-04-13 — v1.3 roadmap created, all 17 requirements mapped*
