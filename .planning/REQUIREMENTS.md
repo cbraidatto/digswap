@@ -345,5 +345,78 @@ None — this is a focused fix milestone.
 - Unmapped: 0
 
 ---
+
+## v1.3 Requirements — Local Library
+
+### Scan & Index
+
+- [ ] **SCAN-01**: User can select a local folder as their music library root via native OS folder picker
+- [ ] **SCAN-02**: User can trigger a recursive scan of all audio files in the selected folder with real-time progress indication
+- [ ] **SCAN-03**: App extracts metadata from audio file tags (ID3v2, Vorbis, FLAC) including artist, album, title, year, track number, format, bitrate, duration
+- [ ] **SCAN-04**: App infers metadata from filename and folder structure when tags are missing or incomplete
+- [ ] **SCAN-05**: App performs a diff scan on startup comparing stored index against current folder state, detecting added, removed, and modified files
+
+### AI Metadata
+
+- [ ] **AI-01**: App sends poorly-tagged files to Gemini Flash API to infer artist, album, and track information from available clues (filename, folder path, partial tags)
+- [ ] **AI-02**: AI-inferred metadata includes a confidence score — low confidence items are flagged for user review
+- [ ] **AI-03**: User's manual corrections are preserved and never overwritten by subsequent AI re-inference
+
+### Daemon & Background
+
+- [ ] **DAEMON-01**: App minimizes to system tray instead of closing when user clicks the window close button
+- [ ] **DAEMON-02**: Tray icon shows context menu with options: Open, Pause Watching, Quit
+- [ ] **DAEMON-03**: App watches the configured folder for file changes in real-time using chokidar, automatically updating the local index
+- [ ] **DAEMON-04**: User can enable auto-start with Windows from settings, launching the app minimized to tray on boot
+- [ ] **DAEMON-05**: App enforces single-instance lock — opening a second instance focuses the existing window
+
+### Sync & Web
+
+- [ ] **SYNC-01**: App syncs local library metadata to Supabase as collection items with addedVia "local", visible in the web app
+- [ ] **SYNC-02**: When a local release matches an existing Discogs-imported release (same artist + album), app links to the existing release instead of creating a duplicate
+- [ ] **SYNC-03**: When a file is removed from the local folder, the corresponding collection item is removed from the web collection
+- [ ] **SYNC-04**: Sync operates incrementally — only changed items are synced, not the entire library
+
+### Future Requirements (deferred from v1.3)
+
+- Preview/confirm AI inference before adding to collection
+- YouTube link auto-resolution per release (blocked by 100/day API quota)
+
+### Out of Scope (v1.3)
+
+| Feature | Reason |
+|---------|--------|
+| Modifying user's local files (tags, filenames) | Read-only access only — we are a social network, not a tagger |
+| Discogs cross-reference search for local items | Would require API calls per item, rate limit concern |
+| Mobile app file scanning | Desktop-only feature by design |
+
+## v1.3 Traceability
+
+| Requirement | Phase | Status |
+|-------------|-------|--------|
+| SCAN-01 | TBD | Pending |
+| SCAN-02 | TBD | Pending |
+| SCAN-03 | TBD | Pending |
+| SCAN-04 | TBD | Pending |
+| SCAN-05 | TBD | Pending |
+| AI-01 | TBD | Pending |
+| AI-02 | TBD | Pending |
+| AI-03 | TBD | Pending |
+| DAEMON-01 | TBD | Pending |
+| DAEMON-02 | TBD | Pending |
+| DAEMON-03 | TBD | Pending |
+| DAEMON-04 | TBD | Pending |
+| DAEMON-05 | TBD | Pending |
+| SYNC-01 | TBD | Pending |
+| SYNC-02 | TBD | Pending |
+| SYNC-03 | TBD | Pending |
+| SYNC-04 | TBD | Pending |
+
+**Coverage:**
+- v1.3 requirements: 17 total
+- Mapped to phases: 0 (awaiting roadmap)
+- Unmapped: 17
+
+---
 *Requirements defined: 2026-03-25*
-*Last updated: 2026-04-06 — v1.1 Deploy Readiness requirements added*
+*Last updated: 2026-04-14 — v1.3 Local Library requirements added*
