@@ -543,7 +543,10 @@ Plans:
   2. User can trigger a recursive scan and see real-time progress (files found, files processed)
   3. Each scanned audio file shows extracted metadata: artist, album, title, year, track number, format, bitrate, duration
   4. Files with missing or incomplete tags display metadata inferred from filename and folder structure
-**Plans**: TBD
+**Plans**: 2 plans
+Plans:
+- [ ] 029-01-PLAN.md -- Install better-sqlite3, define types, build scanner backend (SQLite + metadata + folder inference)
+- [ ] 029-02-PLAN.md -- Wire IPC handlers, extend preload bridge, build Library UI (empty/scanning/error/library states)
 
 ### Phase 30: Sync Engine
 **Goal**: Local library items appear in the web app as part of the user's collection, deduplicated against Discogs imports
