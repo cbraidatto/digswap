@@ -12,8 +12,9 @@ import { LobbyScreen } from "./LobbyScreen";
 import { AudioPrepScreen } from "./AudioPrepScreen";
 import { TransferScreen } from "./TransferScreen";
 import { CompletionScreen } from "./CompletionScreen";
+import { LibraryScreen } from "./LibraryScreen";
 
-type Tab = "inbox" | "settings";
+type Tab = "inbox" | "settings" | "library";
 
 export function AppShell() {
   const [loading, setLoading] = useState(true);
@@ -106,7 +107,7 @@ export function AppShell() {
     <div className="relative flex flex-col h-screen bg-[#0d0d0d] text-[#e8dcc8]">
       {/* Tab bar */}
       <nav className="flex items-center gap-0 border-b border-[#2a2218] bg-[#111008]">
-        {(["inbox", "settings"] as Tab[]).map((tab) => (
+        {(["inbox", "library", "settings"] as Tab[]).map((tab) => (
           <button
             key={tab}
             type="button"
@@ -118,7 +119,7 @@ export function AppShell() {
                 : "text-[#7a6e5f] hover:text-[#e8dcc8]",
             ].join(" ")}
           >
-            {tab === "inbox" ? "Trades" : "Settings"}
+            {tab === "inbox" ? "Trades" : tab === "library" ? "Biblioteca" : "Settings"}
           </button>
         ))}
       </nav>
@@ -127,6 +128,8 @@ export function AppShell() {
       <main className="flex-1 overflow-y-auto">
         {activeTab === "inbox" ? (
           <InboxScreen session={session} onOpenTrade={handleOpenTrade} />
+        ) : activeTab === "library" ? (
+          <LibraryScreen />
         ) : (
           <SettingsScreen session={session} onSignOut={() => setSession(null)} />
         )}
