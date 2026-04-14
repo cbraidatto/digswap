@@ -4,6 +4,7 @@ import type { DesktopSupabaseAuth } from "./supabase-auth";
 import type { DesktopSessionStore } from "./session-store";
 import type { DesktopTradeRuntime } from "./trade-runtime";
 import { runAudioUploadPipeline } from "./audio/upload-pipeline";
+import { registerLibraryIpc } from "./library/library-ipc";
 import { getTradeWindow } from "./window";
 
 interface RegisterDesktopIpcOptions {
@@ -205,4 +206,7 @@ export function registerDesktopIpc({
   tradeRuntime.onTransferComplete((event) => {
     sendToTradeWindow("desktop:transfer-complete", event);
   });
+
+  // Library IPC handlers (Phase 29)
+  registerLibraryIpc(sendToTradeWindow);
 }

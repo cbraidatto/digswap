@@ -4,11 +4,15 @@ import type {
   AuthProvider,
   DesktopBootstrapState,
   DesktopBridge,
+  DesktopBridgeLibrary,
   DesktopBridgeTradeRuntime,
   DesktopProtocolPayload,
   DesktopSettings,
+  LibraryTrack,
   LobbyStateEvent,
   PendingTrade,
+  ScanProgressEvent,
+  ScanResult,
   SupabaseSession,
   TradeDetail,
   TransferCompleteEvent,
@@ -24,7 +28,7 @@ function subscribe<T>(channel: string, listener: (payload: T) => void) {
   };
 }
 
-const desktopBridge: DesktopBridge & DesktopBridgeTradeRuntime = {
+const desktopBridge: DesktopBridge & DesktopBridgeTradeRuntime & DesktopBridgeLibrary = {
   getBootstrapState: () =>
     ipcRenderer.invoke("desktop:get-bootstrap-state") as Promise<DesktopBootstrapState>,
   getSession: () => ipcRenderer.invoke("desktop:get-session") as Promise<SupabaseSession | null>,
@@ -60,6 +64,22 @@ const desktopBridge: DesktopBridge & DesktopBridgeTradeRuntime = {
     subscribe("desktop:lobby-state-changed", listener),
   selectAndPrepareAudio: (tradeId: string, proposalItemId: string) =>
     ipcRenderer.invoke("desktop:select-and-prepare-audio", tradeId, proposalItemId) as Promise<AudioPrepResult>,
+
+  // Library methods (Phase 29)
+  selectLibraryFolder: () =>
+    ipcRenderer.invoke("desktop:select-library-folder") as Promise<string | null>,
+  startScan: (folderPath: string) =>
+    ipcRenderer.invoke("desktop:start-scan", folderPath) as Promise<ScanResult>,
+  startIncrementalScan: () =>
+    ipcRenderer.invoke("desktop:start-incremental-scan") as Promise<ScanResult>,
+  startFullScan: () =>
+    ipcRenderer.invoke("desktop:start-full-scan") as Promise<ScanResult>,
+  getLibraryTracks: () =>
+    ipcRenderer.invoke("desktop:get-library-tracks") as Promise<LibraryTrack[]>,
+  getLibraryRoot: () =>
+    ipcRenderer.invoke("desktop:get-library-root") as Promise<string | null>,
+  onScanProgress: (listener: (event: ScanProgressEvent) => void) =>
+    subscribe("desktop:scan-progress", listener),
 };
 
 contextBridge.exposeInMainWorld("desktopBridge", desktopBridge);

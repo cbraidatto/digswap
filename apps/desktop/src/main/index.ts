@@ -2,6 +2,7 @@ import { app, BrowserWindow } from "electron";
 import type { DesktopProtocolPayload } from "../shared/ipc-types";
 import { resolveDesktopSupabaseConfig } from "./config";
 import { registerDesktopIpc } from "./ipc";
+import { closeLibraryDb } from "./library/db";
 import { extractProtocolUrlFromArgv, parseProtocolUrl, registerProtocolClient } from "./protocol";
 import { DesktopSessionStore } from "./session-store";
 import { DesktopSupabaseAuth } from "./supabase-auth";
@@ -152,6 +153,8 @@ app.whenReady().then(async () => {
 });
 
 app.on("before-quit", () => {
+  closeLibraryDb();
+
   if (!tradeRuntime) {
     return;
   }
