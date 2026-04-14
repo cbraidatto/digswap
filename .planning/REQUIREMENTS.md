@@ -350,10 +350,10 @@ None — this is a focused fix milestone.
 
 ### Scan & Index
 
-- [ ] **SCAN-01**: User can select a local folder as their music library root via native OS folder picker
-- [ ] **SCAN-02**: User can trigger a recursive scan of all audio files in the selected folder with real-time progress indication
-- [ ] **SCAN-03**: App extracts metadata from audio file tags (ID3v2, Vorbis, FLAC) including artist, album, title, year, track number, format, bitrate, duration
-- [ ] **SCAN-04**: App infers metadata from filename and folder structure when tags are missing or incomplete
+- [x] **SCAN-01**: User can select a local folder as their music library root via native OS folder picker
+- [x] **SCAN-02**: User can trigger a recursive scan of all audio files in the selected folder with real-time progress indication
+- [x] **SCAN-03**: App extracts metadata from audio file tags (ID3v2, Vorbis, FLAC) including artist, album, title, year, track number, format, bitrate, duration
+- [x] **SCAN-04**: App infers metadata from filename and folder structure when tags are missing or incomplete
 - [ ] **SCAN-05**: App performs a diff scan on startup comparing stored index against current folder state, detecting added, removed, and modified files
 
 ### AI Metadata
@@ -394,10 +394,10 @@ None — this is a focused fix milestone.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| SCAN-01 | Phase 29: Local Index + Folder Scanner | Pending |
-| SCAN-02 | Phase 29: Local Index + Folder Scanner | Pending |
-| SCAN-03 | Phase 29: Local Index + Folder Scanner | Pending |
-| SCAN-04 | Phase 29: Local Index + Folder Scanner | Pending |
+| SCAN-01 | Phase 29: Local Index + Folder Scanner | Complete |
+| SCAN-02 | Phase 29: Local Index + Folder Scanner | Complete |
+| SCAN-03 | Phase 29: Local Index + Folder Scanner | Complete |
+| SCAN-04 | Phase 29: Local Index + Folder Scanner | Complete |
 | SCAN-05 | Phase 31: Tray Daemon + File Watcher | Pending |
 | AI-01 | Phase 32: AI Metadata Enrichment | Pending |
 | AI-02 | Phase 32: AI Metadata Enrichment | Pending |
