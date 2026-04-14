@@ -60,15 +60,20 @@ Each step completed unlocks more of the app and awards a welcome badge. Users wi
 
 Feed and Profile have equal weight — both are primary entry points. Feed-first for social diggers; Profile-first for collection-focused diggers. Neither is secondary.
 
-## Current Milestone: v1.1 Deploy Readiness
+## Current Milestone: v1.3 Local Library — Soulseek-Inspired Collection Import
 
-**Goal:** Resolver todos os blockers técnicos que impedem o deploy em produção
+**Goal:** Ampliar o DigSwap para diggers que não usam Discogs — importar coleção direto de arquivos locais no PC, com IA organizando metadata e o desktop app rodando em background como daemon.
 
 **Target features:**
-- Fix erros TypeScript que bloqueiam o build (gems/queries.ts)
-- Atualizar Vite para resolver 6 vulnerabilidades HIGH
-- Fix testes falhando (gem-badge.test.tsx)
-- Cleanup lint CRLF (179 erros de formatação)
+- Tray mode + background daemon — app minimiza pro system tray, roda sempre-on
+- Scan de pasta local — seleciona pasta, scan recursivo de arquivos de áudio
+- Extração de metadata — lê tags ID3/Vorbis + nome de arquivo + estrutura de pastas
+- IA organizadora (Gemini Flash) — infere artista/álbum/faixa quando metadata é bagunçada
+- File watcher em tempo real — detecta adição/remoção de arquivos enquanto app está no tray
+- Diff scan no startup — ao reabrir o app, compara índice salvo vs estado atual da pasta
+- Sync com coleção no servidor — items aparecem no web app igual Discogs (source: "local")
+- Busca YouTube automática — para cada release identificado
+- Startup automático — opção de iniciar com o Windows
 
 ## Requirements
 
@@ -195,7 +200,7 @@ Feed and Profile have equal weight — both are primary entry points. Feed-first
 
 This document evolves at phase transitions and milestone boundaries.
 
-*Last updated: 2026-04-07 — Phase 23 (Test Fix) complete — all 646 tests passing*
+*Last updated: 2026-04-14 — Milestone v1.3 started (Local Library)*
 
 **After each phase transition** (via `/gsd:transition`):
 1. Requirements invalidated? → Move to Out of Scope with reason
