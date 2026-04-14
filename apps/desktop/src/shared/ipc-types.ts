@@ -178,11 +178,68 @@ export interface DesktopBridgeTradeRuntime {
   onLobbyStateChanged(listener: (event: LobbyStateEvent) => void): () => void;
 }
 
+// ─────────────────────────────────────────────────────────────────────────────
+// LIBRARY — Phase 29: Local Index + Folder Scanner
+// ─────────────────────────────────────────────────────────────────────────────
+
+export type MetadataConfidence = "high" | "low";
+
+/** Progress event emitted during folder scanning, throttled at 50ms. */
+export interface ScanProgressEvent {
+  filesFound: number;
+  filesProcessed: number;
+  currentPath: string;
+  errorCount: number;
+}
+
+/** Result returned when a scan completes. */
+export interface ScanResult {
+  filesFound: number;
+  filesProcessed: number;
+  errors: Array<{ filePath: string; reason: string }>;
+}
+
+/** A single track in the local library index. */
+export interface LibraryTrack {
+  id: string;
+  filePath: string;
+  fileHash: string | null;
+  fileSize: number;
+  modifiedAt: string;
+  scannedAt: string;
+  artist: string | null;
+  album: string | null;
+  title: string | null;
+  year: number | null;
+  trackNumber: number | null;
+  format: string;
+  bitrate: number;
+  sampleRate: number;
+  bitDepth: number | null;
+  duration: number;
+  artistConfidence: MetadataConfidence;
+  albumConfidence: MetadataConfidence;
+  titleConfidence: MetadataConfidence;
+  yearConfidence: MetadataConfidence;
+  trackConfidence: MetadataConfidence;
+}
+
+/** IPC bridge for library operations exposed on window.desktopBridge. */
+export interface DesktopBridgeLibrary {
+  selectLibraryFolder(): Promise<string | null>;
+  startScan(folderPath: string): Promise<ScanResult>;
+  startIncrementalScan(): Promise<ScanResult>;
+  startFullScan(): Promise<ScanResult>;
+  getLibraryTracks(): Promise<LibraryTrack[]>;
+  getLibraryRoot(): Promise<string | null>;
+  onScanProgress(listener: (event: ScanProgressEvent) => void): () => void;
+}
+
 declare global {
   interface Window {
     desktopShell?: DesktopMainShellBridge;
-    // Augment: trade runtime methods merged at runtime by the preload script
-    desktopBridge: DesktopBridge & DesktopBridgeTradeRuntime;
+    // Augment: trade runtime + library methods merged at runtime by the preload script
+    desktopBridge: DesktopBridge & DesktopBridgeTradeRuntime & DesktopBridgeLibrary;
   }
 }
 
