@@ -203,6 +203,14 @@ vi.mock("@/lib/entitlements", () => ({
 }));
 
 // ---------------------------------------------------------------------------
+// Mocks — Next.js cache (revalidatePath used in acceptProposalAction)
+// ---------------------------------------------------------------------------
+vi.mock("next/cache", () => ({
+	revalidatePath: vi.fn(),
+	revalidateTag: vi.fn(),
+}));
+
+// ---------------------------------------------------------------------------
 // Mocks — Admin client (for notifications)
 // ---------------------------------------------------------------------------
 vi.mock("@/lib/supabase/admin", () => ({
@@ -424,7 +432,8 @@ describe("acceptProposalAction", () => {
 
 		const result = await acceptProposalAction(PROPOSAL_ID);
 
-		expect(result).toEqual({ success: true });
+		expect(result).toMatchObject({ success: true });
+		expect(result).toHaveProperty("tradeId", TRADE_ID);
 	});
 
 	it("returns error when proposer tries to accept own proposal", async () => {

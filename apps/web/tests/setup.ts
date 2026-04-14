@@ -1,5 +1,7 @@
-import "@testing-library/jest-dom/vitest";
-import { vi } from "vitest";
+import * as matchers from "@testing-library/jest-dom/matchers";
+import { expect, vi } from "vitest";
+
+expect.extend(matchers);
 
 // React 19 requires this to be set for act() to work in test environments
 // see: https://github.com/reactwg/react-18/discussions/102
