@@ -26,6 +26,7 @@ export const collectionItems = pgTable(
 		personalRating: integer("personal_rating"), // 1-5 star rating, null = unrated
 		createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
 		updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow().notNull(),
+		deletedAt: timestamp("deleted_at", { withTimezone: true }),
 	},
 	(table) => [
 		pgPolicy("collection_items_select_own", {
@@ -51,5 +52,6 @@ export const collectionItems = pgTable(
 		}),
 		index("collection_items_user_id_idx").on(table.userId),
 		index("collection_items_release_id_idx").on(table.releaseId),
+		index("collection_items_deleted_at_idx").on(table.deletedAt).where(sql`deleted_at IS NOT NULL`),
 	],
 );
