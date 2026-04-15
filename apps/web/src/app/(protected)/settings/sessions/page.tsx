@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { redirect } from "next/navigation";
 import { SessionList } from "@/components/settings/session-list";
 import { createClient } from "@/lib/supabase/server";
@@ -28,6 +29,13 @@ export default async function SessionsPage() {
 	return (
 		<div className="flex min-h-dvh flex-col items-center bg-background px-4 py-8">
 			<div className="w-full max-w-[600px] space-y-6">
+				<Link
+					href="/settings"
+					className="font-mono text-xs text-on-surface-variant hover:text-primary flex items-center gap-1 transition-colors"
+				>
+					<span className="material-symbols-outlined text-[14px]">arrow_back</span>
+					SETTINGS
+				</Link>
 				<div>
 					<h1 className="font-heading text-2xl font-semibold tracking-[-0.02em] text-foreground">
 						Active Sessions

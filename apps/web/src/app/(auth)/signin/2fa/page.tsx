@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { redirect } from "next/navigation";
 import { AuthCard } from "@/components/auth/auth-card";
 import { TotpChallenge } from "@/components/auth/totp-challenge";
@@ -52,6 +53,11 @@ export default async function TwoFactorPage() {
 		<div className="w-full max-w-[380px]">
 			<AuthCard title="Enter Verification Code">
 				<TotpChallenge />
+				<div className="mt-4 text-center">
+					<Link href="/signin" className="text-sm text-primary underline-offset-4 hover:underline">
+						Back to Sign In
+					</Link>
+				</div>
 			</AuthCard>
 		</div>
 	);

@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { getReviewCountForRelease, getReviewsForRelease } from "@/lib/community/queries";
 import { getReleaseByDiscogsId } from "@/lib/release/queries";
+import { BackButton } from "@/components/shell/back-button";
 import { createClient } from "@/lib/supabase/server";
 import { OwnersSection } from "./_components/owners-section";
 import { ReleaseActions } from "./_components/release-actions";
@@ -61,7 +62,10 @@ export default async function ReleasePage({ params }: ReleasePageProps) {
 
 	return (
 		<div className="max-w-4xl mx-auto px-4 py-6 space-y-8">
-			<span className="font-mono text-xs text-primary tracking-[0.2em]">RELEASE_PAGE</span>
+			<div className="flex items-center justify-between">
+				<BackButton />
+				<span className="font-mono text-xs text-primary tracking-[0.2em]">RELEASE_PAGE</span>
+			</div>
 
 			<ReleaseHero
 				release={{
