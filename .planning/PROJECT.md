@@ -200,7 +200,7 @@ Feed and Profile have equal weight — both are primary entry points. Feed-first
 
 This document evolves at phase transitions and milestone boundaries.
 
-*Last updated: 2026-04-15 — Phase 032 complete (AI Metadata Enrichment) — v1.3 milestone complete*
+*Last updated: 2026-04-15 — v1.3 Local Library milestone shipped (Phases 29-32)*
 
 **After each phase transition** (via `/gsd:transition`):
 1. Requirements invalidated? → Move to Out of Scope with reason
