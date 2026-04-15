@@ -92,3 +92,4 @@ tmp/
 # Loose screenshots/audit images
 *.png
 !apps/web/public/*.png
+!apps/desktop/resources/*.png

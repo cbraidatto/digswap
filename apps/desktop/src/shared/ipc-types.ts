@@ -25,6 +25,7 @@ export interface SupabaseSession {
 export interface DesktopSettings {
   downloadPath: string;
   updateChannel: "stable" | "beta";
+  autoStart: boolean;
 }
 
 export interface DesktopStorageHealth {

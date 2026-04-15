@@ -15,6 +15,11 @@ export interface MainWindowConfig {
 
 let mainWindow: BrowserWindow | null = null;
 let tradeWindow: BrowserWindow | null = null;
+let isQuitting = false;
+
+export function setIsQuitting(value: boolean): void {
+  isQuitting = value;
+}
 
 function resolvePreloadPath(name: "main" | "trade") {
   return path.join(__dirname, `../preload/${name}.js`);
@@ -122,7 +127,14 @@ function lockDownMainWindowNavigation(window: BrowserWindow, config: MainWindowC
   );
 }
 
-export async function createMainWindow(config: MainWindowConfig) {
+export interface MainWindowOptions {
+  bootToTray?: boolean;
+}
+
+export async function createMainWindow(
+  config: MainWindowConfig,
+  options?: MainWindowOptions,
+) {
   if (mainWindow && !mainWindow.isDestroyed()) {
     return mainWindow;
   }
@@ -145,8 +157,18 @@ export async function createMainWindow(config: MainWindowConfig) {
 
   lockDownMainWindowNavigation(mainWindow, config);
 
-  mainWindow.once("ready-to-show", () => {
-    mainWindow?.show();
+  if (!options?.bootToTray) {
+    mainWindow.once("ready-to-show", () => {
+      mainWindow?.show();
+    });
+  }
+
+  mainWindow.on("close", (event) => {
+    if (!isQuitting) {
+      event.preventDefault();
+      mainWindow?.hide();
+      return;
+    }
   });
 
   mainWindow.on("closed", () => {
