@@ -8,18 +8,20 @@ export const runtime = "nodejs";
 
 const trackSchema = z.object({
 	localTrackId: z.string(),
-	filePath: z.string(),
 	artist: z.string().nullable(),
 	album: z.string().nullable(),
 	title: z.string().nullable(),
 	year: z.number().int().nullable(),
 	trackNumber: z.number().int().nullable(),
 	format: z.string(),
-	bitrate: z.number().int(),
+	bitrate: z.number(),
 	sampleRate: z.number().int(),
+	bitDepth: z.number().int().nullable().optional(),
 	duration: z.number(),
-	artistConfidence: z.enum(["high", "low"]),
-	albumConfidence: z.enum(["high", "low"]),
+	fileHash: z.string().nullable().optional(),
+	fileSize: z.number().int().optional(),
+	artistConfidence: z.string().default("high"),
+	albumConfidence: z.string().default("high"),
 });
 
 const syncRequestSchema = z.object({
