@@ -2,6 +2,7 @@ import Database from "better-sqlite3";
 import { app } from "electron";
 import path from "node:path";
 import { randomUUID } from "node:crypto";
+import type { LibraryTrack } from "../../shared/ipc-types";
 
 let db: Database.Database | null = null;
 
@@ -60,6 +61,28 @@ function initSchema(database: Database.Database): void {
     CREATE INDEX IF NOT EXISTS idx_tracks_album ON tracks(album);
     CREATE INDEX IF NOT EXISTS idx_tracks_synced ON tracks(syncedAt);
   `);
+  migrateSchema(database);
+}
+
+function migrateSchema(database: Database.Database): void {
+  const newColumns = [
+    "artistUserEdited INTEGER NOT NULL DEFAULT 0",
+    "albumUserEdited INTEGER NOT NULL DEFAULT 0",
+    "titleUserEdited INTEGER NOT NULL DEFAULT 0",
+    "yearUserEdited INTEGER NOT NULL DEFAULT 0",
+    "trackUserEdited INTEGER NOT NULL DEFAULT 0",
+  ];
+  for (const col of newColumns) {
+    const colName = col.split(" ")[0];
+    const existing = database
+      .prepare(
+        "SELECT name FROM pragma_table_info('tracks') WHERE name = ?",
+      )
+      .get(colName);
+    if (!existing) {
+      database.exec(`ALTER TABLE tracks ADD COLUMN ${col}`);
+    }
+  }
 }
 
 export interface TrackRow {
@@ -84,6 +107,11 @@ export interface TrackRow {
   titleConfidence: string;
   yearConfidence: string;
   trackConfidence: string;
+  artistUserEdited: number;
+  albumUserEdited: number;
+  titleUserEdited: number;
+  yearUserEdited: number;
+  trackUserEdited: number;
 }
 
 export function insertTracks(
@@ -95,12 +123,14 @@ export function insertTracks(
       id, filePath, fileHash, fileSize, modifiedAt, scannedAt,
       artist, album, title, year, trackNumber,
       format, bitrate, sampleRate, bitDepth, duration,
-      artistConfidence, albumConfidence, titleConfidence, yearConfidence, trackConfidence
+      artistConfidence, albumConfidence, titleConfidence, yearConfidence, trackConfidence,
+      artistUserEdited, albumUserEdited, titleUserEdited, yearUserEdited, trackUserEdited
     ) VALUES (
       @id, @filePath, @fileHash, @fileSize, @modifiedAt, @scannedAt,
       @artist, @album, @title, @year, @trackNumber,
       @format, @bitrate, @sampleRate, @bitDepth, @duration,
-      @artistConfidence, @albumConfidence, @titleConfidence, @yearConfidence, @trackConfidence
+      @artistConfidence, @albumConfidence, @titleConfidence, @yearConfidence, @trackConfidence,
+      @artistUserEdited, @albumUserEdited, @titleUserEdited, @yearUserEdited, @trackUserEdited
     )
   `);
 
@@ -242,4 +272,93 @@ export function getReleaseMappingsForPaths(
     if (mapping) releaseIds.add(mapping);
   }
   return [...releaseIds];
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// AI Enrichment helpers (Phase 32)
+// ─────────────────────────────────────────────────────────────────────────────
+
+export function getQualifyingTracks(database: Database.Database): TrackRow[] {
+  return database
+    .prepare(
+      `SELECT * FROM tracks
+     WHERE (artist IS NULL AND artistUserEdited = 0)
+        OR (album IS NULL AND albumUserEdited = 0)
+        OR (title IS NULL AND titleUserEdited = 0)
+        OR (year IS NULL AND yearUserEdited = 0)
+     ORDER BY filePath`,
+    )
+    .all() as TrackRow[];
+}
+
+export function updateTrackAiMetadata(
+  database: Database.Database,
+  trackId: string,
+  updates: Record<string, string | number>,
+  confidenceOverrides: Record<string, string>,
+): void {
+  const setClauses: string[] = [];
+  const values: (string | number)[] = [];
+  for (const [key, val] of Object.entries(updates)) {
+    setClauses.push(`${key} = ?`);
+    values.push(val);
+  }
+  for (const [key, val] of Object.entries(confidenceOverrides)) {
+    setClauses.push(`${key} = ?`);
+    values.push(val);
+  }
+  if (setClauses.length === 0) return;
+  values.push(trackId);
+  database
+    .prepare(`UPDATE tracks SET ${setClauses.join(", ")} WHERE id = ?`)
+    .run(...values);
+}
+
+export function updateTrackField(
+  database: Database.Database,
+  trackId: string,
+  field: "artist" | "album" | "title" | "year" | "trackNumber",
+  value: string | number | null,
+): void {
+  const editedCol =
+    field === "trackNumber" ? "trackUserEdited" : `${field}UserEdited`;
+  const confCol =
+    field === "trackNumber" ? "trackConfidence" : `${field}Confidence`;
+  database
+    .prepare(
+      `UPDATE tracks SET ${field} = ?, ${editedCol} = 1, ${confCol} = 'high' WHERE id = ?`,
+    )
+    .run(value, trackId);
+}
+
+export function trackRowToLibraryTrack(row: TrackRow): LibraryTrack {
+  return {
+    id: row.id,
+    filePath: row.filePath,
+    fileHash: row.fileHash,
+    fileSize: row.fileSize,
+    modifiedAt: row.modifiedAt,
+    scannedAt: row.scannedAt,
+    artist: row.artist,
+    album: row.album,
+    title: row.title,
+    year: row.year,
+    trackNumber: row.trackNumber,
+    format: row.format,
+    bitrate: row.bitrate,
+    sampleRate: row.sampleRate,
+    bitDepth: row.bitDepth,
+    duration: row.duration,
+    artistConfidence:
+      row.artistConfidence as LibraryTrack["artistConfidence"],
+    albumConfidence: row.albumConfidence as LibraryTrack["albumConfidence"],
+    titleConfidence: row.titleConfidence as LibraryTrack["titleConfidence"],
+    yearConfidence: row.yearConfidence as LibraryTrack["yearConfidence"],
+    trackConfidence: row.trackConfidence as LibraryTrack["trackConfidence"],
+    artistUserEdited: Boolean(row.artistUserEdited),
+    albumUserEdited: Boolean(row.albumUserEdited),
+    titleUserEdited: Boolean(row.titleUserEdited),
+    yearUserEdited: Boolean(row.yearUserEdited),
+    trackUserEdited: Boolean(row.trackUserEdited),
+  };
 }

@@ -60,17 +60,18 @@ function makeTrackRow(overrides: Partial<TrackRow> = {}): TrackRow {
     titleUserEdited: 0,
     yearUserEdited: 0,
     trackUserEdited: 0,
+    ...overrides,
   };
 }
 
 describe("AI Enrichment", () => {
   describe("[AI-01] buildPrompt", () => {
     it("includes file path in prompt text for each track", () => {
-      const tracks = [
-        makeTrackRow({ filePath: "/music/Jazz/Blue Note/01 - Cantaloupe.flac" }),
-      ];
+      const track = makeTrackRow({ filePath: "/music/Jazz/Blue Note/01 - Cantaloupe.flac" });
+      expect(track.filePath).toBe("/music/Jazz/Blue Note/01 - Cantaloupe.flac");
+      const tracks = [track];
       const prompt = buildPrompt(tracks);
-      expect(prompt).toContain("Jazz/Blue Note/01 - Cantaloupe.flac");
+      expect(prompt).toContain("music/Jazz/Blue Note/01 - Cantaloupe.flac");
     });
 
     it("includes existing partial tags in prompt text", () => {
@@ -245,6 +246,7 @@ describe("AI Enrichment", () => {
         tracks,
         "test-api-key",
         (event) => progressCalls.push(event),
+        { delayMs: 0 },
       );
 
       expect(mockGenerateContent).toHaveBeenCalledTimes(2);
@@ -286,6 +288,7 @@ describe("AI Enrichment", () => {
         tracks,
         "test-api-key",
         () => {},
+        { delayMs: 0 },
       );
 
       expect(result.errors.length).toBeGreaterThan(0);

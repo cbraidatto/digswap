@@ -15,6 +15,7 @@
   },
   "dependencies": {
     "@digswap/trade-domain": "workspace:*",
+    "@google/genai": "^1.50.1",
     "@supabase/supabase-js": "^2.101.0",
     "better-sqlite3": "^12.9.0",
     "chokidar": "^4.0.3",
@@ -23,7 +24,8 @@
     "music-metadata": "^11.12.3",
     "peerjs": "^1.5.4",
     "react": "^19",
-    "react-dom": "^19"
+    "react-dom": "^19",
+    "zod": "^4.3.6"
   },
   "devDependencies": {
     "@electron/rebuild": "^4.0.3",
