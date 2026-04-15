@@ -3,13 +3,14 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 // ---------- Module-level mocks (vi.hoisted) ----------
 
 const { mockHandle, mockShowOpenDialog, mockGetLibraryDb, mockGetAllTracks,
-  mockGetLibraryRoot, mockScanFolder } = vi.hoisted(() => ({
+  mockGetLibraryRoot, mockScanFolder, mockTrackRowToLibraryTrack } = vi.hoisted(() => ({
   mockHandle: vi.fn(),
   mockShowOpenDialog: vi.fn(),
   mockGetLibraryDb: vi.fn(),
   mockGetAllTracks: vi.fn(),
   mockGetLibraryRoot: vi.fn(),
   mockScanFolder: vi.fn(),
+  mockTrackRowToLibraryTrack: vi.fn((row: any) => ({ ...row, artistUserEdited: false })),
 }));
 
 vi.mock("electron", () => ({
@@ -22,10 +23,26 @@ vi.mock("./db", () => ({
   getAllTracks: mockGetAllTracks,
   getLibraryRoot: mockGetLibraryRoot,
   closeLibraryDb: vi.fn(),
+  trackRowToLibraryTrack: mockTrackRowToLibraryTrack,
+  getQualifyingTracks: vi.fn().mockReturnValue([]),
+  updateTrackAiMetadata: vi.fn(),
+  updateTrackField: vi.fn(),
 }));
 
 vi.mock("./scanner", () => ({
   scanFolder: mockScanFolder,
+}));
+
+vi.mock("./ai-enrichment", () => ({
+  enrichTracks: vi.fn().mockResolvedValue({ total: 0, enriched: 0, errors: [] }),
+}));
+
+vi.mock("./sync-manager", () => ({
+  startSync: vi.fn().mockResolvedValue({ synced: 0, created: 0, linked: 0, deleted: 0, errors: [] }),
+}));
+
+vi.mock("../watcher", () => ({
+  restartWatching: vi.fn(),
 }));
 
 // Module under test
@@ -59,8 +76,8 @@ function getHandler(channel: string) {
 // ---------- Tests ----------
 
 describe("registerLibraryIpc", () => {
-  it("registers all 7 IPC handlers", () => {
-    expect(handlers.size).toBe(7);
+  it("registers all 12 IPC handlers", () => {
+    expect(handlers.size).toBe(12);
     expect(handlers.has("desktop:select-library-folder")).toBe(true);
     expect(handlers.has("desktop:start-scan")).toBe(true);
     expect(handlers.has("desktop:start-incremental-scan")).toBe(true);
@@ -68,6 +85,11 @@ describe("registerLibraryIpc", () => {
     expect(handlers.has("desktop:get-library-tracks")).toBe(true);
     expect(handlers.has("desktop:get-library-root")).toBe(true);
     expect(handlers.has("desktop:start-sync")).toBe(true);
+    expect(handlers.has("desktop:enrich-metadata")).toBe(true);
+    expect(handlers.has("desktop:update-track-field")).toBe(true);
+    expect(handlers.has("desktop:get-gemini-api-key")).toBe(true);
+    expect(handlers.has("desktop:set-gemini-api-key")).toBe(true);
+    expect(handlers.has("desktop:remove-gemini-api-key")).toBe(true);
   });
 });
 
@@ -178,16 +200,17 @@ describe("desktop:start-full-scan", () => {
 });
 
 describe("desktop:get-library-tracks", () => {
-  it("returns tracks from db", () => {
-    const mockTracks = [
-      { id: "1", filePath: "/a.flac", title: "Track 1" },
-      { id: "2", filePath: "/b.flac", title: "Track 2" },
+  it("returns tracks mapped via trackRowToLibraryTrack", () => {
+    const mockRows = [
+      { id: "1", filePath: "/a.flac", title: "Track 1", artistUserEdited: 0 },
+      { id: "2", filePath: "/b.flac", title: "Track 2", artistUserEdited: 1 },
     ];
-    mockGetAllTracks.mockReturnValue(mockTracks);
+    mockGetAllTracks.mockReturnValue(mockRows);
 
     const result = getHandler("desktop:get-library-tracks")();
-    expect(result).toEqual(mockTracks);
     expect(mockGetAllTracks).toHaveBeenCalledWith(mockDb);
+    expect(mockTrackRowToLibraryTrack).toHaveBeenCalledTimes(2);
+    expect(Array.isArray(result)).toBe(true);
   });
 });
 

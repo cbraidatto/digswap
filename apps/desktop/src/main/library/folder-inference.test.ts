@@ -65,9 +65,10 @@ describe("inferFromPath", () => {
     expect(result!.title).toBe("Title");
   });
 
-  it("returns null for no-match paths", () => {
+  it("extracts title from bare filename as fallback", () => {
     const result = inferFromPath("random-filename.flac");
-    expect(result).toBeNull();
+    expect(result).not.toBeNull();
+    expect(result!.title).toBe("random-filename");
   });
 
   it("trims whitespace from extracted fields", () => {
