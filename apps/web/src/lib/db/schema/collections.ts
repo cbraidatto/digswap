@@ -6,6 +6,7 @@ import {
 	pgTable,
 	text,
 	timestamp,
+	uniqueIndex,
 	uuid,
 	varchar,
 } from "drizzle-orm/pg-core";
@@ -50,6 +51,7 @@ export const collectionItems = pgTable(
 			to: authenticatedRole,
 			using: sql`${table.userId} = ${authUid}`,
 		}),
+		uniqueIndex("collection_items_user_release_unique").on(table.userId, table.releaseId),
 		index("collection_items_user_id_idx").on(table.userId),
 		index("collection_items_release_id_idx").on(table.releaseId),
 		index("collection_items_deleted_at_idx").on(table.deletedAt).where(sql`deleted_at IS NOT NULL`),
