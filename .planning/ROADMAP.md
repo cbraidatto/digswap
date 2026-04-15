@@ -52,7 +52,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 ### v1.3 Local Library
 
 - [ ] **Phase 29: Local Index + Folder Scanner** - Native folder picker, recursive audio scan with progress, metadata extraction from tags and filename/folder inference
-- [ ] **Phase 30: Sync Engine** - Upload local library to Supabase as collection items, Discogs dedup, deletion sync, incremental-only transfers
+- [x] **Phase 30: Sync Engine** - Upload local library to Supabase as collection items, Discogs dedup, deletion sync, incremental-only transfers (completed 2026-04-15)
 - [ ] **Phase 31: Tray Daemon + File Watcher** - Minimize to tray, chokidar file watching, diff scan on startup, auto-start with Windows, single-instance lock
 - [ ] **Phase 32: AI Metadata Enrichment** - Gemini Flash inference for poorly-tagged files, confidence scoring, user correction persistence
 
@@ -636,7 +636,7 @@ Phases execute in numeric order: 1 → 20 (v1.0), then 21 → 24 (v1.1 Deploy Re
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|----------|
 | 29. Local Index + Folder Scanner | 0/0 | Not Started |  |
-| 30. Sync Engine | 0/0 | Not Started |  |
+| 30. Sync Engine | 3/3 | Complete | 2026-04-15 |
 | 31. Tray Daemon + File Watcher | 0/0 | Not Started |  |
 | 32. AI Metadata Enrichment | 0/0 | Not Started |  |
 
