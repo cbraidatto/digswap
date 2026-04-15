@@ -34,14 +34,14 @@ Declared values (must be multiples of 4):
 | Token | Value | Usage |
 |-------|-------|-------|
 | xs | 4px | Icon gaps (sparkle icon margin-right), inline badge padding |
-| sm | 8px | Compact row padding (`py-2`), button gaps |
+| sm | 8px | Compact row padding (`py-2`), button gaps, inline edit vertical padding (`py-1`) |
 | md | 16px | Default element spacing (`px-4`), section gaps (`gap-4`) |
 | lg | 24px | Section padding (`p-6`, `gap-6`) |
 | xl | 32px | Not used in this phase |
 | 2xl | 48px | Not used in this phase |
 | 3xl | 64px | Not used in this phase |
 
-Exceptions: Inline edit input padding uses 6px vertical (`py-1.5`) to match existing track row height of `py-1.5` / `py-2` without layout shift.
+No new spacing exceptions declared in this phase. Existing codebase uses `py-1.5` (6px) in `LibraryAlbumView.tsx` track rows and `SettingsScreen.tsx` buttons; these are pre-existing inherited values, not tokens introduced by this phase. New components in this phase use only the 4-multiple scale above.
 
 ---
 
@@ -69,7 +69,7 @@ Exceptions: Inline edit input padding uses 6px vertical (`py-1.5`) to match exis
 
 ### Accent (`#c8914a`) reserved for:
 
-1. **"Enrich metadata" CTA button** — primary action background
+1. **"Enriquecer IA" CTA button** — primary action background
 2. **Active tab indicator** — tab bar underline (existing)
 3. **Progress bar fill** — enrichment progress bar (matches scan progress bar)
 4. **Scanning/progress label** — uppercase tracking label during enrichment
@@ -96,13 +96,21 @@ Exceptions: Inline edit input padding uses 6px vertical (`py-1.5`) to match exis
 
 ---
 
+## Focal Point
+
+**Default library state:** The "Enriquecer IA" button in the header bar is the primary focal point. It uses the accent color (`#c8914a`) background against the dark header (`#111008`), drawing the eye as the only warm-filled element in the header row.
+
+**Enrichment state:** The progress bar fill (`#c8914a` on `#1a1508` track) becomes the visual anchor. The centered layout with the animated fill creates a single point of attention during the enrichment process.
+
+---
+
 ## Component Inventory
 
 ### New Components
 
 | Component | Location | Description |
 |-----------|----------|-------------|
-| Enrich button | `LibraryScreen.tsx` header bar | "Enrich metadata" CTA next to Re-scan buttons |
+| Enrich button | `LibraryScreen.tsx` header bar | "Enriquecer IA" CTA next to Re-scan buttons |
 | Enrichment progress | `LibraryScreen.tsx` | Progress bar + counter overlay during AI inference |
 | AI sparkle badge | `LibraryListView.tsx`, `LibraryAlbumView.tsx` | Inline SVG sparkle icon before AI-inferred field values |
 | Inline edit input | `LibraryListView.tsx`, `LibraryAlbumView.tsx` | Text input replacing cell content on click, with save-on-blur/Enter |
@@ -122,10 +130,10 @@ Exceptions: Inline edit input padding uses 6px vertical (`py-1.5`) to match exis
 
 ## Interaction Contracts
 
-### I-01: "Enrich metadata" Button
+### I-01: "Enriquecer IA" Button
 
 - **Location:** Library header bar, right side, between "Re-scan Completo" and view toggle buttons
-- **Appearance:** `bg-[#c8914a] text-[#0d0d0d] px-4 py-1.5 rounded text-xs font-semibold` (matches "Escolher Pasta" CTA weight but compact size to fit header bar)
+- **Appearance:** `bg-[#c8914a] text-[#0d0d0d] px-4 py-1.5 rounded text-xs font-semibold` (inherits existing `py-1.5` button pattern from SettingsScreen.tsx — not a new spacing token)
 - **Label:** "Enriquecer IA" (Portuguese, consistent with "Re-scan Completo")
 - **Disabled state:** `opacity-50 cursor-not-allowed` when: enrichment in progress, OR no qualifying tracks, OR no API key configured
 - **Tooltip when disabled (no key):** "Configure a chave API do Gemini em Settings"
@@ -155,7 +163,7 @@ Exceptions: Inline edit input padding uses 6px vertical (`py-1.5`) to match exis
 
 - **Trigger:** Click on any AI-inferred cell (sparkle badge cells)
 - **Appearance:** Replace cell `<span>` with `<input>` of matching width
-- **Input styling:** `bg-[#0d0d0d] border border-[#c8914a]/50 rounded px-2 py-1 text-sm text-[#e8dcc8] outline-none focus:border-[#c8914a]` 
+- **Input styling:** `bg-[#0d0d0d] border border-[#c8914a]/50 rounded px-2 py-1 text-sm text-[#e8dcc8] outline-none focus:border-[#c8914a]`
 - **No layout shift:** Input height matches cell height. Use `min-w-0` and cell width constraints.
 - **Save:** On Enter key or blur (focus loss)
 - **Cancel:** On Escape key — revert to original value
@@ -171,7 +179,7 @@ Exceptions: Inline edit input padding uses 6px vertical (`py-1.5`) to match exis
 - **Description:** `text-xs text-[#7a6e5f] mt-1` reading "Cole sua chave API do Google AI Studio para enriquecer metadados com IA."
 - **Input:** `bg-[#0d0d0d] border border-[#2a2218] rounded px-3 py-2 text-sm font-mono text-[#e8dcc8] placeholder-[#4a4035] w-full mt-3` with placeholder "AIza..."
 - **Save button:** `bg-[#c8914a] text-[#0d0d0d] px-4 py-2 rounded text-sm font-semibold mt-3` reading "Salvar e Enriquecer"
-- **Cancel link:** `text-xs text-[#4a4035] hover:text-[#7a6e5f] mt-2` reading "Cancelar"
+- **Dismiss link:** `text-xs text-[#4a4035] hover:text-[#7a6e5f] mt-2` reading "Manter sem IA"
 - **After save:** Key stored in safeStorage vault, enrichment begins immediately
 
 ### I-06: Settings — Gemini API Key Section
@@ -180,10 +188,11 @@ Exceptions: Inline edit input padding uses 6px vertical (`py-1.5`) to match exis
 - **Pattern:** Matches existing SettingsScreen section layout exactly
 - **Label:** `text-[#e8dcc8] text-sm font-medium` reading "Gemini API Key"
 - **Display when set:** Masked key display `text-[#7a6e5f] text-xs font-mono` showing "AIza...{last4}" in `bg-[#111008] border border-[#2a2218] rounded px-3 py-2`
-- **Change button:** `text-xs font-medium text-[#c8914a] hover:text-[#e8a85a]` reading "Change"
-- **Remove button:** `text-xs font-medium text-red-400 hover:text-red-300` reading "Remove"
+- **"Alterar chave" button:** `text-xs font-medium text-[#c8914a] hover:text-[#e8a85a]` reading "Alterar chave"
+- **"Remover chave" button:** `text-xs font-medium text-red-400 hover:text-red-300` reading "Remover chave"
+- **"Remover chave" confirmation:** On click, button text changes to "Confirmar remocao?" in `text-red-300` for 3 seconds. A second click within the 3-second window executes removal. If no second click, reverts to "Remover chave". No modal dialog.
 - **Description:** `text-[#4a4035] text-xs` reading "Obtenha em ai.google.dev/aistudio — o plano gratuito permite 500 solicitacoes/dia."
-- **Display when not set:** Same layout but value shows `text-[#4a4035] text-xs` reading "Nao configurada" and only a "Configure" button in accent color
+- **Display when not set:** Same layout but value shows `text-[#4a4035] text-xs` reading "Nao configurada" and only a "Configurar chave API" button in accent color
 
 ---
 
@@ -203,11 +212,14 @@ Exceptions: Inline edit input padding uses 6px vertical (`py-1.5`) to match exis
 | API key prompt heading | "Chave API do Gemini" |
 | API key prompt body | "Cole sua chave API do Google AI Studio para enriquecer metadados com IA." |
 | API key prompt CTA | "Salvar e Enriquecer" |
-| API key prompt cancel | "Cancelar" |
+| API key prompt dismiss | "Manter sem IA" |
 | API key settings label | "Gemini API Key" |
 | API key settings not set | "Nao configurada" |
 | API key settings help | "Obtenha em ai.google.dev/aistudio — o plano gratuito permite 500 solicitacoes/dia." |
-| API key remove action | "Remove" |
+| API key settings change | "Alterar chave" |
+| API key settings remove | "Remover chave" |
+| API key settings remove confirm | "Confirmar remocao?" |
+| API key settings configure | "Configurar chave API" |
 | Error: invalid key | "Chave API invalida. Verifique e tente novamente." |
 | Error: rate limited | "Limite de solicitacoes atingido. Tente novamente em alguns minutos." |
 | Error: network | "Falha de conexao com a API do Gemini. Verifique sua internet." |
@@ -239,11 +251,19 @@ Exceptions: Inline edit input padding uses 6px vertical (`py-1.5`) to match exis
 
 | State | Appearance |
 |-------|------------|
-| Default | `bg-[#c8914a] text-[#0d0d0d] text-xs font-semibold px-4 py-1.5 rounded` |
+| Default | `bg-[#c8914a] text-[#0d0d0d] text-xs font-semibold px-4 py-1.5 rounded` (inherits existing button pattern) |
 | Hover | `hover:brightness-110` |
 | Disabled (no key) | `opacity-50 cursor-not-allowed`, tooltip about configuring key |
 | Disabled (no qualifying) | `opacity-50 cursor-not-allowed`, tooltip about all tracks complete |
 | Disabled (enriching) | `opacity-50 cursor-not-allowed`, progress shown in content area |
+
+### Remove Key Confirmation States
+
+| State | Appearance |
+|-------|------------|
+| Default | `text-xs font-medium text-red-400 hover:text-red-300` reading "Remover chave" |
+| Confirming | `text-xs font-medium text-red-300` reading "Confirmar remocao?" — reverts after 3 seconds if no second click |
+| After removal | Section switches to "not set" display with "Configurar chave API" button |
 
 ---
 
