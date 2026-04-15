@@ -98,6 +98,8 @@ export interface DesktopMainShellBridge {
   setAutoStart(enabled: boolean): Promise<void>;
   /** Check whether auto-start is currently enabled. */
   getAutoStart(): Promise<boolean>;
+  /** Listen for startup diff scan results. */
+  onDiffScanResult(listener: (result: DiffScanResult) => void): () => void;
 }
 
 /**
@@ -181,6 +183,15 @@ export interface DesktopBridgeTradeRuntime {
   onTransferProgress(listener: (event: TransferProgressEvent) => void): () => void;
   onTransferComplete(listener: (event: TransferCompleteEvent) => void): () => void;
   onLobbyStateChanged(listener: (event: LobbyStateEvent) => void): () => void;
+}
+
+/** Result of startup diff scan comparing SQLite index vs filesystem. */
+export interface DiffScanResult {
+  added: number;
+  removed: number;
+  modified: number;
+  totalIndexed: number;
+  hasChanges: boolean;
 }
 
 declare global {
