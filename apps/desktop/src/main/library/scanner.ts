@@ -110,6 +110,11 @@ export async function scanFolder(
         titleConfidence: meta.titleConfidence,
         yearConfidence: meta.yearConfidence,
         trackConfidence: meta.trackConfidence,
+        artistUserEdited: 0,
+        albumUserEdited: 0,
+        titleUserEdited: 0,
+        yearUserEdited: 0,
+        trackUserEdited: 0,
       });
 
       // Flush batch periodically

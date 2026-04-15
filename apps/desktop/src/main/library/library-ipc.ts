@@ -1,6 +1,6 @@
 import { ipcMain, dialog } from "electron";
 import type { ScanProgressEvent, ScanResult, SyncResult, SyncProgress, LibraryTrack } from "../../shared/ipc-types";
-import { getLibraryDb, getAllTracks, getLibraryRoot } from "./db";
+import { getLibraryDb, getAllTracks, getLibraryRoot, trackRowToLibraryTrack } from "./db";
 import { scanFolder } from "./scanner";
 import { startSync } from "./sync-manager";
 import { restartWatching } from "../watcher";
@@ -55,7 +55,7 @@ export function registerLibraryIpc(
 
   ipcMain.handle("desktop:get-library-tracks", (): LibraryTrack[] => {
     const db = getLibraryDb();
-    return getAllTracks(db) as LibraryTrack[];
+    return getAllTracks(db).map(trackRowToLibraryTrack);
   });
 
   ipcMain.handle("desktop:get-library-root", (): string | null => {

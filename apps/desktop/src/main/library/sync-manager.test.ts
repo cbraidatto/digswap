@@ -68,6 +68,11 @@ function makeTrack(overrides: Partial<TrackRow> & { id: string; filePath: string
     titleConfidence: overrides.titleConfidence ?? "high",
     yearConfidence: overrides.yearConfidence ?? "high",
     trackConfidence: overrides.trackConfidence ?? "high",
+    artistUserEdited: overrides.artistUserEdited ?? 0,
+    albumUserEdited: overrides.albumUserEdited ?? 0,
+    titleUserEdited: overrides.titleUserEdited ?? 0,
+    yearUserEdited: overrides.yearUserEdited ?? 0,
+    trackUserEdited: overrides.trackUserEdited ?? 0,
   };
 }
 
