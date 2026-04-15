@@ -586,7 +586,10 @@ Plans:
   1. Files with missing or low-quality tags are sent to Gemini Flash API for metadata inference
   2. AI-inferred metadata displays a confidence indicator -- low confidence items are visually flagged for user review
   3. User can manually correct any metadata field, and those corrections persist through subsequent AI re-inference runs
-**Plans**: TBD
+**Plans**: 2 plans
+Plans:
+- [ ] 032-01-PLAN.md — Restore types, schema migration, AI enrichment service + tests
+- [ ] 032-02-PLAN.md — IPC wiring, preload bridge, all UI surfaces
 ## Progress
 
 **Execution Order:**
@@ -641,7 +644,7 @@ Phases execute in numeric order: 1 → 20 (v1.0), then 21 → 24 (v1.1 Deploy Re
 | 29. Local Index + Folder Scanner | 0/0 | Not Started |  |
 | 30. Sync Engine | 3/3 | Complete | 2026-04-15 |
 | 31. Tray Daemon + File Watcher | 0/2 | Not Started |  |
-| 32. AI Metadata Enrichment | 0/0 | Not Started |  |
+| 32. AI Metadata Enrichment | 0/2 | Planning Complete |  |
 
 ### Phase 19: Security Hardening — Fix 74 audit vulnerabilities
 
