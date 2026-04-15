@@ -59,14 +59,15 @@ function getHandler(channel: string) {
 // ---------- Tests ----------
 
 describe("registerLibraryIpc", () => {
-  it("registers all 6 IPC handlers", () => {
-    expect(handlers.size).toBe(6);
+  it("registers all 7 IPC handlers", () => {
+    expect(handlers.size).toBe(7);
     expect(handlers.has("desktop:select-library-folder")).toBe(true);
     expect(handlers.has("desktop:start-scan")).toBe(true);
     expect(handlers.has("desktop:start-incremental-scan")).toBe(true);
     expect(handlers.has("desktop:start-full-scan")).toBe(true);
     expect(handlers.has("desktop:get-library-tracks")).toBe(true);
     expect(handlers.has("desktop:get-library-root")).toBe(true);
+    expect(handlers.has("desktop:start-sync")).toBe(true);
   });
 });
 
