@@ -14,13 +14,19 @@ export interface MainWindowConfig {
 }
 
 let mainWindow: BrowserWindow | null = null;
+let tradeWindow: BrowserWindow | null = null;
+let isQuitting = false;
+
+export function setIsQuitting(value: boolean): void {
+  isQuitting = value;
+}
 
 function resolvePreloadPath(name: "main" | "trade") {
   return path.join(__dirname, `../preload/${name}.js`);
 }
 
-function resolveLocalRendererFilePath() {
-  return path.join(__dirname, "../renderer/index.html");
+function resolveTradeRendererFilePath() {
+  return path.join(__dirname, "../renderer/renderer-trade/index.html");
 }
 
 function resolveAllowedMainWindowOrigins(config: MainWindowConfig) {
@@ -121,7 +127,14 @@ function lockDownMainWindowNavigation(window: BrowserWindow, config: MainWindowC
   );
 }
 
-export async function createMainWindow(config: MainWindowConfig) {
+export interface MainWindowOptions {
+  bootToTray?: boolean;
+}
+
+export async function createMainWindow(
+  config: MainWindowConfig,
+  options?: MainWindowOptions,
+) {
   if (mainWindow && !mainWindow.isDestroyed()) {
     return mainWindow;
   }
@@ -144,8 +157,18 @@ export async function createMainWindow(config: MainWindowConfig) {
 
   lockDownMainWindowNavigation(mainWindow, config);
 
-  mainWindow.once("ready-to-show", () => {
-    mainWindow?.show();
+  if (!options?.bootToTray) {
+    mainWindow.once("ready-to-show", () => {
+      mainWindow?.show();
+    });
+  }
+
+  mainWindow.on("close", (event) => {
+    if (!isQuitting) {
+      event.preventDefault();
+      mainWindow?.hide();
+      return;
+    }
   });
 
   mainWindow.on("closed", () => {
@@ -157,11 +180,58 @@ export async function createMainWindow(config: MainWindowConfig) {
   return mainWindow;
 }
 
+export async function createTradeWindow() {
+  if (tradeWindow && !tradeWindow.isDestroyed()) {
+    return tradeWindow;
+  }
+
+  tradeWindow = new BrowserWindow({
+    width: 600,
+    height: 700,
+    minWidth: 520,
+    minHeight: 620,
+    show: false,
+    title: "DigSwap Trade",
+    backgroundColor: "#0b0907",
+    autoHideMenuBar: true,
+    webPreferences: {
+      preload: resolvePreloadPath("trade"),
+      contextIsolation: true,
+      nodeIntegration: false,
+      sandbox: true,
+    },
+  });
+
+  tradeWindow.once("ready-to-show", () => {
+    tradeWindow?.show();
+  });
+
+  tradeWindow.on("closed", () => {
+    tradeWindow = null;
+  });
+
+  if (process.env.ELECTRON_RENDERER_URL) {
+    const base = process.env.ELECTRON_RENDERER_URL.replace(/\/$/, "");
+    await tradeWindow.loadURL(`${base}/renderer-trade/index.html`);
+  } else {
+    await tradeWindow.loadFile(resolveTradeRendererFilePath());
+  }
+
+  return tradeWindow;
+}
 
 export function getMainWindow() {
   return mainWindow;
 }
 
+export function getTradeWindow() {
+  return tradeWindow;
+}
+
 export function focusMainWindow() {
   focusWindow(mainWindow);
+}
+
+export function focusTradeWindow() {
+  focusWindow(tradeWindow);
 }

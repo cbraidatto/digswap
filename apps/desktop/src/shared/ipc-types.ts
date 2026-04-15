@@ -25,6 +25,7 @@ export interface SupabaseSession {
 export interface DesktopSettings {
   downloadPath: string;
   updateChannel: "stable" | "beta";
+  autoStart: boolean;
 }
 
 export interface DesktopStorageHealth {
@@ -87,16 +88,16 @@ export interface DesktopShellSessionPayload {
 export interface DesktopMainShellBridge {
   isDesktop(): boolean;
   getAppVersion(): Promise<string>;
+  /**
+   * Handoff-code flow: the web app sends a single-use code (30s TTL)
+   * instead of raw tokens. The desktop exchanges it server-side via
+   * POST /api/desktop/session/exchange, keeping tokens out of the browser.
+   */
   syncHandoffCode(code: string | null): Promise<void>;
-  openLibrary(): Promise<void>;
-  // Library methods — used by /biblioteca page
-  selectLibraryFolder(): Promise<string | null>;
-  startScan(folderPath: string, mode: "incremental" | "full"): Promise<ScanResult>;
-  getLibraryTracks(): Promise<LibraryTrack[]>;
-  getLibraryRoot(): Promise<string | null>;
-  onScanProgress(listener: (event: ScanProgressEvent) => void): () => void;
-  startSync(): Promise<SyncResult>;
-  onSyncProgress(listener: (event: SyncProgress) => void): () => void;
+  /** Enable or disable launching at system login (boot-to-tray). */
+  setAutoStart(enabled: boolean): Promise<void>;
+  /** Check whether auto-start is currently enabled. */
+  getAutoStart(): Promise<boolean>;
 }
 
 /**
@@ -149,23 +150,6 @@ export interface TradeDetail {
   expiresAt: string | null;
 }
 
-/** Fired by multi-item transfer per chunk within a batch item. */
-export interface MultiItemProgressEvent {
-  tradeId: string;
-  itemIndex: number;       // 0-based
-  totalItems: number;
-  proposalItemId: string;
-  bytesTransferred: number;
-  totalBytes: number;
-}
-
-/** Fired when a multi-item batch transfer completes (all items processed). */
-export interface MultiItemCompleteEvent {
-  tradeId: string;
-  completedItems: Array<{ proposalItemId: string; filePath: string; sha256: string }>;
-  allVerified: boolean;    // true when all items have receipts
-}
-
 /** Fired by onTransferProgress listener as chunks arrive. */
 export interface TransferProgressEvent {
   bytesReceived: number;
@@ -199,88 +183,11 @@ export interface DesktopBridgeTradeRuntime {
   onLobbyStateChanged(listener: (event: LobbyStateEvent) => void): () => void;
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// LIBRARY — Phase 29: Local Index + Folder Scanner
-// ─────────────────────────────────────────────────────────────────────────────
-
-export type MetadataConfidence = "high" | "low";
-
-/** Progress event emitted during folder scanning, throttled at 50ms. */
-export interface ScanProgressEvent {
-  filesFound: number;
-  filesProcessed: number;
-  currentPath: string;
-  errorCount: number;
-}
-
-/** Result returned when a scan completes. */
-export interface ScanResult {
-  filesFound: number;
-  filesProcessed: number;
-  errors: Array<{ filePath: string; reason: string }>;
-}
-
-/** A single track in the local library index. */
-export interface LibraryTrack {
-  id: string;
-  filePath: string;
-  fileHash: string | null;
-  fileSize: number;
-  modifiedAt: string;
-  scannedAt: string;
-  artist: string | null;
-  album: string | null;
-  title: string | null;
-  year: number | null;
-  trackNumber: number | null;
-  format: string;
-  bitrate: number;
-  sampleRate: number;
-  bitDepth: number | null;
-  duration: number;
-  artistConfidence: MetadataConfidence;
-  albumConfidence: MetadataConfidence;
-  titleConfidence: MetadataConfidence;
-  yearConfidence: MetadataConfidence;
-  trackConfidence: MetadataConfidence;
-}
-
-/** Result returned when a sync operation completes. */
-export interface SyncResult {
-  synced: number;
-  created: number;
-  linked: number;
-  deleted: number;
-  errors: string[];
-}
-
-/** Progress event emitted during library sync, sent via desktop:sync-progress. */
-export interface SyncProgress {
-  phase: "preparing" | "uploading" | "deleting" | "done" | "error";
-  total: number;
-  sent: number;
-  message: string;
-}
-
-
-/** IPC bridge for library operations exposed on window.desktopBridge. */
-export interface DesktopBridgeLibrary {
-  selectLibraryFolder(): Promise<string | null>;
-  startScan(folderPath: string): Promise<ScanResult>;
-  startIncrementalScan(): Promise<ScanResult>;
-  startFullScan(): Promise<ScanResult>;
-  startSync(): Promise<SyncResult>;
-  getLibraryTracks(): Promise<LibraryTrack[]>;
-  getLibraryRoot(): Promise<string | null>;
-  onScanProgress(listener: (event: ScanProgressEvent) => void): () => void;
-  onSyncProgress(listener: (event: SyncProgress) => void): () => void;
-}
-
 declare global {
   interface Window {
     desktopShell?: DesktopMainShellBridge;
-    // Augment: trade runtime + library methods merged at runtime by the preload script
-    desktopBridge: DesktopBridge & DesktopBridgeTradeRuntime & DesktopBridgeLibrary;
+    // Augment: trade runtime methods merged at runtime by the preload script
+    desktopBridge: DesktopBridge & DesktopBridgeTradeRuntime;
   }
 }
 

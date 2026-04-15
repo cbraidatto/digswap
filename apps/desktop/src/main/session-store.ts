@@ -45,6 +45,7 @@ export class DesktopSessionStore {
       settings: {
         downloadPath: getDefaultDownloadPath(),
         updateChannel: "stable",
+        autoStart: false,
       },
       lastProtocolPayload: null,
       pendingTransferReceipts: [],
