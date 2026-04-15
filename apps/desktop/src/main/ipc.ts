@@ -118,6 +118,21 @@ export function registerDesktopIpc({
     sessionStore.setSettings(settings);
   });
 
+  ipcMain.handle("desktop:set-auto-start", (_event, enabled: boolean) => {
+    app.setLoginItemSettings({
+      openAtLogin: enabled,
+      args: enabled ? ["--boot-to-tray"] : [],
+    });
+    sessionStore.setSettings({ autoStart: enabled });
+  });
+
+  ipcMain.handle("desktop:get-auto-start", () => {
+    const loginSettings = app.getLoginItemSettings({
+      args: ["--boot-to-tray"],
+    });
+    return loginSettings.openAtLogin;
+  });
+
   ipcMain.handle("desktop:select-download-path", async () => {
     const result = await dialog.showOpenDialog({
       properties: ["openDirectory", "createDirectory"],

@@ -6,12 +6,14 @@ import { extractProtocolUrlFromArgv, parseProtocolUrl, registerProtocolClient } 
 import { DesktopSessionStore } from "./session-store";
 import { DesktopSupabaseAuth } from "./supabase-auth";
 import { DesktopTradeRuntime } from "./trade-runtime";
+import { createTray, destroyTray } from "./tray";
 import {
   createMainWindow,
   createTradeWindow,
   focusMainWindow,
   focusTradeWindow,
   getMainWindow,
+  setIsQuitting,
 } from "./window";
 
 // Allow a second dev instance via DIGSWAP_SECOND_INSTANCE=1.
@@ -32,6 +34,7 @@ if (!gotLock) {
 
 app.setAppUserModelId("com.digswap.desktop");
 
+const isBootToTray = process.argv.includes("--boot-to-tray");
 const queuedProtocolUrls: string[] = [];
 let sessionStore: DesktopSessionStore | null = null;
 let authRuntime: DesktopSupabaseAuth | null = null;
@@ -122,10 +125,12 @@ app.whenReady().then(async () => {
     tradeRuntime,
   });
 
-  await createMainWindow({
-    siteUrl: desktopSiteUrl,
-    supabaseUrl: desktopSupabaseUrl,
-  });
+  createTray();
+
+  await createMainWindow(
+    { siteUrl: desktopSiteUrl, supabaseUrl: desktopSupabaseUrl },
+    { bootToTray: isBootToTray },
+  );
 
   const startupProtocolUrl = extractProtocolUrlFromArgv(process.argv);
   if (startupProtocolUrl) {
@@ -137,21 +142,23 @@ app.whenReady().then(async () => {
   }
 
   app.on("activate", async () => {
-    if (BrowserWindow.getAllWindows().length === 0) {
-      await createMainWindow({
-        siteUrl: desktopSiteUrl,
-        supabaseUrl: desktopSupabaseUrl,
-      });
+    const mainWin = getMainWindow();
+    if (mainWin && !mainWin.isDestroyed()) {
+      focusMainWindow();
       return;
     }
 
-    if (getMainWindow()) {
-      focusMainWindow();
-    }
+    await createMainWindow({
+      siteUrl: desktopSiteUrl,
+      supabaseUrl: desktopSupabaseUrl,
+    });
   });
 });
 
 app.on("before-quit", () => {
+  setIsQuitting(true);
+  destroyTray();
+
   if (!tradeRuntime) {
     return;
   }
@@ -160,7 +167,5 @@ app.on("before-quit", () => {
 });
 
 app.on("window-all-closed", () => {
-  if (process.platform !== "darwin") {
-    app.quit();
-  }
+  // Intentionally empty -- app runs in tray when window is closed/hidden
 });

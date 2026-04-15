@@ -94,6 +94,10 @@ export interface DesktopMainShellBridge {
    * POST /api/desktop/session/exchange, keeping tokens out of the browser.
    */
   syncHandoffCode(code: string | null): Promise<void>;
+  /** Enable or disable launching at system login (boot-to-tray). */
+  setAutoStart(enabled: boolean): Promise<void>;
+  /** Check whether auto-start is currently enabled. */
+  getAutoStart(): Promise<boolean>;
 }
 
 /**
