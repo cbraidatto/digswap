@@ -573,7 +573,10 @@ Plans:
   3. Adding or removing an audio file in the watched folder is detected within seconds and the index updates automatically
   4. On app startup, a diff scan compares stored index vs current folder state and reconciles additions, removals, and modifications
   5. User can enable auto-start with Windows from settings, and the app launches minimized to tray on boot
-**Plans**: TBD
+**Plans**: 2 plans
+Plans:
+- [ ] 031-01-PLAN.md -- Tray lifecycle: system tray icon, close-to-tray, auto-start with Windows, single-instance enhancement
+- [ ] 031-02-PLAN.md -- File watcher + diff scan: chokidar watcher, startup diff scan, auto scan+sync on changes
 
 ### Phase 32: AI Metadata Enrichment
 **Goal**: Poorly-tagged files get AI-inferred metadata with confidence scoring and user override protection
@@ -637,7 +640,7 @@ Phases execute in numeric order: 1 → 20 (v1.0), then 21 → 24 (v1.1 Deploy Re
 |-------|----------------|--------|----------|
 | 29. Local Index + Folder Scanner | 0/0 | Not Started |  |
 | 30. Sync Engine | 3/3 | Complete | 2026-04-15 |
-| 31. Tray Daemon + File Watcher | 0/0 | Not Started |  |
+| 31. Tray Daemon + File Watcher | 0/2 | Not Started |  |
 | 32. AI Metadata Enrichment | 0/0 | Not Started |  |
 
 ### Phase 19: Security Hardening — Fix 74 audit vulnerabilities
