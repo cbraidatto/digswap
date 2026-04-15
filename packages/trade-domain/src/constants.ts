@@ -1,4 +1,4 @@
-export const TRADE_PROTOCOL_VERSION = 1 as const;
+export const TRADE_PROTOCOL_VERSION = 2 as const;
 
 export const TRANSFER_CHUNK_SIZE_BYTES = 64 * 1024;
 export const TRANSFER_ACK_INTERVAL = 16;

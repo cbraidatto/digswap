@@ -121,7 +121,7 @@ function ShowcaseCard({
 						{meta.icon}
 					</span>
 					<span
-						className={`font-mono ${compact ? "text-[7px]" : "text-[9px]"} uppercase tracking-[0.15em] ${meta.color}`}
+						className={`font-mono ${compact ? "text-[9px]" : "text-[10px]"} uppercase tracking-[0.12em] ${meta.color}`}
 					>
 						{meta.label}
 					</span>
@@ -301,7 +301,7 @@ export function ShowcaseCards({
 	return (
 		<>
 			<div
-				className={`grid grid-cols-3 ${compact ? "gap-1.5" : "gap-3"} transition-opacity ${isSaving ? "opacity-50 pointer-events-none" : ""}`}
+				className={`grid grid-cols-3 ${compact ? "gap-2" : "gap-3"} transition-opacity ${isSaving ? "opacity-50 pointer-events-none" : ""}`}
 			>
 				<ShowcaseCard
 					slot="searching"

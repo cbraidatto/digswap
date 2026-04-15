@@ -184,7 +184,7 @@ export const tradeRuntimeSessions = pgTable(
 		deviceId: varchar("device_id", { length: 255 }).notNull(),
 		clientKind: varchar("client_kind", { length: 20 }).default("desktop").notNull(),
 		desktopVersion: integer("desktop_version").default(1).notNull(),
-		tradeProtocolVersion: integer("trade_protocol_version").default(1).notNull(),
+		tradeProtocolVersion: integer("trade_protocol_version").default(2).notNull(),
 		peerId: varchar("peer_id", { length: 100 }),
 		lastIceCandidateType: varchar("last_ice_candidate_type", { length: 16 }),
 		acquiredAt: timestamp("acquired_at", { withTimezone: true }).defaultNow().notNull(),
@@ -221,7 +221,7 @@ export const tradeTransferReceipts = pgTable(
 		fileSizeBytes: integer("file_size_bytes").notNull(),
 		fileHashSha256: varchar("file_hash_sha256", { length: 64 }).notNull(),
 		iceCandidateType: varchar("ice_candidate_type", { length: 16 }).notNull(),
-		tradeProtocolVersion: integer("trade_protocol_version").default(1).notNull(),
+		tradeProtocolVersion: integer("trade_protocol_version").default(2).notNull(),
 		completedAt: timestamp("completed_at", { withTimezone: true }).notNull(),
 		reconciledAt: timestamp("reconciled_at", { withTimezone: true }).defaultNow().notNull(),
 		createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
@@ -295,15 +295,14 @@ export const tradeProposalItems = pgTable(
 			.references(() => tradeProposals.id, { onDelete: "cascade" })
 			.notNull(),
 		side: varchar("side", { length: 10 }).notNull(), // 'offer' or 'want'
-		collectionItemId: uuid("collection_item_id").references(
-			() => collectionItems.id,
-		),
+		collectionItemId: uuid("collection_item_id").references(() => collectionItems.id),
 		releaseId: uuid("release_id").references(() => releases.id),
 		conditionNotes: text("condition_notes"),
 		declaredQuality: varchar("declared_quality", { length: 50 }),
-		createdAt: timestamp("created_at", { withTimezone: true })
-			.defaultNow()
-			.notNull(),
+		fileHash: varchar("file_hash", { length: 64 }),
+		previewStoragePath: text("preview_storage_path"),
+		previewExpiresAt: timestamp("preview_expires_at", { withTimezone: true }),
+		createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
 	},
 	(table) => [
 		pgPolicy("trade_proposal_items_select_participant", {

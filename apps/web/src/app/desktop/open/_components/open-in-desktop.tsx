@@ -18,15 +18,17 @@
 
 import Link from "next/link";
 import { useCallback, useEffect, useRef, useState } from "react";
+import { isDesktopVersionOutdated } from "@/lib/desktop/version";
 
 type OpenState = "opening" | "success" | "not-installed" | "version-blocked";
 
 interface OpenInDesktopProps {
 	tradeId: string;
 	token: string;
-	minVersion: number;
+	minVersion: string;
+	tradeProtocolVersion: number;
 	/** Optional desktop version reported back via ?dv= URL param */
-	desktopVersion?: number;
+	desktopVersion?: string;
 }
 
 /** Detect OS from user agent for download link selection */
@@ -52,14 +54,16 @@ function getDownloadLink(os: "windows" | "mac" | "linux"): {
 	}
 }
 
-export function OpenInDesktop({ tradeId, token, minVersion, desktopVersion }: OpenInDesktopProps) {
+export function OpenInDesktop({
+	tradeId,
+	token,
+	minVersion,
+	tradeProtocolVersion,
+	desktopVersion,
+}: OpenInDesktopProps) {
 	const [state, setState] = useState<OpenState>(() => {
 		// Version gate check on initial render
-		if (
-			desktopVersion !== undefined &&
-			!Number.isNaN(desktopVersion) &&
-			desktopVersion < minVersion
-		) {
+		if (desktopVersion !== undefined && isDesktopVersionOutdated(desktopVersion, minVersion)) {
 			return "version-blocked";
 		}
 		return "opening";
@@ -68,7 +72,7 @@ export function OpenInDesktop({ tradeId, token, minVersion, desktopVersion }: Op
 	const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 	const os = detectOs();
 	const { href: downloadHref, label: downloadLabel } = getDownloadLink(os);
-	const protocolUrl = `digswap://trade/${tradeId}?handoff=${token}`;
+	const protocolUrl = `digswap://trade/${tradeId}?handoff=${encodeURIComponent(token)}&mv=${encodeURIComponent(minVersion)}&tpv=${tradeProtocolVersion}`;
 
 	const fireProtocolOpen = useCallback(() => {
 		window.location.href = protocolUrl;

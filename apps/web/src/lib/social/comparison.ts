@@ -1,4 +1,4 @@
-import { eq, sql } from "drizzle-orm";
+import { eq, isNull, sql } from "drizzle-orm";
 import { db } from "@/lib/db";
 import { collectionItems } from "@/lib/db/schema/collections";
 import { releases } from "@/lib/db/schema/releases";
@@ -46,12 +46,12 @@ export async function getCollectionComparison(
 				db
 					.select({ releaseId: collectionItems.releaseId })
 					.from(collectionItems)
-					.where(eq(collectionItems.userId, theirUserId))
+					.where(sql`${collectionItems.userId} = ${theirUserId} AND ${collectionItems.deletedAt} IS NULL`)
 					.as("theirs"),
 				sql`"theirs"."release_id" = ${collectionItems.releaseId}`,
 			)
 			.innerJoin(releases, eq(releases.id, collectionItems.releaseId))
-			.where(eq(collectionItems.userId, myUserId))
+			.where(sql`${collectionItems.userId} = ${myUserId} AND ${collectionItems.deletedAt} IS NULL`)
 			.orderBy(sql`${releases.rarityScore} DESC NULLS LAST`)
 			.limit(500),
 
@@ -62,10 +62,12 @@ export async function getCollectionComparison(
 			.innerJoin(releases, eq(releases.id, collectionItems.releaseId))
 			.where(
 				sql`${collectionItems.userId} = ${myUserId}
+					AND ${collectionItems.deletedAt} IS NULL
 					AND NOT EXISTS (
 						SELECT 1 FROM collection_items b
 						WHERE b.user_id = ${theirUserId}
 						  AND b.release_id = ${collectionItems.releaseId}
+						  AND b.deleted_at IS NULL
 					)`,
 			)
 			.orderBy(sql`${releases.rarityScore} DESC NULLS LAST`)
@@ -78,10 +80,12 @@ export async function getCollectionComparison(
 			.innerJoin(releases, eq(releases.id, collectionItems.releaseId))
 			.where(
 				sql`${collectionItems.userId} = ${theirUserId}
+					AND ${collectionItems.deletedAt} IS NULL
 					AND NOT EXISTS (
 						SELECT 1 FROM collection_items b
 						WHERE b.user_id = ${myUserId}
 						  AND b.release_id = ${collectionItems.releaseId}
+						  AND b.deleted_at IS NULL
 					)`,
 			)
 			.orderBy(sql`${releases.rarityScore} DESC NULLS LAST`)

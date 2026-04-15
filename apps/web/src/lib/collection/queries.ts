@@ -1,4 +1,4 @@
-import { and, asc, desc, eq, gte, ilike, lt, ne, or, sql } from "drizzle-orm";
+import { and, asc, desc, eq, gte, ilike, isNull, lt, ne, or, sql } from "drizzle-orm";
 import { unstable_cache } from "next/cache";
 import { db } from "@/lib/db";
 import { collectionItems } from "@/lib/db/schema/collections";
@@ -43,7 +43,10 @@ function buildWhereConditions(
 	filters: CollectionFilters,
 	options?: { excludePrivate?: boolean },
 ) {
-	const conditions = [eq(collectionItems.userId, userId)];
+	const conditions = [
+		eq(collectionItems.userId, userId),
+		isNull(collectionItems.deletedAt), // D-03: exclude soft-deleted items
+	];
 
 	if (filters.genre) {
 		conditions.push(sql`${releases.genre} @> ARRAY[${filters.genre}]::text[]`);
@@ -197,7 +200,7 @@ export const getUniqueGenres = unstable_cache(
 			})
 			.from(collectionItems)
 			.innerJoin(releases, eq(collectionItems.releaseId, releases.id))
-			.where(eq(collectionItems.userId, userId));
+			.where(and(eq(collectionItems.userId, userId), isNull(collectionItems.deletedAt)));
 
 		return rows
 			.map((r) => r.genre)
@@ -221,7 +224,7 @@ export const getTopGenres = unstable_cache(
 			})
 			.from(collectionItems)
 			.innerJoin(releases, eq(collectionItems.releaseId, releases.id))
-			.where(eq(collectionItems.userId, userId))
+			.where(and(eq(collectionItems.userId, userId), isNull(collectionItems.deletedAt)))
 			.groupBy(sql`unnest(${releases.genre})`)
 			.orderBy(sql`count(*) desc`)
 			.limit(limit);
@@ -244,7 +247,7 @@ export const getUniqueFormats = unstable_cache(
 			})
 			.from(collectionItems)
 			.innerJoin(releases, eq(collectionItems.releaseId, releases.id))
-			.where(eq(collectionItems.userId, userId));
+			.where(and(eq(collectionItems.userId, userId), isNull(collectionItems.deletedAt)));
 
 		return rows
 			.map((r) => r.format)

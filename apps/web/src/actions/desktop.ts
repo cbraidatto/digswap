@@ -17,7 +17,10 @@ import { requireUser } from "@/lib/auth/require-user";
 import { db } from "@/lib/db";
 import { tradeRequests } from "@/lib/db/schema/trades";
 import { createHandoffToken } from "@/lib/desktop/handoff-token";
+import { MIN_DESKTOP_VERSION, TRADE_PROTOCOL_VERSION } from "@/lib/desktop/version";
 import { publicEnv } from "@/lib/env";
+import { createClient } from "@/lib/supabase/server";
+import { uuidSchema } from "@/lib/validations/common";
 import { handoffTokenSchema } from "@/lib/validations/desktop";
 
 /**
@@ -69,18 +72,70 @@ export async function generateHandoffToken(
 /**
  * Return the minimum desktop app version required for trading.
  *
- * Reads NEXT_PUBLIC_MIN_DESKTOP_VERSION from env (parseInt, default 1).
- * The version is a monotonic integer per ADR-002 D-10.
+ * Reads NEXT_PUBLIC_MIN_DESKTOP_VERSION from env (semver string, default 0.2.0).
  *
  * No auth required — this is safe to call from the public /desktop/open page.
  */
-export async function checkDesktopVersion(): Promise<{ minVersion: number }> {
+export async function checkDesktopVersion(): Promise<{
+	minVersion: string;
+	tradeProtocolVersion: number;
+}> {
 	try {
 		const raw = publicEnv.NEXT_PUBLIC_MIN_DESKTOP_VERSION;
-		const minVersion = raw ? parseInt(raw, 10) : 1;
-		return { minVersion: Number.isNaN(minVersion) ? 1 : minVersion };
+		return {
+			minVersion: raw?.trim() || MIN_DESKTOP_VERSION,
+			tradeProtocolVersion: TRADE_PROTOCOL_VERSION,
+		};
 	} catch (err) {
 		console.error("[checkDesktopVersion] error:", err);
-		return { minVersion: 1 };
+		return {
+			minVersion: MIN_DESKTOP_VERSION,
+			tradeProtocolVersion: TRADE_PROTOCOL_VERSION,
+		};
+	}
+}
+
+const validatePreviewSchema = handoffTokenSchema.extend({
+	proposalItemId: uuidSchema,
+});
+
+export async function validatePreviewAction(
+	tradeId: string,
+	proposalItemId: string,
+): Promise<{ errors: string[]; valid: boolean }> {
+	try {
+		await requireUser();
+
+		const parsed = validatePreviewSchema.safeParse({ proposalItemId, tradeId });
+		if (!parsed.success) {
+			return { valid: false, errors: ["Invalid trade or proposal item ID."] };
+		}
+
+		const supabase = await createClient();
+		const { data, error } = await supabase.functions.invoke("validate-preview", {
+			body: {
+				proposalItemId: parsed.data.proposalItemId,
+				tradeId: parsed.data.tradeId,
+			},
+		});
+
+		if (error) {
+			console.error("[validatePreviewAction] failed:", error);
+			return { valid: false, errors: ["Failed to validate the uploaded preview."] };
+		}
+
+		if (
+			typeof data === "object" &&
+			data !== null &&
+			Array.isArray((data as { errors?: unknown }).errors) &&
+			typeof (data as { valid?: unknown }).valid === "boolean"
+		) {
+			return data as { errors: string[]; valid: boolean };
+		}
+
+		return { valid: false, errors: ["Preview validation returned an invalid response."] };
+	} catch (err) {
+		console.error("[validatePreviewAction] error:", err);
+		return { valid: false, errors: ["Failed to validate the uploaded preview."] };
 	}
 }

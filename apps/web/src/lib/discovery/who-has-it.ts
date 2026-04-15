@@ -1,4 +1,4 @@
-import { desc, eq } from "drizzle-orm";
+import { and, desc, eq, isNull } from "drizzle-orm";
 import { db } from "@/lib/db";
 import { collectionItems } from "@/lib/db/schema/collections";
 import { releases } from "@/lib/db/schema/releases";
@@ -24,7 +24,7 @@ export async function findWhoHasRelease(discogsId: number, limit = 20): Promise<
 		.from(collectionItems)
 		.innerJoin(releases, eq(collectionItems.releaseId, releases.id))
 		.innerJoin(profiles, eq(collectionItems.userId, profiles.id))
-		.where(eq(releases.discogsId, discogsId))
+		.where(and(eq(releases.discogsId, discogsId), isNull(collectionItems.deletedAt)))
 		.orderBy(desc(releases.rarityScore))
 		.limit(limit);
 	return rows;

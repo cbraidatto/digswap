@@ -1,6 +1,6 @@
 "use server";
 
-import { and, eq, ilike, or } from "drizzle-orm";
+import { and, eq, ilike, isNull, or } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import { db } from "@/lib/db";
@@ -140,6 +140,7 @@ export async function searchCollectionForShowcase(query: string) {
 			.where(
 				and(
 					eq(collectionItems.userId, user.id),
+					isNull(collectionItems.deletedAt),
 					or(ilike(releases.title, `%${sanitized}%`), ilike(releases.artist, `%${sanitized}%`)),
 				),
 			)
@@ -408,5 +409,40 @@ export async function saveCoverPosition(positionY: number) {
 	} catch (err) {
 		console.error("[saveCoverPosition] error:", err);
 		return { error: "Failed to save cover position. Please try again." };
+	}
+}
+
+export async function removeCoverImage() {
+	try {
+		const supabase = await createClient();
+		const {
+			data: { user },
+		} = await supabase.auth.getUser();
+		if (!user) return { error: "Unauthenticated" };
+
+		// Remove all cover files for this user from storage (any extension)
+		const { data: files } = await supabase.storage
+			.from("profile-covers")
+			.list(user.id);
+
+		if (files && files.length > 0) {
+			const paths = files
+				.filter((f) => f.name.startsWith("cover."))
+				.map((f) => `${user.id}/${f.name}`);
+			if (paths.length > 0) {
+				await supabase.storage.from("profile-covers").remove(paths);
+			}
+		}
+
+		await db
+			.update(profiles)
+			.set({ coverUrl: null, updatedAt: new Date() })
+			.where(eq(profiles.id, user.id));
+
+		revalidatePath("/perfil");
+		return { ok: true };
+	} catch (err) {
+		console.error("[removeCoverImage] error:", err);
+		return { error: "Failed to remove cover image. Please try again." };
 	}
 }

@@ -171,12 +171,13 @@ export async function addRecordToCollection(
 			}
 		}
 
-		// Check for duplicate collection item
+		// Check for duplicate collection item (soft-deleted items should not block re-adding)
 		const { data: duplicate } = await admin
 			.from("collection_items")
 			.select("id")
 			.eq("user_id", user.id)
 			.eq("release_id", releaseId)
+			.is("deleted_at", null)
 			.maybeSingle();
 
 		if (duplicate) {
@@ -220,7 +221,8 @@ export async function addRecordToCollection(
 			const { count: collectionCount } = await admin
 				.from("collection_items")
 				.select("*", { count: "exact", head: true })
-				.eq("user_id", user.id);
+				.eq("user_id", user.id)
+				.is("deleted_at", null);
 
 			const itemCount = collectionCount ?? 0;
 

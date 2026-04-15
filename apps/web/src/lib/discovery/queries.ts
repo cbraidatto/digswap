@@ -1,4 +1,4 @@
-import { and, count, countDistinct, desc, eq, gte, ilike, inArray, ne, or, sql } from "drizzle-orm";
+import { and, count, countDistinct, desc, eq, gte, ilike, inArray, isNull, ne, or, sql } from "drizzle-orm";
 import { getDecadeRange } from "@/lib/collection/filters";
 import { db } from "@/lib/db";
 import { collectionItems } from "@/lib/db/schema/collections";
@@ -110,7 +110,7 @@ export async function searchRecords(term: string, limit = 20): Promise<SearchRes
 		})
 		.from(collectionItems)
 		.innerJoin(profiles, eq(collectionItems.userId, profiles.id))
-		.where(inArray(collectionItems.releaseId, releaseIds))
+		.where(and(inArray(collectionItems.releaseId, releaseIds), isNull(collectionItems.deletedAt)))
 		.limit(500);
 
 	// Group owners by releaseId
@@ -163,7 +163,7 @@ export async function browseRecords(
 	userId: string | null = null,
 ): Promise<BrowseResult[]> {
 	// Build WHERE conditions
-	const conditions = [];
+	const conditions = [isNull(collectionItems.deletedAt)]; // D-03: exclude soft-deleted
 
 	// Legacy single-genre filter (kept for backward compat)
 	if (genre) {
@@ -290,7 +290,7 @@ export async function getSuggestedRecords(userId: string, limit = 8): Promise<Su
 		})
 		.from(collectionItems)
 		.innerJoin(releases, eq(collectionItems.releaseId, releases.id))
-		.where(eq(collectionItems.userId, userId))
+		.where(and(eq(collectionItems.userId, userId), isNull(collectionItems.deletedAt)))
 		.groupBy(sql`unnest(${releases.genre})`)
 		.orderBy(desc(sql`genre_count`))
 		.limit(3);
@@ -302,6 +302,7 @@ export async function getSuggestedRecords(userId: string, limit = 8): Promise<Su
 		SELECT 1 FROM collection_items ci_owned
 		WHERE ci_owned.user_id = ${userId}
 		  AND ci_owned.release_id = ${releases.id}
+		  AND ci_owned.deleted_at IS NULL
 	)`;
 
 	// Step 3: Genre-based suggestions -- records in user's top genres they don't own
@@ -326,7 +327,7 @@ export async function getSuggestedRecords(userId: string, limit = 8): Promise<Su
 			})
 			.from(releases)
 			.innerJoin(collectionItems, eq(collectionItems.releaseId, releases.id))
-			.where(and(or(...genreConditions), notOwnedExpr, ne(collectionItems.userId, userId)))
+			.where(and(or(...genreConditions), notOwnedExpr, ne(collectionItems.userId, userId), isNull(collectionItems.deletedAt)))
 			.groupBy(
 				releases.id,
 				releases.discogsId,
@@ -376,7 +377,7 @@ export async function getSuggestedRecords(userId: string, limit = 8): Promise<Su
 			})
 			.from(collectionItems)
 			.innerJoin(releases, eq(collectionItems.releaseId, releases.id))
-			.where(and(inArray(collectionItems.userId, followedIds), notOwnedExpr))
+			.where(and(inArray(collectionItems.userId, followedIds), notOwnedExpr, isNull(collectionItems.deletedAt)))
 			.groupBy(
 				releases.id,
 				releases.discogsId,
@@ -448,7 +449,7 @@ export async function getTrendingRecords(limit = 10): Promise<TrendingRecord[]> 
 		})
 		.from(collectionItems)
 		.innerJoin(releases, eq(collectionItems.releaseId, releases.id))
-		.where(gte(collectionItems.createdAt, sevenDaysAgo))
+		.where(and(gte(collectionItems.createdAt, sevenDaysAgo), isNull(collectionItems.deletedAt)))
 		.groupBy(
 			releases.id,
 			releases.discogsId,

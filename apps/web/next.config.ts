@@ -35,6 +35,7 @@ const nextConfig: NextConfig = {
 	experimental: {
 		serverActions: {
 			bodySizeLimit: "6mb",
+			allowedOrigins: ["trusting-repayment-private.ngrok-free.dev"],
 		},
 	},
 	images: {

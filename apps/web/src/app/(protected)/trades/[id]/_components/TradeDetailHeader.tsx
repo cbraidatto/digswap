@@ -1,11 +1,14 @@
 import Image from "next/image";
 import type { TradeThreadDetail } from "@/lib/trades/messages";
+import { OpenInDesktopButton } from "./OpenInDesktopButton";
 
 const TERMINAL_STATUSES = new Set(["completed", "declined", "cancelled", "expired"]);
+// "Open in Desktop" appears once proposal is accepted (lobby) — upload and transfer are desktop-only
+const DESKTOP_TRANSFER_STATUSES = new Set(["lobby"]);
 
 const STATUS_CONFIG: Record<string, { label: string; dot: string; text: string }> = {
 	pending: { label: "PENDING", dot: "bg-muted-foreground", text: "text-muted-foreground" },
-	lobby: { label: "LOBBY", dot: "bg-primary", text: "text-primary" },
+	lobby: { label: "UPLOAD FILES", dot: "bg-amber-400", text: "text-amber-400" },
 	previewing: { label: "PREVIEWING", dot: "bg-primary", text: "text-primary" },
 	accepted: { label: "ACCEPTED", dot: "bg-primary", text: "text-primary" },
 	transferring: { label: "TRANSFERRING", dot: "bg-secondary", text: "text-secondary" },
@@ -61,15 +64,9 @@ export function TradeDetailHeader({ thread }: Props) {
 				</div>
 			</div>
 
-			{/* Open in Desktop CTA */}
-			{!isTerminal && (
-				<a
-					href={`digswap://trade/${thread.tradeId}`}
-					className="inline-flex items-center gap-2 bg-primary hover:bg-primary text-background font-mono text-xs font-bold px-4 py-2 rounded transition-colors"
-				>
-					<span className="material-symbols-outlined text-sm">open_in_new</span>
-					Open in Desktop
-				</a>
+			{/* Open in Desktop CTA — only after both previews are approved */}
+			{DESKTOP_TRANSFER_STATUSES.has(thread.status) && (
+				<OpenInDesktopButton tradeId={thread.tradeId} />
 			)}
 		</div>
 	);

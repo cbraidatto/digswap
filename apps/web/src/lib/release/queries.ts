@@ -1,4 +1,4 @@
-import { eq, sql } from "drizzle-orm";
+import { and, eq, isNull, sql } from "drizzle-orm";
 import { cache } from "react";
 import { db } from "@/lib/db";
 import { collectionItems } from "@/lib/db/schema/collections";
@@ -41,7 +41,7 @@ export async function getOwnersByReleaseId(releaseId: string, limit = 12): Promi
 		})
 		.from(collectionItems)
 		.innerJoin(profiles, eq(collectionItems.userId, profiles.id))
-		.where(eq(collectionItems.releaseId, releaseId))
+		.where(and(eq(collectionItems.releaseId, releaseId), isNull(collectionItems.deletedAt)))
 		.limit(limit);
 }
 
@@ -53,6 +53,6 @@ export async function getOwnerCountByReleaseId(releaseId: string): Promise<numbe
 	const result = await db
 		.select({ count: sql<number>`count(*)::int` })
 		.from(collectionItems)
-		.where(eq(collectionItems.releaseId, releaseId));
+		.where(and(eq(collectionItems.releaseId, releaseId), isNull(collectionItems.deletedAt)));
 	return Number(result[0]?.count ?? 0);
 }

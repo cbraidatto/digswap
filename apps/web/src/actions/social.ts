@@ -249,7 +249,7 @@ export async function searchUsers(query: string): Promise<SearchResult[]> {
 				username: profiles.username,
 				displayName: profiles.displayName,
 				avatarUrl: profiles.avatarUrl,
-				recordCount: sql<number>`coalesce((select count(*) from collection_items where user_id = ${profiles.id}), 0)`,
+				recordCount: sql<number>`coalesce((select count(*) from collection_items where user_id = ${profiles.id} and deleted_at is null), 0)`,
 				followerCount: sql<number>`coalesce((select count(*) from follows where following_id = ${profiles.id}), 0)`,
 				isFollowing: sql<boolean>`exists(select 1 from follows where follower_id = ${user.id} and following_id = ${profiles.id})`,
 			})

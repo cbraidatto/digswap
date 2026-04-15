@@ -1,4 +1,4 @@
-import { avg, count, desc, eq, sql } from "drizzle-orm";
+import { and, avg, count, desc, eq, isNull, sql } from "drizzle-orm";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { redirect } from "next/navigation";
@@ -57,7 +57,7 @@ export default async function StatsPage() {
 			})
 			.from(collectionItems)
 			.innerJoin(releases, eq(collectionItems.releaseId, releases.id))
-			.where(eq(collectionItems.userId, userId))
+			.where(and(eq(collectionItems.userId, userId), isNull(collectionItems.deletedAt)))
 			.groupBy(sql`unnest(${releases.genre})`)
 			.orderBy(desc(sql`count(*)`))
 			.limit(5),
@@ -70,7 +70,7 @@ export default async function StatsPage() {
 			})
 			.from(collectionItems)
 			.innerJoin(releases, eq(collectionItems.releaseId, releases.id))
-			.where(eq(collectionItems.userId, userId))
+			.where(and(eq(collectionItems.userId, userId), isNull(collectionItems.deletedAt)))
 			.groupBy(sql`floor(${releases.year} / 10) * 10`)
 			.orderBy(desc(sql`count(*)`))
 			.limit(5),
@@ -83,7 +83,7 @@ export default async function StatsPage() {
 			})
 			.from(collectionItems)
 			.innerJoin(releases, eq(collectionItems.releaseId, releases.id))
-			.where(eq(collectionItems.userId, userId))
+			.where(and(eq(collectionItems.userId, userId), isNull(collectionItems.deletedAt)))
 			.groupBy(releases.label)
 			.orderBy(desc(sql`count(*)`))
 			.limit(5),
@@ -93,10 +93,10 @@ export default async function StatsPage() {
 			.select({ avg: avg(releases.rarityScore) })
 			.from(collectionItems)
 			.innerJoin(releases, eq(collectionItems.releaseId, releases.id))
-			.where(eq(collectionItems.userId, userId)),
+			.where(and(eq(collectionItems.userId, userId), isNull(collectionItems.deletedAt))),
 
 		// Total records
-		db.select({ total: count() }).from(collectionItems).where(eq(collectionItems.userId, userId)),
+		db.select({ total: count() }).from(collectionItems).where(and(eq(collectionItems.userId, userId), isNull(collectionItems.deletedAt))),
 
 		// Total listens
 		db.select({ total: count() }).from(listeningLogs).where(eq(listeningLogs.userId, userId)),

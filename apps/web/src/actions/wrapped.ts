@@ -1,6 +1,6 @@
 "use server";
 
-import { and, count, eq, gte, lt } from "drizzle-orm";
+import { and, count, eq, gte, isNull, lt } from "drizzle-orm";
 import { db } from "@/lib/db";
 import { collectionItems } from "@/lib/db/schema/collections";
 import { releases } from "@/lib/db/schema/releases";
@@ -48,6 +48,7 @@ export async function generateWrapped(userId: string, year?: number): Promise<Wr
 			.where(
 				and(
 					eq(collectionItems.userId, userId),
+					isNull(collectionItems.deletedAt),
 					gte(collectionItems.createdAt, startDate),
 					lt(collectionItems.createdAt, endDate),
 				),

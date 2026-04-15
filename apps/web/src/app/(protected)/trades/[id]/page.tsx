@@ -9,6 +9,7 @@ import { createClient } from "@/lib/supabase/server";
 import { getTradeParticipantContext, getTradeThread } from "@/lib/trades/messages";
 import { deriveTradePresence } from "@/lib/trades/presence";
 import { getProposalHistory } from "@/lib/trades/proposal-queries";
+import { getCounterpartyPreviews } from "@/actions/trade-preview";
 import { ProposalActionBar } from "./_components/ProposalActionBar";
 import { ProposalHistoryThread } from "./_components/ProposalHistoryThread";
 import { TradeActionButtons } from "./_components/TradeActionButtons";
@@ -17,6 +18,11 @@ import { TradeMessageComposer } from "./_components/TradeMessageComposer";
 import { TradeMessageThread } from "./_components/TradeMessageThread";
 import { TradePresenceIndicator } from "./_components/TradePresenceIndicator";
 import { TradeReviewForm } from "./_components/TradeReviewForm";
+import { AudioUploadSection } from "./_components/AudioUploadSection"
+import { DevTradePanel } from "./_components/DevTradePanel"
+import { PreviewApprovalSection } from "./_components/PreviewApprovalSection"
+import { TransferSection } from "./_components/TransferSection"
+import { TradeStatusWatcher } from "./_components/TradeStatusWatcher";
 
 export const metadata: Metadata = {
 	title: "Trade — DigSwap",
@@ -60,6 +66,12 @@ export default async function TradeDetailPage({ params }: Props) {
 
 	const isProvider = !participantContext.isRequester;
 
+	// Counterparty previews — only needed in previewing state
+	const counterpartyPreviews =
+		thread.status === "previewing"
+			? await getCounterpartyPreviews(thread.tradeId, user.id).catch(() => [])
+			: [];
+
 	// Presence — best-effort, never block render
 	const presence = await deriveTradePresence(id, user.id).catch(() => null);
 
@@ -68,6 +80,8 @@ export default async function TradeDetailPage({ params }: Props) {
 
 	return (
 		<div className="max-w-2xl mx-auto px-4 py-8">
+			<TradeStatusWatcher tradeId={thread.tradeId} currentStatus={thread.status} />
+
 			{/* Back nav */}
 			<Link
 				href="/trades"
@@ -79,12 +93,13 @@ export default async function TradeDetailPage({ params }: Props) {
 
 			<TradeDetailHeader thread={thread} />
 
-			{/* Trade action buttons (accept/decline/cancel) — legacy flow */}
+			{/* Trade action buttons — legacy accept/decline hidden when proposals exist */}
 			<div className="mb-4">
 				<TradeActionButtons
 					tradeId={thread.tradeId}
 					status={thread.status}
 					isProvider={isProvider}
+					hasProposals={proposalHistory.length > 0}
 				/>
 			</div>
 
@@ -120,6 +135,43 @@ export default async function TradeDetailPage({ params }: Props) {
 				);
 			})()}
 
+			{/* Audio upload section — shown when trade is in lobby (both sides accepted) */}
+			{thread.status === "lobby" && (() => {
+				const acceptedProposal = proposalHistory.findLast((p) => p.status === "accepted");
+				if (!acceptedProposal) return null;
+				// Proposer uploads their "offer" items; non-proposer uploads the "want" items
+				// (which are the records the non-proposer owns)
+				const isProposer = acceptedProposal.proposerId === user.id;
+				const uploadSide = isProposer ? "offer" : "want";
+				const uploadItems = acceptedProposal.items
+					.filter((item) => item.side === uploadSide)
+					.map((item) => ({
+						proposalItemId: item.id,
+						title: item.title ?? "Unknown",
+						artist: item.artist ?? "",
+					}));
+				if (uploadItems.length === 0) return null;
+				return (
+					<div className="mb-4">
+						<AudioUploadSection tradeId={thread.tradeId} items={uploadItems} />
+					</div>
+				);
+			})()}
+
+			{/* Transfer section — P2P file transfer via desktop bridge */}
+			{thread.status === "transferring" && (
+				<div className="mb-4">
+					<TransferSection tradeId={thread.tradeId} />
+				</div>
+			)}
+
+			{/* Preview approval — shown when both sides have uploaded previews */}
+			{thread.status === "previewing" && counterpartyPreviews.length > 0 && (
+				<div className="mb-4">
+					<PreviewApprovalSection tradeId={thread.tradeId} items={counterpartyPreviews} />
+				</div>
+			)}
+
 			{/* Presence indicator */}
 			{presence && (
 				<div className="mb-4">
@@ -146,6 +198,13 @@ export default async function TradeDetailPage({ params }: Props) {
 
 			{/* Trade review form — shown only for completed trades */}
 			<TradeReviewForm tradeId={thread.tradeId} status={thread.status} />
+
+			{/* Dev-only status override panel */}
+			{process.env.NODE_ENV === "development" && (
+				<div className="mt-4">
+					<DevTradePanel tradeId={thread.tradeId} currentStatus={thread.status} />
+				</div>
+			)}
 		</div>
 	);
 }

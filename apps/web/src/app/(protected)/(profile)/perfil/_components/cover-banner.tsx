@@ -3,7 +3,7 @@
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useCallback, useRef, useState } from "react";
-import { saveCoverPosition, uploadCoverImage } from "@/actions/profile";
+import { removeCoverImage, saveCoverPosition, uploadCoverImage } from "@/actions/profile";
 
 interface CoverBannerProps {
 	initialCoverUrl: string | null;
@@ -20,6 +20,7 @@ export function CoverBanner({ initialCoverUrl, initialPositionY, isOwner }: Cove
 	const [pendingPreview, setPendingPreview] = useState<string | null>(null);
 	const [pendingPositionY, setPendingPositionY] = useState(50);
 
+	const [isRemoving, setIsRemoving] = useState(false);
 	const router = useRouter();
 	const fileInputRef = useRef<HTMLInputElement>(null);
 	const dragRef = useRef<{ startY: number; startPos: number } | null>(null);
@@ -124,6 +125,15 @@ export function CoverBanner({ initialCoverUrl, initialPositionY, isOwner }: Cove
 		setIsRepositioning(false);
 	}
 
+	async function handleRemove() {
+		if (!confirm("Remover foto de capa?")) return;
+		setIsRemoving(true);
+		await removeCoverImage();
+		setCoverUrl(null);
+		setIsRemoving(false);
+		router.refresh();
+	}
+
 	// ─── Render ───────────────────────────────────────────────────────
 	return (
 		<>
@@ -155,16 +165,29 @@ export function CoverBanner({ initialCoverUrl, initialPositionY, isOwner }: Cove
 					</>
 				)}
 
-				{/* Edit button — owner only */}
+				{/* Owner controls */}
 				{isOwner && (
-					<button
-						type="button"
-						onClick={() => fileInputRef.current?.click()}
-						className="absolute bottom-3 right-3 flex items-center gap-1.5 font-mono text-xs uppercase tracking-[0.15em] px-3 py-1.5 rounded bg-black/60 text-white border border-white/20 opacity-0 group-hover:opacity-100 transition-opacity hover:bg-black/80"
-					>
-						<span className="material-symbols-outlined text-sm leading-none">photo_camera</span>
-						edit cover
-					</button>
+					<div className="absolute bottom-3 right-3 flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+						{coverUrl && (
+							<button
+								type="button"
+								onClick={handleRemove}
+								disabled={isRemoving}
+								className="flex items-center gap-1.5 font-mono text-xs uppercase tracking-[0.15em] px-3 py-1.5 rounded bg-black/60 text-red-400 border border-red-400/30 hover:bg-black/80 disabled:opacity-50 transition-colors"
+							>
+								<span className="material-symbols-outlined text-sm leading-none">delete</span>
+								{isRemoving ? "removendo..." : "remover"}
+							</button>
+						)}
+						<button
+							type="button"
+							onClick={() => fileInputRef.current?.click()}
+							className="flex items-center gap-1.5 font-mono text-xs uppercase tracking-[0.15em] px-3 py-1.5 rounded bg-black/60 text-white border border-white/20 hover:bg-black/80 transition-colors"
+						>
+							<span className="material-symbols-outlined text-sm leading-none">photo_camera</span>
+							edit cover
+						</button>
+					</div>
 				)}
 
 				<input

@@ -90,7 +90,7 @@ export function ProfileSidebar({ profile, stats, showcase, badges, isOwner }: Pr
 					)}
 
 					{/* Compact stats line */}
-					<div className="flex items-center gap-2 font-mono text-[10px] text-on-surface-variant mb-3 flex-wrap">
+					<div className="flex items-center gap-2 font-mono text-xs text-on-surface-variant mb-4 flex-wrap">
 						<span>
 							<span className="text-on-surface font-bold">{stats.collectionCount}</span> records
 						</span>
@@ -119,15 +119,15 @@ export function ProfileSidebar({ profile, stats, showcase, badges, isOwner }: Pr
 					<BadgeRow badges={badges} />
 
 					{/* Trust Strip */}
-					<div className="mt-3">
+					<div className="mt-4">
 						<TrustStrip userId={profile.id} variant="full" />
 					</div>
 
 					{/* Divider */}
-					<div className="border-t border-outline/10 my-4" />
+					<div className="border-t border-outline/10 my-5" />
 
 					{/* Follow counts */}
-					<div className="flex items-center gap-3 font-mono text-xs mb-3">
+					<div className="flex items-center gap-3 font-mono text-xs mb-4">
 						<FollowList userId={profile.id} type="following" count={stats.followingCount} />
 						<span className="text-outline">&middot;</span>
 						<FollowList userId={profile.id} type="followers" count={stats.followerCount} />
@@ -174,8 +174,8 @@ export function ProfileSidebar({ profile, stats, showcase, badges, isOwner }: Pr
 			</div>
 
 			{/* Showcase Cards */}
-			<div className="bg-surface-container-low rounded-xl p-3 border border-outline-variant/5 overflow-hidden">
-				<p className="font-mono text-[9px] text-on-surface-variant uppercase tracking-[0.15em] mb-2 flex items-center gap-1.5">
+			<div className="bg-surface-container-low rounded-xl p-4 border border-outline-variant/5 overflow-hidden">
+				<p className="font-mono text-[10px] text-on-surface-variant uppercase tracking-[0.15em] mb-3 flex items-center gap-1.5">
 					<span className="material-symbols-outlined text-[13px] text-primary">auto_awesome</span>
 					Showcase
 				</p>

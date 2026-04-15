@@ -29,11 +29,11 @@ export async function TrustStrip({ userId, variant = "full" }: TrustStripProps) 
 	}
 
 	return (
-		<div className="grid grid-cols-4 gap-3 p-3 bg-surface-container-low rounded border border-outline-variant/10">
+		<div className="grid grid-cols-4 gap-2 p-3.5 bg-surface-container-low rounded border border-outline-variant/10">
 			{metrics.map((m) => (
 				<div key={m.label} className="text-center">
-					<div className="font-mono text-[18px] font-bold text-on-surface">{m.value}</div>
-					<div className="font-mono text-[9px] text-on-surface-variant tracking-[0.15em] mt-0.5">
+					<div className="font-mono text-lg font-bold text-on-surface">{m.value}</div>
+					<div className="font-mono text-[10px] text-on-surface-variant tracking-[0.12em] mt-1">
 						{m.label}
 					</div>
 				</div>

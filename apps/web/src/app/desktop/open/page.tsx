@@ -39,10 +39,9 @@ export default async function DesktopOpenPage({ searchParams }: PageProps) {
 	const params = await searchParams;
 	const tradeId = params.trade ?? "";
 	const token = params.token ?? "";
-	const rawDv = params.dv;
-	const desktopVersion = rawDv !== undefined ? parseInt(rawDv, 10) : undefined;
+	const desktopVersion = params.dv?.trim() || undefined;
 
-	const { minVersion } = await checkDesktopVersion();
+	const { minVersion, tradeProtocolVersion } = await checkDesktopVersion();
 
 	return (
 		<div className="flex min-h-dvh flex-col items-center justify-center bg-background px-4 py-8">
@@ -71,6 +70,7 @@ export default async function DesktopOpenPage({ searchParams }: PageProps) {
 					<OpenInDesktop
 						tradeId={tradeId}
 						token={token}
+						tradeProtocolVersion={tradeProtocolVersion}
 						minVersion={minVersion}
 						desktopVersion={desktopVersion}
 					/>

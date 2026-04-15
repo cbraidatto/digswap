@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
@@ -10,7 +11,11 @@ const TABS = [
 	{ href: "/perfil", label: "Profile", icon: "person" },
 ] as const;
 
-export function BottomBar() {
+interface BottomBarProps {
+	avatarUrl?: string | null;
+}
+
+export function BottomBar({ avatarUrl }: BottomBarProps) {
 	const pathname = usePathname();
 
 	return (
@@ -21,6 +26,8 @@ export function BottomBar() {
 		>
 			{TABS.map((tab) => {
 				const isActive = pathname.startsWith(tab.href);
+				const isProfile = tab.href === "/perfil";
+
 				return (
 					<Link
 						key={tab.href}
@@ -30,12 +37,29 @@ export function BottomBar() {
 							isActive ? "text-primary" : "text-on-surface-variant"
 						}`}
 					>
-						<span
-							className="material-symbols-outlined"
-							style={isActive ? { fontVariationSettings: "'FILL' 1" } : undefined}
-						>
-							{tab.icon}
-						</span>
+						{isProfile && avatarUrl ? (
+							<div
+								className={`w-6 h-6 rounded-full overflow-hidden border-2 transition-colors ${
+									isActive ? "border-primary" : "border-on-surface-variant/40"
+								}`}
+							>
+								<Image
+									src={avatarUrl}
+									alt="Profile"
+									width={24}
+									height={24}
+									unoptimized
+									className="w-full h-full object-cover"
+								/>
+							</div>
+						) : (
+							<span
+								className="material-symbols-outlined"
+								style={isActive ? { fontVariationSettings: "'FILL' 1" } : undefined}
+							>
+								{tab.icon}
+							</span>
+						)}
 						<span className="text-xs font-mono uppercase">{tab.label}</span>
 					</Link>
 				);

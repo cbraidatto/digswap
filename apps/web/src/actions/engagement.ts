@@ -1,6 +1,6 @@
 "use server";
 
-import { and, count, eq, sql } from "drizzle-orm";
+import { and, count, eq, isNull, sql } from "drizzle-orm";
 import { z } from "zod";
 import { requireUser } from "@/lib/auth/require-user";
 import { db } from "@/lib/db";
@@ -166,7 +166,7 @@ export async function computeDiggerDna(userId?: string): Promise<{
 			})
 			.from(collectionItems)
 			.innerJoin(releases, eq(collectionItems.releaseId, releases.id))
-			.where(eq(collectionItems.userId, targetUserId));
+			.where(and(eq(collectionItems.userId, targetUserId), isNull(collectionItems.deletedAt)));
 
 		if (items.length === 0) return empty;
 

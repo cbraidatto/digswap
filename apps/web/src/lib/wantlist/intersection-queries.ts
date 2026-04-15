@@ -1,4 +1,4 @@
-import { and, desc, eq, sql } from "drizzle-orm";
+import { and, desc, eq, isNull, sql } from "drizzle-orm";
 import { db } from "@/lib/db";
 import { collectionItems } from "@/lib/db/schema/collections";
 import { releases } from "@/lib/db/schema/releases";
@@ -36,6 +36,7 @@ export async function getWantlistIntersections(
 			and(
 				eq(wantlistItems.releaseId, collectionItems.releaseId),
 				eq(collectionItems.userId, targetUserId),
+				isNull(collectionItems.deletedAt),
 			),
 		)
 		.innerJoin(releases, eq(wantlistItems.releaseId, releases.id))
@@ -64,9 +65,9 @@ export async function getCompatibilityScore(
 ): Promise<{ sharedRecords: number; wantlistMatches: number }> {
 	const [shared] = await db.execute(sql`
 		SELECT count(*)::int AS count FROM (
-			SELECT release_id FROM collection_items WHERE user_id = ${userA}
+			SELECT release_id FROM collection_items WHERE user_id = ${userA} AND deleted_at IS NULL
 			INTERSECT
-			SELECT release_id FROM collection_items WHERE user_id = ${userB}
+			SELECT release_id FROM collection_items WHERE user_id = ${userB} AND deleted_at IS NULL
 		) AS shared
 	`);
 
@@ -74,11 +75,11 @@ export async function getCompatibilityScore(
 		SELECT count(*)::int AS count FROM (
 			SELECT release_id FROM wantlist_items WHERE user_id = ${userA} AND found_at IS NULL
 			INTERSECT
-			SELECT release_id FROM collection_items WHERE user_id = ${userB}
+			SELECT release_id FROM collection_items WHERE user_id = ${userB} AND deleted_at IS NULL
 			UNION
 			SELECT release_id FROM wantlist_items WHERE user_id = ${userB} AND found_at IS NULL
 			INTERSECT
-			SELECT release_id FROM collection_items WHERE user_id = ${userA}
+			SELECT release_id FROM collection_items WHERE user_id = ${userA} AND deleted_at IS NULL
 		) AS matches
 	`);
 

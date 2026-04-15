@@ -1,4 +1,4 @@
-import { eq } from "drizzle-orm";
+import { and, eq, isNull } from "drizzle-orm";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
@@ -105,7 +105,7 @@ export default async function ComparePage({ params }: ComparePageProps) {
 	const [myCollectionCheck] = await db
 		.select({ releaseId: collectionItems.releaseId })
 		.from(collectionItems)
-		.where(eq(collectionItems.userId, user.id))
+		.where(and(eq(collectionItems.userId, user.id), isNull(collectionItems.deletedAt)))
 		.limit(1);
 
 	if (!myCollectionCheck) {

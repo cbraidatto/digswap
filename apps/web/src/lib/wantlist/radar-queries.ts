@@ -1,4 +1,4 @@
-import { and, eq, inArray, ne, sql } from "drizzle-orm";
+import { and, eq, inArray, isNull, ne, sql } from "drizzle-orm";
 import { unstable_cache } from "next/cache";
 import { db } from "@/lib/db";
 import { collectionItems } from "@/lib/db/schema/collections";
@@ -59,6 +59,7 @@ async function _getRadarMatches(currentUserId: string, limit: number): Promise<R
 			and(
 				inArray(collectionItems.releaseId, wantlistReleaseIds),
 				ne(collectionItems.userId, currentUserId),
+				isNull(collectionItems.deletedAt),
 			),
 		)
 		.orderBy(

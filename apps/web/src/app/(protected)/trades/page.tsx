@@ -17,7 +17,7 @@ const TERMINAL_STATUSES = new Set(["completed", "declined", "cancelled", "expire
 
 const STATUS_LABEL: Record<string, { label: string; className: string }> = {
 	pending: { label: "Pending", className: "text-muted-foreground border-outline-variant" },
-	lobby: { label: "Lobby", className: "text-primary border-primary/30" },
+	lobby: { label: "Upload Files", className: "text-amber-400 border-amber-400/40 bg-amber-400/10" },
 	previewing: { label: "Previewing", className: "text-primary border-primary/30" },
 	accepted: { label: "Accepted", className: "text-primary border-primary/30" },
 	transferring: { label: "Transferring", className: "text-secondary border-secondary/30" },

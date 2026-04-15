@@ -95,6 +95,36 @@ export async function initiateTradeAction(input: {
 			return { error: "Cannot initiate a trade with yourself." };
 		}
 
+		// Return existing active trade instead of creating a duplicate
+		const [existing] = await db
+			.select({ id: tradeRequests.id })
+			.from(tradeRequests)
+			.where(
+				and(
+					or(
+						and(
+							eq(tradeRequests.requesterId, user.id),
+							eq(tradeRequests.providerId, parsed.data.providerId),
+						),
+						and(
+							eq(tradeRequests.requesterId, parsed.data.providerId),
+							eq(tradeRequests.providerId, user.id),
+						),
+					),
+					// Only reuse non-terminal trades
+					or(
+						eq(tradeRequests.status, "pending"),
+						eq(tradeRequests.status, "accepted"),
+						eq(tradeRequests.status, "lobby"),
+					),
+				),
+			)
+			.limit(1);
+
+		if (existing) {
+			return { tradeId: existing.id };
+		}
+
 		// Enforce quota before INSERT — atomic increment prevents TOCTOU race
 		const entitlement = await checkAndIncrementTradeCount(user.id);
 		if (!entitlement.allowed) {
@@ -374,4 +404,37 @@ export async function submitTradeReviewAction(input: {
 		console.error("[submitTradeReviewAction] error:", err);
 		return { success: false, error: "Failed to submit review. Please try again." };
 	}
+}
+
+// ---------------------------------------------------------------------------
+// DEV ONLY — force trade status (never call in production)
+// ---------------------------------------------------------------------------
+
+const DEV_ALLOWED_STATUSES = ["lobby", "previewing", "accepted", "transferring", "completed"] as const;
+
+export async function devForceTradeStatusAction(
+	tradeId: string,
+	targetStatus: string,
+): Promise<{ success: boolean; error?: string }> {
+	if (process.env.NODE_ENV !== "development") {
+		return { success: false, error: "Only available in development mode." };
+	}
+
+	const user = await requireUser();
+
+	if (!DEV_ALLOWED_STATUSES.includes(targetStatus as (typeof DEV_ALLOWED_STATUSES)[number])) {
+		return { success: false, error: `Invalid status: ${targetStatus}` };
+	}
+
+	const trade = await loadTradeForParticipant(tradeId, user.id);
+	if (!trade) {
+		return { success: false, error: "Trade not found." };
+	}
+
+	await db
+		.update(tradeRequests)
+		.set({ status: targetStatus, updatedAt: new Date() })
+		.where(eq(tradeRequests.id, tradeId));
+
+	return { success: true };
 }

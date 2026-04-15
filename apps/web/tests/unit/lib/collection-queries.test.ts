@@ -42,6 +42,7 @@ vi.mock("drizzle-orm", () => ({
 	eq: vi.fn((a, b) => ({ a, b })),
 	gte: vi.fn((a, b) => ({ a, b })),
 	ilike: vi.fn((col, pattern) => ({ col, pattern })),
+	isNull: vi.fn((col) => ({ col, op: "isNull" })),
 	lt: vi.fn((a, b) => ({ a, b })),
 	ne: vi.fn((a, b) => ({ a, b })),
 	or: vi.fn((...args) => args),

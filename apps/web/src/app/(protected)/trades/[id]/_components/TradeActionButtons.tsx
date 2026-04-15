@@ -9,11 +9,13 @@ interface Props {
 	status: string;
 	/** true when the current user is the provider (recipient of the request) */
 	isProvider: boolean;
+	/** When true, the proposal flow handles accept/decline — hide legacy buttons */
+	hasProposals?: boolean;
 }
 
 const TERMINAL_STATUSES = new Set(["completed", "declined", "cancelled", "expired"]);
 
-export function TradeActionButtons({ tradeId, status, isProvider }: Props) {
+export function TradeActionButtons({ tradeId, status, isProvider, hasProposals }: Props) {
 	const router = useRouter();
 	const [isPending, startTransition] = useTransition();
 	const [error, setError] = useState<string | null>(null);
@@ -37,8 +39,8 @@ export function TradeActionButtons({ tradeId, status, isProvider }: Props) {
 	return (
 		<div className="flex flex-col gap-2">
 			<div className="flex items-center gap-2 flex-wrap">
-				{/* Provider can accept/decline a pending trade */}
-				{isProvider && status === "pending" && (
+				{/* Provider can accept/decline a pending trade — only if no proposal flow */}
+				{isProvider && status === "pending" && !hasProposals && (
 					<>
 						<button
 							type="button"

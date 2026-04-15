@@ -27,6 +27,7 @@ function createChainedMock(resolveValue: unknown = { data: null, error: null }) 
 	chain.insert = vi.fn().mockReturnValue(chain);
 	chain.update = vi.fn().mockReturnValue(chain);
 	chain.eq = vi.fn().mockReturnValue(chain);
+	chain.is = vi.fn().mockReturnValue(chain);
 	chain.single = vi.fn().mockResolvedValue(resolveValue);
 	chain.maybeSingle = vi.fn().mockResolvedValue(resolveValue);
 	return chain;

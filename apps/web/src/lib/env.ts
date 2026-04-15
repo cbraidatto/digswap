@@ -51,7 +51,7 @@ const publicSchema = z.object({
 	NEXT_PUBLIC_STRIPE_PRICE_MONTHLY: z.string().optional().default(""),
 	NEXT_PUBLIC_STRIPE_PRICE_ANNUAL: z.string().optional().default(""),
 	NEXT_PUBLIC_SENTRY_DSN: z.string().optional().default(""),
-	NEXT_PUBLIC_MIN_DESKTOP_VERSION: z.string().optional().default("1"),
+	NEXT_PUBLIC_MIN_DESKTOP_VERSION: z.string().optional().default("0.2.0"),
 });
 
 function validateEnv() {

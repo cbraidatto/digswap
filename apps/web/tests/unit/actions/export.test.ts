@@ -22,7 +22,9 @@ vi.mock("@/lib/rate-limit", () => ({
 }));
 
 vi.mock("drizzle-orm", () => ({
+	and: vi.fn((...args: unknown[]) => args),
 	eq: vi.fn((a: unknown, b: unknown) => [a, b]),
+	isNull: vi.fn((col: unknown) => ({ col, op: "isNull" })),
 }));
 
 vi.mock("@/lib/db", () => {

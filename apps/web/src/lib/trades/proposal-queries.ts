@@ -1,4 +1,4 @@
-import { and, asc, eq, inArray, or } from "drizzle-orm";
+import { and, asc, eq, inArray, isNull, or } from "drizzle-orm";
 import { db } from "@/lib/db";
 import { collectionItems } from "@/lib/db/schema/collections";
 import { releases } from "@/lib/db/schema/releases";
@@ -77,6 +77,7 @@ export async function getTradeableCollectionItems(
 			and(
 				eq(collectionItems.userId, userId),
 				eq(collectionItems.visibility, "tradeable"),
+				isNull(collectionItems.deletedAt),
 			),
 		)
 		.orderBy(asc(releases.title));

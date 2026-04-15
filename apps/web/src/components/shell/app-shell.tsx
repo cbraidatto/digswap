@@ -63,7 +63,7 @@ export function AppShell({ user, banner, children }: AppShellProps) {
 			</main>
 			<FloatingPlayer />
 			<ChatSidebar />
-			<BottomBar />
+			<BottomBar avatarUrl={user.avatarUrl} />
 		</>
 	);
 }

@@ -201,6 +201,7 @@ export async function markAsFound(
 				.select("id")
 				.eq("user_id", user.id)
 				.eq("release_id", item.release_id)
+				.is("deleted_at", null)
 				.maybeSingle();
 
 			if (!duplicate) {

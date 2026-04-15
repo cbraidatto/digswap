@@ -15,6 +15,7 @@ vi.mock("drizzle-orm", () => ({
 	asc: (arg: unknown) => mockAsc(arg),
 	and: (...args: unknown[]) => mockAnd(...args),
 	gte: (...args: unknown[]) => mockGte(...args),
+	isNull: vi.fn((col: unknown) => ({ col, op: "isNull" })),
 	lt: (...args: unknown[]) => mockLt(...args),
 	sql: Object.assign(
 		(strings: TemplateStringsArray, ...values: unknown[]) => {

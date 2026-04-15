@@ -92,7 +92,7 @@ describe("Runtime schemas", () => {
 		const validHandoff = {
 			tradeId: "550e8400-e29b-41d4-a716-446655440000",
 			token: "abc123handofftoken",
-			minDesktopVersion: "1.0.0",
+			minDesktopVersion: "0.2.0",
 			expiresAt: "2026-04-06T10:00:30.000Z",
 			tradeProtocolVersion: TRADE_PROTOCOL_VERSION,
 		};

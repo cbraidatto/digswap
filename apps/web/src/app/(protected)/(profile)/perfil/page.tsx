@@ -1,4 +1,4 @@
-import { and, count, eq, gte, inArray, isNotNull, or } from "drizzle-orm";
+import { and, count, eq, gte, inArray, isNotNull, isNull, or } from "drizzle-orm";
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 
@@ -133,7 +133,7 @@ export default async function PerfilPage({ searchParams }: PerfilPageProps) {
 		db
 			.select({ weeklyAdds: count() })
 			.from(collectionItems)
-			.where(and(eq(collectionItems.userId, user.id), gte(collectionItems.createdAt, weekAgo))),
+			.where(and(eq(collectionItems.userId, user.id), isNull(collectionItems.deletedAt), gte(collectionItems.createdAt, weekAgo))),
 		db
 			.select({ tradesThisWeek: count() })
 			.from(tradeRequests)

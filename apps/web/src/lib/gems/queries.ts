@@ -24,7 +24,7 @@ export async function getGemDistribution(userId: string): Promise<Record<GemTier
       COUNT(*)::text AS count
     FROM collection_items ci
     JOIN releases r ON r.id = ci.release_id
-    WHERE ci.user_id = ${userId}
+    WHERE ci.user_id = ${userId} AND ci.deleted_at IS NULL AND r.discogs_id IS NOT NULL
     GROUP BY gem_tier
   `);
 
@@ -70,7 +70,7 @@ export async function getGemScoreForUser(userId: string): Promise<number> {
       )::text AS gem_score
     FROM collection_items ci
     JOIN releases r ON r.id = ci.release_id
-    WHERE ci.user_id = ${userId}
+    WHERE ci.user_id = ${userId} AND ci.deleted_at IS NULL AND r.discogs_id IS NOT NULL
   `);
 
 	const result = rows as unknown as Array<{ gem_score: string | null }>;

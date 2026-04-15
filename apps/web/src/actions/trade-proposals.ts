@@ -1,6 +1,7 @@
 "use server";
 
 import { and, desc, eq, or } from "drizzle-orm";
+import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import { requireUser } from "@/lib/auth/require-user";
 import { db } from "@/lib/db";
@@ -444,7 +445,7 @@ export async function createCounterproposalAction(input: {
  */
 export async function acceptProposalAction(
 	proposalId: string,
-): Promise<{ success: boolean; error?: string }> {
+): Promise<{ success: boolean; tradeId?: string; error?: string }> {
 	try {
 		const user = await requireUser();
 
@@ -496,13 +497,14 @@ export async function acceptProposalAction(
 			.set({ status: "accepted", updatedAt: new Date() })
 			.where(eq(tradeProposals.id, parsed.data));
 
-		// Update parent trade status
+		// Update parent trade status to 'lobby' — next step is audio upload before preview
 		await db
 			.update(tradeRequests)
-			.set({ status: "accepted", updatedAt: new Date() })
+			.set({ status: "lobby", updatedAt: new Date() })
 			.where(eq(tradeRequests.id, proposal.tradeId));
 
-		return { success: true };
+		revalidatePath(`/trades/${proposal.tradeId}`);
+		return { success: true, tradeId: proposal.tradeId };
 	} catch (err) {
 		const errMsg = err instanceof Error ? err.message : "Unknown error";
 		if (errMsg.includes("Not authenticated")) {

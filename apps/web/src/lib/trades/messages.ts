@@ -229,30 +229,31 @@ export async function listTradeThreads(userId: string): Promise<TradeThreadListI
 		ORDER BY tp.trade_id, tp.sequence_number DESC
 	`);
 
-	const [counterpartyRows, latestMessageRows, unreadCountRows, pendingProposalRows] = await Promise.all([
-		db
-			.select({
-				avatarUrl: profiles.avatarUrl,
-				id: profiles.id,
-				username: profiles.username,
-			})
-			.from(profiles)
-			.where(inArray(profiles.id, counterpartyIds)),
-		db
-			.selectDistinctOn([tradeMessages.tradeId], {
-				body: tradeMessages.body,
-				createdAt: tradeMessages.createdAt,
-				id: tradeMessages.id,
-				kind: tradeMessages.kind,
-				senderId: tradeMessages.senderId,
-				tradeId: tradeMessages.tradeId,
-			})
-			.from(tradeMessages)
-			.where(inArray(tradeMessages.tradeId, tradeIds))
-			.orderBy(tradeMessages.tradeId, desc(tradeMessages.createdAt)),
-		unreadCountQuery,
-		pendingProposalQuery,
-	]);
+	const [counterpartyRows, latestMessageRows, unreadCountRows, pendingProposalRows] =
+		await Promise.all([
+			db
+				.select({
+					avatarUrl: profiles.avatarUrl,
+					id: profiles.id,
+					username: profiles.username,
+				})
+				.from(profiles)
+				.where(inArray(profiles.id, counterpartyIds)),
+			db
+				.selectDistinctOn([tradeMessages.tradeId], {
+					body: tradeMessages.body,
+					createdAt: tradeMessages.createdAt,
+					id: tradeMessages.id,
+					kind: tradeMessages.kind,
+					senderId: tradeMessages.senderId,
+					tradeId: tradeMessages.tradeId,
+				})
+				.from(tradeMessages)
+				.where(inArray(tradeMessages.tradeId, tradeIds))
+				.orderBy(tradeMessages.tradeId, desc(tradeMessages.createdAt)),
+			unreadCountQuery,
+			pendingProposalQuery,
+		]);
 
 	const counterpartyById = new Map(
 		counterpartyRows.map((row) => [
@@ -380,6 +381,7 @@ export async function getTradeThread(tradeId: string, userId: string): Promise<T
 		counterpartyId: context.counterpartyId,
 		counterpartyUsername: counterparty?.username?.trim() || "Unknown digger",
 		createdAt: context.createdAt,
+		hasPendingProposal: false,
 		lastMessage: latestMessage
 			? {
 					body: latestMessage.body,
@@ -401,6 +403,7 @@ export async function getTradeThread(tradeId: string, userId: string): Promise<T
 			senderUsername: row.senderUsername,
 			tradeId: row.tradeId,
 		})),
+		pendingProposalForMe: false,
 		status: context.status,
 		tradeId: context.tradeId,
 		unreadCount,

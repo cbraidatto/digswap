@@ -1,6 +1,6 @@
 "use server";
 
-import { eq } from "drizzle-orm";
+import { and, eq, isNull } from "drizzle-orm";
 import { requireUser } from "@/lib/auth/require-user";
 import { db } from "@/lib/db";
 import { collectionItems } from "@/lib/db/schema/collections";
@@ -42,7 +42,7 @@ export async function exportCollectionCsv(): Promise<{
 			})
 			.from(collectionItems)
 			.innerJoin(releases, eq(collectionItems.releaseId, releases.id))
-			.where(eq(collectionItems.userId, user.id))
+			.where(and(eq(collectionItems.userId, user.id), isNull(collectionItems.deletedAt)))
 			.orderBy(releases.title);
 
 		// Build CSV
