@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { useRef, useState, useTransition } from "react";
+import { useEffect, useRef, useState, useTransition } from "react";
 import { updateProfile, uploadAvatar } from "@/actions/profile";
 
 interface EditProfileModalProps {
@@ -37,6 +37,16 @@ export function EditProfileModal({ initial }: EditProfileModalProps) {
 	const [error, setError] = useState<string | null>(null);
 	const [isPending, startTransition] = useTransition();
 	const avatarInputRef = useRef<HTMLInputElement>(null);
+
+	// Escape key to close modal
+	useEffect(() => {
+		if (!open) return;
+		function onKeyDown(e: KeyboardEvent) {
+			if (e.key === "Escape") setOpen(false);
+		}
+		window.addEventListener("keydown", onKeyDown);
+		return () => window.removeEventListener("keydown", onKeyDown);
+	}, [open]);
 
 	function handleOpen() {
 		setDisplayName(initial.displayName ?? "");
@@ -104,7 +114,11 @@ export function EditProfileModal({ initial }: EditProfileModalProps) {
 			</button>
 
 			{open && (
-				<div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4">
+				<div
+					className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4"
+					onClick={(e) => { if (e.target === e.currentTarget) setOpen(false); }}
+					role="presentation"
+				>
 					<div className="w-full max-w-md bg-surface-container-low border border-outline/20 rounded-lg overflow-hidden">
 						{/* Header */}
 						<div className="flex items-center justify-between px-6 py-4 border-b border-outline/10">

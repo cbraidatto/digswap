@@ -84,7 +84,16 @@ export function TradeMessageComposer({ tradeId, status }: Props) {
 
 			{error && <p className="text-destructive font-mono text-xs mt-1.5">{error}</p>}
 
-			<div className="flex justify-end mt-2">
+			<div className="flex justify-end gap-2 mt-2">
+				{body.trim() && (
+					<button
+						type="button"
+						onClick={() => { setBody(""); setError(null); textareaRef.current?.focus(); }}
+						className="text-muted-foreground hover:text-foreground font-mono text-xs px-3 py-2 rounded border border-outline-variant/30 transition-colors"
+					>
+						Clear
+					</button>
+				)}
 				<button
 					type="submit"
 					disabled={isDisabled || !body.trim()}

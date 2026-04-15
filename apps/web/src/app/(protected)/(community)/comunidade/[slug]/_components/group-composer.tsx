@@ -222,14 +222,25 @@ export function GroupComposer({ groupId, groupName, onPostCreated }: GroupCompos
 					</button>
 				</div>
 
-				<button
-					type="button"
-					onClick={handleSubmit}
-					disabled={!content.trim() || isSubmitting}
-					className="font-mono text-xs bg-primary text-primary-foreground px-4 py-1 rounded hover:bg-primary/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-				>
-					{isSubmitting ? "posting..." : isReviewMode ? "[Post Review]" : "[Post]"}
-				</button>
+				<div className="flex items-center gap-2">
+					{(content.trim() || linkedRecord || rating) && (
+						<button
+							type="button"
+							onClick={resetForm}
+							className="font-mono text-xs text-muted-foreground hover:text-foreground border border-outline-variant/20 px-3 py-1 rounded transition-colors"
+						>
+							[Reset]
+						</button>
+					)}
+					<button
+						type="button"
+						onClick={handleSubmit}
+						disabled={!content.trim() || isSubmitting}
+						className="font-mono text-xs bg-primary text-primary-foreground px-4 py-1 rounded hover:bg-primary/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+					>
+						{isSubmitting ? "posting..." : isReviewMode ? "[Post Review]" : "[Post]"}
+					</button>
+				</div>
 			</div>
 		</div>
 	);

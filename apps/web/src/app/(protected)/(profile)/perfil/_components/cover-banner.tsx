@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { removeCoverImage, saveCoverPosition, uploadCoverImage } from "@/actions/profile";
 
 interface CoverBannerProps {
@@ -124,6 +124,16 @@ export function CoverBanner({ initialCoverUrl, initialPositionY, isOwner }: Cove
 		setPendingPreview(null);
 		setIsRepositioning(false);
 	}
+
+	// Escape key to cancel repositioning
+	useEffect(() => {
+		if (!isRepositioning) return;
+		function onKeyDown(e: KeyboardEvent) {
+			if (e.key === "Escape") handleCancel();
+		}
+		window.addEventListener("keydown", onKeyDown);
+		return () => window.removeEventListener("keydown", onKeyDown);
+	}, [isRepositioning]);
 
 	async function handleRemove() {
 		if (!confirm("Remover foto de capa?")) return;
