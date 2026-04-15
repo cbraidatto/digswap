@@ -95,6 +95,8 @@ export interface DesktopMainShellBridge {
   getLibraryTracks(): Promise<LibraryTrack[]>;
   getLibraryRoot(): Promise<string | null>;
   onScanProgress(listener: (event: ScanProgressEvent) => void): () => void;
+  startSync(): Promise<SyncResult>;
+  onSyncProgress(listener: (event: SyncProgress) => void): () => void;
 }
 
 /**

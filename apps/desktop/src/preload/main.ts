@@ -4,6 +4,8 @@ import type {
   LibraryTrack,
   ScanProgressEvent,
   ScanResult,
+  SyncResult,
+  SyncProgress,
 } from "../shared/ipc-types";
 
 const desktopShell: DesktopMainShellBridge = {
@@ -26,6 +28,13 @@ const desktopShell: DesktopMainShellBridge = {
     const handler = (_event: Electron.IpcRendererEvent, data: ScanProgressEvent) => listener(data);
     ipcRenderer.on("desktop:scan-progress", handler);
     return () => { ipcRenderer.removeListener("desktop:scan-progress", handler); };
+  },
+  startSync: () =>
+    ipcRenderer.invoke("desktop:start-sync") as Promise<SyncResult>,
+  onSyncProgress: (listener: (event: SyncProgress) => void) => {
+    const handler = (_event: Electron.IpcRendererEvent, data: SyncProgress) => listener(data);
+    ipcRenderer.on("desktop:sync-progress", handler);
+    return () => { ipcRenderer.removeListener("desktop:sync-progress", handler); };
   },
 };
 
