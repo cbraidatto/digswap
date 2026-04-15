@@ -1,0 +1,3788 @@
+﻿
+> @digswap/web@0.1.0 test C:\Users\INTEL\Desktop\Get Shit DOne\apps\web
+> vitest run
+
+
+[1m[46m RUN [49m[22m [36mv4.1.2 [39m[90mC:/Users/INTEL/Desktop/Get Shit DOne/apps/web[39m
+
+ [32mÔ£ô[39m tests/unit/lib/supabase/clients.test.ts [2m([22m[2m4 tests[22m[2m)[22m[33m 573[2mms[22m[39m
+     [33m[2mÔ£ô[22m[39m admin client uses service role key (not anon key) [33m 338[2mms[22m[39m
+ [31mÔØ»[39m tests/unit/gems/gem-badge.test.tsx [2m([22m[2m17 tests[22m[2m | [22m[31m13 failed[39m[2m)[22m[32m 170[2mms[22m[39m
+     [32mÔ£ô[39m renders nothing when score is null[32m 25[2mms[22m[39m
+     [32mÔ£ô[39m renders nothing when score is undefined[32m 3[2mms[22m[39m
+[31m     [31m├ù[31m renders Quartzo text for score 0.1[39m[32m 56[2mms[22m[39m
+[31m     [31m├ù[31m renders Ametista text for score 0.5[39m[32m 8[2mms[22m[39m
+[31m     [31m├ù[31m renders Esmeralda text for score 1.0[39m[32m 7[2mms[22m[39m
+[31m     [31m├ù[31m renders Rubi text for score 2.0[39m[32m 9[2mms[22m[39m
+[31m     [31m├ù[31m renders Safira text for score 4.0[39m[32m 5[2mms[22m[39m
+[31m     [31m├ù[31m renders Diamante text for score 7.0[39m[32m 4[2mms[22m[39m
+[31m     [31m├ù[31m shows weight multiplier when showScore is true[39m[32m 5[2mms[22m[39m
+[31m     [31m├ù[31m does not show weight multiplier by default[39m[32m 4[2mms[22m[39m
+[31m     [31m├ù[31m includes aria-label with tier name and weight[39m[32m 9[2mms[22m[39m
+[31m     [31m├ù[31m uses quartz glyph for quartz tier[39m[32m 3[2mms[22m[39m
+[31m     [31m├ù[31m uses amethyst glyph for amethyst tier[39m[32m 4[2mms[22m[39m
+[31m     [31m├ù[31m uses sapphire glyph for sapphire tier[39m[32m 6[2mms[22m[39m
+[31m     [31m├ù[31m uses diamond glyph for diamond tier[39m[32m 7[2mms[22m[39m
+     [32mÔ£ô[39m applies animate-gem-prismatic class for diamond tier[32m 4[2mms[22m[39m
+     [32mÔ£ô[39m applies custom className[32m 6[2mms[22m[39m
+ [32mÔ£ô[39m tests/security/pentest-fixes.test.ts [2m([22m[2m16 tests[22m[2m)[22m[33m 1165[2mms[22m[39m
+     [33m[2mÔ£ô[22m[39m blocks direct join to private group even when invites exist [33m 890[2mms[22m[39m
+node.exe : [90mstderr[2m | tests/unit/crates/add-
+to-crate-popover.test.tsx[2m > 
+[22m[2mAddToCratePopover[2m > [22m[2mwhen 
+getUserCratesAction resolves with 2 crates, 
+renders 2 crate name buttons
+No C:\Users\INTEL\AppData\Roaming\npm\pnpm.ps1:24 
+caractere:5
++     & "node$exe"  
+"$basedir/node_modules/pnpm/bin/pnpm.cjs" $args
++     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: ([90m 
+   stderr[2m...te name buttons:String) [], Remot  
+  eException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+[22m[39mThe current testing environment is not 
+configured to support act(...)
+
+[90mstderr[2m | tests/unit/crates/add-to-crate-po
+pover.test.tsx[2m > 
+[22m[2mAddToCratePopover[2m > [22m[2mwhen 
+getUserCratesAction resolves with 2 crates, 
+renders 2 crate name buttons
+[22m[39mThe current testing environment is not 
+configured to support act(...)
+
+[90mstderr[2m | tests/unit/crates/add-to-crate-po
+pover.test.tsx[2m > 
+[22m[2mAddToCratePopover[2m > [22m[2mwhen 
+getUserCratesAction resolves with 2 crates, 
+renders 2 crate name buttons
+[22m[39mThe current testing environment is not 
+configured to support act(...)
+
+ [31mÔØ»[39m tests/unit/components/shell/bottom-bar.test.tsx [2m([22m[2m6 tests[22m[2m | [22m[31m4 failed[39m[2m)[22m[33m 848[2mms[22m[39m
+[31m     [31m├ù[31m renders 4 tab links with correct labels[39m[32m 83[2mms[22m[39m
+     [33m[2mÔ£ô[22m[39m renders tab links with correct hrefs [33m 574[2mms[22m[39m
+[31m     [31m├ù[31m marks active tab with aria-current=page[39m[32m 63[2mms[22m[39m
+     [32mÔ£ô[39m applies active styling to current tab[32m 44[2mms[22m[39m
+[31m     [31m├ù[31m has nav element with aria-label[39m[32m 47[2mms[22m[39m
+[31m     [31m├ù[31m detects active tab for deep links using startsWith[39m[32m 32[2mms[22m[39m
+ [32mÔ£ô[39m tests/unit/components/discogs/import-progress.test.tsx [2m([22m[2m7 tests[22m[2m)[22m[33m 736[2mms[22m[39m
+     [33m[2mÔ£ô[22m[39m progress bar has correct ARIA attributes [33m 335[2mms[22m[39m
+[90mstderr[2m | tests/unit/crates/add-to-crate-po
+pover.test.tsx[2m > 
+[22m[2mAddToCratePopover[2m > [22m[2mwhen 
+getUserCratesAction resolves with empty array, 
+renders inline name input
+[22m[39mThe current testing environment is not 
+configured to support act(...)
+
+[90mstderr[2m | tests/unit/crates/add-to-crate-po
+pover.test.tsx[2m > 
+[22m[2mAddToCratePopover[2m > [22m[2mwhen 
+getUserCratesAction resolves with empty array, 
+renders inline name input
+[22m[39mThe current testing environment is not 
+configured to support act(...)
+The current testing environment is not configured 
+to support act(...)
+
+[90mstderr[2m | tests/unit/crates/add-to-crate-po
+pover.test.tsx[2m > 
+[22m[2mAddToCratePopover[2m > [22m[2mwhen 
+getUserCratesAction resolves with empty array, 
+renders inline name input
+[22m[39mThe current testing environment is not 
+configured to support act(...)
+
+ [32mÔ£ô[39m tests/unit/lib/backup-codes.test.ts [2m([22m[2m11 tests[22m[2m)[22m[33m 2482[2mms[22m[39m
+       [33m[2mÔ£ô[22m[39m returns 10 codes by default [33m 734[2mms[22m[39m
+       [33m[2mÔ£ô[22m[39m produces different hashes for the same input (salted) [33m 348[2mms[22m[39m
+       [33m[2mÔ£ô[22m[39m returns false for an incorrect code [33m 349[2mms[22m[39m
+       [33m[2mÔ£ô[22m[39m is case-insensitive (codes work regardless of case) [33m 518[2mms[22m[39m
+[90mstderr[2m | 
+tests/security/auth-bypass.test.ts[2m > 
+[22m[2mAuth Bypass Prevention[2m > 
+[22m[2mcommunity.ts auth guard[2m > 
+[22m[2mshould require authentication for 
+createGroupAction
+[22m[39m[createGroupAction] error: Error: Not 
+authenticated
+    at requireUser (C:/Users/INTEL/Desktop/Get 
+Shit 
+DOne/apps/web/src/lib/auth/require-user.ts:21:9)
+[90m    at processTicksAndRejections 
+(node:internal/process/task_queues:104:5)[39m
+    at Module.createGroupAction 
+(C:/Users/INTEL/Desktop/Get Shit 
+DOne/apps/web/src/actions/community.ts:43:16)
+    at C:/Users/INTEL/Desktop/Get Shit DOne/apps/we
+b/tests/security/auth-bypass.test.ts:385:19
+    at file:///C:/Users/INTEL/Desktop/Get%20Shit%20
+DOne/node_modules/[4m.pnpm[24m/@vitest+runner@4.1
+.2/node_modules/[4m@vitest/runner[24m/dist/chunk-
+artifact.js:1893:20
+
+[90mstderr[2m | 
+tests/security/auth-bypass.test.ts[2m > 
+[22m[2mAuth Bypass Prevention[2m > 
+[22m[2mcommunity.ts auth guard[2m > 
+[22m[2mshould require authentication for 
+joinGroupAction
+[22m[39m[joinGroupAction] error: Error: Not 
+authenticated
+    at requireUser (C:/Users/INTEL/Desktop/Get 
+Shit 
+DOne/apps/web/src/lib/auth/require-user.ts:21:9)
+[90m    at processTicksAndRejections 
+(node:internal/process/task_queues:104:5)[39m
+    at Module.joinGroupAction 
+(C:/Users/INTEL/Desktop/Get Shit 
+DOne/apps/web/src/actions/community.ts:112:16)
+    at C:/Users/INTEL/Desktop/Get Shit DOne/apps/we
+b/tests/security/auth-bypass.test.ts:390:19
+    at file:///C:/Users/INTEL/Desktop/Get%20Shit%20
+DOne/node_modules/[4m.pnpm[24m/@vitest+runner@4.1
+.2/node_modules/[4m@vitest/runner[24m/dist/chunk-
+artifact.js:1893:20
+
+[90mstderr[2m | 
+tests/security/auth-bypass.test.ts[2m > 
+[22m[2mAuth Bypass Prevention[2m > 
+[22m[2mgamification.ts auth guard[2m > 
+[22m[2mshould require authentication for 
+loadGlobalLeaderboard
+[22m[39m[loadGlobalLeaderboard] error: Error: 
+Not authenticated
+    at requireUser (C:/Users/INTEL/Desktop/Get 
+Shit 
+DOne/apps/web/src/lib/auth/require-user.ts:21:9)
+[90m    at processTicksAndRejections 
+(node:internal/process/task_queues:104:5)[39m
+    at Module.loadGlobalLeaderboard 
+(C:/Users/INTEL/Desktop/Get Shit 
+DOne/apps/web/src/actions/gamification.ts:25:16)
+    at C:/Users/INTEL/Desktop/Get Shit DOne/apps/we
+b/tests/security/auth-bypass.test.ts:488:19
+    at file:///C:/Users/INTEL/Desktop/Get%20Shit%20
+DOne/node_modules/[4m.pnpm[24m/@vitest+runner@4.1
+.2/node_modules/[4m@vitest/runner[24m/dist/chunk-
+artifact.js:1893:20
+
+[90mstderr[2m | 
+tests/security/auth-bypass.test.ts[2m > 
+[22m[2mAuth Bypass Prevention[2m > 
+[22m[2monboarding.ts auth guard[2m > 
+[22m[2mshould require authentication for 
+updateProfile
+[22m[39m[updateProfile] error: Error: Not 
+authenticated
+    at requireUser (C:/Users/INTEL/Desktop/Get 
+Shit 
+DOne/apps/web/src/lib/auth/require-user.ts:21:9)
+[90m    at processTicksAndRejections 
+(node:internal/process/task_queues:104:5)[39m
+    at Module.updateProfile 
+(C:/Users/INTEL/Desktop/Get Shit 
+DOne/apps/web/src/actions/onboarding.ts:20:16)
+    at C:/Users/INTEL/Desktop/Get Shit DOne/apps/we
+b/tests/security/auth-bypass.test.ts:497:19
+    at file:///C:/Users/INTEL/Desktop/Get%20Shit%20
+DOne/node_modules/[4m.pnpm[24m/@vitest+runner@4.1
+.2/node_modules/[4m@vitest/runner[24m/dist/chunk-
+artifact.js:1893:20
+
+ [32mÔ£ô[39m tests/security/auth-bypass.test.ts [2m([22m[2m21 tests[22m[2m)[22m[32m 125[2mms[22m[39m
+[90mstderr[2m | tests/unit/crates/add-to-crate-po
+pover.test.tsx[2m > 
+[22m[2mAddToCratePopover[2m > [22m[2mclicking 
+a crate row calls addToCrate with the correct 
+crateId
+[22m[39mThe current testing environment is not 
+configured to support act(...)
+
+[90mstderr[2m | tests/unit/crates/add-to-crate-po
+pover.test.tsx[2m > 
+[22m[2mAddToCratePopover[2m > [22m[2mclicking 
+a crate row calls addToCrate with the correct 
+crateId
+[22m[39mThe current testing environment is not 
+configured to support act(...)
+
+[90mstderr[2m | tests/unit/crates/add-to-crate-po
+pover.test.tsx[2m > 
+[22m[2mAddToCratePopover[2m > [22m[2mclicking 
+a crate row calls addToCrate with the correct 
+crateId
+[22m[39mThe current testing environment is not 
+configured to support act(...)
+
+[90mstderr[2m | tests/unit/components/shell/notif
+ication-bell.test.tsx[2m > 
+[22m[2mNotificationBell[2m > [22m[2mbell has 
+aria-label="Notifications"
+[22m[39mAn update to NotificationBell inside a 
+test was not wrapped in act(...).
+
+When testing, code that causes React state updates 
+should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the 
+user would see in the browser. Learn more at 
+https://react.dev/link/wrap-tests-with-act
+
+ [31mÔØ»[39m tests/unit/components/collection/add-record-dialog.test.tsx [2m([22m[2m5 tests[22m[2m | [22m[31m3 failed[39m[2m)[22m[33m 3013[2mms[22m[39m
+[31m     [31m├ù[31m renders search input when open[39m[33m 720[2mms[22m[39m
+     [32mÔ£ô[39m calls searchDiscogs after typing with debounce[32m 225[2mms[22m[39m
+[31m     [31m├ù[31m displays search results[39m[33m 1603[2mms[22m[39m
+[31m     [31m├ù[31m shows loading state during search[39m[32m 225[2mms[22m[39m
+     [32mÔ£ô[39m does not search if query is less than 2 characters[32m 228[2mms[22m[39m
+ [32mÔ£ô[39m tests/unit/lib/rate-limit.test.ts [2m([22m[2m4 tests[22m[2m)[22m[32m 187[2mms[22m[39m
+ [31mÔØ»[39m tests/unit/crates/add-to-crate-popover.test.tsx [2m([22m[2m3 tests[22m[2m | [22m[31m3 failed[39m[2m)[22m[33m 3834[2mms[22m[39m
+[31m     [31m├ù[31m when getUserCratesAction resolves with 2 crates, renders 2 crate name buttons[39m[33m 1655[2mms[22m[39m
+[31m     [31m├ù[31m when getUserCratesAction resolves with empty array, renders inline name input[39m[33m 1101[2mms[22m[39m
+[31m     [31m├ù[31m clicking a crate row calls addToCrate with the correct crateId[39m[33m 1073[2mms[22m[39m
+ [31mÔØ»[39m tests/unit/components/shell/notification-bell.test.tsx [2m([22m[2m8 tests[22m[2m | [22m[31m6 failed[39m[2m)[22m[33m 4277[2mms[22m[39m
+[31m     [31m├ù[31m renders bell icon with material-symbols-outlined notifications[39m[33m 1089[2mms[22m[39m
+[31m     [31m├ù[31m shows unread badge with count from getUnreadCountAction[39m[33m 1037[2mms[22m[39m
+[31m     [31m├ù[31m badge shows "9+" when count > 9[39m[33m 1038[2mms[22m[39m
+[31m     [31m├ù[31m no badge when count is 0[39m[32m 14[2mms[22m[39m
+[31m     [31m├ù[31m bell has aria-label="Notifications"[39m[32m 8[2mms[22m[39m
+     [32mÔ£ô[39m creates Supabase Realtime channel on mount with correct filter[32m 37[2mms[22m[39m
+     [32mÔ£ô[39m cleans up channel on unmount (removeChannel called)[32m 9[2mms[22m[39m
+[31m     [31m├ù[31m does not decrement unreadCount when markNotificationRead returns error[39m[33m 1040[2mms[22m[39m
+ [31mÔØ»[39m tests/unit/components/collection/collection-grid.test.tsx [2m([22m[2m4 tests[22m[2m | [22m[31m3 failed[39m[2m)[22m[32m 126[2mms[22m[39m
+[31m     [31m├ù[31m renders correct number of cards for given items[39m[32m 61[2mms[22m[39m
+[31m     [31m├ù[31m renders empty state when items is empty[39m[32m 34[2mms[22m[39m
+     [32mÔ£ô[39m grid has responsive classes[32m 21[2mms[22m[39m
+[31m     [31m├ù[31m passes isOwner prop to CollectionCard[39m[32m 6[2mms[22m[39m
+ [31mÔØ»[39m tests/unit/components/shell/app-header.test.tsx [2m([22m[2m7 tests[22m[2m | [22m[31m6 failed[39m[2m)[22m[33m 2279[2mms[22m[39m
+[31m     [31m├ù[31m renders DIGSWAP wordmark[39m[32m 76[2mms[22m[39m
+     [32mÔ£ô[39m renders wordmark with font-heading class[32m 57[2mms[22m[39m
+[31m     [31m├ù[31m renders main navigation links[39m[33m 1035[2mms[22m[39m
+[31m     [31m├ù[31m renders notification bell for the current user[39m[33m 1049[2mms[22m[39m
+[31m     [31m├ù[31m renders global search[39m[32m 19[2mms[22m[39m
+[31m     [31m├ù[31m renders chat toggle[39m[32m 14[2mms[22m[39m
+[31m     [31m├ù[31m renders help link[39m[32m 24[2mms[22m[39m
+ [31mÔØ»[39m tests/unit/components/shell/empty-state.test.tsx [2m([22m[2m3 tests[22m[2m | [22m[31m3 failed[39m[2m)[22m[32m 146[2mms[22m[39m
+[31m     [31m├ù[31m renders heading text[39m[32m 102[2mms[22m[39m
+[31m     [31m├ù[31m renders body text[39m[32m 26[2mms[22m[39m
+[31m     [31m├ù[31m renders the icon as an SVG element[39m[32m 13[2mms[22m[39m
+ [32mÔ£ô[39m tests/security/open-redirect.test.ts [2m([22m[2m8 tests[22m[2m)[22m[32m 25[2mms[22m[39m
+[90mstderr[2m | 
+tests/unit/api/stripe-webhook.test.ts[2m > 
+[22m[2mStripe webhook route[2m > 
+[22m[2mreturns 400 for an invalid signature
+[22m[39m[stripe.webhook] signature verification 
+failed Error: bad signature
+    at Object.<anonymous> 
+(C:/Users/INTEL/Desktop/Get Shit DOne/apps/web/test
+s/unit/api/stripe-webhook.test.ts:174:10)
+    at Object.Mock [as constructEvent] (file:///C:/
+Users/INTEL/Desktop/Get%20Shit%20DOne/node_modules/
+[4m.pnpm[24m/@vitest+spy@4.1.2/node_modules/[4m@
+vitest/spy[24m/dist/index.js:332:34)
+    at POST (C:/Users/INTEL/Desktop/Get Shit DOne/a
+pps/web/src/app/api/stripe/webhook/route.ts:303:27)
+[90m    at processTicksAndRejections 
+(node:internal/process/task_queues:104:5)[39m
+    at C:/Users/INTEL/Desktop/Get Shit DOne/apps/we
+b/tests/unit/api/stripe-webhook.test.ts:177:20
+    at file:///C:/Users/INTEL/Desktop/Get%20Shit%20
+DOne/node_modules/[4m.pnpm[24m/@vitest+runner@4.1
+.2/node_modules/[4m@vitest/runner[24m/dist/chunk-
+artifact.js:1893:20
+
+ [32mÔ£ô[39m tests/unit/api/stripe-webhook.test.ts [2m([22m[2m5 tests[22m[2m)[22m[32m 40[2mms[22m[39m
+ [32mÔ£ô[39m src/tests/trades/proposal-actions.test.ts [2m([22m[2m14 tests[22m[2m)[22m[32m 27[2mms[22m[39m
+[90mstderr[2m | tests/integration/collection/add-
+record.test.ts[2m > 
+[22m[2maddRecordToCollection[2m > 
+[22m[2minserts new release and collection item 
+for unknown discogsId
+[22m[39mcheckWantlistMatches failed: TypeError: 
+admin.from(...).select(...).eq(...).neq is not a 
+function
+    at checkWantlistMatches 
+(C:/Users/INTEL/Desktop/Get Shit 
+DOne/apps/web/src/lib/notifications/match.ts:27:5)
+    at Module.addRecordToCollection 
+(C:/Users/INTEL/Desktop/Get Shit 
+DOne/apps/web/src/actions/collection.ts:212:10)
+[90m    at processTicksAndRejections 
+(node:internal/process/task_queues:104:5)[39m
+    at C:/Users/INTEL/Desktop/Get Shit DOne/apps/we
+b/tests/integration/collection/add-record.test.ts:1
+14:18
+    at file:///C:/Users/INTEL/Desktop/Get%20Shit%20
+DOne/node_modules/[4m.pnpm[24m/@vitest+runner@4.1
+.2/node_modules/[4m@vitest/runner[24m/dist/chunk-
+artifact.js:1893:20
+
+[90mstderr[2m | tests/integration/collection/add-
+record.test.ts[2m > 
+[22m[2maddRecordToCollection[2m > 
+[22m[2mreuses existing release for known 
+discogsId
+[22m[39mcheckWantlistMatches failed: TypeError: 
+admin.from(...).select(...).eq(...).neq is not a 
+function
+    at checkWantlistMatches 
+(C:/Users/INTEL/Desktop/Get Shit 
+DOne/apps/web/src/lib/notifications/match.ts:27:5)
+    at Module.addRecordToCollection 
+(C:/Users/INTEL/Desktop/Get Shit 
+DOne/apps/web/src/actions/collection.ts:212:10)
+[90m    at processTicksAndRejections 
+(node:internal/process/task_queues:104:5)[39m
+    at C:/Users/INTEL/Desktop/Get Shit DOne/apps/we
+b/tests/integration/collection/add-record.test.ts:1
+31:18
+    at file:///C:/Users/INTEL/Desktop/Get%20Shit%20
+DOne/node_modules/[4m.pnpm[24m/@vitest+runner@4.1
+.2/node_modules/[4m@vitest/runner[24m/dist/chunk-
+artifact.js:1893:20
+
+ [32mÔ£ô[39m tests/integration/collection/add-record.test.ts [2m([22m[2m4 tests[22m[2m)[22m[32m 27[2mms[22m[39m
+ [32mÔ£ô[39m tests/security/input-validation.test.ts [2m([22m[2m35 tests[22m[2m)[22m[32m 26[2mms[22m[39m
+[90mstderr[2m | 
+tests/unit/gamification/badge-awards.test.ts[2m > 
+[22m[2mawardBadge[2m > [22m[2mawardBadge 
+returns false when badge slug does not exist
+[22m[39m[awardBadge] Badge not found: 
+nonexistent { message: [32m'not found'[39m }
+
+[90mstderr[2m | 
+tests/unit/gamification/badge-awards.test.ts[2m > 
+[22m[2mawardBadge[2m > [22m[2mawardBadge 
+returns false on insert error (never throws)
+[22m[39m[awardBadge] Failed to insert badge: 
+first_dig { message: [32m'some error'[39m }
+
+ [32mÔ£ô[39m tests/unit/gamification/badge-awards.test.ts [2m([22m[2m5 tests[22m[2m)[22m[32m 15[2mms[22m[39m
+[90mstderr[2m | 
+tests/unit/actions/trade-messages.test.ts[2m > 
+[22m[2msendTradeMessage[2m > [22m[2mrejects 
+unauthenticated caller
+[22m[39m[sendTradeMessage] error: Error: Not 
+authenticated
+    at requireUser (C:/Users/INTEL/Desktop/Get 
+Shit 
+DOne/apps/web/src/lib/auth/require-user.ts:21:9)
+[90m    at processTicksAndRejections 
+(node:internal/process/task_queues:104:5)[39m
+    at sendTradeMessage 
+(C:/Users/INTEL/Desktop/Get Shit 
+DOne/apps/web/src/actions/trade-messages.ts:22:16)
+    at C:/Users/INTEL/Desktop/Get Shit DOne/apps/we
+b/tests/unit/actions/trade-messages.test.ts:95:18
+    at file:///C:/Users/INTEL/Desktop/Get%20Shit%20
+DOne/node_modules/[4m.pnpm[24m/@vitest+runner@4.1
+.2/node_modules/[4m@vitest/runner[24m/dist/chunk-
+artifact.js:1893:20
+
+ [32mÔ£ô[39m tests/unit/actions/trade-messages.test.ts [2m([22m[2m8 tests[22m[2m)[22m[32m 27[2mms[22m[39m
+ [32mÔ£ô[39m tests/unit/social/feed.test.ts [2m([22m[2m5 tests[22m[2m)[22m[32m 15[2mms[22m[39m
+[90mstderr[2m | 
+tests/unit/lib/discogs/import-worker.test.ts[2m > 
+[22m[2mImport worker[2m > 
+[22m[2mprocessImportPage error handling marks 
+job as failed
+[22m[39mImport page processing failed for job 
+job-uuid-123: Error: Discogs API rate limited
+    at C:/Users/INTEL/Desktop/Get Shit DOne/apps/we
+b/tests/unit/lib/discogs/import-worker.test.ts:157:
+37
+    at file:///C:/Users/INTEL/Desktop/Get%20Shit%20
+DOne/node_modules/[4m.pnpm[24m/@vitest+runner@4.1
+.2/node_modules/[4m@vitest/runner[24m/dist/chunk-
+artifact.js:302:11
+    at file:///C:/Users/INTEL/Desktop/Get%20Shit%20
+DOne/node_modules/[4m.pnpm[24m/@vitest+runner@4.1
+.2/node_modules/[4m@vitest/runner[24m/dist/chunk-
+artifact.js:1893:26
+    at file:///C:/Users/INTEL/Desktop/Get%20Shit%20
+DOne/node_modules/[4m.pnpm[24m/@vitest+runner@4.1
+.2/node_modules/[4m@vitest/runner[24m/dist/chunk-
+artifact.js:2316:20
+    at new Promise (<anonymous>)
+    at runWithCancel (file:///C:/Users/INTEL/Deskto
+p/Get%20Shit%20DOne/node_modules/[4m.pnpm[24m/@vi
+test+runner@4.1.2/node_modules/[4m@vitest/runner[
+24m/dist/chunk-artifact.js:2313:10)
+    at file:///C:/Users/INTEL/Desktop/Get%20Shit%20
+DOne/node_modules/[4m.pnpm[24m/@vitest+runner@4.1
+.2/node_modules/[4m@vitest/runner[24m/dist/chunk-
+artifact.js:2295:20
+    at new Promise (<anonymous>)
+    at runWithTimeout (file:///C:/Users/INTEL/Deskt
+op/Get%20Shit%20DOne/node_modules/[4m.pnpm[24m/@v
+itest+runner@4.1.2/node_modules/[4m@vitest/runner
+[24m/dist/chunk-artifact.js:2262:10)
+    at file:///C:/Users/INTEL/Desktop/Get%20Shit%20
+DOne/node_modules/[4m.pnpm[24m/@vitest+runner@4.1
+.2/node_modules/[4m@vitest/runner[24m/dist/chunk-
+artifact.js:2945:64
+
+[90mstderr[2m | 
+tests/unit/lib/discogs/import-worker.test.ts[2m > 
+[22m[2mImport worker[2m > 
+[22m[2mprocessImportPage with job not found 
+returns done
+[22m[39mImport job not found: job-uuid-123 { 
+message: [32m'not found'[39m }
+
+ [32mÔ£ô[39m tests/unit/lib/discogs/import-worker.test.ts [2m([22m[2m11 tests[22m[2m)[22m[32m 30[2mms[22m[39m
+ [32mÔ£ô[39m tests/unit/crates/crates-actions.test.ts [2m([22m[2m7 tests[22m[2m)[22m[32m 23[2mms[22m[39m
+[90mstderr[2m | 
+tests/unit/community/review.test.ts[2m > 
+[22m[2mcreateReviewAction[2m > [22m[2mcreates 
+review with rating 1-5
+[22m[39m[awardBadge] Unexpected error: 
+TypeError: admin.from(...).select is not a function
+    at awardBadge (C:/Users/INTEL/Desktop/Get Shit 
+DOne/apps/web/src/lib/gamification/badge-awards.ts:
+29:5)
+    at Module.createReviewAction 
+(C:/Users/INTEL/Desktop/Get Shit 
+DOne/apps/web/src/actions/community.ts:414:10)
+[90m    at processTicksAndRejections 
+(node:internal/process/task_queues:104:5)[39m
+    at C:/Users/INTEL/Desktop/Get Shit DOne/apps/we
+b/tests/unit/community/review.test.ts:227:18
+    at file:///C:/Users/INTEL/Desktop/Get%20Shit%20
+DOne/node_modules/[4m.pnpm[24m/@vitest+runner@4.1
+.2/node_modules/[4m@vitest/runner[24m/dist/chunk-
+artifact.js:1893:20
+
+[90mstderr[2m | 
+tests/unit/community/review.test.ts[2m > 
+[22m[2mcreateReviewAction[2m > [22m[2mcreates 
+group_post with reviewId
+[22m[39m[awardBadge] Unexpected error: 
+TypeError: admin.from(...).select is not a function
+    at awardBadge (C:/Users/INTEL/Desktop/Get Shit 
+DOne/apps/web/src/lib/gamification/badge-awards.ts:
+29:5)
+    at Module.createReviewAction 
+(C:/Users/INTEL/Desktop/Get Shit 
+DOne/apps/web/src/actions/community.ts:414:10)
+[90m    at processTicksAndRejections 
+(node:internal/process/task_queues:104:5)[39m
+    at C:/Users/INTEL/Desktop/Get Shit DOne/apps/we
+b/tests/unit/community/review.test.ts:266:3
+    at file:///C:/Users/INTEL/Desktop/Get%20Shit%20
+DOne/node_modules/[4m.pnpm[24m/@vitest+runner@4.1
+.2/node_modules/[4m@vitest/runner[24m/dist/chunk-
+artifact.js:1893:20
+
+[90mstderr[2m | 
+tests/unit/community/review.test.ts[2m > 
+[22m[2mcreateReviewAction[2m > [22m[2mhandles 
+pressing-specific review (isPressingSpecific: true)
+[22m[39m[awardBadge] Unexpected error: 
+TypeError: admin.from(...).select is not a function
+    at awardBadge (C:/Users/INTEL/Desktop/Get Shit 
+DOne/apps/web/src/lib/gamification/badge-awards.ts:
+29:5)
+    at Module.createReviewAction 
+(C:/Users/INTEL/Desktop/Get Shit 
+DOne/apps/web/src/actions/community.ts:414:10)
+[90m    at processTicksAndRejections 
+(node:internal/process/task_queues:104:5)[39m
+    at C:/Users/INTEL/Desktop/Get Shit DOne/apps/we
+b/tests/unit/community/review.test.ts:287:18
+    at file:///C:/Users/INTEL/Desktop/Get%20Shit%20
+DOne/node_modules/[4m.pnpm[24m/@vitest+runner@4.1
+.2/node_modules/[4m@vitest/runner[24m/dist/chunk-
+artifact.js:1893:20
+
+[90mstderr[2m | 
+tests/unit/community/review.test.ts[2m > 
+[22m[2mcreateReviewAction[2m > [22m[2mhandles 
+general release review (isPressingSpecific: false)
+[22m[39m[awardBadge] Unexpected error: 
+TypeError: admin.from(...).select is not a function
+    at awardBadge (C:/Users/INTEL/Desktop/Get Shit 
+DOne/apps/web/src/lib/gamification/badge-awards.ts:
+29:5)
+    at Module.createReviewAction 
+(C:/Users/INTEL/Desktop/Get Shit 
+DOne/apps/web/src/actions/community.ts:414:10)
+[90m    at processTicksAndRejections 
+(node:internal/process/task_queues:104:5)[39m
+    at C:/Users/INTEL/Desktop/Get Shit DOne/apps/we
+b/tests/unit/community/review.test.ts:310:18
+    at file:///C:/Users/INTEL/Desktop/Get%20Shit%20
+DOne/node_modules/[4m.pnpm[24m/@vitest+runner@4.1
+.2/node_modules/[4m@vitest/runner[24m/dist/chunk-
+artifact.js:1893:20
+
+ [32mÔ£ô[39m tests/unit/community/review.test.ts [2m([22m[2m9 tests[22m[2m)[22m[32m 40[2mms[22m[39m
+ [32mÔ£ô[39m tests/unit/social/compare.test.ts [2m([22m[2m4 tests[22m[2m)[22m[32m 14[2mms[22m[39m
+ [32mÔ£ô[39m tests/security/rate-limiting.test.ts [2m([22m[2m8 tests[22m[2m)[22m[32m 22[2mms[22m[39m
+ [32mÔ£ô[39m tests/unit/community/group-feed.test.ts [2m([22m[2m5 tests[22m[2m)[22m[32m 13[2mms[22m[39m
+ [32mÔ£ô[39m tests/unit/player/store.test.ts [2m([22m[2m16 tests[22m[2m)[22m[32m 18[2mms[22m[39m
+ [32mÔ£ô[39m tests/unit/validations/auth.test.ts [2m([22m[2m21 tests[22m[2m)[22m[32m 44[2mms[22m[39m
+ [32mÔ£ô[39m tests/integration/collection/public-profile.test.ts [2m([22m[2m2 tests[22m[2m)[22m[32m 14[2mms[22m[39m
+ [32mÔ£ô[39m tests/security/rls-coverage.test.ts [2m([22m[2m65 tests[22m[2m)[22m[32m 36[2mms[22m[39m
+ [32mÔ£ô[39m src/tests/collection/visibility-actions.test.ts [2m([22m[2m14 tests[22m[2m)[22m[32m 29[2mms[22m[39m
+[90mstderr[2m | 
+tests/unit/actions/trade-lifecycle.test.ts[2m > 
+[22m[2macceptTradeAction[2m > [22m[2mrejects 
+unauthenticated caller
+[22m[39m[acceptTradeAction] error: Error: Not 
+authenticated
+    at C:/Users/INTEL/Desktop/Get Shit DOne/apps/we
+b/tests/unit/actions/trade-lifecycle.test.ts:19:28
+    at Mock (file:///C:/Users/INTEL/Desktop/Get%20S
+hit%20DOne/node_modules/[4m.pnpm[24m/@vitest+spy@
+4.1.2/node_modules/[4m@vitest/spy[24m/dist/index.
+js:332:34)
+    at acceptTradeAction 
+(C:/Users/INTEL/Desktop/Get Shit 
+DOne/apps/web/src/actions/trades.ts:144:22)
+    at C:/Users/INTEL/Desktop/Get Shit DOne/apps/we
+b/tests/unit/actions/trade-lifecycle.test.ts:170:24
+    at file:///C:/Users/INTEL/Desktop/Get%20Shit%20
+DOne/node_modules/[4m.pnpm[24m/@vitest+runner@4.1
+.2/node_modules/[4m@vitest/runner[24m/dist/chunk-
+artifact.js:302:11
+    at file:///C:/Users/INTEL/Desktop/Get%20Shit%20
+DOne/node_modules/[4m.pnpm[24m/@vitest+runner@4.1
+.2/node_modules/[4m@vitest/runner[24m/dist/chunk-
+artifact.js:1893:26
+    at file:///C:/Users/INTEL/Desktop/Get%20Shit%20
+DOne/node_modules/[4m.pnpm[24m/@vitest+runner@4.1
+.2/node_modules/[4m@vitest/runner[24m/dist/chunk-
+artifact.js:2316:20
+    at new Promise (<anonymous>)
+    at runWithCancel (file:///C:/Users/INTEL/Deskto
+p/Get%20Shit%20DOne/node_modules/[4m.pnpm[24m/@vi
+test+runner@4.1.2/node_modules/[4m@vitest/runner[
+24m/dist/chunk-artifact.js:2313:10)
+    at file:///C:/Users/INTEL/Desktop/Get%20Shit%20
+DOne/node_modules/[4m.pnpm[24m/@vitest+runner@4.1
+.2/node_modules/[4m@vitest/runner[24m/dist/chunk-
+artifact.js:2295:20
+
+[90mstderr[2m | 
+tests/unit/actions/trade-lifecycle.test.ts[2m > 
+[22m[2msubmitTradeReviewAction[2m > 
+[22m[2mrejects unauthenticated caller
+[22m[39m[submitTradeReviewAction] error: Error: 
+Not authenticated
+    at C:/Users/INTEL/Desktop/Get Shit DOne/apps/we
+b/tests/unit/actions/trade-lifecycle.test.ts:19:28
+    at Mock (file:///C:/Users/INTEL/Desktop/Get%20S
+hit%20DOne/node_modules/[4m.pnpm[24m/@vitest+spy@
+4.1.2/node_modules/[4m@vitest/spy[24m/dist/index.
+js:332:34)
+    at submitTradeReviewAction 
+(C:/Users/INTEL/Desktop/Get Shit 
+DOne/apps/web/src/actions/trades.ts:320:22)
+    at C:/Users/INTEL/Desktop/Get Shit DOne/apps/we
+b/tests/unit/actions/trade-lifecycle.test.ts:304:24
+    at file:///C:/Users/INTEL/Desktop/Get%20Shit%20
+DOne/node_modules/[4m.pnpm[24m/@vitest+runner@4.1
+.2/node_modules/[4m@vitest/runner[24m/dist/chunk-
+artifact.js:302:11
+    at file:///C:/Users/INTEL/Desktop/Get%20Shit%20
+DOne/node_modules/[4m.pnpm[24m/@vitest+runner@4.1
+.2/node_modules/[4m@vitest/runner[24m/dist/chunk-
+artifact.js:1893:26
+    at file:///C:/Users/INTEL/Desktop/Get%20Shit%20
+DOne/node_modules/[4m.pnpm[24m/@vitest+runner@4.1
+.2/node_modules/[4m@vitest/runner[24m/dist/chunk-
+artifact.js:2316:20
+    at new Promise (<anonymous>)
+    at runWithCancel (file:///C:/Users/INTEL/Deskto
+p/Get%20Shit%20DOne/node_modules/[4m.pnpm[24m/@vi
+test+runner@4.1.2/node_modules/[4m@vitest/runner[
+24m/dist/chunk-artifact.js:2313:10)
+    at file:///C:/Users/INTEL/Desktop/Get%20Shit%20
+DOne/node_modules/[4m.pnpm[24m/@vitest+runner@4.1
+.2/node_modules/[4m@vitest/runner[24m/dist/chunk-
+artifact.js:2295:20
+
+ [32mÔ£ô[39m tests/unit/actions/trade-lifecycle.test.ts [2m([22m[2m17 tests[22m[2m)[22m[32m 37[2mms[22m[39m
+ [32mÔ£ô[39m tests/unit/gems/gem-tiers.test.ts [2m([22m[2m31 tests[22m[2m)[22m[32m 15[2mms[22m[39m
+ [32mÔ£ô[39m tests/unit/entitlements.test.ts [2m([22m[2m7 tests[22m[2m)[22m[32m 75[2mms[22m[39m
+ [32mÔ£ô[39m tests/unit/gems/gem-notifications.test.ts [2m([22m[2m7 tests[22m[2m)[22m[32m 16[2mms[22m[39m
+ [32mÔ£ô[39m tests/unit/social/public-profile.test.ts [2m([22m[2m5 tests[22m[2m)[22m[32m 14[2mms[22m[39m
+ [32mÔ£ô[39m tests/integration/discogs/disconnect.test.ts [2m([22m[2m6 tests[22m[2m)[22m[32m 24[2mms[22m[39m
+ [32mÔ£ô[39m tests/integration/auth/signup.test.ts [2m([22m[2m11 tests[22m[2m)[22m[32m 14[2mms[22m[39m
+ [32mÔ£ô[39m tests/unit/lib/collection/rarity.test.ts [2m([22m[2m12 tests[22m[2m)[22m[32m 9[2mms[22m[39m
+ [32mÔ£ô[39m tests/unit/trades/presence.test.ts [2m([22m[2m5 tests[22m[2m)[22m[32m 11[2mms[22m[39m
+ [32mÔ£ô[39m tests/unit/social/follow.test.ts [2m([22m[2m7 tests[22m[2m)[22m[32m 18[2mms[22m[39m
+ [32mÔ£ô[39m tests/unit/lib/discogs/sync.test.ts [2m([22m[2m3 tests[22m[2m)[22m[32m 13[2mms[22m[39m
+ [32mÔ£ô[39m tests/integration/discogs/import.test.ts [2m([22m[2m5 tests[22m[2m)[22m[32m 18[2mms[22m[39m
+ [32mÔ£ô[39m tests/security/idor.test.ts [2m([22m[2m5 tests[22m[2m)[22m[32m 17[2mms[22m[39m
+ [32mÔ£ô[39m tests/unit/release/youtube-search.test.ts [2m([22m[2m7 tests[22m[2m)[22m[32m 15[2mms[22m[39m
+ [32mÔ£ô[39m tests/unit/discovery/taste-match.test.ts [2m([22m[2m4 tests[22m[2m)[22m[32m 14[2mms[22m[39m
+ [32mÔ£ô[39m tests/unit/community/create-group.test.ts [2m([22m[2m6 tests[22m[2m)[22m[32m 15[2mms[22m[39m
+ [32mÔ£ô[39m tests/integration/collection/sort.test.ts [2m([22m[2m6 tests[22m[2m)[22m[32m 13[2mms[22m[39m
+[90mstderr[2m | 
+tests/unit/community/membership.test.ts[2m > 
+[22m[2mjoinGroupAction[2m > [22m[2minserts 
+membership row on join
+[22m[39m[awardBadge] Unexpected error: 
+TypeError: admin.from(...).select is not a function
+    at awardBadge (C:/Users/INTEL/Desktop/Get Shit 
+DOne/apps/web/src/lib/gamification/badge-awards.ts:
+29:5)
+    at Module.joinGroupAction 
+(C:/Users/INTEL/Desktop/Get Shit 
+DOne/apps/web/src/actions/community.ts:172:10)
+[90m    at processTicksAndRejections 
+(node:internal/process/task_queues:104:5)[39m
+    at C:/Users/INTEL/Desktop/Get Shit DOne/apps/we
+b/tests/unit/community/membership.test.ts:231:18
+    at file:///C:/Users/INTEL/Desktop/Get%20Shit%20
+DOne/node_modules/[4m.pnpm[24m/@vitest+runner@4.1
+.2/node_modules/[4m@vitest/runner[24m/dist/chunk-
+artifact.js:1893:20
+
+[90mstderr[2m | 
+tests/unit/community/membership.test.ts[2m > 
+[22m[2mjoinGroupAction[2m > [22m[2mincrements 
+member_count on join
+[22m[39m[awardBadge] Unexpected error: 
+TypeError: admin.from(...).select is not a function
+    at awardBadge (C:/Users/INTEL/Desktop/Get Shit 
+DOne/apps/web/src/lib/gamification/badge-awards.ts:
+29:5)
+    at Module.joinGroupAction 
+(C:/Users/INTEL/Desktop/Get Shit 
+DOne/apps/web/src/actions/community.ts:172:10)
+[90m    at processTicksAndRejections 
+(node:internal/process/task_queues:104:5)[39m
+    at C:/Users/INTEL/Desktop/Get Shit DOne/apps/we
+b/tests/unit/community/membership.test.ts:246:3
+    at file:///C:/Users/INTEL/Desktop/Get%20Shit%20
+DOne/node_modules/[4m.pnpm[24m/@vitest+runner@4.1
+.2/node_modules/[4m@vitest/runner[24m/dist/chunk-
+artifact.js:1893:20
+
+ [32mÔ£ô[39m tests/unit/community/membership.test.ts [2m([22m[2m7 tests[22m[2m)[22m[32m 31[2mms[22m[39m
+[90mstderr[2m | tests/unit/notifications/wantlist
+-match.test.ts[2m > 
+[22m[2mcheckWantlistMatches[2m > [22m[2memail 
+failure does not throw from checkWantlistMatches
+[22m[39mFailed to notify user wanter-1 about 
+wantlist match: Error: Resend API down
+    at C:/Users/INTEL/Desktop/Get Shit DOne/apps/we
+b/tests/unit/notifications/wantlist-match.test.ts:1
+86:35
+    at file:///C:/Users/INTEL/Desktop/Get%20Shit%20
+DOne/node_modules/[4m.pnpm[24m/@vitest+runner@4.1
+.2/node_modules/[4m@vitest/runner[24m/dist/chunk-
+artifact.js:302:11
+    at file:///C:/Users/INTEL/Desktop/Get%20Shit%20
+DOne/node_modules/[4m.pnpm[24m/@vitest+runner@4.1
+.2/node_modules/[4m@vitest/runner[24m/dist/chunk-
+artifact.js:1893:26
+    at file:///C:/Users/INTEL/Desktop/Get%20Shit%20
+DOne/node_modules/[4m.pnpm[24m/@vitest+runner@4.1
+.2/node_modules/[4m@vitest/runner[24m/dist/chunk-
+artifact.js:2316:20
+    at new Promise (<anonymous>)
+    at runWithCancel (file:///C:/Users/INTEL/Deskto
+p/Get%20Shit%20DOne/node_modules/[4m.pnpm[24m/@vi
+test+runner@4.1.2/node_modules/[4m@vitest/runner[
+24m/dist/chunk-artifact.js:2313:10)
+    at file:///C:/Users/INTEL/Desktop/Get%20Shit%20
+DOne/node_modules/[4m.pnpm[24m/@vitest+runner@4.1
+.2/node_modules/[4m@vitest/runner[24m/dist/chunk-
+artifact.js:2295:20
+    at new Promise (<anonymous>)
+    at runWithTimeout (file:///C:/Users/INTEL/Deskt
+op/Get%20Shit%20DOne/node_modules/[4m.pnpm[24m/@v
+itest+runner@4.1.2/node_modules/[4m@vitest/runner
+[24m/dist/chunk-artifact.js:2262:10)
+    at file:///C:/Users/INTEL/Desktop/Get%20Shit%20
+DOne/node_modules/[4m.pnpm[24m/@vitest+runner@4.1
+.2/node_modules/[4m@vitest/runner[24m/dist/chunk-
+artifact.js:2945:64
+
+ [32mÔ£ô[39m tests/unit/notifications/wantlist-match.test.ts [2m([22m[2m5 tests[22m[2m)[22m[32m 23[2mms[22m[39m
+ [32mÔ£ô[39m tests/unit/discovery/genre-browse.test.ts [2m([22m[2m5 tests[22m[2m)[22m[32m 14[2mms[22m[39m
+[90mstderr[2m | 
+tests/unit/notifications/email.test.ts[2m > 
+[22m[2msendWantlistMatchEmail[2m > 
+[22m[2mdoes not throw on Resend error
+[22m[39mFailed to send wantlist match email: 
+Error: API rate limited
+    at C:/Users/INTEL/Desktop/Get Shit DOne/apps/we
+b/tests/unit/notifications/email.test.ts:62:30
+    at file:///C:/Users/INTEL/Desktop/Get%20Shit%20
+DOne/node_modules/[4m.pnpm[24m/@vitest+runner@4.1
+.2/node_modules/[4m@vitest/runner[24m/dist/chunk-
+artifact.js:302:11
+    at file:///C:/Users/INTEL/Desktop/Get%20Shit%20
+DOne/node_modules/[4m.pnpm[24m/@vitest+runner@4.1
+.2/node_modules/[4m@vitest/runner[24m/dist/chunk-
+artifact.js:1893:26
+    at file:///C:/Users/INTEL/Desktop/Get%20Shit%20
+DOne/node_modules/[4m.pnpm[24m/@vitest+runner@4.1
+.2/node_modules/[4m@vitest/runner[24m/dist/chunk-
+artifact.js:2316:20
+    at new Promise (<anonymous>)
+    at runWithCancel (file:///C:/Users/INTEL/Deskto
+p/Get%20Shit%20DOne/node_modules/[4m.pnpm[24m/@vi
+test+runner@4.1.2/node_modules/[4m@vitest/runner[
+24m/dist/chunk-artifact.js:2313:10)
+    at file:///C:/Users/INTEL/Desktop/Get%20Shit%20
+DOne/node_modules/[4m.pnpm[24m/@vitest+runner@4.1
+.2/node_modules/[4m@vitest/runner[24m/dist/chunk-
+artifact.js:2295:20
+    at new Promise (<anonymous>)
+    at runWithTimeout (file:///C:/Users/INTEL/Deskt
+op/Get%20Shit%20DOne/node_modules/[4m.pnpm[24m/@v
+itest+runner@4.1.2/node_modules/[4m@vitest/runner
+[24m/dist/chunk-artifact.js:2262:10)
+    at file:///C:/Users/INTEL/Desktop/Get%20Shit%20
+DOne/node_modules/[4m.pnpm[24m/@vitest+runner@4.1
+.2/node_modules/[4m@vitest/runner[24m/dist/chunk-
+artifact.js:2945:64
+
+ [32mÔ£ô[39m tests/unit/notifications/email.test.ts [2m([22m[2m3 tests[22m[2m)[22m[32m 16[2mms[22m[39m
+ [32mÔ£ô[39m tests/unit/discovery/record-search.test.ts [2m([22m[2m5 tests[22m[2m)[22m[32m 24[2mms[22m[39m
+ [32mÔ£ô[39m tests/unit/gamification/ranking-computation.test.ts [2m([22m[2m22 tests[22m[2m)[22m[32m 12[2mms[22m[39m
+ [32mÔ£ô[39m tests/security/csp.test.ts [2m([22m[2m13 tests[22m[2m)[22m[32m 13[2mms[22m[39m
+ [32mÔ£ô[39m tests/unit/lib/collection/filters.test.ts [2m([22m[2m15 tests[22m[2m)[22m[32m 48[2mms[22m[39m
+ [32mÔ£ô[39m tests/integration/security/headers.test.ts [2m([22m[2m8 tests[22m[2m)[22m[32m 12[2mms[22m[39m
+ [32mÔ£ô[39m tests/unit/gems/gem-distribution.test.ts [2m([22m[2m7 tests[22m[2m)[22m[32m 11[2mms[22m[39m
+ [32mÔ£ô[39m tests/unit/gamification/leaderboard-queries.test.ts [2m([22m[2m9 tests[22m[2m)[22m[32m 14[2mms[22m[39m
+[90mstdout[2m | tests/unit/lib/discogs/oauth.test.ts[2m > [22m[2mDiscogs OAuth helpers[2m > [22m[2mstoreTokens stores in Vault via admin client RPC
+[22m[39m[Discogs OAuth] Tokens stored in Vault for user user-123
+
+[90mstdout[2m | tests/unit/lib/discogs/oauth.test.ts[2m > [22m[2mDiscogs OAuth helpers[2m > [22m[2mstoreTokens falls back to table when Vault fails
+[22m[39m[Discogs OAuth] Tokens stored in fallback table for user user-123
+
+ [32mÔ£ô[39m tests/unit/lib/discogs/oauth.test.ts [2m([22m[2m7 tests[22m[2m)[22m[32m 57[2mms[22m[39m
+ [32mÔ£ô[39m tests/unit/release/release-queries.test.ts [2m([22m[2m6 tests[22m[2m)[22m[32m 12[2mms[22m[39m
+ [32mÔ£ô[39m tests/integration/discogs/callback.test.ts [2m([22m[2m3 tests[22m[2m)[22m[32m 18[2mms[22m[39m
+ [32mÔ£ô[39m tests/unit/notifications/preferences.test.ts [2m([22m[2m6 tests[22m[2m)[22m[32m 44[2mms[22m[39m
+ [32mÔ£ô[39m src/tests/collection/collection-types.test.ts [2m([22m[2m10 tests[22m[2m)[22m[32m 11[2mms[22m[39m
+ [32mÔ£ô[39m tests/unit/release/release-reviews.test.ts [2m([22m[2m4 tests[22m[2m)[22m[32m 12[2mms[22m[39m
+ [32mÔ£ô[39m tests/unit/trades/messages.test.ts [2m([22m[2m2 tests[22m[2m)[22m[32m 12[2mms[22m[39m
+ [32mÔ£ô[39m tests/unit/gamification/profile-ranking.test.ts [2m([22m[2m5 tests[22m[2m)[22m[32m 9[2mms[22m[39m
+ [32mÔ£ô[39m tests/unit/community/visibility.test.ts [2m([22m[2m6 tests[22m[2m)[22m[32m 21[2mms[22m[39m
+ [32mÔ£ô[39m tests/unit/desktop/handoff-token.test.ts [2m([22m[2m5 tests[22m[2m)[22m[32m 20[2mms[22m[39m
+ [32mÔ£ô[39m tests/unit/community/group-post.test.ts [2m([22m[2m5 tests[22m[2m)[22m[32m 18[2mms[22m[39m
+ [32mÔ£ô[39m tests/integration/collection/condition.test.ts [2m([22m[2m6 tests[22m[2m)[22m[32m 16[2mms[22m[39m
+ [32mÔ£ô[39m tests/integration/auth/session.test.ts [2m([22m[2m8 tests[22m[2m | [22m[33m4 skipped[39m[2m)[22m[32m 9[2mms[22m[39m
+ [32mÔ£ô[39m src/tests/trades/desktop-version.test.ts [2m([22m[2m2 tests[22m[2m)[22m[32m 6[2mms[22m[39m
+ [32mÔ£ô[39m tests/unit/community/slugify.test.ts [2m([22m[2m7 tests[22m[2m)[22m[32m 7[2mms[22m[39m
+ [32mÔ£ô[39m tests/unit/social/unfollow.test.ts [2m([22m[2m3 tests[22m[2m)[22m[32m 7[2mms[22m[39m
+ [2m[90mÔåô[39m[22m src/tests/crates/crates-actions.test.ts [2m([22m[2m7 tests[22m[2m | [22m[90m7 todo[39m[2m)[22m
+
+[31mÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»[39m[1m[41m Failed Tests 
+41 [49m[22m[31mÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»[39m
+
+[41m[1m FAIL [22m[49m tests/unit/crates/add-to-
+crate-popover.test.tsx[2m > 
+[22mAddToCratePopover[2m > [22mwhen 
+getUserCratesAction resolves with 2 crates, 
+renders 2 crate name buttons
+[31m[1mError[22m: Invalid Chai property: 
+toBeInTheDocument
+
+Ignored nodes: comments, script, style
+[36m<html>[31m
+  [36m<head />[31m
+  [36m<body>[31m
+    [36m<div>[31m
+      [36m<div[31m
+        [33mdata-open[31m=[32m"true"[31m
+        
+[33mdata-testid[31m=[32m"popover-root"[31m
+      [36m>[31m
+        [36m<div[31m
+          
+[33mdata-testid[31m=[32m"popover-trigger"[31m
+          [33mrole[31m=[32m"button"[31m
+          [33mtabindex[31m=[32m"0"[31m
+        [36m>[31m
+          [36m<button[31m
+            [33mtype[31m=[32m"button"[31m
+          [36m>[31m
+            [0mOpen[0m
+          [36m</button>[31m
+        [36m</div>[31m
+        [36m<div[31m
+          [33mclass[31m=[32m"w-72 p-4 
+bg-surface-container 
+border-outline-variant/20"[31m
+          
+[33mdata-testid[31m=[32m"popover-content"[31m
+        [36m>[31m
+          [36m<div>[31m
+            [36m<p[31m
+              [33mclass[31m=[32m"font-mono 
+text-xs text-primary tracking-[0.15em] mb-3"[31m
+            [36m>[31m
+              [0m[ADD_TO_CRATE][0m
+            [36m</p>[31m
+            [36m<div[31m
+              
+[33mclass[31m=[32m"space-y-0.5"[31m
+            [36m>[31m
+              [36m<button[31m
+                [33mclass[31m=[32m"w-full flex 
+items-center justify-between py-2 px-2 rounded 
+hover:bg-surface-container-high transition-colors 
+disabled:opacity-50"[31m
+                [33mtype[31m=[32m"button"[31m
+              [36m>[31m
+                [36m<span[31m
+                  [33mclass[31m=[32m"font-mono 
+text-xs text-on-surface truncate"[31m
+                [36m>[31m
+                  [0mSabado Dig[0m
+                [36m</span>[31m
+                [36m<span[31m
+                  [33mclass[31m=[32m"flex 
+items-center gap-1.5 flex-shrink-0"[31m
+                [36m>[31m
+                  [36m<span[31m
+                    
+[33mclass[31m=[32m"font-mono text-xs 
+text-on-surface-variant"[31m
+                  [36m>[31m
+                    [0m3[0m
+                  [36m</span>[31m
+                [36m</span>[31m
+              [36m</button>[31m
+              [36m<button[31m
+                [33mclass[31m=[32m"w-full flex 
+items-center justify-between py-2 px-2 rounded 
+hover:bg-surface-container-high transition-colors 
+disabled:opacity-50"[31m
+                [33mtype[31m=[32m"button"[31m
+              [36m>[31m
+                [36m<span[31m
+                  [33mclass[31m=[32m"font-mono 
+text-xs text-on-surface truncate"[31m
+                [36m>[31m
+                  [0mJazz Finds[0m
+                [36m</span>[31m
+                [36m<span[31m
+                  [33mclass[31m=[32m"flex 
+items-center gap-1.5 flex-shrink-0"[31m
+                [36m>[31m
+                  [36m<span[31m
+                    
+[33mclass[31m=[32m"font-mono text-xs 
+text-on-surface-variant"[31m
+                  [36m>[31m
+                    [0m7[0m
+                  [36m</span>[31m
+                [36m</span>[31m
+              [36m</button>[31m
+            [36m</div>[31m
+            [36m<button[31m
+              [33mclass[31m=[32m"w-full 
+font-mono text-xs text-primary hover:underline 
+mt-2 text-left"[31m
+              [33mtype[31m=[32m"button"[31m
+            [36m>[31m
+              [0m[ + New crate ][0m
+            [36m</button>[31m
+          [36m</div>[31m
+        [36m</div>[31m
+      [36m</div>[31m
+    [36m</div>[31m
+  [36m</body>[31m
+[36m</html>[31m[39m
+[36m [2mÔØ»[22m tests/unit/crates/add-to-crate-p
+opover.test.tsx:[2m139:42[22m[39m
+    [90m137|[39m   // Wait for the async 
+getUserCratesAction to resolve and render cratÔÇª
+    [90m138|[39m   [35mawait[39m 
+[34mwaitFor[39m(() [33m=>[39m {
+    [90m139|[39m    [34mexpect[39m(screen[33m.
+[39m[34mgetByText[39m([32m"Sabado Dig"[39m))[
+33m.[39m[34mtoBeInTheDocument[39m()[33m;[39m
+    [90m   |[39m                                 
+         [31m^[39m
+    [90m140|[39m    [34mexpect[39m(screen[33m.
+[39m[34mgetByText[39m([32m"Jazz Finds"[39m))[
+33m.[39m[34mtoBeInTheDocument[39m()[33m;[39m
+    [90m141|[39m   })[33m;[39m
+[90m [2mÔØ»[22m 
+runWithExpensiveErrorDiagnosticsDisabled ../../node
+_modules/.pnpm/@testing-library+dom@10.4.1/node_mod
+ules/@testing-library/dom/dist/config.js:[2m47:12
+[22m[39m
+[90m [2mÔØ»[22m checkCallback ../../node_modules
+/.pnpm/@testing-library+dom@10.4.1/node_modules/@te
+sting-library/dom/dist/wait-for.js:[2m124:77[22m
+[39m
+[90m [2mÔØ»[22m Timeout.checkRealTimersCallback 
+../../node_modules/.pnpm/@testing-library+dom@10.4.
+1/node_modules/@testing-library/dom/dist/wait-for.j
+s:[2m118:16[22m[39m
+
+[31m[2mÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»
+ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»[1/41]ÔÄ»[22m[39m
+
+[41m[1m FAIL [22m[49m tests/unit/crates/add-to-
+crate-popover.test.tsx[2m > 
+[22mAddToCratePopover[2m > [22mwhen 
+getUserCratesAction resolves with empty array, 
+renders inline name input
+[31m[1mError[22m: Invalid Chai property: 
+toBeInTheDocument
+
+Ignored nodes: comments, script, style
+[36m<html>[31m
+  [36m<head />[31m
+  [36m<body>[31m
+    [36m<div>[31m
+      [36m<div[31m
+        [33mdata-open[31m=[32m"true"[31m
+        
+[33mdata-testid[31m=[32m"popover-root"[31m
+      [36m>[31m
+        [36m<div[31m
+          
+[33mdata-testid[31m=[32m"popover-trigger"[31m
+          [33mrole[31m=[32m"button"[31m
+          [33mtabindex[31m=[32m"0"[31m
+        [36m>[31m
+          [36m<button[31m
+            [33mtype[31m=[32m"button"[31m
+          [36m>[31m
+            [0mOpen[0m
+          [36m</button>[31m
+        [36m</div>[31m
+        [36m<div[31m
+          [33mclass[31m=[32m"w-72 p-4 
+bg-surface-container 
+border-outline-variant/20"[31m
+          
+[33mdata-testid[31m=[32m"popover-content"[31m
+        [36m>[31m
+          [36m<div>[31m
+            [36m<p[31m
+              [33mclass[31m=[32m"font-mono 
+text-xs text-primary tracking-[0.15em] mb-3"[31m
+            [36m>[31m
+              [0m[ADD_TO_CRATE][0m
+            [36m</p>[31m
+            [36m<div[31m
+              [33mclass[31m=[32m"space-y-2 
+mt-1"[31m
+            [36m>[31m
+              [36m<input[31m
+                [33mclass[31m=[32m"font-mono 
+text-xs bg-surface-container-low border 
+border-outline-variant/20 rounded h-8 w-full px-2 
+focus:outline-none focus:border-primary/40 
+text-on-surface"[31m
+                [33mplaceholder[31m=[32m"Crate 
+name..."[31m
+                [33mtype[31m=[32m"text"[31m
+                [33mvalue[31m=[32m""[31m
+              [36m/>[31m
+              [36m<button[31m
+                [33mclass[31m=[32m"font-mono 
+text-xs bg-primary-container 
+text-on-primary-container h-7 w-full rounded 
+disabled:opacity-50 transition-opacity"[31m
+                [33mdisabled[31m=[32m""[31m
+                [33mtype[31m=[32m"button"[31m
+              [36m>[31m
+                [0m[CREATE + ADD][0m
+              [36m</button>[31m
+            [36m</div>[31m
+          [36m</div>[31m
+        [36m</div>[31m
+      [36m</div>[31m
+    [36m</div>[31m
+  [36m</body>[31m
+[36m</html>[31m[39m
+[36m [2mÔØ»[22m tests/unit/crates/add-to-crate-p
+opover.test.tsx:[2m159:56[22m[39m
+    [90m157|[39m
+    [90m158|[39m   [35mawait[39m 
+[34mwaitFor[39m(() [33m=>[39m {
+    [90m159|[39m    
+expect(screen.getByPlaceholderText("Crate 
+name...")).toBeInTheDocumÔÇª
+    [90m   |[39m                                 
+                       [31m^[39m
+    [90m160|[39m   })[33m;[39m
+    [90m161|[39m  })[33m;[39m
+[90m [2mÔØ»[22m 
+runWithExpensiveErrorDiagnosticsDisabled ../../node
+_modules/.pnpm/@testing-library+dom@10.4.1/node_mod
+ules/@testing-library/dom/dist/config.js:[2m47:12
+[22m[39m
+[90m [2mÔØ»[22m checkCallback ../../node_modules
+/.pnpm/@testing-library+dom@10.4.1/node_modules/@te
+sting-library/dom/dist/wait-for.js:[2m124:77[22m
+[39m
+[90m [2mÔØ»[22m Timeout.checkRealTimersCallback 
+../../node_modules/.pnpm/@testing-library+dom@10.4.
+1/node_modules/@testing-library/dom/dist/wait-for.j
+s:[2m118:16[22m[39m
+
+[31m[2mÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»
+ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»[2/41]ÔÄ»[22m[39m
+
+[41m[1m FAIL [22m[49m tests/unit/crates/add-to-
+crate-popover.test.tsx[2m > 
+[22mAddToCratePopover[2m > [22mclicking a crate 
+row calls addToCrate with the correct crateId
+[31m[1mError[22m: Invalid Chai property: 
+toBeInTheDocument
+
+Ignored nodes: comments, script, style
+[36m<html>[31m
+  [36m<head />[31m
+  [36m<body>[31m
+    [36m<div>[31m
+      [36m<div[31m
+        [33mdata-open[31m=[32m"true"[31m
+        
+[33mdata-testid[31m=[32m"popover-root"[31m
+      [36m>[31m
+        [36m<div[31m
+          
+[33mdata-testid[31m=[32m"popover-trigger"[31m
+          [33mrole[31m=[32m"button"[31m
+          [33mtabindex[31m=[32m"0"[31m
+        [36m>[31m
+          [36m<button[31m
+            [33mtype[31m=[32m"button"[31m
+          [36m>[31m
+            [0mOpen[0m
+          [36m</button>[31m
+        [36m</div>[31m
+        [36m<div[31m
+          [33mclass[31m=[32m"w-72 p-4 
+bg-surface-container 
+border-outline-variant/20"[31m
+          
+[33mdata-testid[31m=[32m"popover-content"[31m
+        [36m>[31m
+          [36m<div>[31m
+            [36m<p[31m
+              [33mclass[31m=[32m"font-mono 
+text-xs text-primary tracking-[0.15em] mb-3"[31m
+            [36m>[31m
+              [0m[ADD_TO_CRATE][0m
+            [36m</p>[31m
+            [36m<div[31m
+              
+[33mclass[31m=[32m"space-y-0.5"[31m
+            [36m>[31m
+              [36m<button[31m
+                [33mclass[31m=[32m"w-full flex 
+items-center justify-between py-2 px-2 rounded 
+hover:bg-surface-container-high transition-colors 
+disabled:opacity-50"[31m
+                [33mtype[31m=[32m"button"[31m
+              [36m>[31m
+                [36m<span[31m
+                  [33mclass[31m=[32m"font-mono 
+text-xs text-on-surface truncate"[31m
+                [36m>[31m
+                  [0mMy Crate[0m
+                [36m</span>[31m
+                [36m<span[31m
+                  [33mclass[31m=[32m"flex 
+items-center gap-1.5 flex-shrink-0"[31m
+                [36m>[31m
+                  [36m<span[31m
+                    
+[33mclass[31m=[32m"font-mono text-xs 
+text-on-surface-variant"[31m
+                  [36m>[31m
+                    [0m2[0m
+                  [36m</span>[31m
+                [36m</span>[31m
+              [36m</button>[31m
+            [36m</div>[31m
+            [36m<button[31m
+              [33mclass[31m=[32m"w-full 
+font-mono text-xs text-primary hover:underline 
+mt-2 text-left"[31m
+              [33mtype[31m=[32m"button"[31m
+            [36m>[31m
+              [0m[ + New crate ][0m
+            [36m</button>[31m
+          [36m</div>[31m
+        [36m</div>[31m
+      [36m</div>[31m
+    [36m</div>[31m
+  [36m</body>[31m
+[36m</html>[31m[39m
+[36m [2mÔØ»[22m tests/unit/crates/add-to-crate-p
+opover.test.tsx:[2m182:40[22m[39m
+    [90m180|[39m   [90m// Wait for crate list 
+to appear[39m
+    [90m181|[39m   [35mawait[39m 
+[34mwaitFor[39m(() [33m=>[39m {
+    [90m182|[39m    [34mexpect[39m(screen[33m.
+[39m[34mgetByText[39m([32m"My Crate"[39m))[33
+m.[39m[34mtoBeInTheDocument[39m()[33m;[39m
+    [90m   |[39m                                 
+       [31m^[39m
+    [90m183|[39m   })[33m;[39m
+    [90m184|[39m
+[90m [2mÔØ»[22m 
+runWithExpensiveErrorDiagnosticsDisabled ../../node
+_modules/.pnpm/@testing-library+dom@10.4.1/node_mod
+ules/@testing-library/dom/dist/config.js:[2m47:12
+[22m[39m
+[90m [2mÔØ»[22m checkCallback ../../node_modules
+/.pnpm/@testing-library+dom@10.4.1/node_modules/@te
+sting-library/dom/dist/wait-for.js:[2m124:77[22m
+[39m
+[90m [2mÔØ»[22m Timeout.checkRealTimersCallback 
+../../node_modules/.pnpm/@testing-library+dom@10.4.
+1/node_modules/@testing-library/dom/dist/wait-for.j
+s:[2m118:16[22m[39m
+
+[31m[2mÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»
+ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»[3/41]ÔÄ»[22m[39m
+
+[41m[1m FAIL [22m[49m 
+tests/unit/gems/gem-badge.test.tsx[2m > 
+[22mGemBadge[2m > [22mrenders Quartzo text for 
+score 0.1
+[31m[1mError[22m: Invalid Chai property: 
+toBeInTheDocument[39m
+[36m [2mÔØ»[22m tests/unit/gems/gem-badge.test.t
+sx:[2m18:38[22m[39m
+    [90m 16|[39m  [34mit[39m([32m"renders 
+Quartzo text for score 0.1"[39m[33m,[39m () 
+[33m=>[39m {
+    [90m 17|[39m   
+[34mrender[39m([33m<[39m[33mGemBadge[39m [33
+mscore[39m[33m=[39m[33m{[39m[34m0.1[39m[33m
+}[39m [33m/[39m[33m>[39m)[33m;[39m
+    [90m 18|[39m   [34mexpect[39m(screen[33m.
+[39m[34mgetByText[39m([32m"Quartzo"[39m))[33m.
+[39m[34mtoBeInTheDocument[39m()[33m;[39m
+    [90m   |[39m                                 
+     [31m^[39m
+    [90m 19|[39m  })[33m;[39m
+    [90m 20|[39m
+
+[31m[2mÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»
+ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»[4/41]ÔÄ»[22m[39m
+
+[41m[1m FAIL [22m[49m 
+tests/unit/gems/gem-badge.test.tsx[2m > 
+[22mGemBadge[2m > [22mrenders Ametista text for 
+score 0.5
+[31m[1mError[22m: Invalid Chai property: 
+toBeInTheDocument[39m
+[36m [2mÔØ»[22m tests/unit/gems/gem-badge.test.t
+sx:[2m23:39[22m[39m
+    [90m 21|[39m  [34mit[39m([32m"renders 
+Ametista text for score 0.5"[39m[33m,[39m () 
+[33m=>[39m {
+    [90m 22|[39m   
+[34mrender[39m([33m<[39m[33mGemBadge[39m [33
+mscore[39m[33m=[39m[33m{[39m[34m0.5[39m[33m
+}[39m [33m/[39m[33m>[39m)[33m;[39m
+    [90m 23|[39m   [34mexpect[39m(screen[33m.
+[39m[34mgetByText[39m([32m"Ametista"[39m))[33m
+.[39m[34mtoBeInTheDocument[39m()[33m;[39m
+    [90m   |[39m                                 
+      [31m^[39m
+    [90m 24|[39m  })[33m;[39m
+    [90m 25|[39m
+
+[31m[2mÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»
+ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»[5/41]ÔÄ»[22m[39m
+
+[41m[1m FAIL [22m[49m 
+tests/unit/gems/gem-badge.test.tsx[2m > 
+[22mGemBadge[2m > [22mrenders Esmeralda text 
+for score 1.0
+[31m[1mError[22m: Invalid Chai property: 
+toBeInTheDocument[39m
+[36m [2mÔØ»[22m tests/unit/gems/gem-badge.test.t
+sx:[2m28:40[22m[39m
+    [90m 26|[39m  [34mit[39m([32m"renders 
+Esmeralda text for score 1.0"[39m[33m,[39m () 
+[33m=>[39m {
+    [90m 27|[39m   
+[34mrender[39m([33m<[39m[33mGemBadge[39m [33
+mscore[39m[33m=[39m[33m{[39m[34m1.0[39m[33m
+}[39m [33m/[39m[33m>[39m)[33m;[39m
+    [90m 28|[39m   [34mexpect[39m(screen[33m.
+[39m[34mgetByText[39m([32m"Esmeralda"[39m))[33
+m.[39m[34mtoBeInTheDocument[39m()[33m;[39m
+    [90m   |[39m                                 
+       [31m^[39m
+    [90m 29|[39m  })[33m;[39m
+    [90m 30|[39m
+
+[31m[2mÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»
+ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»[6/41]ÔÄ»[22m[39m
+
+[41m[1m FAIL [22m[49m 
+tests/unit/gems/gem-badge.test.tsx[2m > 
+[22mGemBadge[2m > [22mrenders Rubi text for 
+score 2.0
+[31m[1mError[22m: Invalid Chai property: 
+toBeInTheDocument[39m
+[36m [2mÔØ»[22m tests/unit/gems/gem-badge.test.t
+sx:[2m33:35[22m[39m
+    [90m 31|[39m  [34mit[39m([32m"renders 
+Rubi text for score 2.0"[39m[33m,[39m () 
+[33m=>[39m {
+    [90m 32|[39m   
+[34mrender[39m([33m<[39m[33mGemBadge[39m [33
+mscore[39m[33m=[39m[33m{[39m[34m2.0[39m[33m
+}[39m [33m/[39m[33m>[39m)[33m;[39m
+    [90m 33|[39m   [34mexpect[39m(screen[33m.
+[39m[34mgetByText[39m([32m"Rubi"[39m))[33m.[3
+9m[34mtoBeInTheDocument[39m()[33m;[39m
+    [90m   |[39m                                 
+  [31m^[39m
+    [90m 34|[39m  })[33m;[39m
+    [90m 35|[39m
+
+[31m[2mÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»
+ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»[7/41]ÔÄ»[22m[39m
+
+[41m[1m FAIL [22m[49m 
+tests/unit/gems/gem-badge.test.tsx[2m > 
+[22mGemBadge[2m > [22mrenders Safira text for 
+score 4.0
+[31m[1mError[22m: Invalid Chai property: 
+toBeInTheDocument[39m
+[36m [2mÔØ»[22m tests/unit/gems/gem-badge.test.t
+sx:[2m38:37[22m[39m
+    [90m 36|[39m  [34mit[39m([32m"renders 
+Safira text for score 4.0"[39m[33m,[39m () 
+[33m=>[39m {
+    [90m 37|[39m   
+[34mrender[39m([33m<[39m[33mGemBadge[39m [33
+mscore[39m[33m=[39m[33m{[39m[34m4.0[39m[33m
+}[39m [33m/[39m[33m>[39m)[33m;[39m
+    [90m 38|[39m   [34mexpect[39m(screen[33m.
+[39m[34mgetByText[39m([32m"Safira"[39m))[33m.
+[39m[34mtoBeInTheDocument[39m()[33m;[39m
+    [90m   |[39m                                 
+    [31m^[39m
+    [90m 39|[39m  })[33m;[39m
+    [90m 40|[39m
+
+[31m[2mÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»
+ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»[8/41]ÔÄ»[22m[39m
+
+[41m[1m FAIL [22m[49m 
+tests/unit/gems/gem-badge.test.tsx[2m > 
+[22mGemBadge[2m > [22mrenders Diamante text for 
+score 7.0
+[31m[1mError[22m: Invalid Chai property: 
+toBeInTheDocument[39m
+[36m [2mÔØ»[22m tests/unit/gems/gem-badge.test.t
+sx:[2m43:39[22m[39m
+    [90m 41|[39m  [34mit[39m([32m"renders 
+Diamante text for score 7.0"[39m[33m,[39m () 
+[33m=>[39m {
+    [90m 42|[39m   
+[34mrender[39m([33m<[39m[33mGemBadge[39m [33
+mscore[39m[33m=[39m[33m{[39m[34m7.0[39m[33m
+}[39m [33m/[39m[33m>[39m)[33m;[39m
+    [90m 43|[39m   [34mexpect[39m(screen[33m.
+[39m[34mgetByText[39m([32m"Diamante"[39m))[33m
+.[39m[34mtoBeInTheDocument[39m()[33m;[39m
+    [90m   |[39m                                 
+      [31m^[39m
+    [90m 44|[39m  })[33m;[39m
+    [90m 45|[39m
+
+[31m[2mÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»
+ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»[9/41]ÔÄ»[22m[39m
+
+[41m[1m FAIL [22m[49m 
+tests/unit/gems/gem-badge.test.tsx[2m > 
+[22mGemBadge[2m > [22mshows weight multiplier 
+when showScore is true
+[31m[1mError[22m: Invalid Chai property: 
+toBeInTheDocument[39m
+[36m [2mÔØ»[22m tests/unit/gems/gem-badge.test.t
+sx:[2m48:35[22m[39m
+    [90m 46|[39m  [34mit[39m([32m"shows 
+weight multiplier when showScore is 
+true"[39m[33m,[39m () [33m=>[39m {
+    [90m 47|[39m   
+[34mrender[39m([33m<[39m[33mGemBadge[39m [33
+mscore[39m[33m=[39m[33m{[39m[34m7.0[39m[33m
+}[39m [33mshowScore[39m 
+[33m/[39m[33m>[39m)[33m;[39m
+    [90m 48|[39m   [34mexpect[39m(screen[33m.
+[39m[34mgetByText[39m([32m"x100"[39m))[33m.[3
+9m[34mtoBeInTheDocument[39m()[33m;[39m
+    [90m   |[39m                                 
+  [31m^[39m
+    [90m 49|[39m  })[33m;[39m
+    [90m 50|[39m
+
+[31m[2mÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»
+ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»[10/41]ÔÄ»[22m[39m
+
+[41m[1m FAIL [22m[49m 
+tests/unit/gems/gem-badge.test.tsx[2m > 
+[22mGemBadge[2m > [22mdoes not show weight 
+multiplier by default
+[31m[1mError[22m: Invalid Chai property: 
+toBeInTheDocument[39m
+[36m [2mÔØ»[22m tests/unit/gems/gem-badge.test.t
+sx:[2m53:38[22m[39m
+    [90m 51|[39m  [34mit[39m([32m"does not 
+show weight multiplier by default"[39m[33m,[39m 
+() [33m=>[39m {
+    [90m 52|[39m   
+[34mrender[39m([33m<[39m[33mGemBadge[39m [33
+mscore[39m[33m=[39m[33m{[39m[34m7.0[39m[33m
+}[39m [33m/[39m[33m>[39m)[33m;[39m
+    [90m 53|[39m   [34mexpect[39m(screen[33m.
+[39m[34mqueryByText[39m([32m"x100"[39m))[33m.
+[39mnot[33m.[39m[34mtoBeInTheDocument[39m()[33
+m;[39m
+    [90m   |[39m                                 
+     [31m^[39m
+    [90m 54|[39m  })[33m;[39m
+    [90m 55|[39m
+
+[31m[2mÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»
+ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»[11/41]ÔÄ»[22m[39m
+
+[41m[1m FAIL [22m[49m 
+tests/unit/gems/gem-badge.test.tsx[2m > 
+[22mGemBadge[2m > [22mincludes aria-label with 
+tier name and weight
+[31m[1mError[22m: Invalid Chai property: 
+toBeInTheDocument[39m
+[36m [2mÔØ»[22m tests/unit/gems/gem-badge.test.t
+sx:[2m59:16[22m[39m
+    [90m 57|[39m   
+[34mrender[39m([33m<[39m[33mGemBadge[39m [33
+mscore[39m[33m=[39m[33m{[39m[34m7.0[39m[33m
+}[39m [33m/[39m[33m>[39m)[33m;[39m
+    [90m 58|[39m   [35mconst[39m badge 
+[33m=[39m screen[33m.[39m[34mgetByLabelText[3
+9m([36m/Diamante gem/i[39m)[33m;[39m
+    [90m 59|[39m   [34mexpect[39m(badge)[33m.
+[39m[34mtoBeInTheDocument[39m()[33m;[39m
+    [90m   |[39m                [31m^[39m
+    [90m 60|[39m   [34mexpect[39m(badge[33m.[
+39m[34mgetAttribute[39m([32m"aria-label"[39m))
+[33m.[39m[34mtoContain[39m([32m"weight 
+100"[39m)[33m;[39m
+    [90m 61|[39m  })[33m;[39m
+
+[31m[2mÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»
+ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»[12/41]ÔÄ»[22m[39m
+
+[41m[1m FAIL [22m[49m 
+tests/unit/gems/gem-badge.test.tsx[2m > 
+[22mGemBadge[2m > [22muses quartz glyph for 
+quartz tier
+[31m[1mError[22m: Invalid Chai property: 
+toBeInTheDocument[39m
+[36m [2mÔØ»[22m tests/unit/gems/gem-badge.test.t
+sx:[2m65:37[22m[39m
+    [90m 63|[39m  [34mit[39m([32m"uses quartz 
+glyph for quartz tier"[39m[33m,[39m () 
+[33m=>[39m {
+    [90m 64|[39m   
+[34mrender[39m([33m<[39m[33mGemBadge[39m [33
+mscore[39m[33m=[39m[33m{[39m[34m0.1[39m[33m
+}[39m [33m/[39m[33m>[39m)[33m;[39m
+    [90m 65|[39m   [34mexpect[39m(screen[33m.
+[39m[34mgetByText[39m([32m"\u25C7"[39m))[33m.
+[39m[34mtoBeInTheDocument[39m()[33m;[39m
+    [90m   |[39m                                 
+    [31m^[39m
+    [90m 66|[39m  })[33m;[39m
+    [90m 67|[39m
+
+[31m[2mÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»
+ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»[13/41]ÔÄ»[22m[39m
+
+[41m[1m FAIL [22m[49m 
+tests/unit/gems/gem-badge.test.tsx[2m > 
+[22mGemBadge[2m > [22muses amethyst glyph for 
+amethyst tier
+[31m[1mError[22m: Invalid Chai property: 
+toBeInTheDocument[39m
+[36m [2mÔØ»[22m tests/unit/gems/gem-badge.test.t
+sx:[2m70:37[22m[39m
+    [90m 68|[39m  [34mit[39m([32m"uses 
+amethyst glyph for amethyst tier"[39m[33m,[39m 
+() [33m=>[39m {
+    [90m 69|[39m   
+[34mrender[39m([33m<[39m[33mGemBadge[39m [33
+mscore[39m[33m=[39m[33m{[39m[34m0.5[39m[33m
+}[39m [33m/[39m[33m>[39m)[33m;[39m
+    [90m 70|[39m   [34mexpect[39m(screen[33m.
+[39m[34mgetByText[39m([32m"\u2B21"[39m))[33m.
+[39m[34mtoBeInTheDocument[39m()[33m;[39m
+    [90m   |[39m                                 
+    [31m^[39m
+    [90m 71|[39m  })[33m;[39m
+    [90m 72|[39m
+
+[31m[2mÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»
+ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»[14/41]ÔÄ»[22m[39m
+
+[41m[1m FAIL [22m[49m 
+tests/unit/gems/gem-badge.test.tsx[2m > 
+[22mGemBadge[2m > [22muses sapphire glyph for 
+sapphire tier
+[31m[1mError[22m: Invalid Chai property: 
+toBeInTheDocument[39m
+[36m [2mÔØ»[22m tests/unit/gems/gem-badge.test.t
+sx:[2m75:37[22m[39m
+    [90m 73|[39m  [34mit[39m([32m"uses 
+sapphire glyph for sapphire tier"[39m[33m,[39m 
+() [33m=>[39m {
+    [90m 74|[39m   
+[34mrender[39m([33m<[39m[33mGemBadge[39m [33
+mscore[39m[33m=[39m[33m{[39m[34m4.0[39m[33m
+}[39m [33m/[39m[33m>[39m)[33m;[39m
+    [90m 75|[39m   [34mexpect[39m(screen[33m.
+[39m[34mgetByText[39m([32m"\u25C6"[39m))[33m.
+[39m[34mtoBeInTheDocument[39m()[33m;[39m
+    [90m   |[39m                                 
+    [31m^[39m
+    [90m 76|[39m  })[33m;[39m
+    [90m 77|[39m
+
+[31m[2mÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»
+ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»[15/41]ÔÄ»[22m[39m
+
+[41m[1m FAIL [22m[49m 
+tests/unit/gems/gem-badge.test.tsx[2m > 
+[22mGemBadge[2m > [22muses diamond glyph for 
+diamond tier
+[31m[1mError[22m: Invalid Chai property: 
+toBeInTheDocument[39m
+[36m [2mÔØ»[22m tests/unit/gems/gem-badge.test.t
+sx:[2m80:37[22m[39m
+    [90m 78|[39m  [34mit[39m([32m"uses 
+diamond glyph for diamond tier"[39m[33m,[39m () 
+[33m=>[39m {
+    [90m 79|[39m   
+[34mrender[39m([33m<[39m[33mGemBadge[39m [33
+mscore[39m[33m=[39m[33m{[39m[34m7.0[39m[33m
+}[39m [33m/[39m[33m>[39m)[33m;[39m
+    [90m 80|[39m   [34mexpect[39m(screen[33m.
+[39m[34mgetByText[39m([32m"\u2756"[39m))[33m.
+[39m[34mtoBeInTheDocument[39m()[33m;[39m
+    [90m   |[39m                                 
+    [31m^[39m
+    [90m 81|[39m  })[33m;[39m
+    [90m 82|[39m
+
+[31m[2mÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»
+ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»[16/41]ÔÄ»[22m[39m
+
+[41m[1m FAIL [22m[49m tests/unit/components/col
+lection/add-record-dialog.test.tsx[2m > 
+[22mAddRecordDialog[2m > [22mrenders search 
+input when open
+[31m[1mError[22m: Invalid Chai property: 
+toBeInTheDocument[39m
+[36m [2mÔØ»[22m tests/unit/components/collection
+/add-record-dialog.test.tsx:[2m57:70[22m[39m
+    [90m 55|[39m   [34mrender[39m([33m<[39m[
+33mAddRecordDialog[39m [33mopen[39m[33m=[39m[
+33m{[39m[35mtrue[39m[33m}[39m [33monOpenChang
+e[39m[33m=[39m[33m{[39mvi[33m.[39m[34mfn[3
+9m()[33m}[39m [33m/[39m[33m>[39m)[33m;[39m
+    [90m 56|[39m
+    [90m 57|[39m   
+expect(screen.getByPlaceholderText("Search by 
+title or artist...")).ÔÇª
+    [90m   |[39m                                 
+                                     [31m^[39m
+    [90m 58|[39m  })[33m;[39m
+    [90m 59|[39m
+
+[31m[2mÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»
+ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»[17/41]ÔÄ»[22m[39m
+
+[41m[1m FAIL [22m[49m tests/unit/components/col
+lection/add-record-dialog.test.tsx[2m > 
+[22mAddRecordDialog[2m > [22mdisplays search 
+results
+[31m[1mError[22m[39m: Invalid Chai property: 
+toBeInTheDocument
+
+Ignored nodes: comments, script, style
+[36m<html[39m
+  [33mdata-base-ui-scroll-locked[39m=[32m""[39m
+  [33mstyle[39m=[32m"scrollbar-gutter: stable; 
+overflow-y: hidden; overflow-x: hidden; 
+scroll-behavior: unset;"[39m
+[36m>[39m
+  [36m<head />[39m
+  [36m<body[39m
+    [33mstyle[39m=[32m"position: relative; 
+height: calc(100dvh - nanpx); width: calc(100vw - 
+nanpx); box-sizing: border-box; overflow: hidden; 
+scroll-behavior: unset;"[39m
+  [36m>[39m
+    [36m<div[39m
+      [33maria-hidden[39m=[32m"true"[39m
+      [33mdata-base-ui-inert[39m=[32m""[39m
+    [36m/>[39m
+    [36m<div[39m
+      [33mdata-base-ui-portal[39m=[32m""[39m
+      [33mdata-slot[39m=[32m"dialog-portal"[39m
+      [33mid[39m=[32m"┬½re┬╗"[39m
+    [36m>[39m
+      [36m<div[39m
+        [33maria-hidden[39m=[32m"true"[39m
+        [33mdata-base-ui-inert[39m=[32m""[39m
+        [33mrole[39m=[32m"presentation"[39m
+        [33mstyle[39m=[32m"position: fixed; 
+inset: 0px; user-select: none; 
+-webkit-user-select: none;"[39m
+      [36m/>[39m
+      [36m<div[39m
+        [33maria-hidden[39m=[32m"true"[39m
+        [33mclass[39m=[32m"fixed inset-0 
+isolate z-50 bg-black/10 duration-100 
+supports-backdrop-filter:backdrop-blur-xs 
+data-open:animate-in data-open:fade-in-0 
+data-closed:animate-out 
+data-closed:fade-out-0"[39m
+        [33mdata-base-ui-inert[39m=[32m""[39m
+        [33mdata-open[39m=[32m""[39m
+        
+[33mdata-slot[39m=[32m"dialog-overlay"[39m
+        [33mrole[39m=[32m"presentation"[39m
+        [33mstyle[39m=[32m"user-select: none; 
+-webkit-user-select: none;"[39m
+      [36m/>[39m
+      [36m<span[39m
+        
+[33mdata-base-ui-focus-guard[39m=[32m""[39m
+        [33mdata-base-ui-inert[39m=[32m""[39m
+        [33mdata-type[39m=[32m"inside"[39m
+        [33mrole[39m=[32m"button"[39m
+        [33mstyle[39m=[32m"clip-path: 
+inset(50%); overflow: hidden; white-space: nowrap; 
+border: 0px; padding: 0px; width: 1px; height: 
+1px; margin: -1px; position: fixed; top: 0px; 
+left: 0px;"[39m
+        [33mtabindex[39m=[32m"0"[39m
+      [36m/>[39m
+      [36m<div[39m
+        [33maria-describedby[39m=[32m"base-ui-┬½
+rg┬╗"[39m
+        [33maria-labelledby[39m=[32m"base-ui-┬½r
+f┬╗"[39m
+        [33mclass[39m=[32m"fixed top-1/2 
+left-1/2 z-50 w-full max-w-[calc(100%-2rem)] 
+-translate-x-1/2 -translate-y-1/2 gap-4 rounded-xl 
+bg-popover p-4 text-sm text-popover-foreground 
+ring-1 ring-foreground/10 duration-100 
+outline-none data-open:animate-in 
+data-open:fade-in-0 data-open:zoom-in-95 
+data-closed:animate-out data-closed:fade-out-0 
+data-closed:zoom-out-95 sm:max-w-lg max-h-[80vh] 
+flex flex-col"[39m
+        
+[33mdata-base-ui-focusable[39m=[32m""[39m
+        [33mdata-open[39m=[32m""[39m
+        
+[33mdata-slot[39m=[32m"dialog-content"[39m
+        [33mid[39m=[32m"┬½rc┬╗"[39m
+        [33mrole[39m=[32m"dialog"[39m
+        [33mstyle[39m=[32m"--nested-dialogs: 
+0;"[39m
+        [33mtabindex[39m=[32m"-1"[39m
+      [36m>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"flex flex-col 
+gap-2"[39m
+          
+[33mdata-slot[39m=[32m"dialog-header"[39m
+        [36m>[39m
+          [36m<h2[39m
+            [33mclass[39m=[32m"text-base 
+leading-none font-medium font-heading"[39m
+            
+[33mdata-slot[39m=[32m"dialog-title"[39m
+            [33mid[39m=[32m"base-ui-┬½rf┬╗"[39m
+          [36m>[39m
+            [0mAdd Record[0m
+          [36m</h2>[39m
+          [36m<p[39m
+            
+[33mclass[39m=[32m"text-muted-foreground 
+*:[a]:underline *:[a]:underline-offset-3 
+*:[a]:hover:text-foreground font-mono text-xs"[39m
+            
+[33mdata-slot[39m=[32m"dialog-description"[39m
+            [33mid[39m=[32m"base-ui-┬½rg┬╗"[39m
+          [36m>[39m
+            [0mSearch Discogs to find a 
+release[0m
+          [36m</p>[39m
+        [36m</div>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"px-1"[39m
+        [36m>[39m
+          [36m<input[39m
+            [33mclass[39m=[32m"h-8 w-full 
+min-w-0 rounded-lg border border-input 
+bg-transparent px-2.5 py-1 text-base 
+transition-colors outline-none file:inline-flex 
+file:h-6 file:border-0 file:bg-transparent 
+file:text-sm file:font-medium file:text-foreground 
+placeholder:text-muted-foreground 
+focus-visible:border-ring focus-visible:ring-3 
+focus-visible:ring-ring/50 
+disabled:pointer-events-none 
+disabled:cursor-not-allowed disabled:bg-input/50 
+disabled:opacity-50 
+aria-invalid:border-destructive 
+aria-invalid:ring-3 
+aria-invalid:ring-destructive/20 md:text-sm 
+dark:bg-input/30 dark:disabled:bg-input/80 
+dark:aria-invalid:border-destructive/50 
+dark:aria-invalid:ring-destructive/40 
+font-mono"[39m
+            [33mdata-slot[39m=[32m"input"[39m
+            [33mid[39m=[32m"base-ui-┬½rh┬╗"[39m
+            [33mplaceholder[39m=[32m"Search by 
+title or artist..."[39m
+            [33mvalue[39m=[32m"Kind of 
+Blue"[39m
+          [36m/>[39m
+        [36m</div>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"flex-1 
+overflow-y-auto min-h-0 mt-2"[39m
+        [36m>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"space-y-1"[39m
+          [36m>[39m
+            [36m<button[39m
+              [33mclass[39m=[32m"w-full flex 
+items-center gap-3 p-2 rounded-lg 
+hover:bg-surface-container-high transition-colors 
+text-left disabled:opacity-50"[39m
+              [33mtype[39m=[32m"button"[39m
+            [36m>[39m
+              [36m<div[39m
+                [33mclass[39m=[32m"w-12 h-12 
+rounded bg-surface-container-high flex-shrink-0 
+overflow-hidden"[39m
+              [36m>[39m
+                [36m<div[39m
+                  [33mclass[39m=[32m"w-full 
+h-full flex items-center justify-center"[39m
+                [36m>[39m
+                  [36m<span[39m
+                    
+[33mclass[39m=[32m"material-symbols-outlined 
+text-on-surface-variant text-lg"[39m
+                  [36m>[39m
+                    [0malbum[0m
+                  [36m</span>[39m
+                [36m</div>[39m
+              [36m</div>[39m
+              [36m<div[39m
+                [33mclass[39m=[32m"flex-1 
+min-w-0"[39m
+              [36m>[39m
+                [36m<div[39m
+                  [33mclass[39m=[32m"text-sm 
+font-medium text-on-surface truncate"[39m
+                [36m>[39m
+                  [0mKind of Blue[0m
+                [36m</div>[39m
+                [36m<div[39m
+                  [33mclass[39m=[32m"text-xs 
+text-on-surface-variant truncate"[39m
+                [36m>[39m
+                  [0mMiles Davis[0m
+                [36m</div>[39m
+              [36m</div>[39m
+              [36m<div[39m
+                
+[33mclass[39m=[32m"flex-shrink-0 
+text-right"[39m
+              [36m>[39m
+                [36m<div[39m
+                  [33mclass[39m=[32m"text-xs 
+font-mono text-on-surface-variant"[39m
+                [36m>[39m
+                  [36m<div>[39m
+                    [0m1959[0m
+                  [36m</div>[39m
+                  [36m<div[39m
+                    [33mclass[39m=[32m"text-on-s
+urface-variant/60"[39m
+                  [36m>[39m
+                    [0mLP[0m
+                  [36m</div>[39m
+                [36m</div>[39m
+              [36m</div>[39m
+            [36m</button>[39m
+          [36m</div>[39m
+        [36m</div>[39m
+        [36m<button[39m
+          [33mclass[39m=[32m"group/button 
+inline-flex shrink-0 items-center justify-center 
+border border-transparent bg-clip-padding text-sm 
+font-medium whitespace-nowrap transition-all 
+outline-none select-none focus-visible:border-ring 
+focus-visible:ring-3 focus-visible:ring-ring/50 
+active:not-aria-[haspopup]:translate-y-px 
+disabled:pointer-events-none disabled:opacity-50 
+aria-invalid:border-destructive 
+aria-invalid:ring-3 
+aria-invalid:ring-destructive/20 
+dark:aria-invalid:border-destructive/50 
+dark:aria-invalid:ring-destructive/40 
+[&_svg]:pointer-events-none [&_svg]:shrink-0 
+[&_svg:not([class*='size-'])]:size-4 
+hover:bg-muted hover:text-foreground 
+aria-expanded:bg-muted 
+aria-expanded:text-foreground 
+dark:hover:bg-muted/50 size-7 
+rounded-[min(var(--radius-md),12px)] 
+in-data-[slot=button-group]:rounded-lg absolute 
+top-2 right-2"[39m
+          
+[33mdata-slot[39m=[32m"dialog-close"[39m
+          [33mtabindex[39m=[32m"0"[39m
+          [33mtype[39m=[32m"button"[39m
+        [36m>[39m
+          [36m<svg[39m
+            [33maria-hidden[39m=[32m"true"[39m
+            [33mclass[39m=[32m"lucide 
+lucide-x"[39m
+            [33mfill[39m=[32m"none"[39m
+            [33mheight[39m=[32m"24"[39m
+            
+[33mstroke[39m=[32m"currentColor"[39m
+            
+[33mstroke-linecap[39m=[32m"round"[39m
+            
+[33mstroke-linejoin[39m=[32m"round"[39m
+            [33mstroke-width[39m=[32m"2"[39m
+            [33mviewBox[39m=[32m"0 0 24 24"[39m
+            [33mwidth[39m=[32m"24"[39m
+            [33mxmlns[39m=[32m"http://www.w3.org
+/2000/svg"[39m
+          [36m>[39m
+            [36m<path[39m
+              [33md[39m=[32m"M18 6 6 18"[39m
+            [36m/>[39m
+            [36m<path[39m
+              [33md[39m=[32m"m6 6 12 12"[39m
+            [36m/>[39m
+          [36m</svg>[39m
+          [36m<span[39m
+            [33mclass[39m=[32m"sr-only"[39m
+          [36m>[39m
+            [0mClose[0m
+          [36m</span>[39m
+        [36m</button>[39m
+      [36m</div>[39m
+      [36m<span[39m
+        
+[33mdata-base-ui-focus-guard[39m=[32m""[39m
+        [33mdata-base-ui-inert[39m=[32m""[39m
+        [33mdata-type[39m=[32m"inside"[39m
+        [33mrole[39m=[32m"button"[39m
+        [33mstyle[39m=[32m"clip-path: 
+inset(50%); overflow: hidden; white-space: nowrap; 
+border: 0px; padding: 0px; width: 1px; height: 
+1px; margin: -1px; position: fixed; top: 0px; 
+left: 0px;"[39m
+        [33mtabindex[39m=[32m"0"[39m
+      [36m/>[39m
+    [36m</div>[39m
+  [36m</body>[39m
+[36m</html>[39m
+[36m [2mÔØ»[22m tests/unit/components/collection
+/add-record-dialog.test.tsx:[2m119:44[22m[39m
+    [90m117|[39m
+    [90m118|[39m   [35mawait[39m 
+[34mwaitFor[39m(() [33m=>[39m {
+    [90m119|[39m    [34mexpect[39m(screen[33m.
+[39m[34mgetByText[39m([32m"Kind of Blue"[39m))
+[33m.[39m[34mtoBeInTheDocument[39m()[33m;[39m
+    [90m   |[39m                                 
+           [31m^[39m
+    [90m120|[39m   })[33m;[39m
+    [90m121|[39m
+[90m [2mÔØ»[22m 
+runWithExpensiveErrorDiagnosticsDisabled ../../node
+_modules/.pnpm/@testing-library+dom@10.4.1/node_mod
+ules/@testing-library/dom/dist/config.js:[2m47:12
+[22m[39m
+[90m [2mÔØ»[22m checkCallback ../../node_modules
+/.pnpm/@testing-library+dom@10.4.1/node_modules/@te
+sting-library/dom/dist/wait-for.js:[2m124:77[22m
+[39m
+[90m [2mÔØ»[22m Timeout.checkRealTimersCallback 
+../../node_modules/.pnpm/@testing-library+dom@10.4.
+1/node_modules/@testing-library/dom/dist/wait-for.j
+s:[2m118:16[22m[39m
+
+[31m[2mÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»
+ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»[18/41]ÔÄ»[22m[39m
+
+[41m[1m FAIL [22m[49m tests/unit/components/col
+lection/add-record-dialog.test.tsx[2m > 
+[22mAddRecordDialog[2m > [22mshows loading 
+state during search
+[31m[1mError[22m: Invalid Chai property: 
+toBeInTheDocument[39m
+[36m [2mÔØ»[22m tests/unit/components/collection
+/add-record-dialog.test.tsx:[2m135:51[22m[39m
+    [90m133|[39m
+    [90m134|[39m   // After typing but before 
+debounce fires, isSearching should be setÔÇª
+    [90m135|[39m   [34mexpect[39m(screen[33m.
+[39m[34mgetByText[39m([32m"Searching Discogs..."
+[39m))[33m.[39m[34mtoBeInTheDocument[39m()[33
+m;[39m
+    [90m   |[39m                                 
+                  [31m^[39m
+    [90m136|[39m  })[33m;[39m
+    [90m137|[39m
+
+[31m[2mÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»
+ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»[19/41]ÔÄ»[22m[39m
+
+[41m[1m FAIL [22m[49m tests/unit/components/col
+lection/collection-grid.test.tsx[2m > 
+[22mCollectionGrid[2m > [22mrenders correct 
+number of cards for given items
+[31m[1mError[22m: Invalid Chai property: 
+toBeInTheDocument[39m
+[36m [2mÔØ»[22m tests/unit/components/collection
+/collection-grid.test.tsx:[2m58:44[22m[39m
+    [90m 56|[39m   [34mrender[39m([33m<[39m[
+33mCollectionGrid[39m [33mitems[39m[33m=[39m[
+33m{[39mitems[33m}[39m [33misOwner[39m[33m=[
+39m[33m{[39m[35mfalse[39m[33m}[39m 
+[33m/[39m[33m>[39m)[33m;[39m
+    [90m 57|[39m
+    [90m 58|[39m   [34mexpect[39m(screen[33m.
+[39m[34mgetByTestId[39m([32m"card-item-1"[39m))
+[33m.[39m[34mtoBeInTheDocument[39m()[33m;[39m
+    [90m   |[39m                                 
+           [31m^[39m
+    [90m 59|[39m   [34mexpect[39m(screen[33m.
+[39m[34mgetByTestId[39m([32m"card-item-2"[39m))
+[33m.[39m[34mtoBeInTheDocument[39m()[33m;[39m
+    [90m 60|[39m   [34mexpect[39m(screen[33m.
+[39m[34mgetByTestId[39m([32m"card-item-3"[39m))
+[33m.[39m[34mtoBeInTheDocument[39m()[33m;[39m
+
+[31m[2mÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»
+ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»[20/41]ÔÄ»[22m[39m
+
+[41m[1m FAIL [22m[49m tests/unit/components/col
+lection/collection-grid.test.tsx[2m > 
+[22mCollectionGrid[2m > [22mrenders empty state 
+when items is empty
+[31m[1mError[22m: Invalid Chai property: 
+toBeInTheDocument[39m
+[36m [2mÔØ»[22m tests/unit/components/collection
+/collection-grid.test.tsx:[2m66:47[22m[39m
+    [90m 64|[39m   [34mrender[39m([33m<[39m[
+33mCollectionGrid[39m 
+[33mitems[39m[33m=[39m[33m{[39m[][33m}[39m 
+[33misOwner[39m[33m=[39m[33m{[39m[35mfalse[
+39m[33m}[39m [33m/[39m[33m>[39m)[33m;[39m
+    [90m 65|[39m
+    [90m 66|[39m   [34mexpect[39m(screen[33m.
+[39m[34mgetByText[39m([32m"No records found"[39
+m))[33m.[39m[34mtoBeInTheDocument[39m()[33m;[
+39m
+    [90m   |[39m                                 
+              [31m^[39m
+    [90m 67|[39m  })[33m;[39m
+    [90m 68|[39m
+
+[31m[2mÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»
+ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»[21/41]ÔÄ»[22m[39m
+
+[41m[1m FAIL [22m[49m tests/unit/components/col
+lection/collection-grid.test.tsx[2m > 
+[22mCollectionGrid[2m > [22mpasses isOwner prop 
+to CollectionCard
+[31m[1mError[22m: Invalid Chai property: 
+toBeInTheDocument[39m
+[36m [2mÔØ»[22m tests/unit/components/collection
+/collection-grid.test.tsx:[2m86:44[22m[39m
+    [90m 84|[39m
+    [90m 85|[39m   // Card renders since mock 
+does not fail -- verifying no crash with ÔÇª
+    [90m 86|[39m   [34mexpect[39m(screen[33m.
+[39m[34mgetByTestId[39m([32m"card-item-1"[39m))
+[33m.[39m[34mtoBeInTheDocument[39m()[33m;[39m
+    [90m   |[39m                                 
+           [31m^[39m
+    [90m 87|[39m  })[33m;[39m
+    [90m 88|[39m })[33m;[39m
+
+[31m[2mÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»
+ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»[22/41]ÔÄ»[22m[39m
+
+[41m[1m FAIL [22m[49m tests/unit/components/she
+ll/app-header.test.tsx[2m > [22mAppHeader[2m > 
+[22mrenders DIGSWAP wordmark
+[31m[1mError[22m: Invalid Chai property: 
+toBeInTheDocument[39m
+[36m [2mÔØ»[22m tests/unit/components/shell/app-
+header.test.tsx:[2m41:34[22m[39m
+    [90m 39|[39m  [34mit[39m([32m"renders 
+DIGSWAP wordmark"[39m[33m,[39m () [33m=>[39m {
+    [90m 40|[39m   render(<AppHeader 
+displayName="Test" avatarUrl={null} 
+userId="test-uÔÇª
+    [90m 41|[39m   [34mexpect[39m(screen[33m.
+[39m[34mgetByText[39m([32m"DIG"[39m))[33m.[39
+m[34mtoBeInTheDocument[39m()[33m;[39m
+    [90m   |[39m                                 
+ [31m^[39m
+    [90m 42|[39m   [34mexpect[39m(screen[33m.
+[39m[34mgetByText[39m([32m"SWAP"[39m))[33m.[3
+9m[34mtoBeInTheDocument[39m()[33m;[39m
+    [90m 43|[39m  })[33m;[39m
+
+[31m[2mÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»
+ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»[23/41]ÔÄ»[22m[39m
+
+[41m[1m FAIL [22m[49m tests/unit/components/she
+ll/app-header.test.tsx[2m > [22mAppHeader[2m > 
+[22mrenders main navigation links
+[31m[1mError[22m[39m: Invalid Chai property: 
+toBeInTheDocument
+
+Ignored nodes: comments, script, style
+[36m<html>[39m
+  [36m<head />[39m
+  [36m<body>[39m
+    [36m<div>[39m
+      [36m<header[39m
+        [33mclass[39m=[32m"fixed top-0 left-0 
+right-0 z-50 h-14 flex items-center w-full 
+border-b border-outline-variant/10 
+bg-surface-dim/95 backdrop-blur-md"[39m
+      [36m>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"flex items-center 
+w-full px-4 md:px-6 gap-2"[39m
+        [36m>[39m
+          [36m<a[39m
+            [33mclass[39m=[32m"shrink-0 mr-2 
+md:mr-4"[39m
+            [33mhref[39m=[32m"/feed"[39m
+          [36m>[39m
+            [36m<span[39m
+              [33mclass[39m=[32m"text-lg 
+md:text-xl font-bold tracking-tighter 
+font-heading"[39m
+            [36m>[39m
+              [36m<span[39m
+                
+[33mclass[39m=[32m"text-primary"[39m
+              [36m>[39m
+                [0mDIG[0m
+              [36m</span>[39m
+              [36m<span[39m
+                
+[33mclass[39m=[32m"text-on-surface"[39m
+              [36m>[39m
+                [0mSWAP[0m
+              [36m</span>[39m
+            [36m</span>[39m
+          [36m</a>[39m
+          [36m<nav[39m
+            [33mclass[39m=[32m"hidden lg:flex 
+items-center bg-surface-container-high/50 
+rounded-full px-1 py-0.5 gap-0.5"[39m
+          [36m>[39m
+            [36m<a[39m
+              [33mclass[39m=[32m"flex 
+items-center gap-1.5 px-3 py-1.5 rounded-full 
+font-mono text-[11px] uppercase tracking-wider 
+transition-all duration-200 bg-primary/15 
+text-primary font-semibold"[39m
+              [33mhref[39m=[32m"/feed"[39m
+            [36m>[39m
+              [36m<span[39m
+                
+[33mclass[39m=[32m"material-symbols-outlined 
+text-[16px]"[39m
+                
+[33mstyle[39m=[32m"font-variation-settings: 
+'FILL' 1;"[39m
+              [36m>[39m
+                [0mhome[0m
+              [36m</span>[39m
+              [36m<span[39m
+                [33mclass[39m=[32m"hidden 
+xl:inline"[39m
+              [36m>[39m
+                [0mFeed[0m
+              [36m</span>[39m
+            [36m</a>[39m
+            [36m<a[39m
+              [33mclass[39m=[32m"flex 
+items-center gap-1.5 px-3 py-1.5 rounded-full 
+font-mono text-[11px] uppercase tracking-wider 
+transition-all duration-200 
+text-on-surface-variant hover:text-on-surface 
+hover:bg-surface-container-high/80"[39m
+              [33mhref[39m=[32m"/explorar"[39m
+            [36m>[39m
+              [36m<span[39m
+                
+[33mclass[39m=[32m"material-symbols-outlined 
+text-[16px]"[39m
+              [36m>[39m
+                [0mexplore[0m
+              [36m</span>[39m
+              [36m<span[39m
+                [33mclass[39m=[32m"hidden 
+xl:inline"[39m
+              [36m>[39m
+                [0mExplore[0m
+              [36m</span>[39m
+            [36m</a>[39m
+            [36m<a[39m
+              [33mclass[39m=[32m"flex 
+items-center gap-1.5 px-3 py-1.5 rounded-full 
+font-mono text-[11px] uppercase tracking-wider 
+transition-all duration-200 
+text-on-surface-variant hover:text-on-surface 
+hover:bg-surface-container-high/80"[39m
+              [33mhref[39m=[32m"/trades"[39m
+            [36m>[39m
+              [36m<span[39m
+                
+[33mclass[39m=[32m"material-symbols-outlined 
+text-[16px]"[39m
+              [36m>[39m
+                [0mswap_horiz[0m
+              [36m</span>[39m
+              [36m<span[39m
+                [33mclass[39m=[32m"hidden 
+xl:inline"[39m
+              [36m>[39m
+                [0mTrades[0m
+              [36m</span>[39m
+            [36m</a>[39m
+            [36m<a[39m
+              [33mclass[39m=[32m"flex 
+items-center gap-1.5 px-3 py-1.5 rounded-full 
+font-mono text-[11px] uppercase tracking-wider 
+transition-all duration-200 
+text-on-surface-variant hover:text-on-surface 
+hover:bg-surface-container-high/80"[39m
+              
+[33mhref[39m=[32m"/comunidade"[39m
+            [36m>[39m
+              [36m<span[39m
+                
+[33mclass[39m=[32m"material-symbols-outlined 
+text-[16px]"[39m
+              [36m>[39m
+                [0mgroup[0m
+              [36m</span>[39m
+              [36m<span[39m
+                [33mclass[39m=[32m"hidden 
+xl:inline"[39m
+              [36m>[39m
+                [0mCommunity[0m
+              [36m</span>[39m
+            [36m</a>[39m
+            [36m<a[39m
+              [33mclass[39m=[32m"flex 
+items-center gap-1.5 px-3 py-1.5 rounded-full 
+font-mono text-[11px] uppercase tracking-wider 
+transition-all duration-200 
+text-on-surface-variant hover:text-on-surface 
+hover:bg-surface-container-high/80"[39m
+              [33mhref[39m=[32m"/perfil"[39m
+            [36m>[39m
+              [36m<span[39m
+                
+[33mclass[39m=[32m"material-symbols-outlined 
+text-[16px]"[39m
+              [36m>[39m
+                [0mperson[0m
+              [36m</span>[39m
+              [36m<span[39m
+                [33mclass[39m=[32m"hidden 
+xl:inline"[39m
+              [36m>[39m
+                [0mProfile[0m
+              [36m</span>[39m
+            [36m</a>[39m
+          [36m</nav>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"flex-1 flex 
+justify-center px-2 md:px-4"[39m
+          [36m>[39m
+            [36m<div[39m
+              
+[33mdata-testid[39m=[32m"global-search"[39m
+            [36m/>[39m
+          [36m</div>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"flex 
+items-center gap-1"[39m
+          [36m>[39m
+            [36m<a[39m
+              [33maria-label[39m=[32m"How to 
+use DigSwap"[39m
+              [33mclass[39m=[32m"p-2 
+rounded-full text-on-surface-variant 
+hover:text-primary 
+hover:bg-surface-container-high/80 
+transition-colors"[39m
+              [33mhref[39m=[32m"/como-usar"[39m
+            [36m>[39m
+              [36m<span[39m
+                
+[33mclass[39m=[32m"material-symbols-outlined 
+text-[20px]"[39m
+              [36m>[39m
+                [0mhelp[0m
+              [36m</span>[39m
+            [36m</a>[39m
+            [36m<div[39m
+              
+[33mdata-testid[39m=[32m"chat-toggle"[39m
+            [36m/>[39m
+            [36m<div[39m
+              
+[33mdata-testid[39m=[32m"notification-bell"[39m
+              
+[33mdata-user-id[39m=[32m"test-user-id"[39m
+            [36m/>[39m
+          [36m</div>[39m
+        [36m</div>[39m
+      [36m</header>[39m
+    [36m</div>[39m
+  [36m</body>[39m
+[36m</html>[39m...
+[36m [2mÔØ»[22m tests/unit/components/shell/app-
+header.test.tsx:[2m54:36[22m[39m
+    [90m 52|[39m   render(<AppHeader 
+displayName="Test" avatarUrl={null} 
+userId="test-uÔÇª
+    [90m 53|[39m   [35mawait[39m 
+[34mwaitFor[39m(() [33m=>[39m {
+    [90m 54|[39m    [34mexpect[39m(screen[33m.
+[39m[34mgetByText[39m([32m"Feed"[39m))[33m.[
+39m[34mtoBeInTheDocument[39m()[33m;[39m
+    [90m   |[39m                                 
+   [31m^[39m
+    [90m 55|[39m    [34mexpect[39m(screen[33m.
+[39m[34mgetByText[39m([32m"Community"[39m))[3
+3m.[39m[34mtoBeInTheDocument[39m()[33m;[39m
+    [90m 56|[39m    [34mexpect[39m(screen[33m.
+[39m[34mgetByText[39m([32m"Explore"[39m))[33m
+.[39m[34mtoBeInTheDocument[39m()[33m;[39m
+[90m [2mÔØ»[22m 
+runWithExpensiveErrorDiagnosticsDisabled ../../node
+_modules/.pnpm/@testing-library+dom@10.4.1/node_mod
+ules/@testing-library/dom/dist/config.js:[2m47:12
+[22m[39m
+[90m [2mÔØ»[22m checkCallback ../../node_modules
+/.pnpm/@testing-library+dom@10.4.1/node_modules/@te
+sting-library/dom/dist/wait-for.js:[2m124:77[22m
+[39m
+[90m [2mÔØ»[22m Timeout.checkRealTimersCallback 
+../../node_modules/.pnpm/@testing-library+dom@10.4.
+1/node_modules/@testing-library/dom/dist/wait-for.j
+s:[2m118:16[22m[39m
+
+[31m[2mÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»
+ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»[24/41]ÔÄ»[22m[39m
+
+[41m[1m FAIL [22m[49m tests/unit/components/she
+ll/app-header.test.tsx[2m > [22mAppHeader[2m > 
+[22mrenders notification bell for the current user
+[31m[1mError[22m[39m: Invalid Chai property: 
+toHaveAttribute
+
+Ignored nodes: comments, script, style
+[36m<html>[39m
+  [36m<head />[39m
+  [36m<body>[39m
+    [36m<div>[39m
+      [36m<header[39m
+        [33mclass[39m=[32m"fixed top-0 left-0 
+right-0 z-50 h-14 flex items-center w-full 
+border-b border-outline-variant/10 
+bg-surface-dim/95 backdrop-blur-md"[39m
+      [36m>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"flex items-center 
+w-full px-4 md:px-6 gap-2"[39m
+        [36m>[39m
+          [36m<a[39m
+            [33mclass[39m=[32m"shrink-0 mr-2 
+md:mr-4"[39m
+            [33mhref[39m=[32m"/feed"[39m
+          [36m>[39m
+            [36m<span[39m
+              [33mclass[39m=[32m"text-lg 
+md:text-xl font-bold tracking-tighter 
+font-heading"[39m
+            [36m>[39m
+              [36m<span[39m
+                
+[33mclass[39m=[32m"text-primary"[39m
+              [36m>[39m
+                [0mDIG[0m
+              [36m</span>[39m
+              [36m<span[39m
+                
+[33mclass[39m=[32m"text-on-surface"[39m
+              [36m>[39m
+                [0mSWAP[0m
+              [36m</span>[39m
+            [36m</span>[39m
+          [36m</a>[39m
+          [36m<nav[39m
+            [33mclass[39m=[32m"hidden lg:flex 
+items-center bg-surface-container-high/50 
+rounded-full px-1 py-0.5 gap-0.5"[39m
+          [36m>[39m
+            [36m<a[39m
+              [33mclass[39m=[32m"flex 
+items-center gap-1.5 px-3 py-1.5 rounded-full 
+font-mono text-[11px] uppercase tracking-wider 
+transition-all duration-200 bg-primary/15 
+text-primary font-semibold"[39m
+              [33mhref[39m=[32m"/feed"[39m
+            [36m>[39m
+              [36m<span[39m
+                
+[33mclass[39m=[32m"material-symbols-outlined 
+text-[16px]"[39m
+                
+[33mstyle[39m=[32m"font-variation-settings: 
+'FILL' 1;"[39m
+              [36m>[39m
+                [0mhome[0m
+              [36m</span>[39m
+              [36m<span[39m
+                [33mclass[39m=[32m"hidden 
+xl:inline"[39m
+              [36m>[39m
+                [0mFeed[0m
+              [36m</span>[39m
+            [36m</a>[39m
+            [36m<a[39m
+              [33mclass[39m=[32m"flex 
+items-center gap-1.5 px-3 py-1.5 rounded-full 
+font-mono text-[11px] uppercase tracking-wider 
+transition-all duration-200 
+text-on-surface-variant hover:text-on-surface 
+hover:bg-surface-container-high/80"[39m
+              [33mhref[39m=[32m"/explorar"[39m
+            [36m>[39m
+              [36m<span[39m
+                
+[33mclass[39m=[32m"material-symbols-outlined 
+text-[16px]"[39m
+              [36m>[39m
+                [0mexplore[0m
+              [36m</span>[39m
+              [36m<span[39m
+                [33mclass[39m=[32m"hidden 
+xl:inline"[39m
+              [36m>[39m
+                [0mExplore[0m
+              [36m</span>[39m
+            [36m</a>[39m
+            [36m<a[39m
+              [33mclass[39m=[32m"flex 
+items-center gap-1.5 px-3 py-1.5 rounded-full 
+font-mono text-[11px] uppercase tracking-wider 
+transition-all duration-200 
+text-on-surface-variant hover:text-on-surface 
+hover:bg-surface-container-high/80"[39m
+              [33mhref[39m=[32m"/trades"[39m
+            [36m>[39m
+              [36m<span[39m
+                
+[33mclass[39m=[32m"material-symbols-outlined 
+text-[16px]"[39m
+              [36m>[39m
+                [0mswap_horiz[0m
+              [36m</span>[39m
+              [36m<span[39m
+                [33mclass[39m=[32m"hidden 
+xl:inline"[39m
+              [36m>[39m
+                [0mTrades[0m
+              [36m</span>[39m
+            [36m</a>[39m
+            [36m<a[39m
+              [33mclass[39m=[32m"flex 
+items-center gap-1.5 px-3 py-1.5 rounded-full 
+font-mono text-[11px] uppercase tracking-wider 
+transition-all duration-200 
+text-on-surface-variant hover:text-on-surface 
+hover:bg-surface-container-high/80"[39m
+              
+[33mhref[39m=[32m"/comunidade"[39m
+            [36m>[39m
+              [36m<span[39m
+                
+[33mclass[39m=[32m"material-symbols-outlined 
+text-[16px]"[39m
+              [36m>[39m
+                [0mgroup[0m
+              [36m</span>[39m
+              [36m<span[39m
+                [33mclass[39m=[32m"hidden 
+xl:inline"[39m
+              [36m>[39m
+                [0mCommunity[0m
+              [36m</span>[39m
+            [36m</a>[39m
+            [36m<a[39m
+              [33mclass[39m=[32m"flex 
+items-center gap-1.5 px-3 py-1.5 rounded-full 
+font-mono text-[11px] uppercase tracking-wider 
+transition-all duration-200 
+text-on-surface-variant hover:text-on-surface 
+hover:bg-surface-container-high/80"[39m
+              [33mhref[39m=[32m"/perfil"[39m
+            [36m>[39m
+              [36m<span[39m
+                
+[33mclass[39m=[32m"material-symbols-outlined 
+text-[16px]"[39m
+              [36m>[39m
+                [0mperson[0m
+              [36m</span>[39m
+              [36m<span[39m
+                [33mclass[39m=[32m"hidden 
+xl:inline"[39m
+              [36m>[39m
+                [0mProfile[0m
+              [36m</span>[39m
+            [36m</a>[39m
+          [36m</nav>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"flex-1 flex 
+justify-center px-2 md:px-4"[39m
+          [36m>[39m
+            [36m<div[39m
+              
+[33mdata-testid[39m=[32m"global-search"[39m
+            [36m/>[39m
+          [36m</div>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"flex 
+items-center gap-1"[39m
+          [36m>[39m
+            [36m<a[39m
+              [33maria-label[39m=[32m"How to 
+use DigSwap"[39m
+              [33mclass[39m=[32m"p-2 
+rounded-full text-on-surface-variant 
+hover:text-primary 
+hover:bg-surface-container-high/80 
+transition-colors"[39m
+              [33mhref[39m=[32m"/como-usar"[39m
+            [36m>[39m
+              [36m<span[39m
+                
+[33mclass[39m=[32m"material-symbols-outlined 
+text-[20px]"[39m
+              [36m>[39m
+                [0mhelp[0m
+              [36m</span>[39m
+            [36m</a>[39m
+            [36m<div[39m
+              
+[33mdata-testid[39m=[32m"chat-toggle"[39m
+            [36m/>[39m
+            [36m<div[39m
+              
+[33mdata-testid[39m=[32m"notification-bell"[39m
+              
+[33mdata-user-id[39m=[32m"test-user-id"[39m
+            [36m/>[39m
+          [36m</div>[39m
+        [36m</div>[39m
+      [36m</header>[39m
+    [36m</div>[39m
+  [36m</body>[39m
+[36m</html>[39m...
+[36m [2mÔØ»[22m tests/unit/components/shell/app-
+header.test.tsx:[2m65:51[22m[39m
+    [90m 63|[39m   render(<AppHeader 
+displayName="Test" avatarUrl={null} 
+userId="test-uÔÇª
+    [90m 64|[39m   [35mawait[39m 
+[34mwaitFor[39m(() [33m=>[39m {
+    [90m 65|[39m    [34mexpect[39m(screen[33m.
+[39m[34mgetByTestId[39m([32m"notification-bell"
+[39m))[33m.[39m[34mtoHaveAttribute[39m(
+    [90m   |[39m                                 
+                  [31m^[39m
+    [90m 66|[39m     
+[32m"data-user-id"[39m[33m,[39m
+    [90m 67|[39m     
+[32m"test-user-id"[39m[33m,[39m
+[90m [2mÔØ»[22m 
+runWithExpensiveErrorDiagnosticsDisabled ../../node
+_modules/.pnpm/@testing-library+dom@10.4.1/node_mod
+ules/@testing-library/dom/dist/config.js:[2m47:12
+[22m[39m
+[90m [2mÔØ»[22m checkCallback ../../node_modules
+/.pnpm/@testing-library+dom@10.4.1/node_modules/@te
+sting-library/dom/dist/wait-for.js:[2m124:77[22m
+[39m
+[90m [2mÔØ»[22m Timeout.checkRealTimersCallback 
+../../node_modules/.pnpm/@testing-library+dom@10.4.
+1/node_modules/@testing-library/dom/dist/wait-for.j
+s:[2m118:16[22m[39m
+
+[31m[2mÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»
+ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»[25/41]ÔÄ»[22m[39m
+
+[41m[1m FAIL [22m[49m tests/unit/components/she
+ll/app-header.test.tsx[2m > [22mAppHeader[2m > 
+[22mrenders global search
+[31m[1mError[22m: Invalid Chai property: 
+toBeInTheDocument[39m
+[36m [2mÔØ»[22m tests/unit/components/shell/app-
+header.test.tsx:[2m74:46[22m[39m
+    [90m 72|[39m  [34mit[39m([32m"renders 
+global search"[39m[33m,[39m () [33m=>[39m {
+    [90m 73|[39m   render(<AppHeader 
+displayName="Test" avatarUrl={null} 
+userId="test-uÔÇª
+    [90m 74|[39m   [34mexpect[39m(screen[33m.
+[39m[34mgetByTestId[39m([32m"global-search"[39m
+))[33m.[39m[34mtoBeInTheDocument[39m()[33m;[3
+9m
+    [90m   |[39m                                 
+             [31m^[39m
+    [90m 75|[39m  })[33m;[39m
+    [90m 76|[39m
+
+[31m[2mÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»
+ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»[26/41]ÔÄ»[22m[39m
+
+[41m[1m FAIL [22m[49m tests/unit/components/she
+ll/app-header.test.tsx[2m > [22mAppHeader[2m > 
+[22mrenders chat toggle
+[31m[1mError[22m: Invalid Chai property: 
+toBeInTheDocument[39m
+[36m [2mÔØ»[22m tests/unit/components/shell/app-
+header.test.tsx:[2m79:44[22m[39m
+    [90m 77|[39m  [34mit[39m([32m"renders 
+chat toggle"[39m[33m,[39m () [33m=>[39m {
+    [90m 78|[39m   render(<AppHeader 
+displayName="Test" avatarUrl={null} 
+userId="test-uÔÇª
+    [90m 79|[39m   [34mexpect[39m(screen[33m.
+[39m[34mgetByTestId[39m([32m"chat-toggle"[39m))
+[33m.[39m[34mtoBeInTheDocument[39m()[33m;[39m
+    [90m   |[39m                                 
+           [31m^[39m
+    [90m 80|[39m  })[33m;[39m
+    [90m 81|[39m
+
+[31m[2mÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»
+ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»[27/41]ÔÄ»[22m[39m
+
+[41m[1m FAIL [22m[49m tests/unit/components/she
+ll/app-header.test.tsx[2m > [22mAppHeader[2m > 
+[22mrenders help link
+[31m[1mError[22m: Invalid Chai property: 
+toHaveAttribute[39m
+[36m [2mÔØ»[22m tests/unit/components/shell/app-
+header.test.tsx:[2m85:19[22m[39m
+    [90m 83|[39m   render(<AppHeader 
+displayName="Test" avatarUrl={null} 
+userId="test-uÔÇª
+    [90m 84|[39m   [35mconst[39m helpLink 
+[33m=[39m screen[33m.[39m[34mgetByLabelText[3
+9m([32m"How to use DigSwap"[39m)[33m;[39m
+    [90m 85|[39m   [34mexpect[39m(helpLink)[33
+m.[39m[34mtoHaveAttribute[39m([32m"href"[39m[
+33m,[39m [32m"/como-usar"[39m)[33m;[39m
+    [90m   |[39m                   [31m^[39m
+    [90m 86|[39m  })[33m;[39m
+    [90m 87|[39m })[33m;[39m
+
+[31m[2mÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»
+ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»[28/41]ÔÄ»[22m[39m
+
+[41m[1m FAIL [22m[49m tests/unit/components/she
+ll/bottom-bar.test.tsx[2m > [22mBottomBar[2m > 
+[22mrenders 4 tab links with correct labels
+[31m[1mError[22m: Invalid Chai property: 
+toBeInTheDocument[39m
+[36m [2mÔØ»[22m tests/unit/components/shell/bott
+om-bar.test.tsx:[2m22:36[22m[39m
+    [90m 20|[39m  [34mit[39m([32m"renders 4 
+tab links with correct labels"[39m[33m,[39m () 
+[33m=>[39m {
+    [90m 21|[39m   
+[34mrender[39m([33m<[39m[33mBottomBar[39m 
+[33m/[39m[33m>[39m)[33m;[39m
+    [90m 22|[39m   [34mexpect[39m(screen[33m.
+[39m[34mgetByText[39m([32m"Radar"[39m))[33m.[
+39m[34mtoBeInTheDocument[39m()[33m;[39m
+    [90m   |[39m                                 
+   [31m^[39m
+    [90m 23|[39m   [34mexpect[39m(screen[33m.
+[39m[34mgetByText[39m([32m"Explore"[39m))[33m.
+[39m[34mtoBeInTheDocument[39m()[33m;[39m
+    [90m 24|[39m   [34mexpect[39m(screen[33m.
+[39m[34mgetByText[39m([32m"Trades"[39m))[33m.
+[39m[34mtoBeInTheDocument[39m()[33m;[39m
+
+[31m[2mÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»
+ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»[29/41]ÔÄ»[22m[39m
+
+[41m[1m FAIL [22m[49m tests/unit/components/she
+ll/bottom-bar.test.tsx[2m > [22mBottomBar[2m > 
+[22mmarks active tab with aria-current=page
+[31m[1mError[22m: Invalid Chai property: 
+toHaveAttribute[39m
+[36m [2mÔØ»[22m tests/unit/components/shell/bott
+om-bar.test.tsx:[2m42:20[22m[39m
+    [90m 40|[39m   
+[34mrender[39m([33m<[39m[33mBottomBar[39m 
+[33m/[39m[33m>[39m)[33m;[39m
+    [90m 41|[39m   [35mconst[39m radarLink 
+[33m=[39m screen[33m.[39m[34mgetByText[39m([
+32m"Radar"[39m)[33m.[39m[34mclosest[39m([32m"
+a"[39m)[33m;[39m
+    [90m 42|[39m   [34mexpect[39m(radarLink)[3
+3m.[39m[34mtoHaveAttribute[39m([32m"aria-curren
+t"[39m[33m,[39m [32m"page"[39m)[33m;[39m
+    [90m   |[39m                    [31m^[39m
+    [90m 43|[39m
+    [90m 44|[39m   [35mconst[39m explorarLink 
+[33m=[39m screen[33m.[39m[34mgetByText[39m([
+32m"Explore"[39m)[33m.[39m[34mclosest[39m([32
+m"a"[39m)[33m;[39m
+
+[31m[2mÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»
+ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»[30/41]ÔÄ»[22m[39m
+
+[41m[1m FAIL [22m[49m tests/unit/components/she
+ll/bottom-bar.test.tsx[2m > [22mBottomBar[2m > 
+[22mhas nav element with aria-label
+[31m[1mError[22m: Invalid Chai property: 
+toHaveAttribute[39m
+[36m [2mÔØ»[22m tests/unit/components/shell/bott
+om-bar.test.tsx:[2m61:14[22m[39m
+    [90m 59|[39m   
+[34mrender[39m([33m<[39m[33mBottomBar[39m 
+[33m/[39m[33m>[39m)[33m;[39m
+    [90m 60|[39m   [35mconst[39m nav 
+[33m=[39m screen[33m.[39m[34mgetByRole[39m([
+32m"navigation"[39m)[33m;[39m
+    [90m 61|[39m   [34mexpect[39m(nav)[33m.[3
+9m[34mtoHaveAttribute[39m([32m"aria-label"[39m
+[33m,[39m [32m"Main navigation"[39m)[33m;[39m
+    [90m   |[39m              [31m^[39m
+    [90m 62|[39m  })[33m;[39m
+    [90m 63|[39m
+
+[31m[2mÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»
+ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»[31/41]ÔÄ»[22m[39m
+
+[41m[1m FAIL [22m[49m tests/unit/components/she
+ll/bottom-bar.test.tsx[2m > [22mBottomBar[2m > 
+[22mdetects active tab for deep links using 
+startsWith
+[31m[1mError[22m: Invalid Chai property: 
+toHaveAttribute[39m
+[36m [2mÔØ»[22m tests/unit/components/shell/bott
+om-bar.test.tsx:[2m68:21[22m[39m
+    [90m 66|[39m   
+[34mrender[39m([33m<[39m[33mBottomBar[39m 
+[33m/[39m[33m>[39m)[33m;[39m
+    [90m 67|[39m   [35mconst[39m tradesLink 
+[33m=[39m screen[33m.[39m[34mgetByText[39m([
+32m"Trades"[39m)[33m.[39m[34mclosest[39m([32m
+"a"[39m)[33m;[39m
+    [90m 68|[39m   [34mexpect[39m(tradesLink)[
+33m.[39m[34mtoHaveAttribute[39m([32m"aria-curre
+nt"[39m[33m,[39m [32m"page"[39m)[33m;[39m
+    [90m   |[39m                     [31m^[39m
+    [90m 69|[39m  })[33m;[39m
+    [90m 70|[39m })[33m;[39m
+
+[31m[2mÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»
+ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»[32/41]ÔÄ»[22m[39m
+
+[41m[1m FAIL [22m[49m tests/unit/components/she
+ll/empty-state.test.tsx[2m > [22mEmptyState[2m 
+> [22mrenders heading text
+[31m[1mError[22m: Invalid Chai property: 
+toBeInTheDocument[39m
+[36m [2mÔØ»[22m tests/unit/components/shell/empt
+y-state.test.tsx:[2m9:43[22m[39m
+    [90m  7|[39m  [34mit[39m([32m"renders 
+heading text"[39m[33m,[39m () [33m=>[39m {
+    [90m  8|[39m   render(<EmptyState 
+icon={Disc3} heading="Test Heading" body="Test 
+boÔÇª
+    [90m  9|[39m   [34mexpect[39m(screen[33m.
+[39m[34mgetByText[39m([32m"Test Heading"[39m))
+[33m.[39m[34mtoBeInTheDocument[39m()[33m;[39m
+    [90m   |[39m                                 
+          [31m^[39m
+    [90m 10|[39m  })[33m;[39m
+    [90m 11|[39m
+
+[31m[2mÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»
+ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»[33/41]ÔÄ»[22m[39m
+
+[41m[1m FAIL [22m[49m tests/unit/components/she
+ll/empty-state.test.tsx[2m > [22mEmptyState[2m 
+> [22mrenders body text
+[31m[1mError[22m: Invalid Chai property: 
+toBeInTheDocument[39m
+[36m [2mÔØ»[22m tests/unit/components/shell/empt
+y-state.test.tsx:[2m14:40[22m[39m
+    [90m 12|[39m  [34mit[39m([32m"renders 
+body text"[39m[33m,[39m () [33m=>[39m {
+    [90m 13|[39m   render(<EmptyState 
+icon={Disc3} heading="Test Heading" body="Test 
+boÔÇª
+    [90m 14|[39m   [34mexpect[39m(screen[33m.
+[39m[34mgetByText[39m([32m"Test body"[39m))[33
+m.[39m[34mtoBeInTheDocument[39m()[33m;[39m
+    [90m   |[39m                                 
+       [31m^[39m
+    [90m 15|[39m  })[33m;[39m
+    [90m 16|[39m
+
+[31m[2mÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»
+ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»[34/41]ÔÄ»[22m[39m
+
+[41m[1m FAIL [22m[49m tests/unit/components/she
+ll/empty-state.test.tsx[2m > [22mEmptyState[2m 
+> [22mrenders the icon as an SVG element
+[31m[1mError[22m: Invalid Chai property: 
+toBeInTheDocument[39m
+[36m [2mÔØ»[22m tests/unit/components/shell/empt
+y-state.test.tsx:[2m22:14[22m[39m
+    [90m 20|[39m   )[33m;[39m
+    [90m 21|[39m   [35mconst[39m svg 
+[33m=[39m container[33m.[39m[34mquerySelector
+[39m([32m"svg"[39m)[33m;[39m
+    [90m 22|[39m   [34mexpect[39m(svg)[33m.[3
+9m[34mtoBeInTheDocument[39m()[33m;[39m
+    [90m   |[39m              [31m^[39m
+    [90m 23|[39m  })[33m;[39m
+    [90m 24|[39m })[33m;[39m
+
+[31m[2mÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»
+ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»[35/41]ÔÄ»[22m[39m
+
+[41m[1m FAIL [22m[49m tests/unit/components/she
+ll/notification-bell.test.tsx[2m > 
+[22mNotificationBell[2m > [22mrenders bell icon 
+with material-symbols-outlined notifications
+[31m[1mTestingLibraryElementError[22m[39m: 
+Found multiple elements with the text: 
+notifications
+
+Here are the matching elements:
+
+Ignored nodes: comments, script, style
+[36m<span[39m
+  [33mclass[39m=[32m"material-symbols-outlined 
+text-[20px]"[39m
+[36m>[39m
+  [0mnotifications[0m
+[36m</span>[39m
+
+Ignored nodes: comments, script, style
+[36m<span[39m
+  [33mclass[39m=[32m"material-symbols-outlined 
+shrink-0 mt-0.5 text-on-surface-variant 
+text-lg"[39m
+[36m>[39m
+  [0mnotifications[0m
+[36m</span>[39m
+
+(If this is intentional, then use the `*AllBy*` 
+variant of the query (like `queryAllByText`, 
+`getAllByText`, or `findAllByText`)).
+
+Ignored nodes: comments, script, style
+[36m<body>[39m
+  [36m<div>[39m
+    [36m<div[39m
+      [33mdata-testid[39m=[32m"popover"[39m
+    [36m>[39m
+      [36m<button[39m
+        [33maria-expanded[39m=[32m"false"[39m
+        
+[33maria-label[39m=[32m"Notifications"[39m
+        [33mclass[39m=[32m"relative p-2 
+text-on-surface-variant hover:bg-surface-bright 
+transition-colors rounded"[39m
+        [33mtype[39m=[32m"button"[39m
+      [36m>[39m
+        [36m<span[39m
+          
+[33mclass[39m=[32m"material-symbols-outlined 
+text-[20px]"[39m
+        [36m>[39m
+          [0mnotifications[0m
+        [36m</span>[39m
+        [36m<span[39m
+          [33maria-label[39m=[32m"3 unread 
+notifications"[39m
+          [33mclass[39m=[32m"absolute -top-0.5 
+-right-0.5 bg-destructive 
+text-destructive-foreground text-xs font-mono 
+font-semibold rounded-full min-w-[18px] h-[18px] 
+flex items-center justify-center px-1"[39m
+          [33mrole[39m=[32m"img"[39m
+        [36m>[39m
+          [0m3[0m
+        [36m</span>[39m
+      [36m</button>[39m
+      [36m<div[39m
+        
+[33mdata-testid[39m=[32m"popover-content"[39m
+      [36m>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"flex items-center 
+justify-between p-4 border-b 
+border-outline-variant/10"[39m
+        [36m>[39m
+          [36m<span[39m
+            [33mclass[39m=[32m"font-heading 
+font-semibold text-on-surface"[39m
+          [36m>[39m
+            [0mNotifications[0m
+          [36m</span>[39m
+          [36m<span[39m
+            [33mclass[39m=[32m"font-mono 
+text-xs text-on-surface-variant"[39m
+          [36m>[39m
+            [0m([0m
+            [0m3[0m
+            [0m)[0m
+          [36m</span>[39m
+        [36m</div>[39m
+        [36m<ul>[39m
+          [36m<li[39m
+            [33mclass[39m=[32m"list-none"[39m
+          [36m>[39m
+            [36m<button[39m
+              [33mclass[39m=[32m"flex gap-3 p-4 
+cursor-pointer hover:bg-surface-container-high 
+transition-colors w-full text-left border-l-2 
+border-primary"[39m
+              [33mtype[39m=[32m"button"[39m
+            [36m>[39m
+              [36m<span[39m
+                
+[33mclass[39m=[32m"material-symbols-outlined 
+shrink-0 mt-0.5 text-primary text-lg"[39m
+              [36m>[39m
+                [0mplaylist_add_check[0m
+              [36m</span>[39m
+              [36m<div[39m
+                [33mclass[39m=[32m"flex 
+flex-col gap-0.5 min-w-0 flex-1"[39m
+              [36m>[39m
+                [36m<div[39m
+                  [33mclass[39m=[32m"text-sm 
+font-semibold text-on-surface"[39m
+                [36m>[39m
+                  [0mWantlist match found![0m
+                [36m</div>[39m
+                [36m<div[39m
+                  [33mclass[39m=[32m"text-sm 
+text-on-surface-variant line-clamp-1"[39m
+                [36m>[39m
+                  [0mSomeone has Kind of Blue[0m
+                [36m</div>[39m
+                [36m<div[39m
+                  [33mclass[39m=[32m"font-mono 
+text-xs text-on-surface-variant"[39m
+                [36m>[39m
+                  [0m15d ago[0m
+                [36m</div>[39m
+              [36m</div>[39m
+            [36m</button>[39m
+          [36m</li>[39m
+          [36m<li[39m
+            [33mclass[39m=[32m"list-none"[39m
+          [36m>[39m
+            [36m<hr />[39m
+            [36m<button[39m
+              [33mclass[39m=[32m"flex gap-3 p-4 
+cursor-pointer hover:bg-surface-container-high 
+transition-colors w-full text-left"[39m
+              [33mtype[39m=[32m"button"[39m
+            [36m>[39m
+              [36m<span[39m
+                
+[33mclass[39m=[32m"material-symbols-outlined 
+shrink-0 mt-0.5 text-on-surface-variant 
+text-lg"[39m
+              [36m>[39m
+                [0mnotifications[0m
+              [36m</span>[39m
+              [36m<div[39m
+                [33mclass[39m=[32m"flex 
+flex-col gap-0.5 min-w-0 flex-1"[39m
+              [36m>[39m
+                [36m<div[39m
+                  [33mclass[39m=[32m"text-sm 
+font-semibold text-on-surface"[39m
+                [36m>[39m
+                  [0mWelcome to DigSwap[0m
+                [36m</div>[39m
+                [36m<div[39m
+                  [33mclass[39m=[32m"font-mono 
+text-xs text-on-surface-variant"[39m
+                [36m>[39m
+                  [0m16d ago[0m
+                [36m</div>[39m
+              [36m</div>[39m
+            [36m</button>[39m
+          [36m</li>[39m
+        [36m</ul>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"flex items-center 
+justify-between p-4 border-t 
+border-outline-variant/10"[39m
+        [36m>[39m
+          [36m<button[39m
+            [33mclass[39m=[32m"font-mono 
+text-xs text-primary hover:underline"[39m
+            [33mtype[39m=[32m"button"[39m
+          [36m>[39m
+            [0mMark all read[0m
+          [36m</button>[39m
+          [36m<a[39m
+            [33mclass[39m=[32m"font-mono 
+text-xs text-secondary hover:underline"[39m
+            
+[33mhref[39m=[32m"/notifications"[39m
+          [36m>[39m
+            [0mView all notifications[0m
+          [36m</a>[39m
+        [36m</div>[39m
+      [36m</div>[39m
+    [36m</div>[39m
+  [36m</div>[39m
+[36m</body>[39m
+
+Ignored nodes: comments, script, style
+[36m<html>[39m
+  [36m<head />[39m
+  [36m<body>[39m
+    [36m<div>[39m
+      [36m<div[39m
+        [33mdata-testid[39m=[32m"popover"[39m
+      [36m>[39m
+        [36m<button[39m
+          [33maria-expanded[39m=[32m"false"[39m
+          
+[33maria-label[39m=[32m"Notifications"[39m
+          [33mclass[39m=[32m"relative p-2 
+text-on-surface-variant hover:bg-surface-bright 
+transition-colors rounded"[39m
+          [33mtype[39m=[32m"button"[39m
+        [36m>[39m
+          [36m<span[39m
+            
+[33mclass[39m=[32m"material-symbols-outlined 
+text-[20px]"[39m
+          [36m>[39m
+            [0mnotifications[0m
+          [36m</span>[39m
+          [36m<span[39m
+            [33maria-label[39m=[32m"3 unread 
+notifications"[39m
+            [33mclass[39m=[32m"absolute 
+-top-0.5 -right-0.5 bg-destructive 
+text-destructive-foreground text-xs font-mono 
+font-semibold rounded-full min-w-[18px] h-[18px] 
+flex items-center justify-center px-1"[39m
+            [33mrole[39m=[32m"img"[39m
+          [36m>[39m
+            [0m3[0m
+          [36m</span>[39m
+        [36m</button>[39m
+        [36m<div[39m
+          
+[33mdata-testid[39m=[32m"popover-content"[39m
+        [36m>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"flex 
+items-center justify-between p-4 border-b 
+border-outline-variant/10"[39m
+          [36m>[39m
+            [36m<span[39m
+              [33mclass[39m=[32m"font-heading 
+font-semibold text-on-surface"[39m
+            [36m>[39m
+              [0mNotifications[0m
+            [36m</span>[39m
+            [36m<span[39m
+              [33mclass[39m=[32m"font-mono 
+text-xs text-on-surface-variant"[39m
+            [36m>[39m
+              [0m([0m
+              [0m3[0m
+              [0m)[0m
+            [36m</span>[39m
+          [36m</div>[39m
+          [36m<ul>[39m
+            [36m<li[39m
+              [33mclass[39m=[32m"list-none"[39m
+            [36m>[39m
+              [36m<button[39m
+                [33mclass[39m=[32m"flex gap-3 
+p-4 cursor-pointer hover:bg-surface-container-high 
+transition-colors w-full text-left border-l-2 
+border-primary"[39m
+                [33mtype[39m=[32m"button"[39m
+              [36m>[39m
+                [36m<span[39m
+                  
+[33mclass[39m=[32m"material-symbols-outlined 
+shrink-0 mt-0.5 text-primary text-lg"[39m
+                [36m>[39m
+                  [0mplaylist_add_check[0m
+                [36m</span>[39m
+                [36m<div[39m
+                  [33mclass[39m=[32m"flex 
+flex-col gap-0.5 min-w-0 flex-1"[39m
+                [36m>[39m
+                  [36m<div[39m
+                    [33mclass[39m=[32m"text-sm 
+font-semibold text-on-surface"[39m
+                  [36m>[39m
+                    [0mWantlist match found![0m
+                  [36m</div>[39m
+                  [36m<div[39m
+                    [33mclass[39m=[32m"text-sm 
+text-on-surface-variant line-clamp-1"[39m
+                  [36m>[39m
+                    [0mSomeone has Kind of 
+Blue[0m
+                  [36m</div>[39m
+                  [36m<div[39m
+                    
+[33mclass[39m=[32m"font-mono text-xs 
+text-on-surface-variant"[39m
+                  [36m>[39m
+                    [0m15d ago[0m
+                  [36m</div>[39m
+                [36m</div>[39m
+              [36m</button>[39m
+            [36m</li>[39m
+            [36m<li[39m
+              [33mclass[39m=[32m"list-none"[39m
+            [36m>[39m
+              [36m<hr />[39m
+              [36m<button[39m
+                [33mclass[39m=[32m"flex gap-3 
+p-4 cursor-pointer hover:bg-surface-container-high 
+transition-colors w-full text-left"[39m
+                [33mtype[39m=[32m"button"[39m
+              [36m>[39m
+                [36m<span[39m
+                  
+[33mclass[39m=[32m"material-symbols-outlined 
+shrink-0 mt-0.5 text-on-surface-variant 
+text-lg"[39m
+                [36m>[39m
+                  [0mnotifications[0m
+                [36m</span>[39m
+                [36m<div[39m
+                  [33mclass[39m=[32m"flex 
+flex-col gap-0.5 min-w-0 flex-1"[39m
+                [36m>[39m
+                  [36m<div[39m
+                    [33mclass[39m=[32m"text-sm 
+font-semibold text-on-surface"[39m
+                  [36m>[39m
+                    [0mWelcome to DigSwap[0m
+                  [36m</div>[39m
+                  [36m<div[39m
+                    
+[33mclass[39m=[32m"font-mono text-xs 
+text-on-surface-variant"[39m
+                  [36m>[39m
+                    [0m16d ago[0m
+                  [36m</div>[39m
+                [36m</div>[39m
+              [36m</button>[39m
+            [36m</li>[39m
+          [36m</ul>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"flex 
+items-center justify-between p-4 border-t 
+border-outline-variant/10"[39m
+          [36m>[39m
+            [36m<button[39m
+              [33mclass[39m=[32m"font-mono 
+text-xs text-primary hover:underline"[39m
+              [33mtype[39m=[32m"button"[39m
+            [36m>[39m
+              [0mMark all read[0m
+            [36m</button>[39m
+            [36m<a[39m
+              [33mclass[39m=[32m"font-mono 
+text-xs text-secondary hover:underline"[39m
+              
+[33mhref[39m=[32m"/notifications"[39m
+            [36m>[39m
+              [0mView all notifications[0m
+            [36m</a>[39m
+          [36m</div>[39m
+        [36m</div>[39m
+      [36m</div>[39m
+    [36m</div>[39m
+  [36m</body>[39m
+[36m</html>[39m
+[90m [2mÔØ»[22m Proxy.waitForWrapper ../../node_
+modules/.pnpm/@testing-library+dom@10.4.1/node_modu
+les/@testing-library/dom/dist/wait-for.js:[2m163:2
+7[22m[39m
+[36m [2mÔØ»[22m tests/unit/components/shell/noti
+fication-bell.test.tsx:[2m118:9[22m[39m
+    [90m116|[39m   [34mrender[39m([33m<[39m[
+33mNotificationBell[39m 
+[33muserId[39m[33m=[39m[32m"user-123"[39m 
+[33m/[39m[33m>[39m)[33m;[39m
+    [90m117|[39m
+    [90m118|[39m   [35mawait[39m 
+[34mwaitFor[39m(() [33m=>[39m {
+    [90m   |[39m         [31m^[39m
+    [90m119|[39m    [35mconst[39m icon 
+[33m=[39m screen[33m.[39m[34mgetByText[39m([
+32m"notifications"[39m)[33m;[39m
+    [90m120|[39m    [34mexpect[39m(icon)[33m.
+[39m[34mtoBeInTheDocument[39m()[33m;[39m
+
+[31m[2mÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»
+ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»[36/41]ÔÄ»[22m[39m
+
+[41m[1m FAIL [22m[49m tests/unit/components/she
+ll/notification-bell.test.tsx[2m > 
+[22mNotificationBell[2m > [22mshows unread 
+badge with count from getUnreadCountAction
+[31m[1mError[22m[39m: Invalid Chai property: 
+toBeInTheDocument
+
+Ignored nodes: comments, script, style
+[36m<html>[39m
+  [36m<head />[39m
+  [36m<body>[39m
+    [36m<div>[39m
+      [36m<div[39m
+        [33mdata-testid[39m=[32m"popover"[39m
+      [36m>[39m
+        [36m<button[39m
+          [33maria-expanded[39m=[32m"false"[39m
+          
+[33maria-label[39m=[32m"Notifications"[39m
+          [33mclass[39m=[32m"relative p-2 
+text-on-surface-variant hover:bg-surface-bright 
+transition-colors rounded"[39m
+          [33mtype[39m=[32m"button"[39m
+        [36m>[39m
+          [36m<span[39m
+            
+[33mclass[39m=[32m"material-symbols-outlined 
+text-[20px]"[39m
+          [36m>[39m
+            [0mnotifications[0m
+          [36m</span>[39m
+          [36m<span[39m
+            [33maria-label[39m=[32m"3 unread 
+notifications"[39m
+            [33mclass[39m=[32m"absolute 
+-top-0.5 -right-0.5 bg-destructive 
+text-destructive-foreground text-xs font-mono 
+font-semibold rounded-full min-w-[18px] h-[18px] 
+flex items-center justify-center px-1"[39m
+            [33mrole[39m=[32m"img"[39m
+          [36m>[39m
+            [0m3[0m
+          [36m</span>[39m
+        [36m</button>[39m
+        [36m<div[39m
+          
+[33mdata-testid[39m=[32m"popover-content"[39m
+        [36m>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"flex 
+items-center justify-between p-4 border-b 
+border-outline-variant/10"[39m
+          [36m>[39m
+            [36m<span[39m
+              [33mclass[39m=[32m"font-heading 
+font-semibold text-on-surface"[39m
+            [36m>[39m
+              [0mNotifications[0m
+            [36m</span>[39m
+            [36m<span[39m
+              [33mclass[39m=[32m"font-mono 
+text-xs text-on-surface-variant"[39m
+            [36m>[39m
+              [0m([0m
+              [0m3[0m
+              [0m)[0m
+            [36m</span>[39m
+          [36m</div>[39m
+          [36m<ul>[39m
+            [36m<li[39m
+              [33mclass[39m=[32m"list-none"[39m
+            [36m>[39m
+              [36m<button[39m
+                [33mclass[39m=[32m"flex gap-3 
+p-4 cursor-pointer hover:bg-surface-container-high 
+transition-colors w-full text-left border-l-2 
+border-primary"[39m
+                [33mtype[39m=[32m"button"[39m
+              [36m>[39m
+                [36m<span[39m
+                  
+[33mclass[39m=[32m"material-symbols-outlined 
+shrink-0 mt-0.5 text-primary text-lg"[39m
+                [36m>[39m
+                  [0mplaylist_add_check[0m
+                [36m</span>[39m
+                [36m<div[39m
+                  [33mclass[39m=[32m"flex 
+flex-col gap-0.5 min-w-0 flex-1"[39m
+                [36m>[39m
+                  [36m<div[39m
+                    [33mclass[39m=[32m"text-sm 
+font-semibold text-on-surface"[39m
+                  [36m>[39m
+                    [0mWantlist match found![0m
+                  [36m</div>[39m
+                  [36m<div[39m
+                    [33mclass[39m=[32m"text-sm 
+text-on-surface-variant line-clamp-1"[39m
+                  [36m>[39m
+                    [0mSomeone has Kind of 
+Blue[0m
+                  [36m</div>[39m
+                  [36m<div[39m
+                    
+[33mclass[39m=[32m"font-mono text-xs 
+text-on-surface-variant"[39m
+                  [36m>[39m
+                    [0m15d ago[0m
+                  [36m</div>[39m
+                [36m</div>[39m
+              [36m</button>[39m
+            [36m</li>[39m
+            [36m<li[39m
+              [33mclass[39m=[32m"list-none"[39m
+            [36m>[39m
+              [36m<hr />[39m
+              [36m<button[39m
+                [33mclass[39m=[32m"flex gap-3 
+p-4 cursor-pointer hover:bg-surface-container-high 
+transition-colors w-full text-left"[39m
+                [33mtype[39m=[32m"button"[39m
+              [36m>[39m
+                [36m<span[39m
+                  
+[33mclass[39m=[32m"material-symbols-outlined 
+shrink-0 mt-0.5 text-on-surface-variant 
+text-lg"[39m
+                [36m>[39m
+                  [0mnotifications[0m
+                [36m</span>[39m
+                [36m<div[39m
+                  [33mclass[39m=[32m"flex 
+flex-col gap-0.5 min-w-0 flex-1"[39m
+                [36m>[39m
+                  [36m<div[39m
+                    [33mclass[39m=[32m"text-sm 
+font-semibold text-on-surface"[39m
+                  [36m>[39m
+                    [0mWelcome to DigSwap[0m
+                  [36m</div>[39m
+                  [36m<div[39m
+                    
+[33mclass[39m=[32m"font-mono text-xs 
+text-on-surface-variant"[39m
+                  [36m>[39m
+                    [0m16d ago[0m
+                  [36m</div>[39m
+                [36m</div>[39m
+              [36m</button>[39m
+            [36m</li>[39m
+          [36m</ul>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"flex 
+items-center justify-between p-4 border-t 
+border-outline-variant/10"[39m
+          [36m>[39m
+            [36m<button[39m
+              [33mclass[39m=[32m"font-mono 
+text-xs text-primary hover:underline"[39m
+              [33mtype[39m=[32m"button"[39m
+            [36m>[39m
+              [0mMark all read[0m
+            [36m</button>[39m
+            [36m<a[39m
+              [33mclass[39m=[32m"font-mono 
+text-xs text-secondary hover:underline"[39m
+              
+[33mhref[39m=[32m"/notifications"[39m
+            [36m>[39m
+              [0mView all notifications[0m
+            [36m</a>[39m
+          [36m</div>[39m
+        [36m</div>[39m
+      [36m</div>[39m
+    [36m</div>[39m
+  [36m</body>[39m
+[36m</html>[39m
+[36m [2mÔØ»[22m tests/unit/components/shell/noti
+fication-bell.test.tsx:[2m131:59[22m[39m
+    [90m129|[39m
+    [90m130|[39m   [35mawait[39m 
+[34mwaitFor[39m(() [33m=>[39m {
+    [90m131|[39m    
+expect(screen.getByLabelText("3 unread 
+notifications")).toBeInTheDoÔÇª
+    [90m   |[39m                                 
+                          [31m^[39m
+    [90m132|[39m    [34mexpect[39m(screen[33m.
+[39m[34mgetByText[39m([32m"3"[39m))[33m.[39m
+[34mtoBeInTheDocument[39m()[33m;[39m
+    [90m133|[39m   })[33m;[39m
+[90m [2mÔØ»[22m 
+runWithExpensiveErrorDiagnosticsDisabled ../../node
+_modules/.pnpm/@testing-library+dom@10.4.1/node_mod
+ules/@testing-library/dom/dist/config.js:[2m47:12
+[22m[39m
+[90m [2mÔØ»[22m checkCallback ../../node_modules
+/.pnpm/@testing-library+dom@10.4.1/node_modules/@te
+sting-library/dom/dist/wait-for.js:[2m124:77[22m
+[39m
+[90m [2mÔØ»[22m Timeout.checkRealTimersCallback 
+../../node_modules/.pnpm/@testing-library+dom@10.4.
+1/node_modules/@testing-library/dom/dist/wait-for.j
+s:[2m118:16[22m[39m
+
+[31m[2mÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»
+ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»[37/41]ÔÄ»[22m[39m
+
+[41m[1m FAIL [22m[49m tests/unit/components/she
+ll/notification-bell.test.tsx[2m > 
+[22mNotificationBell[2m > [22mbadge shows "9+" 
+when count > 9
+[31m[1mError[22m[39m: Invalid Chai property: 
+toBeInTheDocument
+
+Ignored nodes: comments, script, style
+[36m<html>[39m
+  [36m<head />[39m
+  [36m<body>[39m
+    [36m<div>[39m
+      [36m<div[39m
+        [33mdata-testid[39m=[32m"popover"[39m
+      [36m>[39m
+        [36m<button[39m
+          [33maria-expanded[39m=[32m"false"[39m
+          
+[33maria-label[39m=[32m"Notifications"[39m
+          [33mclass[39m=[32m"relative p-2 
+text-on-surface-variant hover:bg-surface-bright 
+transition-colors rounded"[39m
+          [33mtype[39m=[32m"button"[39m
+        [36m>[39m
+          [36m<span[39m
+            
+[33mclass[39m=[32m"material-symbols-outlined 
+text-[20px]"[39m
+          [36m>[39m
+            [0mnotifications[0m
+          [36m</span>[39m
+          [36m<span[39m
+            [33maria-label[39m=[32m"42 unread 
+notifications"[39m
+            [33mclass[39m=[32m"absolute 
+-top-0.5 -right-0.5 bg-destructive 
+text-destructive-foreground text-xs font-mono 
+font-semibold rounded-full min-w-[18px] h-[18px] 
+flex items-center justify-center px-1"[39m
+            [33mrole[39m=[32m"img"[39m
+          [36m>[39m
+            [0m9+[0m
+          [36m</span>[39m
+        [36m</button>[39m
+        [36m<div[39m
+          
+[33mdata-testid[39m=[32m"popover-content"[39m
+        [36m>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"flex 
+items-center justify-between p-4 border-b 
+border-outline-variant/10"[39m
+          [36m>[39m
+            [36m<span[39m
+              [33mclass[39m=[32m"font-heading 
+font-semibold text-on-surface"[39m
+            [36m>[39m
+              [0mNotifications[0m
+            [36m</span>[39m
+            [36m<span[39m
+              [33mclass[39m=[32m"font-mono 
+text-xs text-on-surface-variant"[39m
+            [36m>[39m
+              [0m([0m
+              [0m42[0m
+              [0m)[0m
+            [36m</span>[39m
+          [36m</div>[39m
+          [36m<ul>[39m
+            [36m<li[39m
+              [33mclass[39m=[32m"list-none"[39m
+            [36m>[39m
+              [36m<button[39m
+                [33mclass[39m=[32m"flex gap-3 
+p-4 cursor-pointer hover:bg-surface-container-high 
+transition-colors w-full text-left border-l-2 
+border-primary"[39m
+                [33mtype[39m=[32m"button"[39m
+              [36m>[39m
+                [36m<span[39m
+                  
+[33mclass[39m=[32m"material-symbols-outlined 
+shrink-0 mt-0.5 text-primary text-lg"[39m
+                [36m>[39m
+                  [0mplaylist_add_check[0m
+                [36m</span>[39m
+                [36m<div[39m
+                  [33mclass[39m=[32m"flex 
+flex-col gap-0.5 min-w-0 flex-1"[39m
+                [36m>[39m
+                  [36m<div[39m
+                    [33mclass[39m=[32m"text-sm 
+font-semibold text-on-surface"[39m
+                  [36m>[39m
+                    [0mWantlist match found![0m
+                  [36m</div>[39m
+                  [36m<div[39m
+                    [33mclass[39m=[32m"text-sm 
+text-on-surface-variant line-clamp-1"[39m
+                  [36m>[39m
+                    [0mSomeone has Kind of 
+Blue[0m
+                  [36m</div>[39m
+                  [36m<div[39m
+                    
+[33mclass[39m=[32m"font-mono text-xs 
+text-on-surface-variant"[39m
+                  [36m>[39m
+                    [0m15d ago[0m
+                  [36m</div>[39m
+                [36m</div>[39m
+              [36m</button>[39m
+            [36m</li>[39m
+            [36m<li[39m
+              [33mclass[39m=[32m"list-none"[39m
+            [36m>[39m
+              [36m<hr />[39m
+              [36m<button[39m
+                [33mclass[39m=[32m"flex gap-3 
+p-4 cursor-pointer hover:bg-surface-container-high 
+transition-colors w-full text-left"[39m
+                [33mtype[39m=[32m"button"[39m
+              [36m>[39m
+                [36m<span[39m
+                  
+[33mclass[39m=[32m"material-symbols-outlined 
+shrink-0 mt-0.5 text-on-surface-variant 
+text-lg"[39m
+                [36m>[39m
+                  [0mnotifications[0m
+                [36m</span>[39m
+                [36m<div[39m
+                  [33mclass[39m=[32m"flex 
+flex-col gap-0.5 min-w-0 flex-1"[39m
+                [36m>[39m
+                  [36m<div[39m
+                    [33mclass[39m=[32m"text-sm 
+font-semibold text-on-surface"[39m
+                  [36m>[39m
+                    [0mWelcome to DigSwap[0m
+                  [36m</div>[39m
+                  [36m<div[39m
+                    
+[33mclass[39m=[32m"font-mono text-xs 
+text-on-surface-variant"[39m
+                  [36m>[39m
+                    [0m16d ago[0m
+                  [36m</div>[39m
+                [36m</div>[39m
+              [36m</button>[39m
+            [36m</li>[39m
+          [36m</ul>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"flex 
+items-center justify-between p-4 border-t 
+border-outline-variant/10"[39m
+          [36m>[39m
+            [36m<button[39m
+              [33mclass[39m=[32m"font-mono 
+text-xs text-primary hover:underline"[39m
+              [33mtype[39m=[32m"button"[39m
+            [36m>[39m
+              [0mMark all read[0m
+            [36m</button>[39m
+            [36m<a[39m
+              [33mclass[39m=[32m"font-mono 
+text-xs text-secondary hover:underline"[39m
+              
+[33mhref[39m=[32m"/notifications"[39m
+            [36m>[39m
+              [0mView all notifications[0m
+            [36m</a>[39m
+          [36m</div>[39m
+        [36m</div>[39m
+      [36m</div>[39m
+    [36m</div>[39m
+  [36m</body>[39m
+[36m</html>[39m
+[36m [2mÔØ»[22m tests/unit/components/shell/noti
+fication-bell.test.tsx:[2m142:34[22m[39m
+    [90m140|[39m
+    [90m141|[39m   [35mawait[39m 
+[34mwaitFor[39m(() [33m=>[39m {
+    [90m142|[39m    [34mexpect[39m(screen[33m.
+[39m[34mgetByText[39m([32m"9+"[39m))[33m.[39
+m[34mtoBeInTheDocument[39m()[33m;[39m
+    [90m   |[39m                                 
+ [31m^[39m
+    [90m143|[39m   })[33m;[39m
+    [90m144|[39m  })[33m;[39m
+[90m [2mÔØ»[22m 
+runWithExpensiveErrorDiagnosticsDisabled ../../node
+_modules/.pnpm/@testing-library+dom@10.4.1/node_mod
+ules/@testing-library/dom/dist/config.js:[2m47:12
+[22m[39m
+[90m [2mÔØ»[22m checkCallback ../../node_modules
+/.pnpm/@testing-library+dom@10.4.1/node_modules/@te
+sting-library/dom/dist/wait-for.js:[2m124:77[22m
+[39m
+[90m [2mÔØ»[22m Timeout.checkRealTimersCallback 
+../../node_modules/.pnpm/@testing-library+dom@10.4.
+1/node_modules/@testing-library/dom/dist/wait-for.j
+s:[2m118:16[22m[39m
+
+[31m[2mÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»
+ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»[38/41]ÔÄ»[22m[39m
+
+[41m[1m FAIL [22m[49m tests/unit/components/she
+ll/notification-bell.test.tsx[2m > 
+[22mNotificationBell[2m > [22mno badge when 
+count is 0
+[31m[1mError[22m: Invalid Chai property: 
+toBeInTheDocument[39m
+[36m [2mÔØ»[22m tests/unit/components/shell/noti
+fication-bell.test.tsx:[2m155:59[22m[39m
+    [90m153|[39m   })[33m;[39m
+    [90m154|[39m
+    [90m155|[39m   
+expect(screen.queryByLabelText(/unread 
+notifications/)).not.toBeInThÔÇª
+    [90m   |[39m                                 
+                          [31m^[39m
+    [90m156|[39m  })[33m;[39m
+    [90m157|[39m
+
+[31m[2mÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»
+ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»[39/41]ÔÄ»[22m[39m
+
+[41m[1m FAIL [22m[49m tests/unit/components/she
+ll/notification-bell.test.tsx[2m > 
+[22mNotificationBell[2m > [22mbell has 
+aria-label="Notifications"
+[31m[1mError[22m: Invalid Chai property: 
+toBeInTheDocument[39m
+[36m [2mÔØ»[22m tests/unit/components/shell/noti
+fication-bell.test.tsx:[2m161:49[22m[39m
+    [90m159|[39m   [34mrender[39m([33m<[39m[
+33mNotificationBell[39m 
+[33muserId[39m[33m=[39m[32m"user-123"[39m 
+[33m/[39m[33m>[39m)[33m;[39m
+    [90m160|[39m
+    [90m161|[39m   [34mexpect[39m(screen[33m.
+[39m[34mgetByLabelText[39m([32m"Notifications"[
+39m))[33m.[39m[34mtoBeInTheDocument[39m()[33m;
+[39m
+    [90m   |[39m                                 
+                [31m^[39m
+    [90m162|[39m  })[33m;[39m
+    [90m163|[39m
+
+[31m[2mÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»
+ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»[40/41]ÔÄ»[22m[39m
+
+[41m[1m FAIL [22m[49m tests/unit/components/she
+ll/notification-bell.test.tsx[2m > 
+[22mNotificationBell[2m > [22mdoes not 
+decrement unreadCount when markNotificationRead 
+returns error
+[31m[1mError[22m[39m: Invalid Chai property: 
+toBeInTheDocument
+
+Ignored nodes: comments, script, style
+[36m<html>[39m
+  [36m<head />[39m
+  [36m<body>[39m
+    [36m<div>[39m
+      [36m<div[39m
+        [33mdata-testid[39m=[32m"popover"[39m
+      [36m>[39m
+        [36m<button[39m
+          [33maria-expanded[39m=[32m"false"[39m
+          
+[33maria-label[39m=[32m"Notifications"[39m
+          [33mclass[39m=[32m"relative p-2 
+text-on-surface-variant hover:bg-surface-bright 
+transition-colors rounded"[39m
+          [33mtype[39m=[32m"button"[39m
+        [36m>[39m
+          [36m<span[39m
+            
+[33mclass[39m=[32m"material-symbols-outlined 
+text-[20px]"[39m
+          [36m>[39m
+            [0mnotifications[0m
+          [36m</span>[39m
+          [36m<span[39m
+            [33maria-label[39m=[32m"3 unread 
+notifications"[39m
+            [33mclass[39m=[32m"absolute 
+-top-0.5 -right-0.5 bg-destructive 
+text-destructive-foreground text-xs font-mono 
+font-semibold rounded-full min-w-[18px] h-[18px] 
+flex items-center justify-center px-1"[39m
+            [33mrole[39m=[32m"img"[39m
+          [36m>[39m
+            [0m3[0m
+          [36m</span>[39m
+        [36m</button>[39m
+        [36m<div[39m
+          
+[33mdata-testid[39m=[32m"popover-content"[39m
+        [36m>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"flex 
+items-center justify-between p-4 border-b 
+border-outline-variant/10"[39m
+          [36m>[39m
+            [36m<span[39m
+              [33mclass[39m=[32m"font-heading 
+font-semibold text-on-surface"[39m
+            [36m>[39m
+              [0mNotifications[0m
+            [36m</span>[39m
+            [36m<span[39m
+              [33mclass[39m=[32m"font-mono 
+text-xs text-on-surface-variant"[39m
+            [36m>[39m
+              [0m([0m
+              [0m3[0m
+              [0m)[0m
+            [36m</span>[39m
+          [36m</div>[39m
+          [36m<ul>[39m
+            [36m<li[39m
+              [33mclass[39m=[32m"list-none"[39m
+            [36m>[39m
+              [36m<button[39m
+                [33mclass[39m=[32m"flex gap-3 
+p-4 cursor-pointer hover:bg-surface-container-high 
+transition-colors w-full text-left border-l-2 
+border-primary"[39m
+                [33mtype[39m=[32m"button"[39m
+              [36m>[39m
+                [36m<span[39m
+                  
+[33mclass[39m=[32m"material-symbols-outlined 
+shrink-0 mt-0.5 text-primary text-lg"[39m
+                [36m>[39m
+                  [0mplaylist_add_check[0m
+                [36m</span>[39m
+                [36m<div[39m
+                  [33mclass[39m=[32m"flex 
+flex-col gap-0.5 min-w-0 flex-1"[39m
+                [36m>[39m
+                  [36m<div[39m
+                    [33mclass[39m=[32m"text-sm 
+font-semibold text-on-surface"[39m
+                  [36m>[39m
+
+[2m Test Files [22m [1m[31m8 failed[39m[22m[2m | [22m[1m[32m69 passed[39m[22m[2m | [22m[33m1 skipped[39m[90m (78)[39m
+                    [0mWantlist match found![0m
+                  [36m</div>[39m
+                  [36m<div[39m
+                    [33mclass[39m=[32m"text-sm 
+text-on-surface-variant line-clamp-1"[39m
+                  [36m>[39m
+                    [0mSomeone has Kind of 
+Blue[0m
+                  [36m</div>[39m
+                  [36m<div[39m
+                    
+[33mclass[39m=[32m"font-mono text-xs 
+text-on-surface-variant"[39m
+                  [36m>[39m
+                    [0m15d ago[0m
+                  [36m</div>[39m
+                [36m</div>[39m
+              [36m</button>[39m
+            [36m</li>[39m
+            [36m<li[39m
+              [33mclass[39m=[32m"list-none"[39m
+            [36m>[39m
+              [36m<hr />[39m
+              [36m<button[39m
+                [33mclass[39m=[32m"flex gap-3 
+p-4 cursor-pointer hover:bg-surface-container-high 
+transition-colors w-full text-left"[39m
+                [33mtype[39m=[32m"button"[39m
+              [36m>[39m
+                [36m<span[39m
+                  
+[33mclass[39m=[32m"material-symbols-outlined 
+shrink-0 mt-0.5 text-on-surface-variant 
+text-lg"[39m
+                [36m>[39m
+                  [0mnotifications[0m
+                [36m</span>[39m
+                [36m<div[39m
+                  [33mclass[39m=[32m"flex 
+flex-col gap-0.5 min-w-0 flex-1"[39m
+                [36m>[39m
+                  [36m<div[39m
+                    [33mclass[39m=[32m"text-sm 
+font-semibold text-on-surface"[39m
+                  [36m>[39m
+                    [0mWelcome to DigSwap[0m
+                  [36m</div>[39m
+                  [36m<div[39m
+                    
+[33mclass[39m=[32m"font-mono text-xs 
+text-on-surface-variant"[39m
+                  [36m>[39m
+                    [0m16d ago[0m
+                  [36m</div>[39m
+                [36m</div>[39m
+              [36m</button>[39m
+            [36m</li>[39m
+          [36m</ul>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"flex 
+items-center justify-between p-4 border-t 
+border-outline-variant/10"[39m
+          [36m>[39m
+            [36m<button[39m
+              [33mclass[39m=[32m"font-mono 
+text-xs text-primary hover:underline"[39m
+              [33mtype[39m=[32m"button"[39m
+            [36m>[39m
+              [0mMark all read[0m
+            [36m</button>[39m
+            [36m<a[39m
+              [33mclass[39m=[32m"font-mono 
+text-xs text-secondary hover:underline"[39m
+              
+[33mhref[39m=[32m"/notifications"[39m
+            [36m>[39m
+              [0mView all notifications[0m
+            [36m</a>[39m
+[2m      Tests [22m [1m[31m41 failed[39m[22m[2m | [22m[1m[32m645 passed[39m[22m[2m | [22m[33m4 skipped[39m[2m | [22m[90m7 todo[39m[90m (697)[39m
+          [36m</div>[39m
+        [36m</div>[39m
+      [36m</div>[39m
+    [36m</div>[39m
+  [36m</body>[39m
+[36m</html>[39m
+[36m [2mÔØ»[22m tests/unit/components/shell/noti
+fication-bell.test.tsx:[2m203:33[22m[39m
+    [90m201|[39m   [90m// Wait for initial data 
+to load[39m
+    [90m202|[39m   [35mawait[39m 
+[34mwaitFor[39m(() [33m=>[39m {
+    [90m203|[39m    [34mexpect[39m(screen[33m.
+[39m[34mgetByText[39m([32m"3"[39m))[33m.[39m
+[34mtoBeInTheDocument[39m()[33m;[39m
+    [90m   |[39m                                 
+[31m^[39m
+    [90m204|[39m   })[33m;[39m
+    [90m205|[39m
+[90m [2mÔØ»[22m 
+runWithExpensiveErrorDiagnosticsDisabled ../../node
+_modules/.pnpm/@testing-library+dom@10.4.1/node_mod
+ules/@testing-library/dom/dist/config.js:[2m47:12
+[22m[39m
+[90m [2mÔØ»[22m checkCallback ../../node_modules
+/.pnpm/@testing-library+dom@10.4.1/node_modules/@te
+sting-library/dom/dist/wait-for.js:[2m124:77[22m
+[39m
+[90m [2mÔØ»[22m Timeout.checkRealTimersCallback 
+../../node_modules/.pnpm/@testing-library+dom@10.4.
+1/node_modules/@testing-library/dom/dist/wait-for.j
+s:[2m118:16[22m[39m
+
+[31m[2mÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»
+ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»[41/41]ÔÄ»[22m[39m
+
+[2m   Start at [22m 16:43:12
+[2m   Duration [22m 37.63s[2m (transform 7.16s, setup 42.44s, import 50.64s, tests 21.28s, environment 217.26s)[22m
+
+ÔÇëELIFECYCLEÔÇë Test failed. See above for more details.

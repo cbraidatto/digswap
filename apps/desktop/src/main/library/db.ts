@@ -52,6 +52,11 @@ function initSchema(database: Database.Database): void {
       syncedAt          TEXT,
       syncHash          TEXT
     );
+    CREATE TABLE IF NOT EXISTS release_mappings (
+      albumKey   TEXT PRIMARY KEY,
+      releaseId  TEXT NOT NULL,
+      updatedAt  TEXT NOT NULL
+    );
     CREATE INDEX IF NOT EXISTS idx_tracks_album ON tracks(album);
     CREATE INDEX IF NOT EXISTS idx_tracks_synced ON tracks(syncedAt);
   `);
@@ -162,4 +167,79 @@ export function getIndexedFileMtimes(
 
 export function generateTrackId(): string {
   return randomUUID();
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Sync helpers (Phase 30)
+// ─────────────────────────────────────────────────────────────────────────────
+
+export function makeLocalAlbumKey(artist: string | null, album: string | null): string {
+  const a = (artist ?? "").toLowerCase().trim();
+  const b = (album ?? "").toLowerCase().trim();
+  return `${a}::${b}`;
+}
+
+export function getUnsyncedTracks(database: Database.Database): TrackRow[] {
+  return database.prepare(`
+    SELECT * FROM tracks
+    WHERE syncedAt IS NULL OR syncedAt < modifiedAt
+    ORDER BY artist, album, trackNumber
+  `).all() as TrackRow[];
+}
+
+export function markTracksSynced(
+  database: Database.Database,
+  trackIds: string[],
+): void {
+  const now = new Date().toISOString();
+  const stmt = database.prepare(
+    "UPDATE tracks SET syncedAt = ? WHERE id = ?",
+  );
+  const tx = database.transaction((ids: string[]) => {
+    for (const id of ids) stmt.run(now, id);
+  });
+  tx(trackIds);
+}
+
+export function getIndexedFilePaths(database: Database.Database): string[] {
+  const rows = database.prepare("SELECT filePath FROM tracks").all() as Array<{ filePath: string }>;
+  return rows.map(r => r.filePath);
+}
+
+export function getReleaseMapping(database: Database.Database, albumKey: string): string | null {
+  const row = database.prepare(
+    "SELECT releaseId FROM release_mappings WHERE albumKey = ?",
+  ).get(albumKey) as { releaseId: string } | undefined;
+  return row?.releaseId ?? null;
+}
+
+export function setReleaseMappings(
+  database: Database.Database,
+  mappings: Array<{ albumKey: string; releaseId: string }>,
+): void {
+  const now = new Date().toISOString();
+  const stmt = database.prepare(
+    "INSERT OR REPLACE INTO release_mappings (albumKey, releaseId, updatedAt) VALUES (?, ?, ?)",
+  );
+  const tx = database.transaction((items: typeof mappings) => {
+    for (const m of items) stmt.run(m.albumKey, m.releaseId, now);
+  });
+  tx(mappings);
+}
+
+export function getReleaseMappingsForPaths(
+  database: Database.Database,
+  filePaths: string[],
+): string[] {
+  const releaseIds = new Set<string>();
+  for (const fp of filePaths) {
+    const track = database.prepare(
+      "SELECT artist, album FROM tracks WHERE filePath = ?",
+    ).get(fp) as { artist: string | null; album: string | null } | undefined;
+    if (!track) continue;
+    const key = makeLocalAlbumKey(track.artist, track.album);
+    const mapping = getReleaseMapping(database, key);
+    if (mapping) releaseIds.add(mapping);
+  }
+  return [...releaseIds];
 }

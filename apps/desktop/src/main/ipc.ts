@@ -207,7 +207,15 @@ export function registerDesktopIpc({
     sendToMainWindow("desktop:transfer-complete", event);
   });
 
-  // Library IPC handlers (Phase 29)
-  registerLibraryIpc(sendToMainWindow);
+  // Library IPC handlers (Phase 29 + Phase 30 sync)
+  registerLibraryIpc(
+    sendToMainWindow,
+    () => authRuntime,
+    () => {
+      const siteUrl = (authRuntime as unknown as { config?: { siteUrl?: string } })
+        ?.config?.siteUrl ?? "http://localhost:3000";
+      return siteUrl;
+    },
+  );
 
 }

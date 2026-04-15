@@ -1,10 +1,14 @@
 import { ipcMain, dialog } from "electron";
-import type { ScanProgressEvent, ScanResult, LibraryTrack } from "../../shared/ipc-types";
-import { getLibraryDb, getAllTracks, getLibraryRoot, closeLibraryDb } from "./db";
+import type { ScanProgressEvent, ScanResult, SyncResult, SyncProgress, LibraryTrack } from "../../shared/ipc-types";
+import { getLibraryDb, getAllTracks, getLibraryRoot } from "./db";
 import { scanFolder } from "./scanner";
+import { startSync } from "./sync-manager";
+import type { DesktopSupabaseAuth } from "../supabase-auth";
 
 export function registerLibraryIpc(
   sendToMainWindow: <T>(channel: string, payload: T) => void,
+  getAuth?: () => DesktopSupabaseAuth,
+  getSiteUrl?: () => string,
 ): void {
   ipcMain.handle("desktop:select-library-folder", async () => {
     const result = await dialog.showOpenDialog({
@@ -51,5 +55,24 @@ export function registerLibraryIpc(
   ipcMain.handle("desktop:get-library-root", (): string | null => {
     const db = getLibraryDb();
     return getLibraryRoot(db);
+  });
+
+  ipcMain.handle("desktop:start-sync", async (): Promise<SyncResult> => {
+    const db = getLibraryDb();
+    const auth = getAuth?.();
+    const siteUrl = getSiteUrl?.() ?? "http://localhost:3000";
+
+    if (!auth) {
+      return { synced: 0, created: 0, linked: 0, deleted: 0, errors: ["Auth not configured"] };
+    }
+
+    return startSync(
+      db,
+      siteUrl,
+      () => auth.getAccessToken(),
+      (progress: SyncProgress) => {
+        sendToMainWindow("desktop:sync-progress", progress);
+      },
+    );
   });
 }

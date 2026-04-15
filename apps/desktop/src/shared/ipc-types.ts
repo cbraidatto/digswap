@@ -243,15 +243,35 @@ export interface LibraryTrack {
   trackConfidence: MetadataConfidence;
 }
 
+/** Result returned when a sync operation completes. */
+export interface SyncResult {
+  synced: number;
+  created: number;
+  linked: number;
+  deleted: number;
+  errors: string[];
+}
+
+/** Progress event emitted during library sync, sent via desktop:sync-progress. */
+export interface SyncProgress {
+  phase: "preparing" | "uploading" | "deleting" | "done" | "error";
+  total: number;
+  sent: number;
+  message: string;
+}
+
+
 /** IPC bridge for library operations exposed on window.desktopBridge. */
 export interface DesktopBridgeLibrary {
   selectLibraryFolder(): Promise<string | null>;
   startScan(folderPath: string): Promise<ScanResult>;
   startIncrementalScan(): Promise<ScanResult>;
   startFullScan(): Promise<ScanResult>;
+  startSync(): Promise<SyncResult>;
   getLibraryTracks(): Promise<LibraryTrack[]>;
   getLibraryRoot(): Promise<string | null>;
   onScanProgress(listener: (event: ScanProgressEvent) => void): () => void;
+  onSyncProgress(listener: (event: SyncProgress) => void): () => void;
 }
 
 declare global {
