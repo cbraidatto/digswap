@@ -258,7 +258,7 @@ describe("sync-manager", () => {
       }
       mockGetUnsyncedTracks.mockReturnValue(tracks);
       mockGetIndexedFilePaths.mockReturnValue([...tracks.map(t => t.filePath), "/music/gone.flac"]);
-      mockExistsSync.mockImplementation((p) => String(p) !== "/music/gone.flac");
+      mockExistsSync.mockImplementation(((p: unknown) => String(p) !== "/music/gone.flac") as () => boolean);
       mockGetReleaseMappingsForPaths.mockReturnValue(["rel-del"]);
 
       mockFetch.mockResolvedValue(successResponse());
