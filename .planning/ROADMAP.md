@@ -557,7 +557,11 @@ Plans:
   2. A local release that matches an existing Discogs-imported release links to the same release instead of creating a duplicate
   3. When a file is deleted from the local folder and a sync runs, the corresponding web collection item is removed
   4. Sync sends only changed items to the server, not the entire library (observable via network or progress indicator)
-**Plans**: TBD
+**Plans**: 3 plans
+Plans:
+- [ ] 030-01-PLAN.md -- Web sync infrastructure: schema migration, normalization, batch processor, API route
+- [ ] 030-02-PLAN.md -- Desktop sync manager: incremental detection, album grouping, batch HTTP, IPC handler
+- [ ] 030-03-PLAN.md -- Soft-delete query filter audit, human verification of full sync flow
 
 ### Phase 31: Tray Daemon + File Watcher
 **Goal**: Desktop app runs persistently in the background, watching for file changes and keeping the index current
