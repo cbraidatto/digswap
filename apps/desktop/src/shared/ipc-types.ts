@@ -183,6 +183,7 @@ export interface DesktopBridgeTradeRuntime {
   onTransferProgress(listener: (event: TransferProgressEvent) => void): () => void;
   onTransferComplete(listener: (event: TransferCompleteEvent) => void): () => void;
   onLobbyStateChanged(listener: (event: LobbyStateEvent) => void): () => void;
+  selectAndPrepareAudio(tradeId: string, proposalItemId: string): Promise<AudioPrepResult>;
 }
 
 /** Result of startup diff scan comparing SQLite index vs filesystem. */
@@ -194,11 +195,147 @@ export interface DiffScanResult {
   hasChanges: boolean;
 }
 
+// ─────────────────────────────────────────────────────────────────────────────
+// LIBRARY — Phase 29+32: Local Index + AI Metadata Enrichment
+// ─────────────────────────────────────────────────────────────────────────────
+
+export type MetadataConfidence = "high" | "low" | "ai";
+
+export interface ScanProgressEvent {
+  filesFound: number;
+  filesProcessed: number;
+  currentPath: string;
+  errorCount: number;
+}
+
+export interface ScanResult {
+  filesFound: number;
+  filesProcessed: number;
+  errors: Array<{ filePath: string; reason: string }>;
+}
+
+export interface LibraryTrack {
+  id: string;
+  filePath: string;
+  fileHash: string | null;
+  fileSize: number;
+  modifiedAt: string;
+  scannedAt: string;
+  artist: string | null;
+  album: string | null;
+  title: string | null;
+  year: number | null;
+  trackNumber: number | null;
+  format: string;
+  bitrate: number;
+  sampleRate: number;
+  bitDepth: number | null;
+  duration: number;
+  artistConfidence: MetadataConfidence;
+  albumConfidence: MetadataConfidence;
+  titleConfidence: MetadataConfidence;
+  yearConfidence: MetadataConfidence;
+  trackConfidence: MetadataConfidence;
+  /** Phase 32: Per-field user edit flags */
+  artistUserEdited: boolean;
+  albumUserEdited: boolean;
+  titleUserEdited: boolean;
+  yearUserEdited: boolean;
+  trackUserEdited: boolean;
+}
+
+export interface SyncResult {
+  synced: number;
+  created: number;
+  linked: number;
+  deleted: number;
+  errors: string[];
+}
+
+export interface SyncProgress {
+  phase: "preparing" | "uploading" | "deleting" | "done" | "error";
+  total: number;
+  sent: number;
+  message: string;
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// AUDIO — Phase 27: Desktop Audio Pipeline
+// ─────────────────────────────────────────────────────────────────────────────
+
+export interface AudioPrepResult {
+  tradeId: string;
+  proposalItemId: string;
+  storagePath: string;
+  signedUrl: string;
+  expiresAt: string;
+  sha256: string;
+  format: string;
+  bitrate: number;
+  sampleRate: number;
+  duration: number;
+  fileSize: number;
+}
+
+export interface MultiItemProgressEvent {
+  tradeId: string;
+  itemIndex: number;
+  totalItems: number;
+  proposalItemId: string;
+  bytesTransferred: number;
+  totalBytes: number;
+}
+
+export interface MultiItemCompleteEvent {
+  tradeId: string;
+  completedItems: Array<{
+    proposalItemId: string;
+    filePath: string;
+    sha256: string;
+  }>;
+  allVerified: boolean;
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// AI ENRICHMENT — Phase 32
+// ─────────────────────────────────────────────────────────────────────────────
+
+export interface EnrichProgressEvent {
+  total: number;
+  processed: number;
+  enriched: number;
+  errorCount: number;
+}
+
+export interface EnrichResult {
+  total: number;
+  enriched: number;
+  errors: string[];
+}
+
+export interface DesktopBridgeLibrary {
+  selectLibraryFolder(): Promise<string | null>;
+  startScan(folderPath: string): Promise<ScanResult>;
+  startIncrementalScan(): Promise<ScanResult>;
+  startFullScan(): Promise<ScanResult>;
+  startSync(): Promise<SyncResult>;
+  getLibraryTracks(): Promise<LibraryTrack[]>;
+  getLibraryRoot(): Promise<string | null>;
+  onScanProgress(listener: (event: ScanProgressEvent) => void): () => void;
+  onSyncProgress(listener: (event: SyncProgress) => void): () => void;
+  /** Phase 32: AI enrichment */
+  enrichMetadata(): Promise<EnrichResult>;
+  updateTrackField(trackId: string, field: string, value: string | number | null): Promise<void>;
+  getGeminiApiKey(): Promise<string | null>;
+  setGeminiApiKey(apiKey: string): Promise<void>;
+  removeGeminiApiKey(): Promise<void>;
+  onEnrichProgress(listener: (event: EnrichProgressEvent) => void): () => void;
+}
+
 declare global {
   interface Window {
     desktopShell?: DesktopMainShellBridge;
-    // Augment: trade runtime methods merged at runtime by the preload script
-    desktopBridge: DesktopBridge & DesktopBridgeTradeRuntime;
+    desktopBridge: DesktopBridge & DesktopBridgeTradeRuntime & DesktopBridgeLibrary;
   }
 }
 

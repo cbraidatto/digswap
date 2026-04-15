@@ -8,12 +8,16 @@ import type {
   DesktopBridgeTradeRuntime,
   DesktopProtocolPayload,
   DesktopSettings,
+  EnrichProgressEvent,
+  EnrichResult,
   LibraryTrack,
   LobbyStateEvent,
   PendingTrade,
   ScanProgressEvent,
   ScanResult,
   SupabaseSession,
+  SyncProgress,
+  SyncResult,
   TradeDetail,
   TransferCompleteEvent,
   TransferProgressEvent,
@@ -80,6 +84,26 @@ const desktopBridge: DesktopBridge & DesktopBridgeTradeRuntime & DesktopBridgeLi
     ipcRenderer.invoke("desktop:get-library-root") as Promise<string | null>,
   onScanProgress: (listener: (event: ScanProgressEvent) => void) =>
     subscribe("desktop:scan-progress", listener),
+
+  // Sync methods (Phase 30)
+  startSync: () =>
+    ipcRenderer.invoke("desktop:start-sync") as Promise<SyncResult>,
+  onSyncProgress: (listener: (event: SyncProgress) => void) =>
+    subscribe("desktop:sync-progress", listener),
+
+  // AI enrichment methods (Phase 32)
+  enrichMetadata: () =>
+    ipcRenderer.invoke("desktop:enrich-metadata") as Promise<EnrichResult>,
+  updateTrackField: (trackId: string, field: string, value: string | number | null) =>
+    ipcRenderer.invoke("desktop:update-track-field", trackId, field, value) as Promise<void>,
+  getGeminiApiKey: () =>
+    ipcRenderer.invoke("desktop:get-gemini-api-key") as Promise<string | null>,
+  setGeminiApiKey: (apiKey: string) =>
+    ipcRenderer.invoke("desktop:set-gemini-api-key", apiKey) as Promise<void>,
+  removeGeminiApiKey: () =>
+    ipcRenderer.invoke("desktop:remove-gemini-api-key") as Promise<void>,
+  onEnrichProgress: (listener: (event: EnrichProgressEvent) => void) =>
+    subscribe("desktop:enrich-progress", listener),
 };
 
 contextBridge.exposeInMainWorld("desktopBridge", desktopBridge);
