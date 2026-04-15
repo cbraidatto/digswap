@@ -588,7 +588,7 @@ Plans:
   3. User can manually correct any metadata field, and those corrections persist through subsequent AI re-inference runs
 **Plans**: 2 plans
 Plans:
-- [ ] 032-01-PLAN.md — Restore types, schema migration, AI enrichment service + tests
+- [x] 032-01-PLAN.md — Restore types, schema migration, AI enrichment service + tests
 - [ ] 032-02-PLAN.md — IPC wiring, preload bridge, all UI surfaces
 ## Progress
 
