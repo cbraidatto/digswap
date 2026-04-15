@@ -39,12 +39,15 @@ Out of scope:
 - If Discogs finds a match: update local release record with `discogsId`, fill in cover/genre/tracklist
 - If Discogs finds no match: release remains local-only (`discogsId = NULL`)
 - `discogsId` is already nullable on `releases` table — no schema change needed for this
+- **NOTE:** Stage 2 (Discogs dedup queue) is deferred to Phase 32. Phase 30 implements Stage 1 only and increments `dedupQueued` counter for items that would enter Stage 2.
 
 ### D-02: Sync Transport — Dedicated API Route
 - `POST /api/desktop/library/sync` with Bearer token (Supabase access token)
 - Follows existing handoff pattern: `admin.auth.getUser(accessToken)` for auth validation
 - Electron batches 50-100 tracks per request to stay under Vercel 10s Hobby timeout
-- Request body: `{ tracks: TrackSyncPayload[], deletedPaths: string[] }`
+- Request body: `{ tracks: TrackSyncPayload[], deletedReleaseIds: string[] }`
+- **DEVIATION from original design:** Originally specified `deletedPaths: string[]` (file paths). Changed to `deletedReleaseIds: string[]` (web-side release UUIDs) because the server cannot map file paths to collection items without storing paths in the database. Instead, the desktop tracks albumKey-to-releaseId mappings locally (in a `release_mappings` SQLite table), detects deleted files via `fs.existsSync`, looks up their release IDs, and sends those UUIDs. This is cleaner and avoids adding a `localPath` column to the web schema.
+- Response body includes `releaseMappings: Array<{ albumKey: string; releaseId: string }>` so the desktop can populate its mapping table after each successful batch.
 - Electron sync manager: iterates batches, writes `syncedAt = now()` to SQLite on 200 OK per batch
 - Resumable: on failure, next sync picks up from `WHERE syncedAt IS NULL OR syncedAt < modifiedAt`
 - Idempotent: upsert semantics on server side (conflict on user_id + release_id)
@@ -154,6 +157,7 @@ Out of scope:
 - **Cross-user discovery for local releases** — "Who else has this local album?" Currently local releases with `discogsId = NULL` won't appear in discovery. Future feature
 - **Sync conflict resolution UI** — What if user edits a collection item on web while desktop syncs a change? Currently last-write-wins. More sophisticated merge could be a future enhancement
 - **Multiple library roots support** — Phase 29 deferred this; sync engine would need to handle multiple sources per user
+- **Stage 2 Discogs dedup queue** — D-01 describes a Discogs API fallback for unmatched/low-confidence items. Phase 30 implements Stage 1 (normalized exact match) only and increments `dedupQueued` counter. The actual Discogs search queue (background job, rate limiting, result merging) is deferred to Phase 32. The `dedupQueued` counter in SyncResponse tracks how many items would benefit from this.
 
 </deferred>
 
