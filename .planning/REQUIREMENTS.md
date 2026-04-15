@@ -365,7 +365,7 @@ None — this is a focused fix milestone.
 ### Daemon & Background
 
 - [ ] **DAEMON-01**: App minimizes to system tray instead of closing when user clicks the window close button
-- [ ] **DAEMON-02**: Tray icon shows context menu with options: Open, Pause Watching, Quit
+- [ ] **DAEMON-02**: Tray icon shows context menu with options: Open, Quit
 - [ ] **DAEMON-03**: App watches the configured folder for file changes in real-time using chokidar, automatically updating the local index
 - [ ] **DAEMON-04**: User can enable auto-start with Windows from settings, launching the app minimized to tray on boot
 - [ ] **DAEMON-05**: App enforces single-instance lock — opening a second instance focuses the existing window

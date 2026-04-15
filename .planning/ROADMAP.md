@@ -569,7 +569,7 @@ Plans:
 **Requirements**: DAEMON-01, DAEMON-02, DAEMON-03, DAEMON-04, DAEMON-05, SCAN-05
 **Success Criteria** (what must be TRUE):
   1. Clicking the window close button minimizes the app to system tray instead of quitting
-  2. Tray icon shows a context menu with Open, Pause Watching, and Quit options
+  2. Tray icon shows a context menu with Open and Quit options
   3. Adding or removing an audio file in the watched folder is detected within seconds and the index updates automatically
   4. On app startup, a diff scan compares stored index vs current folder state and reconciles additions, removals, and modifications
   5. User can enable auto-start with Windows from settings, and the app launches minimized to tray on boot

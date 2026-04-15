@@ -44,7 +44,7 @@ The existing codebase provides strong foundations: single-instance lock already 
 | ID | Description | Research Support |
 |----|-------------|------------------|
 | DAEMON-01 | App minimizes to system tray instead of closing when user clicks close button | Intercept BrowserWindow `close` event with `preventDefault()` + `win.hide()`. Remove `window-all-closed` quit on Windows. Tray API keeps app alive. |
-| DAEMON-02 | Tray icon shows context menu with options: Open, ~~Pause Watching~~, Quit | CONTEXT.md D-02 overrides REQUIREMENTS.md — menu has only Open + Quit (no Pause). Use `Tray` + `Menu.buildFromTemplate()`. |
+| DAEMON-02 | Tray icon shows context menu with options: Open, Quit | CONTEXT.md D-02 specifies exactly 2 items: Open + Quit (no Pause Watching). Use `Tray` + `Menu.buildFromTemplate()`. |
 | DAEMON-03 | App watches configured folder for file changes using chokidar, auto-updating local index | chokidar 4.x with `ignored` filter for extensions + temp files, `awaitWriteFinish`, 2-min debounce via custom setTimeout. Triggers `scanFolder` incremental + `startSync`. |
 | DAEMON-04 | User can enable auto-start with Windows from settings, launching minimized to tray | Use `app.setLoginItemSettings()` with `args: ["--boot-to-tray"]` instead of electron-auto-launch (see research below). Check `process.argv` for `--boot-to-tray` to skip showing window. |
 | DAEMON-05 | App enforces single-instance lock — opening second instance focuses existing window | Already exists at `index.ts:26`. Enhance `second-instance` handler to also `win.show()` + `win.focus()` when window is hidden in tray. |
@@ -459,6 +459,12 @@ app.on("window-all-closed", () => {
 
 ## Validation Architecture
 
+### Test Strategy
+
+Electron main-process modules (Tray, BrowserWindow lifecycle, app events, chokidar watcher) require deep mocking of Electron internals that makes unit tests brittle and low-value for this lifecycle-integration phase. The existing test infrastructure (see `protocol.test.ts`) mocks only stateless utility functions.
+
+**Approach:** Build verification (`tsc --noEmit`) + structural grep checks in `<verify>` blocks confirm correct wiring. Behavioral correctness is verified via manual smoke test during human-verify checkpoint at phase verification.
+
 ### Test Framework
 | Property | Value |
 |----------|-------|
@@ -467,26 +473,20 @@ app.on("window-all-closed", () => {
 | Quick run command | `cd apps/desktop && pnpm test` |
 | Full suite command | `cd apps/desktop && pnpm test` |
 
-### Phase Requirements -> Test Map
-| Req ID | Behavior | Test Type | Automated Command | File Exists? |
-|--------|----------|-----------|-------------------|-------------|
-| DAEMON-01 | Close button hides window instead of quitting | unit | `cd apps/desktop && pnpm vitest run src/main/tray.test.ts -t "close hides"` | No — Wave 0 |
-| DAEMON-02 | Tray menu has Open + Quit, double-click opens | unit | `cd apps/desktop && pnpm vitest run src/main/tray.test.ts -t "context menu"` | No — Wave 0 |
-| DAEMON-03 | chokidar watches library root, debounced scan+sync | unit | `cd apps/desktop && pnpm vitest run src/main/watcher.test.ts` | No — Wave 0 |
-| DAEMON-04 | Auto-start toggle sets login item settings | unit | `cd apps/desktop && pnpm vitest run src/main/tray.test.ts -t "auto-start"` | No — Wave 0 |
-| DAEMON-05 | Second instance focuses existing window | unit | `cd apps/desktop && pnpm vitest run src/main/tray.test.ts -t "single-instance"` | No — Wave 0 |
-| SCAN-05 | Diff scan detects added/removed/modified files | unit | `cd apps/desktop && pnpm vitest run src/main/diff-scan.test.ts` | No — Wave 0 |
+### Phase Requirements -> Verification Map
+| Req ID | Behavior | Verification Method | Automated Command |
+|--------|----------|---------------------|-------------------|
+| DAEMON-01 | Close button hides window instead of quitting | Build + structural grep | `cd apps/desktop && npx tsc --noEmit && grep -q "event.preventDefault" src/main/window.ts` |
+| DAEMON-02 | Tray menu has Open + Quit, double-click opens | Build + structural grep | `cd apps/desktop && npx tsc --noEmit && grep -q '"Open"' src/main/tray.ts && grep -q '"Quit"' src/main/tray.ts` |
+| DAEMON-03 | chokidar watches library root, debounced scan+sync | Build + structural grep | `cd apps/desktop && npx tsc --noEmit && grep -q "DEBOUNCE_MS" src/main/watcher.ts` |
+| DAEMON-04 | Auto-start toggle sets login item settings | Build + structural grep | `cd apps/desktop && npx tsc --noEmit && grep -q "setLoginItemSettings" src/main/ipc.ts` |
+| DAEMON-05 | Second instance focuses existing window | Build + structural grep | `cd apps/desktop && npx tsc --noEmit && grep -q "focusMainWindow" src/main/index.ts` |
+| SCAN-05 | Diff scan detects added/removed/modified files | Build + structural grep | `cd apps/desktop && npx tsc --noEmit && grep -q "runDiffScan" src/main/diff-scan.ts` |
 
 ### Sampling Rate
-- **Per task commit:** `cd apps/desktop && pnpm test`
-- **Per wave merge:** `cd apps/desktop && pnpm test`
-- **Phase gate:** Full suite green before `/gsd:verify-work`
-
-### Wave 0 Gaps
-- [ ] `apps/desktop/src/main/tray.test.ts` — covers DAEMON-01, DAEMON-02, DAEMON-04, DAEMON-05
-- [ ] `apps/desktop/src/main/watcher.test.ts` — covers DAEMON-03
-- [ ] `apps/desktop/src/main/diff-scan.test.ts` — covers SCAN-05
-- [ ] Mocks needed: `electron` module (Tray, Menu, app, BrowserWindow), `chokidar`, `fs/promises`
+- **Per task commit:** `cd apps/desktop && npx tsc --noEmit`
+- **Per wave merge:** `cd apps/desktop && npx tsc --noEmit && pnpm test`
+- **Phase gate:** Full suite green + manual smoke test before `/gsd:verify-work`
 
 ## Project Constraints (from CLAUDE.md)
 
