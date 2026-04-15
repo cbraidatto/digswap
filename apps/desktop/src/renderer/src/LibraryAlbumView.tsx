@@ -3,12 +3,22 @@ import type { LibraryTrack, MetadataConfidence } from "../../shared/ipc-types";
 
 interface Props {
   tracks: LibraryTrack[];
+  onTrackFieldUpdate?: (trackId: string, field: string, value: string | number | null) => void;
 }
 
 function formatDuration(seconds: number): string {
   const mins = Math.floor(seconds / 60);
   const secs = Math.floor(seconds % 60);
   return `${mins}:${secs.toString().padStart(2, "0")}`;
+}
+
+/** Inline SVG sparkle icon used for AI-inferred fields */
+function SparkleIcon() {
+  return (
+    <svg className="inline w-3 h-3 mr-1 opacity-60" viewBox="0 0 16 16" fill="currentColor">
+      <path d="M8 0l2 5h5l-4 3 2 5-5-3-5 3 2-5-4-3h5z" />
+    </svg>
+  );
 }
 
 interface AlbumGroup {
@@ -74,6 +84,14 @@ export function LibraryAlbumView({ tracks }: Props) {
                 <span className="text-sm font-semibold text-[#4a4035] italic truncate">
                   {group.album}
                 </span>
+              ) : group.albumConfidence === "ai" ? (
+                <span
+                  className="text-sm font-semibold text-[#c8914a] truncate"
+                  title="Inferido por IA — editar na vista de lista"
+                >
+                  <SparkleIcon />
+                  {group.album}
+                </span>
               ) : group.albumConfidence === "low" ? (
                 <span
                   className="text-sm font-semibold text-[#8b7355] italic truncate"
@@ -90,7 +108,15 @@ export function LibraryAlbumView({ tracks }: Props) {
               {group.artist && (
                 <>
                   <span className="text-sm text-[#4a4035]"> -- </span>
-                  {group.artistConfidence === "low" ? (
+                  {group.artistConfidence === "ai" ? (
+                    <span
+                      className="text-sm text-[#c8914a] truncate"
+                      title="Inferido por IA — editar na vista de lista"
+                    >
+                      <SparkleIcon />
+                      {group.artist}
+                    </span>
+                  ) : group.artistConfidence === "low" ? (
                     <span
                       className="text-sm text-[#8b7355] italic truncate"
                       title="Inferido do caminho do arquivo"
@@ -127,7 +153,15 @@ export function LibraryAlbumView({ tracks }: Props) {
                 {track.trackNumber ?? ""}
               </div>
               <div className="flex-1 truncate">
-                {track.titleConfidence === "low" ? (
+                {track.titleConfidence === "ai" ? (
+                  <span
+                    className="text-[#c8914a]"
+                    title="Inferido por IA — editar na vista de lista"
+                  >
+                    <SparkleIcon />
+                    {track.title ?? "--"}
+                  </span>
+                ) : track.titleConfidence === "low" ? (
                   <span
                     className="text-[#8b7355] italic"
                     title="Inferido do caminho do arquivo"

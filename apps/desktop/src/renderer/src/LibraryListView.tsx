@@ -1,8 +1,9 @@
-import React from "react";
+import React, { useState } from "react";
 import type { LibraryTrack, MetadataConfidence } from "../../shared/ipc-types";
 
 interface Props {
   tracks: LibraryTrack[];
+  onTrackFieldUpdate?: (trackId: string, field: string, value: string | number | null) => void;
 }
 
 function formatDuration(seconds: number): string {
@@ -21,12 +22,57 @@ function InferredCell({
   value,
   confidence,
   className = "",
+  onEdit,
 }: {
   value: string | null;
   confidence: MetadataConfidence;
   className?: string;
+  onEdit?: (newValue: string) => void;
 }) {
+  const [editing, setEditing] = useState(false);
+  const [editValue, setEditValue] = useState(value ?? "");
+
   if (!value) return <span className={`text-[#4a4035] ${className}`}>--</span>;
+
+  if (editing) {
+    return (
+      <input
+        autoFocus
+        className="bg-[#0d0d0d] border border-[#c8914a]/50 rounded px-2 py-1 text-sm text-[#e8dcc8] outline-none focus:border-[#c8914a] min-w-0"
+        value={editValue}
+        onChange={(e) => setEditValue(e.target.value)}
+        onKeyDown={(e) => {
+          if (e.key === "Enter") {
+            onEdit?.(editValue);
+            setEditing(false);
+          }
+          if (e.key === "Escape") {
+            setEditValue(value);
+            setEditing(false);
+          }
+        }}
+        onBlur={() => {
+          onEdit?.(editValue);
+          setEditing(false);
+        }}
+      />
+    );
+  }
+
+  if (confidence === "ai") {
+    return (
+      <span
+        className={`text-[#c8914a] ${className} cursor-pointer`}
+        title="Inferido por IA — clique para editar"
+        onClick={() => { setEditValue(value); setEditing(true); }}
+      >
+        <svg className="inline w-3 h-3 mr-1 opacity-60" viewBox="0 0 16 16" fill="currentColor">
+          <path d="M8 0l2 5h5l-4 3 2 5-5-3-5 3 2-5-4-3h5z" />
+        </svg>
+        {value}
+      </span>
+    );
+  }
 
   if (confidence === "low") {
     return (
@@ -42,7 +88,7 @@ function InferredCell({
   return <span className={className}>{value}</span>;
 }
 
-export function LibraryListView({ tracks }: Props) {
+export function LibraryListView({ tracks, onTrackFieldUpdate }: Props) {
   return (
     <div className="overflow-auto flex-1">
       {/* Header */}
@@ -66,6 +112,7 @@ export function LibraryListView({ tracks }: Props) {
               value={track.title}
               confidence={track.titleConfidence}
               className="text-[#e8dcc8]"
+              onEdit={(val) => onTrackFieldUpdate?.(track.id, "title", val)}
             />
           </div>
           <div className="w-[180px] truncate">
@@ -73,6 +120,7 @@ export function LibraryListView({ tracks }: Props) {
               value={track.artist}
               confidence={track.artistConfidence}
               className="text-[#e8dcc8]"
+              onEdit={(val) => onTrackFieldUpdate?.(track.id, "artist", val)}
             />
           </div>
           <div className="w-[180px] truncate">
@@ -80,6 +128,7 @@ export function LibraryListView({ tracks }: Props) {
               value={track.album}
               confidence={track.albumConfidence}
               className="text-[#7a6e5f]"
+              onEdit={(val) => onTrackFieldUpdate?.(track.id, "album", val)}
             />
           </div>
           <div className="w-[60px] text-center text-xs font-mono text-[#4a4035]">

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import type { DesktopSettings, SupabaseSession } from "../../shared/ipc-types";
 
 interface Props {
@@ -12,13 +12,21 @@ export function SettingsScreen({ session, onSignOut }: Props) {
   const [saving, setSaving] = useState(false);
   const [signingOut, setSigningOut] = useState(false);
 
+  // Gemini API Key state
+  const [geminiKey, setGeminiKey] = useState<string | null>(null);
+  const [editingKey, setEditingKey] = useState(false);
+  const [newKeyValue, setNewKeyValue] = useState("");
+  const [removeConfirm, setRemoveConfirm] = useState(false);
+
   useEffect(() => {
     Promise.all([
       window.desktopBridge.getSettings(),
       window.desktopBridge.getAppVersion(),
-    ]).then(([s, v]) => {
+      window.desktopBridge.getGeminiApiKey(),
+    ]).then(([s, v, gKey]) => {
       setSettingsState(s);
       setAppVersion(v);
+      setGeminiKey(gKey);
     });
   }, []);
 
@@ -55,10 +63,38 @@ export function SettingsScreen({ session, onSignOut }: Props) {
     }
   }
 
+  // Gemini API Key handlers
+  const handleSaveGeminiKey = useCallback(async () => {
+    if (!newKeyValue.trim()) return;
+    await window.desktopBridge.setGeminiApiKey(newKeyValue.trim());
+    setGeminiKey(newKeyValue.trim());
+    setEditingKey(false);
+    setNewKeyValue("");
+  }, [newKeyValue]);
+
+  const handleRemoveGeminiKey = useCallback(async () => {
+    if (!removeConfirm) {
+      setRemoveConfirm(true);
+      // Revert confirmation after 3 seconds if not clicked again
+      setTimeout(() => setRemoveConfirm(false), 3000);
+      return;
+    }
+    // Second click within 3-second window: execute removal
+    await window.desktopBridge.removeGeminiApiKey();
+    setGeminiKey(null);
+    setRemoveConfirm(false);
+  }, [removeConfirm]);
+
+  /** Mask a key for display: show first 4 + last 4 chars */
+  function maskKey(key: string): string {
+    if (key.length <= 8) return key;
+    return `${key.slice(0, 4)}...${key.slice(-4)}`;
+  }
+
   if (!settings) {
     return (
       <div className="flex items-center justify-center h-full p-12">
-        <span className="text-[#7a6e5f] text-sm animate-pulse">Loading settings…</span>
+        <span className="text-[#7a6e5f] text-sm animate-pulse">Loading settings...</span>
       </div>
     );
   }
@@ -111,6 +147,82 @@ export function SettingsScreen({ session, onSignOut }: Props) {
         </div>
       </section>
 
+      {/* Gemini API Key (Phase 32) */}
+      <section className="flex flex-col gap-2">
+        <label className="text-[#e8dcc8] text-sm font-medium">Gemini API Key</label>
+
+        {editingKey ? (
+          <>
+            <input
+              type="text"
+              value={newKeyValue}
+              onChange={(e) => setNewKeyValue(e.target.value)}
+              placeholder="AIza..."
+              className="bg-[#0d0d0d] border border-[#2a2218] rounded px-3 py-2 text-sm font-mono text-[#e8dcc8] placeholder-[#4a4035] w-full"
+              autoFocus
+            />
+            <div className="flex gap-3">
+              <button
+                type="button"
+                onClick={handleSaveGeminiKey}
+                disabled={!newKeyValue.trim()}
+                className="text-xs font-medium text-[#c8914a] disabled:opacity-50"
+              >
+                Salvar
+              </button>
+              <button
+                type="button"
+                onClick={() => { setEditingKey(false); setNewKeyValue(""); }}
+                className="text-xs font-medium text-[#4a4035]"
+              >
+                Cancelar
+              </button>
+            </div>
+          </>
+        ) : geminiKey ? (
+          <>
+            <span className="text-[#7a6e5f] text-xs font-mono bg-[#111008] border border-[#2a2218] rounded px-3 py-2">
+              {maskKey(geminiKey)}
+            </span>
+            <div className="flex gap-3">
+              <button
+                type="button"
+                onClick={() => { setEditingKey(true); setNewKeyValue(""); }}
+                className="text-xs font-medium text-[#c8914a] hover:text-[#e8a85a]"
+              >
+                Alterar chave
+              </button>
+              <button
+                type="button"
+                onClick={handleRemoveGeminiKey}
+                className={`text-xs font-medium transition-colors ${
+                  removeConfirm
+                    ? "text-red-300"
+                    : "text-red-400 hover:text-red-300"
+                }`}
+              >
+                {removeConfirm ? "Confirmar remocao?" : "Remover chave"}
+              </button>
+            </div>
+          </>
+        ) : (
+          <>
+            <span className="text-[#4a4035] text-xs">Nao configurada</span>
+            <button
+              type="button"
+              onClick={() => setEditingKey(true)}
+              className="w-fit text-xs font-medium text-[#c8914a] hover:text-[#e8a85a]"
+            >
+              Configurar chave API
+            </button>
+          </>
+        )}
+
+        <p className="text-[#4a4035] text-xs">
+          Obtenha em ai.google.dev/aistudio — o plano gratuito permite 500 solicitacoes/dia.
+        </p>
+      </section>
+
       {/* Account */}
       <section className="flex flex-col gap-2">
         <label className="text-[#e8dcc8] text-sm font-medium">Account</label>
@@ -122,7 +234,7 @@ export function SettingsScreen({ session, onSignOut }: Props) {
           onClick={handleSignOut}
           className="mt-1 w-fit text-xs font-medium text-red-400 hover:text-red-300 disabled:opacity-50 transition-colors"
         >
-          {signingOut ? "Signing out…" : "Sign Out"}
+          {signingOut ? "Signing out..." : "Sign Out"}
         </button>
       </section>
     </div>

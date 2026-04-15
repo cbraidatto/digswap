@@ -1,9 +1,9 @@
 import React, { useCallback, useEffect, useState } from "react";
-import type { LibraryTrack, ScanProgressEvent, ScanResult } from "../../shared/ipc-types";
+import type { LibraryTrack, ScanProgressEvent, ScanResult, EnrichProgressEvent, EnrichResult } from "../../shared/ipc-types";
 import { LibraryListView } from "./LibraryListView";
 import { LibraryAlbumView } from "./LibraryAlbumView";
 
-type ScreenState = "empty" | "scanning" | "error-summary" | "library";
+type ScreenState = "empty" | "scanning" | "error-summary" | "library" | "enriching" | "enrich-complete" | "api-key-prompt";
 
 export function LibraryScreen() {
   const [screenState, setScreenState] = useState<ScreenState>("empty");
@@ -12,6 +12,13 @@ export function LibraryScreen() {
   const [scanErrors, setScanErrors] = useState<Array<{ filePath: string; reason: string }>>([]);
   const [viewMode, setViewMode] = useState<"list" | "album">("list");
   const [libraryRoot, setLibraryRoot] = useState<string | null>(null);
+
+  // AI enrichment state
+  const [enrichProgress, setEnrichProgress] = useState<EnrichProgressEvent | null>(null);
+  const [enrichResult, setEnrichResult] = useState<EnrichResult | null>(null);
+  const [hasApiKey, setHasApiKey] = useState<boolean>(false);
+  const [qualifyingCount, setQualifyingCount] = useState<number>(0);
+  const [apiKeyInput, setApiKeyInput] = useState("");
 
   // Check for existing library on mount
   useEffect(() => {
@@ -26,6 +33,11 @@ export function LibraryScreen() {
     });
   }, []);
 
+  // Check API key on mount
+  useEffect(() => {
+    window.desktopBridge.getGeminiApiKey().then((key) => setHasApiKey(!!key));
+  }, []);
+
   // Subscribe to scan progress events
   useEffect(() => {
     const unsub = window.desktopBridge.onScanProgress((event: ScanProgressEvent) => {
@@ -33,6 +45,22 @@ export function LibraryScreen() {
     });
     return unsub;
   }, []);
+
+  // Subscribe to enrich progress events
+  useEffect(() => {
+    const unsub = window.desktopBridge.onEnrichProgress((event: EnrichProgressEvent) => {
+      setEnrichProgress(event);
+    });
+    return unsub;
+  }, []);
+
+  // Compute qualifying count when tracks change
+  useEffect(() => {
+    const count = tracks.filter(
+      (t) => t.artist === null || t.album === null || t.title === null || t.year === null,
+    ).length;
+    setQualifyingCount(count);
+  }, [tracks]);
 
   const handleScanComplete = useCallback((result: ScanResult) => {
     if (result.errors.length > 0) {
@@ -75,6 +103,50 @@ export function LibraryScreen() {
       setTracks(loadedTracks);
       setScreenState("library");
     });
+  }, []);
+
+  const handleEnrich = useCallback(async () => {
+    const key = await window.desktopBridge.getGeminiApiKey();
+    if (!key) {
+      setScreenState("api-key-prompt");
+      return;
+    }
+    setScreenState("enriching");
+    setEnrichProgress(null);
+    const result = await window.desktopBridge.enrichMetadata();
+    setEnrichResult(result);
+    setScreenState("enrich-complete");
+    // Auto-return to library after 3 seconds
+    setTimeout(async () => {
+      const loadedTracks = await window.desktopBridge.getLibraryTracks();
+      setTracks(loadedTracks);
+      setScreenState("library");
+      setEnrichResult(null);
+    }, 3000);
+  }, []);
+
+  const handleSaveApiKey = useCallback(async (apiKey: string) => {
+    await window.desktopBridge.setGeminiApiKey(apiKey);
+    setHasApiKey(true);
+    // Start enrichment immediately after saving key
+    setScreenState("enriching");
+    setEnrichProgress(null);
+    const result = await window.desktopBridge.enrichMetadata();
+    setEnrichResult(result);
+    setScreenState("enrich-complete");
+    setTimeout(async () => {
+      const loadedTracks = await window.desktopBridge.getLibraryTracks();
+      setTracks(loadedTracks);
+      setScreenState("library");
+      setEnrichResult(null);
+    }, 3000);
+  }, []);
+
+  const handleTrackFieldUpdate = useCallback(async (trackId: string, field: string, value: string | number | null) => {
+    await window.desktopBridge.updateTrackField(trackId, field, value);
+    // Refresh tracks to get updated confidence/userEdited flags
+    const loadedTracks = await window.desktopBridge.getLibraryTracks();
+    setTracks(loadedTracks);
   }, []);
 
   // ── Empty state ──
@@ -195,6 +267,86 @@ export function LibraryScreen() {
     );
   }
 
+  // ── Enriching state ──
+  if (screenState === "enriching") {
+    const progress = enrichProgress;
+    const pct = progress && progress.total > 0
+      ? Math.round((progress.processed / progress.total) * 100) : 0;
+    return (
+      <div className="flex flex-col items-center justify-center h-full gap-6">
+        <span className="text-xs font-semibold uppercase tracking-[0.18em] text-[#c8914a]">
+          Enriquecendo...
+        </span>
+        <div className="w-full max-w-md h-2 rounded-full bg-[#1a1508]">
+          <div
+            className="h-2 rounded-full bg-[#c8914a] transition-all duration-150"
+            style={{ width: `${pct}%` }}
+          />
+        </div>
+        <span className="text-sm font-mono text-[#e8dcc8]">
+          {progress?.processed ?? 0} / {progress?.total ?? 0} faixas
+        </span>
+        {progress && progress.errorCount > 0 && (
+          <span className="text-xs text-[#e85c5c]">{progress.errorCount} erros</span>
+        )}
+      </div>
+    );
+  }
+
+  // ── Enrich complete state ──
+  if (screenState === "enrich-complete" && enrichResult) {
+    return (
+      <div className="flex flex-col items-center justify-center h-full gap-4">
+        <span className="text-sm text-[#7ac87a]">
+          Enriquecimento completo — {enrichResult.enriched} faixas atualizadas
+        </span>
+      </div>
+    );
+  }
+
+  // ── API key prompt state ──
+  if (screenState === "api-key-prompt") {
+    return (
+      <div className="flex flex-col items-center justify-center h-full">
+        <div className="rounded border border-[#2a2218] bg-[#111008] p-4 w-full max-w-md mx-auto mt-8">
+          <h2 className="text-sm font-semibold text-[#e8dcc8]">
+            Chave API do Gemini
+          </h2>
+          <p className="text-xs text-[#7a6e5f] mt-1">
+            Cole sua chave API do Google AI Studio para enriquecer metadados com IA.
+          </p>
+          <input
+            type="text"
+            value={apiKeyInput}
+            onChange={(e) => setApiKeyInput(e.target.value)}
+            placeholder="AIza..."
+            className="bg-[#0d0d0d] border border-[#2a2218] rounded px-3 py-2 text-sm font-mono text-[#e8dcc8] placeholder-[#4a4035] w-full mt-3"
+          />
+          <button
+            type="button"
+            onClick={() => {
+              if (apiKeyInput.trim()) {
+                handleSaveApiKey(apiKeyInput.trim());
+                setApiKeyInput("");
+              }
+            }}
+            disabled={!apiKeyInput.trim()}
+            className="bg-[#c8914a] text-[#0d0d0d] px-4 py-2 rounded text-sm font-semibold mt-3 disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            Salvar e Enriquecer
+          </button>
+          <button
+            type="button"
+            onClick={() => setScreenState("library")}
+            className="block text-xs text-[#4a4035] hover:text-[#7a6e5f] mt-2"
+          >
+            Manter sem IA
+          </button>
+        </div>
+      </div>
+    );
+  }
+
   // ── Library state ──
   return (
     <div className="flex flex-col h-full">
@@ -219,6 +371,25 @@ export function LibraryScreen() {
             className="text-xs text-[#7a6e5f] hover:text-[#c8914a] transition-colors"
           >
             Re-scan Completo
+          </button>
+
+          {/* AI Enrich button (Phase 32) */}
+          <button
+            type="button"
+            onClick={handleEnrich}
+            disabled={qualifyingCount === 0}
+            className={`text-xs font-semibold px-4 py-1.5 rounded transition-all ${
+              qualifyingCount === 0
+                ? "bg-[#c8914a]/50 text-[#0d0d0d] opacity-50 cursor-not-allowed"
+                : "bg-[#c8914a] text-[#0d0d0d] hover:brightness-110"
+            }`}
+            title={
+              !hasApiKey ? "Configure a chave API do Gemini em Settings"
+              : qualifyingCount === 0 ? "Todas as faixas ja possuem metadados completos"
+              : undefined
+            }
+          >
+            Enriquecer IA
           </button>
 
           {/* View toggle */}
@@ -265,9 +436,9 @@ export function LibraryScreen() {
 
       {/* Content */}
       {viewMode === "list" ? (
-        <LibraryListView tracks={tracks} />
+        <LibraryListView tracks={tracks} onTrackFieldUpdate={handleTrackFieldUpdate} />
       ) : (
-        <LibraryAlbumView tracks={tracks} />
+        <LibraryAlbumView tracks={tracks} onTrackFieldUpdate={handleTrackFieldUpdate} />
       )}
     </div>
   );
