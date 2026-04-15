@@ -354,7 +354,7 @@ None — this is a focused fix milestone.
 - [x] **SCAN-02**: User can trigger a recursive scan of all audio files in the selected folder with real-time progress indication
 - [x] **SCAN-03**: App extracts metadata from audio file tags (ID3v2, Vorbis, FLAC) including artist, album, title, year, track number, format, bitrate, duration
 - [x] **SCAN-04**: App infers metadata from filename and folder structure when tags are missing or incomplete
-- [ ] **SCAN-05**: App performs a diff scan on startup comparing stored index against current folder state, detecting added, removed, and modified files
+- [x] **SCAN-05**: App performs a diff scan on startup comparing stored index against current folder state, detecting added, removed, and modified files
 
 ### AI Metadata
 
@@ -366,7 +366,7 @@ None — this is a focused fix milestone.
 
 - [ ] **DAEMON-01**: App minimizes to system tray instead of closing when user clicks the window close button
 - [ ] **DAEMON-02**: Tray icon shows context menu with options: Open, Quit
-- [ ] **DAEMON-03**: App watches the configured folder for file changes in real-time using chokidar, automatically updating the local index
+- [x] **DAEMON-03**: App watches the configured folder for file changes in real-time using chokidar, automatically updating the local index
 - [ ] **DAEMON-04**: User can enable auto-start with Windows from settings, launching the app minimized to tray on boot
 - [ ] **DAEMON-05**: App enforces single-instance lock — opening a second instance focuses the existing window
 
@@ -398,13 +398,13 @@ None — this is a focused fix milestone.
 | SCAN-02 | Phase 29: Local Index + Folder Scanner | Complete |
 | SCAN-03 | Phase 29: Local Index + Folder Scanner | Complete |
 | SCAN-04 | Phase 29: Local Index + Folder Scanner | Complete |
-| SCAN-05 | Phase 31: Tray Daemon + File Watcher | Pending |
+| SCAN-05 | Phase 31: Tray Daemon + File Watcher | Complete |
 | AI-01 | Phase 32: AI Metadata Enrichment | Pending |
 | AI-02 | Phase 32: AI Metadata Enrichment | Pending |
 | AI-03 | Phase 32: AI Metadata Enrichment | Pending |
 | DAEMON-01 | Phase 31: Tray Daemon + File Watcher | Pending |
 | DAEMON-02 | Phase 31: Tray Daemon + File Watcher | Pending |
-| DAEMON-03 | Phase 31: Tray Daemon + File Watcher | Pending |
+| DAEMON-03 | Phase 31: Tray Daemon + File Watcher | Complete |
 | DAEMON-04 | Phase 31: Tray Daemon + File Watcher | Pending |
 | DAEMON-05 | Phase 31: Tray Daemon + File Watcher | Pending |
 | SYNC-01 | Phase 30: Sync Engine | Pending |

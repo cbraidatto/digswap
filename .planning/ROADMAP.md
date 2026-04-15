@@ -575,8 +575,8 @@ Plans:
   5. User can enable auto-start with Windows from settings, and the app launches minimized to tray on boot
 **Plans**: 2 plans
 Plans:
-- [ ] 031-01-PLAN.md -- Tray lifecycle: system tray icon, close-to-tray, auto-start with Windows, single-instance enhancement
-- [ ] 031-02-PLAN.md -- File watcher + diff scan: chokidar watcher, startup diff scan, auto scan+sync on changes
+- [x] 031-01-PLAN.md -- Tray lifecycle: system tray icon, close-to-tray, auto-start with Windows, single-instance enhancement
+- [x] 031-02-PLAN.md -- File watcher + diff scan: chokidar watcher, startup diff scan, auto scan+sync on changes
 
 ### Phase 32: AI Metadata Enrichment
 **Goal**: Poorly-tagged files get AI-inferred metadata with confidence scoring and user override protection
