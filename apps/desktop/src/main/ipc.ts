@@ -3,7 +3,9 @@ import type { SupabaseSession } from "../shared/ipc-types";
 import type { DesktopSupabaseAuth } from "./supabase-auth";
 import type { DesktopSessionStore } from "./session-store";
 import type { DesktopTradeRuntime } from "./trade-runtime";
-import { getTradeWindow } from "./window";
+import { runAudioUploadPipeline } from "./audio/upload-pipeline";
+import { registerLibraryIpc } from "./library/library-ipc";
+import { getMainWindow } from "./window";
 
 interface RegisterDesktopIpcOptions {
   authRuntime: DesktopSupabaseAuth;
@@ -11,13 +13,13 @@ interface RegisterDesktopIpcOptions {
   tradeRuntime: DesktopTradeRuntime;
 }
 
-function sendToTradeWindow<TPayload>(channel: string, payload: TPayload) {
-  const tradeWindow = getTradeWindow();
-  if (!tradeWindow || tradeWindow.isDestroyed()) {
+function sendToMainWindow<TPayload>(channel: string, payload: TPayload) {
+  const mainWindow = getMainWindow();
+  if (!mainWindow || mainWindow.isDestroyed()) {
     return;
   }
 
-  tradeWindow.webContents.send(channel, payload);
+  mainWindow.webContents.send(channel, payload);
 }
 
 export function registerDesktopIpc({
@@ -154,19 +156,58 @@ export function registerDesktopIpc({
     shell.showItemInFolder(filePath);
   });
 
+  ipcMain.handle(
+    "desktop:select-and-prepare-audio",
+    async (_event, tradeId: string, proposalItemId: string) => {
+      const result = await dialog.showOpenDialog({
+        properties: ["openFile"],
+        filters: [
+          {
+            name: "Audio",
+            extensions: ["flac", "wav", "mp3", "aiff", "ogg"],
+          },
+        ],
+        title: "Select an audio file for this trade",
+      });
+
+      if (result.canceled || result.filePaths.length === 0) {
+        throw new Error("File picker cancelled by user");
+      }
+
+      const session = await authRuntime.getSession();
+      if (!session) {
+        throw new Error("Not authenticated — cannot prepare audio file");
+      }
+
+      const client = authRuntime.getClientOrThrow();
+
+      return runAudioUploadPipeline(
+        client,
+        tradeId,
+        session.user.id,
+        proposalItemId,
+        result.filePaths[0],
+      );
+    },
+  );
+
   authRuntime.onSessionChanged((session: SupabaseSession | null) => {
-    sendToTradeWindow("desktop:session-changed", session);
+    sendToMainWindow("desktop:session-changed", session);
   });
 
   tradeRuntime.onLobbyStateChanged((event) => {
-    sendToTradeWindow("desktop:lobby-state-changed", event);
+    sendToMainWindow("desktop:lobby-state-changed", event);
   });
 
   tradeRuntime.onTransferProgress((event) => {
-    sendToTradeWindow("desktop:transfer-progress", event);
+    sendToMainWindow("desktop:transfer-progress", event);
   });
 
   tradeRuntime.onTransferComplete((event) => {
-    sendToTradeWindow("desktop:transfer-complete", event);
+    sendToMainWindow("desktop:transfer-complete", event);
   });
+
+  // Library IPC handlers (Phase 29)
+  registerLibraryIpc(sendToMainWindow);
+
 }
