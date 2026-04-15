@@ -589,7 +589,7 @@ Plans:
 **Plans**: 2 plans
 Plans:
 - [x] 032-01-PLAN.md — Restore types, schema migration, AI enrichment service + tests
-- [ ] 032-02-PLAN.md — IPC wiring, preload bridge, all UI surfaces
+- [x] 032-02-PLAN.md — IPC wiring, preload bridge, all UI surfaces
 ## Progress
 
 **Execution Order:**

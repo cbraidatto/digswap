@@ -358,9 +358,9 @@ None — this is a focused fix milestone.
 
 ### AI Metadata
 
-- [ ] **AI-01**: App sends poorly-tagged files to Gemini Flash API to infer artist, album, and track information from available clues (filename, folder path, partial tags)
-- [ ] **AI-02**: AI-inferred metadata includes a confidence score — low confidence items are flagged for user review
-- [ ] **AI-03**: User's manual corrections are preserved and never overwritten by subsequent AI re-inference
+- [x] **AI-01**: App sends poorly-tagged files to Gemini Flash API to infer artist, album, and track information from available clues (filename, folder path, partial tags)
+- [x] **AI-02**: AI-inferred metadata includes a confidence score — low confidence items are flagged for user review
+- [x] **AI-03**: User's manual corrections are preserved and never overwritten by subsequent AI re-inference
 
 ### Daemon & Background
 
@@ -399,9 +399,9 @@ None — this is a focused fix milestone.
 | SCAN-03 | Phase 29: Local Index + Folder Scanner | Complete |
 | SCAN-04 | Phase 29: Local Index + Folder Scanner | Complete |
 | SCAN-05 | Phase 31: Tray Daemon + File Watcher | Complete |
-| AI-01 | Phase 32: AI Metadata Enrichment | Pending |
-| AI-02 | Phase 32: AI Metadata Enrichment | Pending |
-| AI-03 | Phase 32: AI Metadata Enrichment | Pending |
+| AI-01 | Phase 32: AI Metadata Enrichment | Complete |
+| AI-02 | Phase 32: AI Metadata Enrichment | Complete |
+| AI-03 | Phase 32: AI Metadata Enrichment | Complete |
 | DAEMON-01 | Phase 31: Tray Daemon + File Watcher | Pending |
 | DAEMON-02 | Phase 31: Tray Daemon + File Watcher | Pending |
 | DAEMON-03 | Phase 31: Tray Daemon + File Watcher | Complete |
