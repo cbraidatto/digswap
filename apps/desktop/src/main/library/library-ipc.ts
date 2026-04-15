@@ -3,6 +3,7 @@ import type { ScanProgressEvent, ScanResult, SyncResult, SyncProgress, LibraryTr
 import { getLibraryDb, getAllTracks, getLibraryRoot } from "./db";
 import { scanFolder } from "./scanner";
 import { startSync } from "./sync-manager";
+import { restartWatching } from "../watcher";
 import type { DesktopSupabaseAuth } from "../supabase-auth";
 
 export function registerLibraryIpc(
@@ -20,9 +21,14 @@ export function registerLibraryIpc(
   });
 
   ipcMain.handle("desktop:start-scan", async (_event, folderPath: string, mode: "incremental" | "full"): Promise<ScanResult> => {
-    return scanFolder(folderPath, (progress: ScanProgressEvent) => {
+    const result = await scanFolder(folderPath, (progress: ScanProgressEvent) => {
       sendToMainWindow("desktop:scan-progress", progress);
     }, { incremental: mode === "incremental" });
+
+    // Restart watcher on the (possibly new) library folder
+    restartWatching(folderPath);
+
+    return result;
   });
 
   ipcMain.handle("desktop:start-incremental-scan", async (): Promise<ScanResult> => {

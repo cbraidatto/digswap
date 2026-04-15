@@ -1,5 +1,5 @@
 import { contextBridge, ipcRenderer } from "electron";
-import type { DesktopMainShellBridge } from "../shared/ipc-types";
+import type { DiffScanResult, DesktopMainShellBridge } from "../shared/ipc-types";
 
 const desktopShell: DesktopMainShellBridge = {
   isDesktop: () => true,
@@ -13,6 +13,13 @@ const desktopShell: DesktopMainShellBridge = {
     ipcRenderer.invoke("desktop:set-auto-start", enabled) as Promise<void>,
   getAutoStart: () =>
     ipcRenderer.invoke("desktop:get-auto-start") as Promise<boolean>,
+  onDiffScanResult: (listener: (result: DiffScanResult) => void) => {
+    const handler = (_event: Electron.IpcRendererEvent, data: DiffScanResult) => listener(data);
+    ipcRenderer.on("desktop:diff-scan-result", handler);
+    return () => {
+      ipcRenderer.removeListener("desktop:diff-scan-result", handler);
+    };
+  },
 };
 
 contextBridge.exposeInMainWorld("desktopShell", desktopShell);

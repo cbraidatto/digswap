@@ -1,12 +1,17 @@
-import { app, BrowserWindow } from "electron";
+import { app, BrowserWindow, Notification } from "electron";
 import type { DesktopProtocolPayload } from "../shared/ipc-types";
 import { resolveDesktopSupabaseConfig } from "./config";
+import { runDiffScan } from "./diff-scan";
 import { registerDesktopIpc } from "./ipc";
+import { closeLibraryDb, getLibraryDb, getLibraryRoot } from "./library/db";
+import { scanFolder } from "./library/scanner";
+import { startSync } from "./library/sync-manager";
 import { extractProtocolUrlFromArgv, parseProtocolUrl, registerProtocolClient } from "./protocol";
 import { DesktopSessionStore } from "./session-store";
 import { DesktopSupabaseAuth } from "./supabase-auth";
 import { DesktopTradeRuntime } from "./trade-runtime";
 import { createTray, destroyTray } from "./tray";
+import { startWatching, stopWatching } from "./watcher";
 import {
   createMainWindow,
   createTradeWindow,
@@ -49,6 +54,34 @@ function resolveDesktopSiteUrl() {
     process.env.NEXT_PUBLIC_SITE_URL ??
     "http://localhost:3000"
   );
+}
+
+async function runWatcherScanAndSync(): Promise<void> {
+  try {
+    const db = getLibraryDb();
+    const rootPath = getLibraryRoot(db);
+    if (!rootPath) return;
+
+    // Run incremental scan
+    await scanFolder(rootPath, (progress) => {
+      const mainWin = getMainWindow();
+      if (mainWin && !mainWin.isDestroyed()) {
+        mainWin.webContents.send("desktop:scan-progress", progress);
+      }
+    }, { incremental: true });
+
+    // Auto-sync after scan
+    if (!authRuntime) return;
+    const siteUrl = desktopSiteUrl;
+    await startSync(db, siteUrl, () => authRuntime!.getAccessToken(), (progress) => {
+      const mainWin = getMainWindow();
+      if (mainWin && !mainWin.isDestroyed()) {
+        mainWin.webContents.send("desktop:sync-progress", progress);
+      }
+    });
+  } catch (err) {
+    console.error("[watcher] scan+sync error:", err);
+  }
 }
 
 async function publishProtocolPayload(payload: DesktopProtocolPayload) {
@@ -141,6 +174,50 @@ app.whenReady().then(async () => {
     await processProtocolUrl(queuedProtocolUrl);
   }
 
+  // Start watcher and diff scan if library root is configured
+  try {
+    const db = getLibraryDb();
+    const rootPath = getLibraryRoot(db);
+    if (rootPath) {
+      // Start file watcher
+      startWatching(rootPath, () => {
+        void runWatcherScanAndSync();
+      });
+
+      // Run diff scan on startup (background)
+      void (async () => {
+        const result = await runDiffScan(db);
+        const mainWin = getMainWindow();
+        if (mainWin && !mainWin.isDestroyed()) {
+          mainWin.webContents.send("desktop:diff-scan-result", result);
+        }
+        // If window is hidden (boot-to-tray), show native notification
+        if (result.hasChanges && mainWin && !mainWin.isVisible()) {
+          new Notification({
+            title: "DigSwap",
+            body: `Found ${result.added} new, ${result.removed} removed, ${result.modified} modified files`,
+          }).show();
+        }
+        // Large library warning (per D-04)
+        if (result.totalIndexed > 10000) {
+          const mainWin2 = getMainWindow();
+          if (mainWin2 && !mainWin2.isDestroyed()) {
+            mainWin2.webContents.send("desktop:large-library-warning", {
+              count: result.totalIndexed,
+              message: `Your library has ${result.totalIndexed} files. Watching large folders may use more system resources.`,
+            });
+          }
+        }
+        // Auto-sync if changes found (per D-06)
+        if (result.hasChanges) {
+          await runWatcherScanAndSync();
+        }
+      })();
+    }
+  } catch (err) {
+    console.error("[startup] watcher/diff-scan init error:", err);
+  }
+
   app.on("activate", async () => {
     const mainWin = getMainWindow();
     if (mainWin && !mainWin.isDestroyed()) {
@@ -157,7 +234,9 @@ app.whenReady().then(async () => {
 
 app.on("before-quit", () => {
   setIsQuitting(true);
+  stopWatching(); // Stop watcher first (prevents scan trigger during shutdown)
   destroyTray();
+  closeLibraryDb();
 
   if (!tradeRuntime) {
     return;
