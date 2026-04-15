@@ -373,8 +373,8 @@ None — this is a focused fix milestone.
 ### Sync & Web
 
 - [ ] **SYNC-01**: App syncs local library metadata to Supabase as collection items with addedVia "local", visible in the web app
-- [ ] **SYNC-02**: When a local release matches an existing Discogs-imported release (same artist + album), app links to the existing release instead of creating a duplicate
-- [ ] **SYNC-03**: When a file is removed from the local folder, the corresponding collection item is removed from the web collection
+- [x] **SYNC-02**: When a local release matches an existing Discogs-imported release (same artist + album), app links to the existing release instead of creating a duplicate
+- [x] **SYNC-03**: When a file is removed from the local folder, the corresponding collection item is removed from the web collection
 - [ ] **SYNC-04**: Sync operates incrementally — only changed items are synced, not the entire library
 
 ### Future Requirements (deferred from v1.3)
@@ -408,8 +408,8 @@ None — this is a focused fix milestone.
 | DAEMON-04 | Phase 31: Tray Daemon + File Watcher | Pending |
 | DAEMON-05 | Phase 31: Tray Daemon + File Watcher | Pending |
 | SYNC-01 | Phase 30: Sync Engine | Pending |
-| SYNC-02 | Phase 30: Sync Engine | Pending |
-| SYNC-03 | Phase 30: Sync Engine | Pending |
+| SYNC-02 | Phase 30: Sync Engine | Complete |
+| SYNC-03 | Phase 30: Sync Engine | Complete |
 | SYNC-04 | Phase 30: Sync Engine | Pending |
 
 **Coverage:**
