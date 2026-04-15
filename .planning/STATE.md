@@ -2,15 +2,15 @@
 gsd_state_version: 1.0
 milestone: v1.1
 milestone_name: Deploy Readiness
-status: verifying
-stopped_at: Phase 30 context gathered
-last_updated: "2026-04-15T01:03:59.061Z"
-last_activity: 2026-04-14
+status: executing
+stopped_at: Completed 030-01-PLAN.md
+last_updated: "2026-04-15T01:48:10.609Z"
+last_activity: 2026-04-15
 progress:
-  total_phases: 31
-  completed_phases: 27
-  total_plans: 114
-  completed_plans: 112
+  total_phases: 25
+  completed_phases: 22
+  total_plans: 101
+  completed_plans: 97
   percent: 0
 ---
 
@@ -27,8 +27,8 @@ See: .planning/PROJECT.md (updated 2026-04-06)
 
 Phase: 24 (lint-cleanup) — EXECUTING
 Plan: 2 of 2
-Status: Phase complete — ready for verification
-Last activity: 2026-04-14
+Status: Ready to execute
+Last activity: 2026-04-15
 
 Progress: [░░░░░░░░░░] 0%
 
@@ -106,8 +106,7 @@ Progress: [░░░░░░░░░░] 0%
 | Phase 21 P01 | 1min | 1 tasks | 1 files |
 | Phase 22 P01 | 3min | 1 tasks | 5 files |
 | Phase 23-test-fix P01 | 2min | 1 tasks | 1 files |
-| Phase 029 P01 | 9min | 3 tasks | 9 files |
-| Phase 029 P02 | 6min | 2 tasks | 9 files |
+| Phase 030 P01 | 7min | 2 tasks | 8 files |
 
 ## Accumulated Context
 
@@ -239,8 +238,9 @@ Recent decisions affecting current work:
 - [Phase 20]: RANK_TITLES recalibrated to 501/2001/5001 — typical 200-record collection scores ~1030 gem points
 - [Phase 21]: Used standard 'as unknown as T' double-cast pattern for raw SQL results from db.execute()
 - [Phase 22]: Direct devDep vite ^8.0.5 in apps/web to force patched transitive resolution from @vitejs/plugin-react (pnpm overrides caused cross-workspace conflicts)
-- [Phase 029]: better-sqlite3 for synchronous SQLite in Electron main process; confidence flags high/low for tag vs inferred metadata
-- [Phase 029]: sendToTradeWindow used for library IPC progress events -- library UI lives in trade window renderer
+- [Phase 030]: Removed audioFormat/bitrate/sampleRate from collection item upsert -- columns not in schema
+- [Phase 030]: Added uniqueIndex on (userId, releaseId) to Drizzle schema to match existing DB constraint
+- [Phase 030]: Added src/lib/**/*.test.ts to vitest include for co-located test files
 
 ### Roadmap Evolution
 
@@ -268,6 +268,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-04-15T01:03:59.048Z
-Stopped at: Phase 30 context gathered
-Resume file: .planning/phases/030-sync-engine/030-CONTEXT.md
+Last session: 2026-04-15T01:48:10.600Z
+Stopped at: Completed 030-01-PLAN.md
+Resume file: None

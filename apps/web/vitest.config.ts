@@ -16,7 +16,7 @@ export default defineConfig({
 			STRIPE_SECRET_KEY: "test-stripe-secret-key",
 		},
 		environment: "jsdom",
-		include: ["tests/**/*.test.ts", "tests/**/*.test.tsx", "src/tests/**/*.test.ts"],
+		include: ["tests/**/*.test.ts", "tests/**/*.test.tsx", "src/tests/**/*.test.ts", "src/lib/**/*.test.ts"],
 		globals: true,
 		setupFiles: ["tests/setup.ts"],
 		coverage: {
