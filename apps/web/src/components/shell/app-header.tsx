@@ -3,6 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useEffect, useState } from "react";
 import { ChatToggleButton } from "@/components/chat/chat-toggle-button";
 import { BarcodeScanner } from "@/components/shell/barcode-scanner";
 import { GlobalSearch } from "@/components/shell/global-search";
@@ -25,6 +26,12 @@ interface AppHeaderProps {
 
 export function AppHeader({ userId, avatarUrl, displayName }: AppHeaderProps) {
 	const pathname = usePathname();
+	const [isDesktop, setIsDesktop] = useState(false);
+
+	useEffect(() => {
+		const shell = (window as unknown as { desktopShell?: { isDesktop?: () => boolean } }).desktopShell;
+		if (shell?.isDesktop?.()) setIsDesktop(true);
+	}, []);
 
 	return (
 		<header className="fixed top-0 left-0 right-0 z-50 h-14 flex items-center w-full border-b border-outline-variant/10 bg-surface-dim/95 backdrop-blur-md">
@@ -61,7 +68,7 @@ export function AppHeader({ userId, avatarUrl, displayName }: AppHeaderProps) {
 							</Link>
 						);
 					})}
-						{typeof window !== "undefined" && (window as { desktopShell?: { isDesktop?: () => boolean } }).desktopShell?.isDesktop?.() && (
+						{isDesktop && (
 							<Link
 								href="/biblioteca"
 								className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full font-mono text-[11px] uppercase tracking-wider transition-all duration-200 ${
