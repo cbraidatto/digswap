@@ -8,7 +8,6 @@ import { makeAlbumKey, normalizeForDedup } from "./normalize";
 
 export interface TrackSyncPayload {
 	localTrackId: string;
-	filePath: string;
 	artist: string | null;
 	album: string | null;
 	title: string | null;
@@ -18,8 +17,8 @@ export interface TrackSyncPayload {
 	bitrate: number;
 	sampleRate: number;
 	duration: number;
-	artistConfidence: "high" | "low";
-	albumConfidence: "high" | "low";
+	artistConfidence: string;
+	albumConfidence: string;
 }
 
 export interface ReleaseMapping {

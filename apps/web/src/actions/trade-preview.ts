@@ -1,6 +1,6 @@
 "use server";
 
-import { and, eq, isNotNull, ne } from "drizzle-orm";
+import { and, eq, isNotNull, ne, or } from "drizzle-orm";
 import { requireUser } from "@/lib/auth/require-user";
 import { db } from "@/lib/db";
 import { collectionItems } from "@/lib/db/schema/collections";
@@ -108,12 +108,17 @@ export async function approvePreviewAction(
 	tradeId: string,
 ): Promise<{ success: boolean; error?: string }> {
 	try {
-		await requireUser();
+		const user = await requireUser();
 
 		const [trade] = await db
 			.select({ id: tradeRequests.id, status: tradeRequests.status })
 			.from(tradeRequests)
-			.where(eq(tradeRequests.id, tradeId))
+			.where(
+				and(
+					eq(tradeRequests.id, tradeId),
+					or(eq(tradeRequests.requesterId, user.id), eq(tradeRequests.providerId, user.id)),
+				),
+			)
 			.limit(1);
 
 		if (!trade) return { success: false, error: "Trade not found." };
@@ -138,12 +143,17 @@ export async function declinePreviewAction(
 	tradeId: string,
 ): Promise<{ success: boolean; error?: string }> {
 	try {
-		await requireUser();
+		const user = await requireUser();
 
 		const [trade] = await db
 			.select({ id: tradeRequests.id, status: tradeRequests.status })
 			.from(tradeRequests)
-			.where(eq(tradeRequests.id, tradeId))
+			.where(
+				and(
+					eq(tradeRequests.id, tradeId),
+					or(eq(tradeRequests.requesterId, user.id), eq(tradeRequests.providerId, user.id)),
+				),
+			)
 			.limit(1);
 
 		if (!trade) return { success: false, error: "Trade not found." };

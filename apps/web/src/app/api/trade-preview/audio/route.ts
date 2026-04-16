@@ -1,4 +1,4 @@
-import { and, eq, isNotNull, ne } from "drizzle-orm";
+import { and, eq, isNotNull, or } from "drizzle-orm";
 import { type NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { collectionItems } from "@/lib/db/schema/collections";
@@ -59,12 +59,15 @@ export async function GET(request: NextRequest) {
 		.where(
 			and(
 				eq(tradeRequests.id, item.tradeId),
-				// user is requester or provider — checked via OR in a subquery-friendly way
+				or(eq(tradeRequests.requesterId, user.id), eq(tradeRequests.providerId, user.id)),
 			),
 		)
 		.limit(1);
 
-	// Additional participant check via collection_items ownership — at least one side must match
+	if (!trade) {
+		return new NextResponse("Forbidden", { status: 403 });
+	}
+
 	const serviceSupabase = createServiceClient(
 		publicEnv.NEXT_PUBLIC_SUPABASE_URL,
 		env.SUPABASE_SERVICE_ROLE_KEY,

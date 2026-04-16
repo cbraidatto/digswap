@@ -11,6 +11,7 @@ import {
 import { createAdminClient } from "@/lib/supabase/admin";
 
 export const runtime = "nodejs";
+export const maxDuration = 60;
 
 function getWebhookSecret() {
 	const secret = env.STRIPE_WEBHOOK_SECRET;

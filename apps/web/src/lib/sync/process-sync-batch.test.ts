@@ -18,7 +18,6 @@ import type { TrackSyncPayload } from "./process-sync-batch";
 function makeTrack(overrides: Partial<TrackSyncPayload> = {}): TrackSyncPayload {
 	return {
 		localTrackId: "track-1",
-		filePath: "/music/test.flac",
 		artist: "The Beatles",
 		album: "Abbey Road",
 		title: "Come Together",
