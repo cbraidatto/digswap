@@ -82,7 +82,10 @@ export default function BibliotecaPage() {
       setState("not-desktop");
       return;
     }
-    const bridge = (window as unknown as { desktopBridge?: DesktopBridgeLibrary }).desktopBridge;
+    // Main window exposes library methods as desktopLibrary (preload/main.ts)
+    // Trade window exposes them as desktopBridge (preload/trade.ts)
+    const bridge = (window as unknown as { desktopLibrary?: DesktopBridgeLibrary; desktopBridge?: DesktopBridgeLibrary }).desktopLibrary
+      ?? (window as unknown as { desktopBridge?: DesktopBridgeLibrary }).desktopBridge;
     if (!bridge?.getLibraryRoot) {
       setState("not-desktop");
       return;
