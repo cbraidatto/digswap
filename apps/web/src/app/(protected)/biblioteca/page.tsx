@@ -35,10 +35,11 @@ interface LibraryTrack {
   titleConfidence: "high" | "low";
 }
 
-interface DesktopShell {
-  isDesktop(): boolean;
+interface DesktopBridgeLibrary {
   selectLibraryFolder(): Promise<string | null>;
-  startScan(folderPath: string, mode: "incremental" | "full"): Promise<ScanResult>;
+  startScan(folderPath: string): Promise<ScanResult>;
+  startIncrementalScan(): Promise<ScanResult>;
+  startFullScan(): Promise<ScanResult>;
   getLibraryTracks(): Promise<LibraryTrack[]>;
   getLibraryRoot(): Promise<string | null>;
   onScanProgress(listener: (event: ScanProgressEvent) => void): () => void;
@@ -73,18 +74,23 @@ export default function BibliotecaPage() {
   const [progress, setProgress] = useState<ScanProgressEvent | null>(null);
   const [scanResult, setScanResult] = useState<ScanResult | null>(null);
   const [viewMode, setViewMode] = useState<ViewMode>("list");
-  const shellRef = useRef<DesktopShell | null>(null);
+  const bridgeRef = useRef<DesktopBridgeLibrary | null>(null);
 
   useEffect(() => {
-    const shell = (window as unknown as { desktopShell?: DesktopShell }).desktopShell;
+    const shell = (window as unknown as { desktopShell?: { isDesktop?: () => boolean } }).desktopShell;
     if (!shell?.isDesktop?.()) {
       setState("not-desktop");
       return;
     }
-    shellRef.current = shell;
+    const bridge = (window as unknown as { desktopBridge?: DesktopBridgeLibrary }).desktopBridge;
+    if (!bridge?.getLibraryRoot) {
+      setState("not-desktop");
+      return;
+    }
+    bridgeRef.current = bridge;
 
     // Load existing library
-    Promise.all([shell.getLibraryRoot(), shell.getLibraryTracks()]).then(([root, existingTracks]) => {
+    Promise.all([bridge.getLibraryRoot(), bridge.getLibraryTracks()]).then(([root, existingTracks]) => {
       setLibraryRoot(root);
       if (existingTracks.length > 0) {
         setTracks(existingTracks);
@@ -92,35 +98,37 @@ export default function BibliotecaPage() {
       } else {
         setState("empty");
       }
+    }).catch(() => {
+      setState("empty");
     });
   }, []);
 
   const handleSelectFolder = useCallback(async () => {
-    const shell = shellRef.current;
-    if (!shell) return;
-    const folder = await shell.selectLibraryFolder();
+    const bridge = bridgeRef.current;
+    if (!bridge) return;
+    const folder = await bridge.selectLibraryFolder();
     if (!folder) return;
     setLibraryRoot(folder);
     startScan(folder, "full");
   }, []);
 
   const startScan = useCallback(async (folder: string, mode: "incremental" | "full") => {
-    const shell = shellRef.current;
-    if (!shell) return;
+    const bridge = bridgeRef.current;
+    if (!bridge) return;
 
     setState("scanning");
     setProgress({ filesFound: 0, filesProcessed: 0, currentPath: "" });
 
-    const unsub = shell.onScanProgress((event) => {
+    const unsub = bridge.onScanProgress((event) => {
       setProgress(event);
     });
 
     try {
-      const result = await shell.startScan(folder, mode);
+      const result = mode === "incremental" ? await bridge.startIncrementalScan() : await bridge.startFullScan();
       unsub();
       setScanResult(result);
 
-      const updatedTracks = await shell.getLibraryTracks();
+      const updatedTracks = await bridge.getLibraryTracks();
       setTracks(updatedTracks);
 
       if (result.skippedFiles.length > 0) {
