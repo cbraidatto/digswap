@@ -60,20 +60,21 @@ Each step completed unlocks more of the app and awards a welcome badge. Users wi
 
 Feed and Profile have equal weight — both are primary entry points. Feed-first for social diggers; Profile-first for collection-focused diggers. Neither is secondary.
 
-## Current Milestone: v1.3 Local Library — Soulseek-Inspired Collection Import
+## Current Milestone: v1.4 Production Launch
 
-**Goal:** Ampliar o DigSwap para diggers que não usam Discogs — importar coleção direto de arquivos locais no PC, com IA organizando metadata e o desktop app rodando em background como daemon.
+**Goal:** Colocar o webapp do DigSwap no ar com segurança — primeira deploy de produção, com auditoria pré-deploy, setup de infraestrutura, smoke tests e UAT humano antes de liberar acesso real.
 
 **Target features:**
-- Tray mode + background daemon — app minimiza pro system tray, roda sempre-on
-- Scan de pasta local — seleciona pasta, scan recursivo de arquivos de áudio
-- Extração de metadata — lê tags ID3/Vorbis + nome de arquivo + estrutura de pastas
-- IA organizadora (Gemini Flash) — infere artista/álbum/faixa quando metadata é bagunçada
-- File watcher em tempo real — detecta adição/remoção de arquivos enquanto app está no tray
-- Diff scan no startup — ao reabrir o app, compara índice salvo vs estado atual da pasta
-- Sync com coleção no servidor — items aparecem no web app igual Discogs (source: "local")
-- Busca YouTube automática — para cada release identificado
-- Startup automático — opção de iniciar com o Windows
+- Pre-deploy audit — build, typecheck, tests, lint, migrations, env vars, secrets auditados antes de tocar em prod
+- Supabase prod setup — projeto prod separado do dev, migrations aplicadas, RLS testada, Storage configurado, backups ativos
+- Vercel + domínio — projeto Vercel criado, env vars, DNS Hostinger apontado, SSL validado
+- Deploy + smoke tests automatizados — primeiro deploy real, health checks, Stripe webhook, OAuth callbacks atualizados
+- Human UAT — fluxo completo testado como usuário real (signup, Discogs, trade, etc.)
+
+**Scope notes:**
+- Stack: Vercel + Supabase Cloud + Hostinger (só domínio)
+- Desktop app fora de escopo — lançamento desktop vira milestone v1.5 separada (envolve code signing, VPS com PeerJS/coturn, auto-update)
+- Solo dev, primeira deploy — plano explícito e verificável, sem atalhos
 
 ## Requirements
 
@@ -200,7 +201,7 @@ Feed and Profile have equal weight — both are primary entry points. Feed-first
 
 This document evolves at phase transitions and milestone boundaries.
 
-*Last updated: 2026-04-15 — v1.3 Local Library milestone shipped (Phases 29-32)*
+*Last updated: 2026-04-20 — v1.4 Production Launch milestone started*
 
 **After each phase transition** (via `/gsd:transition`):
 1. Requirements invalidated? → Move to Out of Scope with reason
