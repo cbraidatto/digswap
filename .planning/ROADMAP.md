@@ -552,11 +552,9 @@ Plans:
 **Plans**: TBD
 
 
-### v1.3 Local Library
+**v1.3 Local Library** — Phase Details archived to `.planning/milestones/v1.3-ROADMAP.md`
 
-<!-- v1.3 Phase Details archived to .planning/milestones/v1.3-ROADMAP.md -->
-
-### v1.4 Production Launch
+**v1.4 Production Launch**
 
 ### Phase 33: Pre-Deploy Audit Gate
 **Goal**: Independent verification that commit 35ed595's "all pre-deploy blockers fixed" claim holds end-to-end — every CI gate green against main, migration trail applies cleanly on empty Supabase, cold-start 500 fix holds under curl, session revocation E2E passes, Discogs tokens encrypted via Vault, no secrets ever committed, and every env var in `.env.local.example` has a planned prod value. Establishes a clean baseline before touching any prod infrastructure.
