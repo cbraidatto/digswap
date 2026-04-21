@@ -108,6 +108,14 @@ export function registerLibraryIpc(
     });
   });
 
+  const ALLOWED_TRACK_FIELDS = new Set([
+    "artist",
+    "album",
+    "title",
+    "year",
+    "trackNumber",
+  ]);
+
   ipcMain.handle(
     "desktop:update-track-field",
     async (
@@ -116,6 +124,9 @@ export function registerLibraryIpc(
       field: string,
       value: string | number | null,
     ): Promise<void> => {
+      if (typeof field !== "string" || !ALLOWED_TRACK_FIELDS.has(field)) {
+        throw new Error(`Invalid track field: ${String(field)}`);
+      }
       const db = getLibraryDb();
       updateTrackField(db, trackId, field as "artist" | "album" | "title" | "year" | "trackNumber", value);
     },

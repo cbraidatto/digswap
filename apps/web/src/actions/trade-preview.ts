@@ -25,11 +25,25 @@ export interface PreviewItem {
 
 /**
  * Returns the counterparty's uploaded preview items with 1-hour signed URLs.
+ * Caller must be a participant in the trade — identity is derived from the
+ * session, not from arguments.
  */
-export async function getCounterpartyPreviews(
-	tradeId: string,
-	currentUserId: string,
-): Promise<PreviewItem[]> {
+export async function getCounterpartyPreviews(tradeId: string): Promise<PreviewItem[]> {
+	const user = await requireUser();
+
+	const [trade] = await db
+		.select({ id: tradeRequests.id })
+		.from(tradeRequests)
+		.where(
+			and(
+				eq(tradeRequests.id, tradeId),
+				or(eq(tradeRequests.requesterId, user.id), eq(tradeRequests.providerId, user.id)),
+			),
+		)
+		.limit(1);
+
+	if (!trade) return [];
+
 	// Find the accepted proposal for this trade
 	const [proposal] = await db
 		.select({ id: tradeProposals.id })
@@ -55,7 +69,7 @@ export async function getCounterpartyPreviews(
 		.where(
 			and(
 				eq(tradeProposalItems.proposalId, proposal.id),
-				ne(collectionItems.userId, currentUserId),
+				ne(collectionItems.userId, user.id),
 				isNotNull(tradeProposalItems.previewStoragePath),
 			),
 		);

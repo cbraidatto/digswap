@@ -69,7 +69,7 @@ export default async function TradeDetailPage({ params }: Props) {
 	// Counterparty previews — only needed in previewing state
 	const counterpartyPreviews =
 		thread.status === "previewing"
-			? await getCounterpartyPreviews(thread.tradeId, user.id).catch(() => [])
+			? await getCounterpartyPreviews(thread.tradeId).catch(() => [])
 			: [];
 
 	// Presence — best-effort, never block render

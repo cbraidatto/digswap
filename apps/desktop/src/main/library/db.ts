@@ -291,6 +291,22 @@ export function getQualifyingTracks(database: Database.Database): TrackRow[] {
     .all() as TrackRow[];
 }
 
+const ALLOWED_UPDATE_COLUMNS = new Set([
+  "artist",
+  "album",
+  "title",
+  "year",
+  "trackNumber",
+]);
+
+const ALLOWED_CONFIDENCE_COLUMNS = new Set([
+  "artistConfidence",
+  "albumConfidence",
+  "titleConfidence",
+  "yearConfidence",
+  "trackConfidence",
+]);
+
 export function updateTrackAiMetadata(
   database: Database.Database,
   trackId: string,
@@ -300,10 +316,16 @@ export function updateTrackAiMetadata(
   const setClauses: string[] = [];
   const values: (string | number)[] = [];
   for (const [key, val] of Object.entries(updates)) {
+    if (!ALLOWED_UPDATE_COLUMNS.has(key)) {
+      throw new Error(`Invalid update column: ${key}`);
+    }
     setClauses.push(`${key} = ?`);
     values.push(val);
   }
   for (const [key, val] of Object.entries(confidenceOverrides)) {
+    if (!ALLOWED_CONFIDENCE_COLUMNS.has(key)) {
+      throw new Error(`Invalid confidence column: ${key}`);
+    }
     setClauses.push(`${key} = ?`);
     values.push(val);
   }
@@ -314,19 +336,30 @@ export function updateTrackAiMetadata(
     .run(...values);
 }
 
+const TRACK_FIELD_COLUMNS: Record<
+  "artist" | "album" | "title" | "year" | "trackNumber",
+  { value: string; edited: string; confidence: string }
+> = {
+  artist: { value: "artist", edited: "artistUserEdited", confidence: "artistConfidence" },
+  album: { value: "album", edited: "albumUserEdited", confidence: "albumConfidence" },
+  title: { value: "title", edited: "titleUserEdited", confidence: "titleConfidence" },
+  year: { value: "year", edited: "yearUserEdited", confidence: "yearConfidence" },
+  trackNumber: { value: "trackNumber", edited: "trackUserEdited", confidence: "trackConfidence" },
+};
+
 export function updateTrackField(
   database: Database.Database,
   trackId: string,
   field: "artist" | "album" | "title" | "year" | "trackNumber",
   value: string | number | null,
 ): void {
-  const editedCol =
-    field === "trackNumber" ? "trackUserEdited" : `${field}UserEdited`;
-  const confCol =
-    field === "trackNumber" ? "trackConfidence" : `${field}Confidence`;
+  const cols = TRACK_FIELD_COLUMNS[field];
+  if (!cols) {
+    throw new Error(`Invalid track field: ${String(field)}`);
+  }
   database
     .prepare(
-      `UPDATE tracks SET ${field} = ?, ${editedCol} = 1, ${confCol} = 'high' WHERE id = ?`,
+      `UPDATE tracks SET ${cols.value} = ?, ${cols.edited} = 1, ${cols.confidence} = 'high' WHERE id = ?`,
     )
     .run(value, trackId);
 }
