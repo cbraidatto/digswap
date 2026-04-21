@@ -145,73 +145,82 @@ Empty initially. Populated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| DEP-AUD-01 | TBD | Pending |
-| DEP-AUD-02 | TBD | Pending |
-| DEP-AUD-03 | TBD | Pending |
-| DEP-AUD-04 | TBD | Pending |
-| DEP-AUD-05 | TBD | Pending |
-| DEP-AUD-06 | TBD | Pending |
-| DEP-AUD-07 | TBD | Pending |
-| DEP-AUD-08 | TBD | Pending |
-| DEP-SB-01 | TBD | Pending |
-| DEP-SB-02 | TBD | Pending |
-| DEP-SB-03 | TBD | Pending |
-| DEP-SB-04 | TBD | Pending |
-| DEP-SB-05 | TBD | Pending |
-| DEP-SB-06 | TBD | Pending |
-| DEP-SB-07 | TBD | Pending |
-| DEP-SB-08 | TBD | Pending |
-| DEP-SB-09 | TBD | Pending |
-| DEP-SB-10 | TBD | Pending |
-| DEP-VCL-01 | TBD | Pending |
-| DEP-VCL-02 | TBD | Pending |
-| DEP-VCL-03 | TBD | Pending |
-| DEP-VCL-04 | TBD | Pending |
-| DEP-VCL-05 | TBD | Pending |
-| DEP-VCL-06 | TBD | Pending |
-| DEP-VCL-07 | TBD | Pending |
-| DEP-VCL-08 | TBD | Pending |
-| DEP-VCL-09 | TBD | Pending |
-| DEP-VCL-10 | TBD | Pending |
-| DEP-DNS-01 | TBD | Pending |
-| DEP-DNS-02 | TBD | Pending |
-| DEP-DNS-03 | TBD | Pending |
-| DEP-DNS-04 | TBD | Pending |
-| DEP-DNS-05 | TBD | Pending |
-| DEP-DNS-06 | TBD | Pending |
-| DEP-DNS-07 | TBD | Pending |
-| DEP-INT-01 | TBD | Pending |
-| DEP-INT-02 | TBD | Pending |
-| DEP-INT-03 | TBD | Pending |
-| DEP-INT-04 | TBD | Pending |
-| DEP-INT-05 | TBD | Pending |
-| DEP-INT-06 | TBD | Pending |
-| DEP-INT-07 | TBD | Pending |
-| DEP-INT-08 | TBD | Pending |
-| DEP-UAT-01 | TBD | Pending |
-| DEP-UAT-02 | TBD | Pending |
-| DEP-UAT-03 | TBD | Pending |
-| DEP-UAT-04 | TBD | Pending |
-| DEP-UAT-05 | TBD | Pending |
-| DEP-UAT-06 | TBD | Pending |
-| DEP-UAT-07 | TBD | Pending |
-| DEP-UAT-08 | TBD | Pending |
-| DEP-UAT-09 | TBD | Pending |
-| DEP-UAT-10 | TBD | Pending |
-| DEP-UAT-11 | TBD | Pending |
-| DEP-UAT-12 | TBD | Pending |
-| DEP-MON-01 | TBD | Pending |
-| DEP-MON-02 | TBD | Pending |
-| DEP-MON-03 | TBD | Pending |
-| DEP-MON-04 | TBD | Pending |
-| DEP-MON-05 | TBD | Pending |
-| DEP-MON-06 | TBD | Pending |
+| DEP-AUD-01 | Phase 33 | Pending |
+| DEP-AUD-02 | Phase 33 | Pending |
+| DEP-AUD-03 | Phase 33 | Pending |
+| DEP-AUD-04 | Phase 33 | Pending |
+| DEP-AUD-05 | Phase 33 | Pending |
+| DEP-AUD-06 | Phase 33 | Pending |
+| DEP-AUD-07 | Phase 33 | Pending |
+| DEP-AUD-08 | Phase 33 | Pending |
+| DEP-SB-01 | Phase 34 | Pending |
+| DEP-SB-02 | Phase 34 | Pending |
+| DEP-SB-03 | Phase 34 | Pending |
+| DEP-SB-04 | Phase 34 | Pending |
+| DEP-SB-05 | Phase 34 | Pending |
+| DEP-SB-06 | Phase 34 | Pending |
+| DEP-SB-07 | Phase 34 | Pending |
+| DEP-SB-08 | Phase 34 | Pending |
+| DEP-SB-09 | Phase 34 | Pending |
+| DEP-SB-10 | Phase 34 | Pending |
+| DEP-VCL-01 | Phase 35 | Pending |
+| DEP-VCL-02 | Phase 35 | Pending |
+| DEP-VCL-03 | Phase 35 | Pending |
+| DEP-VCL-04 | Phase 35 | Pending |
+| DEP-VCL-05 | Phase 35 | Pending |
+| DEP-VCL-06 | Phase 35 | Pending |
+| DEP-VCL-07 | Phase 35 | Pending |
+| DEP-VCL-08 | Phase 35 | Pending |
+| DEP-VCL-09 | Phase 35 | Pending |
+| DEP-VCL-10 | Phase 35 | Pending |
+| DEP-DNS-01 | Phase 36 | Pending |
+| DEP-DNS-02 | Phase 36 | Pending |
+| DEP-DNS-03 | Phase 36 | Pending |
+| DEP-DNS-04 | Phase 36 | Pending |
+| DEP-DNS-05 | Phase 36 | Pending |
+| DEP-DNS-06 | Phase 36 | Pending |
+| DEP-DNS-07 | Phase 36 | Pending |
+| DEP-INT-01 | Phase 37 | Pending |
+| DEP-INT-02 | Phase 37 | Pending |
+| DEP-INT-03 | Phase 37 | Pending |
+| DEP-INT-04 | Phase 37 | Pending |
+| DEP-INT-05 | Phase 37 | Pending |
+| DEP-INT-06 | Phase 37 | Pending |
+| DEP-INT-07 | Phase 37 | Pending |
+| DEP-INT-08 | Phase 37 | Pending |
+| DEP-UAT-01 | Phase 38 | Pending |
+| DEP-UAT-02 | Phase 38 | Pending |
+| DEP-UAT-03 | Phase 38 | Pending |
+| DEP-UAT-04 | Phase 38 | Pending |
+| DEP-UAT-05 | Phase 38 | Pending |
+| DEP-UAT-06 | Phase 38 | Pending |
+| DEP-UAT-07 | Phase 38 | Pending |
+| DEP-UAT-08 | Phase 38 | Pending |
+| DEP-UAT-09 | Phase 38 | Pending |
+| DEP-UAT-10 | Phase 38 | Pending |
+| DEP-UAT-11 | Phase 38 | Pending |
+| DEP-UAT-12 | Phase 38 | Pending |
+| DEP-MON-01 | Phase 39 | Pending |
+| DEP-MON-02 | Phase 39 | Pending |
+| DEP-MON-03 | Phase 39 | Pending |
+| DEP-MON-04 | Phase 39 | Pending |
+| DEP-MON-05 | Phase 39 | Pending |
+| DEP-MON-06 | Phase 39 | Pending |
 
 **Coverage:**
 - v1.4 requirements: 61 total
-- Mapped to phases: 0 (pending roadmap)
-- Unmapped: 61 (to be resolved by gsd-roadmapper)
+- Mapped to phases: 61 (Phase 33-39)
+- Unmapped: 0 — 100% coverage verified 2026-04-20
+
+**Phase distribution:**
+- Phase 33 (Pre-Deploy Audit Gate): 8 requirements (DEP-AUD-01 → DEP-AUD-08)
+- Phase 34 (Supabase Production Setup): 10 requirements (DEP-SB-01 → DEP-SB-10)
+- Phase 35 (Vercel + Environment Wiring): 10 requirements (DEP-VCL-01 → DEP-VCL-10)
+- Phase 36 (DNS + SSL Cutover): 7 requirements (DEP-DNS-01 → DEP-DNS-07)
+- Phase 37 (External Integrations): 8 requirements (DEP-INT-01 → DEP-INT-08)
+- Phase 38 (Smoke Tests + Human UAT): 12 requirements (DEP-UAT-01 → DEP-UAT-12)
+- Phase 39 (Monitoring + Observability Setup): 6 requirements (DEP-MON-01 → DEP-MON-06)
 
 ---
 *Requirements defined: 2026-04-20*
-*Last updated: 2026-04-20 after initial milestone v1.4 definition*
+*Last updated: 2026-04-20 after gsd-roadmapper mapped all 61 requirements to phases 33-39*

@@ -61,6 +61,21 @@ See: `.planning/milestones/v1.3-ROADMAP.md`
 
 </details>
 
+
+### v1.4 Production Launch
+
+**Milestone goal:** Colocar o webapp do DigSwap no ar com seguranca — primeira deploy de producao, com auditoria pre-deploy, setup de infraestrutura, smoke tests e UAT humano antes de liberar acesso real.
+
+**Phase Numbering:** v1.3 ended at phase 32. v1.4 starts at phase 33 and continues sequentially.
+
+- [ ] **Phase 33: Pre-Deploy Audit Gate** - Independent verification of the 35ed595 baseline (build/typecheck/test/lint green, migration trail clean, cold-start fix verified, secrets audit, env inventory)
+- [ ] **Phase 34: Supabase Production Setup** - Separate digswap-prod project with migrations, RLS, Edge Functions, pg_cron, Vault secrets, Storage bucket, Pro tier, PITR enabled
+- [ ] **Phase 35: Vercel + Environment Wiring** - Vercel project with 21 prod-scoped env vars, post-build secret grep clean, first build green on *.vercel.app preview
+- [ ] **Phase 36: DNS + SSL Cutover** - Hostinger A/CNAME pointing at Vercel, Let's Encrypt cert live, CAA audited, DNS propagated (point of no return)
+- [ ] **Phase 37: External Integrations** - Stripe Live mode activated (1-3 business day SLA — START DAY 1), Discogs prod app, Google/GitHub OAuth prod redirect URIs, Resend domain verified, Supabase Auth SMTP via Resend
+- [ ] **Phase 38: Smoke Tests + Human UAT** - Playwright smoke against prod, /api/health green, cold-start curl test, Stripe round-trip, OAuth round-trip, email deliverability, human UAT signoff, RUNBOOK.md, rollback rehearsal
+- [ ] **Phase 39: Monitoring + Observability** *(parallel track — runs alongside 35-37, must complete before 38)* - Sentry prod DSN + beforeSend filter, UptimeRobot pinging /api/health, Stripe failure alerts, Vercel Analytics + Speed Insights, Sentry spike protection
+
 ## Phase Details
 
 ### Phase 1: Foundation + Authentication
@@ -540,10 +555,117 @@ Plans:
 ### v1.3 Local Library
 
 <!-- v1.3 Phase Details archived to .planning/milestones/v1.3-ROADMAP.md -->
+
+### v1.4 Production Launch
+
+### Phase 33: Pre-Deploy Audit Gate
+**Goal**: Independent verification that commit 35ed595's "all pre-deploy blockers fixed" claim holds end-to-end — every CI gate green against main, migration trail applies cleanly on empty Supabase, cold-start 500 fix holds under curl, session revocation E2E passes, Discogs tokens encrypted via Vault, no secrets ever committed, and every env var in `.env.local.example` has a planned prod value. Establishes a clean baseline before touching any prod infrastructure.
+**Depends on**: Nothing (verification gate — entry point for v1.4)
+**Requirements**: DEP-AUD-01, DEP-AUD-02, DEP-AUD-03, DEP-AUD-04, DEP-AUD-05, DEP-AUD-06, DEP-AUD-07, DEP-AUD-08
+**Success Criteria** (what must be TRUE):
+  1. All 4 CI gates (typecheck, build, test, lint) run clean against main head and `pnpm audit --prod --audit-level high` reports zero HIGH/CRITICAL
+  2. `supabase db reset` on a fresh throwaway Supabase project applies the entire `supabase/migrations/` trail end-to-end with no error — independently proving Pitfall 3 (migration drift) is closed
+  3. Cold-start curl against `/`, `/signin`, `/signup`, `/pricing` returns 200 in under 3s after 15-min function idle (Pitfall 8 — 35ed595 claim verified, not trusted)
+  4. E2E test: user logs in, copies JWT, logs out, then uses that JWT against a protected API route — response is 401 within 60s (Pitfall 10)
+  5. `SELECT access_token FROM discogs_tokens LIMIT 1` shows Vault-wrapped secrets (never plaintext fallback), confirmed before any prod Discogs flow (Pitfall 11)
+  6. Git history scan (`git log --all -p` + gitleaks) finds zero committed secrets across service_role, Stripe, HANDOFF_HMAC_SECRET, IMPORT_WORKER_SECRET, and Discogs credentials
+  7. Outstanding CSP issue from 2026-03-28 security audit is confirmed resolved or explicitly documented as accepted risk with sign-off in RUNBOOK.md
+  8. Inventory document lists every variable in `.env.local.example` alongside its planned prod value source (Supabase dashboard, Stripe dashboard, `openssl rand -hex 32`, etc.) — zero `TBD` rows
+**Plans**: TBD
+**P0 pitfalls to flag during plan-phase**: Pitfall 1 (service-role NEXT_PUBLIC_ misprefix, grep `.next/static`), Pitfall 2 (`.env.local` committed, gitleaks history scan), Pitfall 3 (migration drift, `supabase db reset` on empty), Pitfall 8 (cold-start 500s, curl verification), Pitfall 10 (session revocation, E2E), Pitfall 11 (Discogs plaintext fallback, Vault check)
+**UI hint**: no
+
+### Phase 34: Supabase Production Setup
+**Goal**: Stand up a fully isolated `digswap-prod` Supabase project — all 28+ migrations applied via `supabase db push` (never drizzle-kit), RLS Security Advisor green, Edge Functions deployed, pg_cron jobs active, Vault populated with secrets required by scheduled jobs, trade-previews Storage bucket configured with CORS and 48h TTL, Pro tier enabled to disable the 7-day free-tier auto-pause, PITR active with a rehearsed restore on a throwaway project, and the DATABASE_URL connection pinned to PgBouncer transaction pooler on port 6543 with `prepare: false`. This phase creates the root dependency every subsequent phase needs.
+**Depends on**: Phase 33
+**Requirements**: DEP-SB-01, DEP-SB-02, DEP-SB-03, DEP-SB-04, DEP-SB-05, DEP-SB-06, DEP-SB-07, DEP-SB-08, DEP-SB-09, DEP-SB-10
+**Success Criteria** (what must be TRUE):
+  1. `digswap-prod` Supabase project exists as a separate project from dev (different project ref, different URL, different keys) — confirmed by `supabase projects list`
+  2. `supabase db push --linked` against prod applies every migration in `supabase/migrations/` cleanly; Security Advisor reports zero tables without RLS policies and zero policies referencing missing columns
+  3. Both Edge Functions (`cleanup-trade-previews`, `validate-preview`) deployed and invocable; `SELECT COUNT(*) FROM cron.job WHERE active` returns 3 or more
+  4. `trade-previews` Storage bucket exists with Public = off, CORS configured to production origin only, and 48h object lifecycle
+  5. Supabase Pro plan active on the prod project (verified via dashboard billing view) — auto-pause disabled, PITR enabled, and a PITR restore to a throwaway project has been rehearsed end-to-end at least once
+  6. Prod `DATABASE_URL` uses the pooler host on port 6543 with `?pgbouncer=true` and the app connects with `prepare: false` (Drizzle config verified against prod URL)
+**Plans**: TBD
+**P0 pitfalls to flag during plan-phase**: Pitfall 3 (migration drift — `supabase db push` only), Pitfall 4 (wrong-DB migration — confirm `supabase link` ref before every command), Pitfall 5 (RLS works under anon role — run Security Advisor, test with real JWT), Pitfall 11 (enable Vault BEFORE any Discogs connection), Pitfall 17 (pooler port 6543 + `prepare: false`), Pitfall 18 (pg_cron needs `postgres` role), Pitfall 20 (buckets default Public off), Pitfall 26 (500MB DB ceiling — Pro required before domain goes live)
+**UI hint**: no
+
+### Phase 35: Vercel + Environment Wiring
+**Goal**: Create the Vercel project linked to the GitHub repo (Root Directory `apps/web`), populate all 21 env vars with **Production scope only** (never "All Environments"), scope Preview separately at dev Supabase + Stripe test mode so PR previews can never write to prod, regenerate `HANDOFF_HMAC_SECRET` and `IMPORT_WORKER_SECRET` fresh for prod via `openssl rand -hex 32`, pin the Node.js runtime to 20 (matching CI), upgrade to Vercel Pro before any paying user (60s function timeout + rollback to any deploy), reduce HSTS to `max-age=300` for the launch window, and run the first successful build on a `*.vercel.app` preview URL — all before any DNS cutover. Post-build `grep` of `.next/static/` must find zero secret hits.
+**Depends on**: Phase 34 (needs prod Supabase URL/keys to populate env vars)
+**Requirements**: DEP-VCL-01, DEP-VCL-02, DEP-VCL-03, DEP-VCL-04, DEP-VCL-05, DEP-VCL-06, DEP-VCL-07, DEP-VCL-08, DEP-VCL-09, DEP-VCL-10
+**Success Criteria** (what must be TRUE):
+  1. Vercel project is linked to the GitHub repo with Root Directory `apps/web`; pnpm workspace install + `pnpm --filter @digswap/web build` succeeds in Vercel's build runner
+  2. All 21 env vars from `.env.local.example` are populated in Vercel with **Production scope only** — separate Preview scope values point at dev Supabase + Stripe test mode (verified by opening the dashboard variable-by-variable)
+  3. Post-build `grep -r "service_role|STRIPE_SECRET|HANDOFF_HMAC|IMPORT_WORKER_SECRET|DATABASE_URL" apps/web/.next/static/` returns zero hits; exactly 7 env vars carry the `NEXT_PUBLIC_` prefix (all public-safe)
+  4. `HANDOFF_HMAC_SECRET` and `IMPORT_WORKER_SECRET` in prod are freshly generated 32-byte hex strings (not reused from dev, not the dev default string) — Vercel project is on Pro plan with 60s function timeout available
+  5. Node.js runtime pinned to 20 in Vercel Project Settings (matches CI); HSTS reduced to `max-age=300` for launch window
+  6. First production build completes green on the Vercel-assigned `*.vercel.app` URL; `/api/health` returns 200 against that preview URL before any DNS change
+**Plans**: TBD
+**P0 pitfalls to flag during plan-phase**: Pitfall 1 (NEXT_PUBLIC_ misprefix — post-build secret grep mandatory), Pitfall 9 (Preview deploys writing to prod Supabase — Production scope only), Pitfall 22 (Vercel Hobby non-commercial — Pro before Stripe), Pitfall 25 (bandwidth overages — tighten middleware matcher), Pitfall 29 (dev HANDOFF_HMAC_SECRET in prod — freshly generate)
+**UI hint**: no
+
+### Phase 36: DNS + SSL Cutover
+**Goal**: Point Hostinger DNS at Vercel — A record `@` to `76.76.21.21` (Vercel apex), CNAME `www` to `cname.vercel-dns.com`, TTLs dropped to 300s during cutover week for quick revert, CAA records audited to ensure Let's Encrypt is permitted (or absent so Vercel's ACME can issue freely), existing MX records preserved so Hostinger email routing stays intact. After DNS propagates from 2+ independent resolvers, Vercel auto-issues a Let's Encrypt cert; `openssl s_client` confirms the cert is live on port 443. **This phase is the point of no return** — after DNS resolves, every subsequent issue becomes a live incident rather than a pre-deploy catch.
+**Depends on**: Phase 35
+**Requirements**: DEP-DNS-01, DEP-DNS-02, DEP-DNS-03, DEP-DNS-04, DEP-DNS-05, DEP-DNS-06, DEP-DNS-07
+**Success Criteria** (what must be TRUE):
+  1. `dig @1.1.1.1 digswap.com A +short` and `dig @8.8.8.8 digswap.com A +short` both return `76.76.21.21`; `dig @1.1.1.1 www.digswap.com +short` returns a Vercel CNAME target
+  2. `openssl s_client -connect digswap.com:443 -servername digswap.com </dev/null` shows a valid Let's Encrypt certificate; browser padlock is green on first visit from a fresh profile
+  3. `dig CAA digswap.com +short` either returns no CAA records or includes `letsencrypt.org` — cert issuance is not silently blocked
+  4. Hostinger DNS TTLs are set to 300s during cutover week, ready to be raised to 3600s once stability is confirmed at the end of soak
+  5. Existing MX records on `digswap.com` are preserved intact — Hostinger email routing is unaffected by the cutover
+**Plans**: TBD
+**P0 pitfalls to flag during plan-phase**: Pitfall 12 (DNS set but SSL not ready — wait for `openssl s_client` before announcing), Pitfall 13 (HSTS locks users in — kept at max-age=300 per Phase 35)
+**UI hint**: no
+
+### Phase 37: External Integrations
+**Goal**: With the prod domain live, wire every external service to the real URL: activate Stripe Live mode (**this activation must be initiated on Day 1 of the milestone because Stripe's SLA is 1-3 business days** — waiting until this phase is too late), register the Stripe Live webhook at `https://[domain]/api/stripe/webhook` with its own dedicated `whsec_live_*` signing secret distinct from test, put Live Price IDs in `NEXT_PUBLIC_STRIPE_PRICE_MONTHLY` and `NEXT_PUBLIC_STRIPE_PRICE_ANNUAL` (no `price_test_*`), register a separate Discogs prod app with the prod callback as sole callback URL, update the Supabase Auth redirect URL allow-list with `https://[domain]/**`, configure Google OAuth client and GitHub OAuth app with the prod Supabase callback URI, verify the Resend sending domain via DKIM/SPF/DMARC records on Hostinger DNS, and point Supabase Auth's SMTP at Resend so transactional emails deliver from `noreply@[domain]` instead of Supabase's default shared sender.
+**Depends on**: Phase 36 (needs live domain for OAuth callbacks and Stripe webhook endpoint URL)
+**Requirements**: DEP-INT-01, DEP-INT-02, DEP-INT-03, DEP-INT-04, DEP-INT-05, DEP-INT-06, DEP-INT-07, DEP-INT-08
+**Success Criteria** (what must be TRUE):
+  1. Stripe Live mode is fully activated (tax info, bank account, business details approved) — activation was initiated on Day 1 to cover the 1-3 business day SLA; `STRIPE_SECRET_KEY` in Vercel begins with `sk_live_` and `NEXT_PUBLIC_STRIPE_PRICE_*` reference Live-mode Price IDs
+  2. A dedicated **Live-mode** webhook endpoint exists in Stripe dashboard pointing at `https://[domain]/api/stripe/webhook` with its own `whsec_live_*` signing secret in Vercel env (distinct value from any test-mode secret)
+  3. A second, prod-only Discogs app is registered with `https://[domain]/api/discogs/callback` as its sole callback URL; dev Discogs app is untouched and continues serving localhost
+  4. Supabase Auth redirect URL allow-list contains `https://[domain]/**`; Google OAuth client and GitHub OAuth app both list the prod Supabase project's `<ref>.supabase.co/auth/v1/callback` as an authorized redirect URI
+  5. Resend sending domain shows "Verified" in the Resend dashboard; DKIM, SPF, and DMARC TXT records on Hostinger DNS are propagated and validated; Supabase Auth SMTP is configured to send via Resend so signup/password-reset emails deliver from `noreply@[domain]`
+**Plans**: TBD
+**P0 pitfalls to flag during plan-phase**: Pitfall 6 (Stripe webhook signing secret test-vs-live confusion), Pitfall 7 (OAuth redirect URIs not registered for prod — login 100% broken), Pitfall 15 (Resend deliverability — DKIM/SPF/DMARC mandatory before first email), Pitfall 21 (Stripe test-vs-live price IDs and keys — all five must flip together)
+**UI hint**: no
+
+### Phase 38: Smoke Tests + Human UAT
+**Goal**: Final gate before any public access — Playwright smoke suite passes against the real production URL (not localhost), `/api/health` returns 200 while probing DB + Redis + Discogs connectivity, cold-start test proves the 35ed595 fix holds in prod under fresh-Lambda conditions, Stripe webhook round-trip verified with a real $1 charge (subscription row written then refunded), OAuth round-trip tested per provider (Discogs, Google, GitHub), email deliverability verified across Gmail/Outlook/iCloud/ProtonMail (inbox not spam), CSP zero violations in DevTools Console across all routes including Stripe Checkout and Google OAuth, preview deploys confirmed pointing at dev Supabase not prod, RUNBOOK.md committed with the top 10 failure modes and their fix steps, Vercel Instant Rollback rehearsed once end-to-end, and Sentry verified ingesting events with a test error. Human UAT sign-off required before any public announcement; minimum 1-week soak with invite-only users.
+**Depends on**: Phase 37 (requires all external integrations wired); **also requires Phase 39 complete** (monitoring is a UAT input, not a post-launch add)
+**Requirements**: DEP-UAT-01, DEP-UAT-02, DEP-UAT-03, DEP-UAT-04, DEP-UAT-05, DEP-UAT-06, DEP-UAT-07, DEP-UAT-08, DEP-UAT-09, DEP-UAT-10, DEP-UAT-11, DEP-UAT-12
+**Success Criteria** (what must be TRUE):
+  1. Playwright smoke suite runs green against `https://[domain]` (not just localhost); `/api/health` returns 200 with `{db: ok, redis: ok, discogs: ok}`; cold-start test (15-min idle then curl) returns 200 in under 3s for `/`, `/signin`, `/signup`, `/pricing`
+  2. Stripe webhook round-trip verified: a real $1 charge in Live mode fires `checkout.session.completed`, `/api/stripe/webhook` returns 200, a subscription row appears in prod DB, the charge is then refunded — audit trail documented
+  3. OAuth round-trip passes per provider (Discogs, Google, GitHub) from the prod URL; email deliverability verified to Gmail + Outlook + iCloud + ProtonMail with every test message landing in inbox, not spam
+  4. Full human UAT is signed off by the solo developer: signup, email verification, Discogs connect + import, collection browse, trade proposal, Stripe checkout — full loop from prod URL, all steps pass on first attempt
+  5. CSP violations are zero in DevTools Console across every route including Stripe Checkout redirect and Google OAuth flow; preview deploy env vars confirmed pointing at dev Supabase (not prod) via debug grep
+  6. `RUNBOOK.md` is committed to the repo with top 10 failure modes (symptoms + component + fix steps); Vercel Instant Rollback is rehearsed end-to-end (deploy no-op change → rollback via CLI + dashboard → re-enable auto-promote) and documented in RUNBOOK; Sentry is verified ingesting a deliberately-triggered test error within 60s
+**Plans**: TBD
+**P0 pitfalls to flag during plan-phase**: Pitfall 6 (Stripe webhook verification — real $1 round-trip is the only proof), Pitfall 8 (cold-start 500s — non-optional curl verification, this is where the 35ed595 claim gets independently validated in prod), Pitfall 9 (preview-to-prod bleed — confirm preview SUPABASE_URL prefix matches dev), Pitfall 14 (CSP violations — DevTools Console must be zero across all flows), Pitfall 15 (email deliverability — test all 4 major inboxes)
+**UI hint**: no
+
+### Phase 39: Monitoring + Observability Setup
+**Goal**: Production observability live before UAT begins — Sentry prod DSN and auth token configured in Vercel (build-time source map upload enabled), Sentry `beforeSend` filter suppresses CSP noise and strips PII from error events (no email addresses or tokens leaking into Sentry), UptimeRobot pinging `/api/health` every 5 minutes with email alerts on failure, Stripe webhook failure email alerts configured in the Stripe dashboard, Vercel Analytics and Speed Insights components added to `app/layout.tsx` for Core Web Vitals and traffic visibility, and Sentry spike protection enabled so a single error storm cannot blow out the free-tier 5K errors/month quota (which would leave real bugs invisible). This phase **runs as a parallel track alongside phases 35-37** (depends only on Phase 35 for the prod URL) and must be complete before Phase 38 UAT begins.
+**Depends on**: Phase 35 (needs prod URL for uptime probe); **parallel track with phases 36 and 37**
+**Requirements**: DEP-MON-01, DEP-MON-02, DEP-MON-03, DEP-MON-04, DEP-MON-05, DEP-MON-06
+**Success Criteria** (what must be TRUE):
+  1. Sentry prod project is created; `NEXT_PUBLIC_SENTRY_DSN`, `SENTRY_ORG`, `SENTRY_PROJECT`, and `SENTRY_AUTH_TOKEN` are set in Vercel (DSN in runtime scope, auth token as build-only sensitive); source maps upload successfully during each prod build
+  2. Sentry `beforeSend` hook filters out `csp-violation` noise and strips email addresses and auth tokens from error payloads before send; spike protection is enabled at the project level
+  3. UptimeRobot monitor is configured to ping `https://[domain]/api/health` every 5 minutes with email alert to the solo dev on any non-200 response
+  4. Stripe dashboard has email alerts enabled on webhook 5xx / delivery failures at the Live-mode endpoint; Vercel Analytics and Speed Insights components are mounted in `app/layout.tsx` and Core Web Vitals begin reporting on every prod page view
+  5. All monitoring is verified end-to-end: a deliberate test error appears in Sentry within 60s, UptimeRobot shows the prod monitor as "Up", Vercel Analytics dashboard shows at least one recorded page view
+**Plans**: TBD
+**P0 pitfalls to flag during plan-phase**: Pitfall 28 (Sentry quota blown by CSP noise — `beforeSend` filter mandatory), Pitfall 1 (Sentry auth token is a secret — never `NEXT_PUBLIC_`, build scope only)
+**UI hint**: no
+
 ## Progress
 
 **Execution Order:**
-Phases execute in numeric order: 1 → 20 (v1.0), then 21 → 24 (v1.1 Deploy Readiness), then 25 → 28 (v1.2 Trade Redesign), then 29 → 32 (v1.3 Local Library)
+Phases execute in numeric order: 1 → 20 (v1.0), then 21 → 24 (v1.1 Deploy Readiness), then 25 → 28 (v1.2 Trade Redesign), then 29 → 32 (v1.3 Local Library), then 33 → 39 (v1.4 Production Launch — 33 through 38 sequential, 39 parallel with 35-37)
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
@@ -595,6 +717,18 @@ Phases execute in numeric order: 1 → 20 (v1.0), then 21 → 24 (v1.1 Deploy Re
 | 30. Sync Engine | 3/3 | Complete | 2026-04-15 |
 | 31. Tray Daemon + File Watcher | 2/2 | Complete | 2026-04-15 |
 | 32. AI Metadata Enrichment | 2/2 | Complete | 2026-04-15 |
+
+**v1.4 Production Launch:**
+
+| Phase | Plans Complete | Status | Completed |
+|-------|----------------|--------|----------|
+| 33. Pre-Deploy Audit Gate | 0/0 | Not Started |  |
+| 34. Supabase Production Setup | 0/0 | Not Started |  |
+| 35. Vercel + Environment Wiring | 0/0 | Not Started |  |
+| 36. DNS + SSL Cutover | 0/0 | Not Started |  |
+| 37. External Integrations | 0/0 | Not Started |  |
+| 38. Smoke Tests + Human UAT | 0/0 | Not Started |  |
+| 39. Monitoring + Observability Setup | 0/0 | Not Started |  |
 
 ### Phase 19: Security Hardening — Fix 74 audit vulnerabilities
 
