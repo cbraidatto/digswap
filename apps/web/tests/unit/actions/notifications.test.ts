@@ -21,8 +21,8 @@ let adminInsertResult: { data: unknown; error: unknown } = { data: null, error: 
 
 const adminMaybeSingleMock = vi.fn(() => adminUpdateResult);
 const adminSelectMock = vi.fn(() => ({ maybeSingle: adminMaybeSingleMock }));
-const adminEqChain = vi.fn(() => ({ eq: adminEqChain, select: adminSelectMock }));
-const adminUpdateMock = vi.fn(() => ({ eq: adminEqChain }));
+const adminEqChain: ReturnType<typeof vi.fn> = vi.fn(() => ({ eq: adminEqChain, select: adminSelectMock }));
+const adminUpdateMock: ReturnType<typeof vi.fn> = vi.fn(() => ({ eq: adminEqChain }));
 
 const adminInsertSingleMock = vi.fn(() => adminInsertResult);
 const adminInsertSelectMock = vi.fn(() => ({ single: adminInsertSingleMock }));

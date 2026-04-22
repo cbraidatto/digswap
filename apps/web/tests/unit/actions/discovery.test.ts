@@ -50,10 +50,10 @@ vi.mock("@/actions/search-signals", () => ({
 	logSearchSignal: vi.fn(async () => {}),
 }));
 
-const mockSearchRecords = vi.fn(async () => [{ id: "r1", title: "Jazz LP" }]);
-const mockBrowseRecords = vi.fn(async () => [{ id: "r2", title: "Funk LP" }]);
-const mockGetSuggestedRecords = vi.fn(async () => [{ id: "r3", title: "Soul LP" }]);
-const mockGetTrendingRecords = vi.fn(async () => [{ id: "r4", title: "Rock LP" }]);
+const mockSearchRecords = vi.fn(async (..._args: unknown[]) => [{ id: "r1", title: "Jazz LP" }]);
+const mockBrowseRecords = vi.fn(async (..._args: unknown[]) => [{ id: "r2", title: "Funk LP" }]);
+const mockGetSuggestedRecords = vi.fn(async (..._args: unknown[]) => [{ id: "r3", title: "Soul LP" }]);
+const mockGetTrendingRecords = vi.fn(async (..._args: unknown[]) => [{ id: "r4", title: "Rock LP" }]);
 
 vi.mock("@/lib/discovery/queries", () => ({
 	searchRecords: (...args: unknown[]) => mockSearchRecords(...args),

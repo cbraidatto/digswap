@@ -123,7 +123,7 @@ describe("PAGE_SIZE", () => {
 });
 
 describe("getCollectionPage", () => {
-	const defaultFilters = { page: 1, sort: "rarity" };
+	const defaultFilters = { page: 1, sort: "rarity" as const };
 
 	it("returns mapped collection items", async () => {
 		selectResults = [
@@ -289,7 +289,7 @@ describe("getCollectionPage", () => {
 });
 
 describe("getCollectionCount", () => {
-	const defaultFilters = { page: 1, sort: "rarity" };
+	const defaultFilters = { page: 1, sort: "rarity" as const };
 
 	it("returns numeric count", async () => {
 		selectResults = [[{ count: "42" }]];

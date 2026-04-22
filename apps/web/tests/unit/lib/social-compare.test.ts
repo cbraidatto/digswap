@@ -81,7 +81,7 @@ function compItem(overrides?: Record<string, unknown>) {
 beforeEach(async () => {
 	promiseAllResults = [];
 	const { db } = vi.mocked(await import("@/lib/db"));
-	(db as Record<string, unknown>).__resetIndex?.();
+	(db as unknown as Record<string, () => void>).__resetIndex?.();
 	vi.clearAllMocks();
 });
 

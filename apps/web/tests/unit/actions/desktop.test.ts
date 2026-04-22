@@ -39,7 +39,7 @@ vi.mock("@/lib/supabase/server", () => ({
 	})),
 }));
 
-const mockCreateHandoffToken = vi.fn(async () => "signed-token-abc");
+const mockCreateHandoffToken = vi.fn(async (..._args: unknown[]) => "signed-token-abc");
 
 vi.mock("@/lib/desktop/handoff-token", () => ({
 	createHandoffToken: (...args: unknown[]) => mockCreateHandoffToken(...args),

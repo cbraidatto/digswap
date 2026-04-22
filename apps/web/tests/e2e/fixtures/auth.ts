@@ -1,4 +1,4 @@
-import { test as base, expect } from "@playwright/test";
+import { type Page, test as base, expect } from "@playwright/test";
 
 /**
  * Auth fixture for E2E tests requiring an authenticated session.
@@ -14,11 +14,7 @@ import { test as base, expect } from "@playwright/test";
  * When env vars are missing, tests using `authedPage` are auto-skipped.
  */
 
-type AuthFixtures = {
-	authedPage: ReturnType<typeof base["extend"]> extends infer T ? T : never;
-};
-
-export const test = base.extend<{ authedPage: typeof base }>({
+export const test = base.extend<{ authedPage: Page }>({
 	authedPage: async ({ page }, use, testInfo) => {
 		const email = process.env.E2E_USER_EMAIL;
 		const password = process.env.E2E_USER_PASSWORD;

@@ -104,25 +104,25 @@ beforeEach(() => {
 
 describe("saveLead", () => {
 	it("saves a lead for authenticated user", async () => {
-		const result = await saveLead("release", TARGET_ID, "Great find", "interested");
+		const result = await saveLead("release", TARGET_ID, "Great find", "watching");
 		expect(result.success).toBe(true);
 	});
 
 	it("rejects unauthenticated user", async () => {
 		mockAuthUser = null;
-		const result = await saveLead("release", TARGET_ID, null, "interested");
+		const result = await saveLead("release", TARGET_ID, null, "watching");
 		expect(result.error).toContain("Not authenticated");
 	});
 
 	it("rejects invalid input", async () => {
-		const result = await saveLead("" as "release", "", null, "" as "interested");
+		const result = await saveLead("" as "release", "", null, "" as "watching");
 		expect(result.error).toBeDefined();
 	});
 });
 
 describe("getLead", () => {
 	it("returns lead for authenticated user", async () => {
-		selectResults = [[{ userId: USER_ID, targetType: "release", targetId: TARGET_ID, status: "interested" }]];
+		selectResults = [[{ userId: USER_ID, targetType: "release", targetId: TARGET_ID, status: "watching" }]];
 		const result = await getLead("release", TARGET_ID);
 		expect(result).not.toBeNull();
 	});
@@ -155,7 +155,7 @@ describe("getLeads", () => {
 
 	it("returns leads with filter", async () => {
 		selectResults = [[{ id: "lead-1" }]];
-		const result = await getLeads({ status: "interested" });
+		const result = await getLeads({ status: "watching" });
 		expect(result).toHaveLength(1);
 	});
 });
