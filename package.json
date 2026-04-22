@@ -23,6 +23,11 @@
     "test:all": "pnpm -r --if-present test",
     "test:e2e": "pnpm --filter @digswap/web test:e2e",
     "test:coverage": "pnpm --filter @digswap/web test -- --coverage",
-    "typecheck": "pnpm -r --if-present typecheck"
+    "typecheck": "pnpm -r --if-present typecheck",
+    "db:guard": "node scripts/drizzle-prod-guard.mjs",
+    "predb:push": "pnpm db:guard",
+    "predb:migrate": "pnpm db:guard",
+    "db:push": "echo 'drizzle-kit push is invoked from the workspace that owns the schema — this root script exists so the predb:push guard always runs first' && exit 0",
+    "db:migrate": "echo 'drizzle-kit migrate is invoked from the workspace that owns the schema — this root script exists so the predb:migrate guard always runs first' && exit 0"
   }
 }
