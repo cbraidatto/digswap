@@ -1,0 +1,8 @@
+# Phase 33 DEP-AUD-05 — Discogs token sample outputs may reveal token prefixes.
+# Redact manually before committing specific samples, or leave ignored.
+05c-plaintext-sample.txt
+05d-vault-sample.txt
+
+# Allow everything else (02a-*, 02b-*, 03-*, 04-*, 05a-*, 05b-*, 06-*, 07-*, 08-*, 00-*) to be committed.
+!00-docker.txt
+!.gitignore
