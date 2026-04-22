@@ -1,0 +1,81 @@
+# .gitleaks.toml — Phase 33 DEP-AUD-07 config
+# Extends gitleaks' default rules; adds custom rules scoped to the 7 DigSwap secret names.
+
+title = "DigSwap Pre-Deploy Audit (Phase 33)"
+
+[extend]
+useDefault = true
+
+# Rule: Supabase service-role key (JWT-shaped, ~400 chars)
+[[rules]]
+id = "digswap-supabase-service-role"
+description = "Supabase service_role JWT detected (possible hardcoded secret)"
+regex = '''(?i)(service_role|SUPABASE_SERVICE_ROLE_KEY)[^a-z0-9_]{1,30}(eyJ[A-Za-z0-9_-]{20,}\.eyJ[A-Za-z0-9_-]{20,}\.[A-Za-z0-9_-]{10,})'''
+secretGroup = 2
+tags = ["digswap", "supabase", "service-role"]
+
+# Rule: Stripe live/test keys
+[[rules]]
+id = "digswap-stripe-secret"
+description = "Stripe sk_live/sk_test key"
+regex = '''\bsk_(live|test)_[0-9a-zA-Z]{24,}\b'''
+tags = ["digswap", "stripe"]
+
+# Rule: Stripe webhook signing secret
+[[rules]]
+id = "digswap-stripe-webhook"
+description = "Stripe whsec_* webhook signing secret"
+regex = '''\bwhsec_[0-9a-zA-Z]{32,}\b'''
+tags = ["digswap", "stripe", "webhook"]
+
+# Rule: HANDOFF_HMAC_SECRET with real-looking hex
+[[rules]]
+id = "digswap-handoff-hmac"
+description = "HANDOFF_HMAC_SECRET = <32+ hex chars>"
+regex = '''HANDOFF_HMAC_SECRET\s*[:=]\s*["']?([0-9a-f]{32,})'''
+secretGroup = 1
+tags = ["digswap", "hmac"]
+
+# Rule: IMPORT_WORKER_SECRET with real-looking hex
+[[rules]]
+id = "digswap-import-worker"
+description = "IMPORT_WORKER_SECRET = <32+ hex chars>"
+regex = '''IMPORT_WORKER_SECRET\s*[:=]\s*["']?([0-9a-zA-Z]{32,})'''
+secretGroup = 1
+tags = ["digswap", "import-worker"]
+
+# Rule: Discogs consumer secret
+[[rules]]
+id = "digswap-discogs-secret"
+description = "DISCOGS_CONSUMER_SECRET with real value"
+regex = '''DISCOGS_CONSUMER_SECRET\s*[:=]\s*["']?([A-Za-z0-9]{20,})'''
+secretGroup = 1
+tags = ["digswap", "discogs"]
+
+# Rule: Postgres URL with inline password
+[[rules]]
+id = "digswap-pg-url-password"
+description = "postgresql:// URL with inline password"
+regex = '''postgres(ql)?://[^:\s]+:([^@\s]{8,})@[a-z0-9.-]+'''
+secretGroup = 2
+tags = ["digswap", "database"]
+
+# Allowlist — these tokens are safe/expected placeholders
+[[allowlists]]
+description = "Skip .env.example files and CI dummy values"
+paths = [
+  '''\.env\.local\.example$''',
+  '''\.env\.example$''',
+  '''\.github/workflows/ci\.yml$''',
+  '''CLAUDE\.md$''',
+  '''\.planning/.*\.md$''',
+  '''\.pi/agent/skills/.*\.md$''',
+]
+# Also ignore placeholder literals that appear in tests / docs
+regexes = [
+  '''dev-hmac-secret-not-for-production''',
+  '''ci-.*-secret''',
+  '''placeholder-key''',
+  '''generate_a_random_32_char_string''',
+  '''your_[a-z_]+_(key|secret|url|token)''',
+]
