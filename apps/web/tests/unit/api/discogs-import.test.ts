@@ -28,16 +28,21 @@ vi.mock("@/lib/env", () => ({
 	},
 }));
 
-const { mockAdminFrom, mockProcessImportPage, mockProcessWantlistPage, mockBroadcastProgress, mockAwardBadge, mockCheckWantlistMatches } = vi.hoisted(
-	() => ({
-		mockAdminFrom: vi.fn(),
-		mockProcessImportPage: vi.fn(),
-		mockProcessWantlistPage: vi.fn(),
-		mockBroadcastProgress: vi.fn(),
-		mockAwardBadge: vi.fn(),
-		mockCheckWantlistMatches: vi.fn(),
-	}),
-);
+const {
+	mockAdminFrom,
+	mockProcessImportPage,
+	mockProcessWantlistPage,
+	mockBroadcastProgress,
+	mockAwardBadge,
+	mockCheckWantlistMatches,
+} = vi.hoisted(() => ({
+	mockAdminFrom: vi.fn(),
+	mockProcessImportPage: vi.fn(),
+	mockProcessWantlistPage: vi.fn(),
+	mockBroadcastProgress: vi.fn(),
+	mockAwardBadge: vi.fn(),
+	mockCheckWantlistMatches: vi.fn(),
+}));
 
 vi.mock("@/lib/supabase/admin", () => ({
 	createAdminClient: vi.fn(() => ({
@@ -101,9 +106,7 @@ describe("Discogs import worker route", () => {
 	});
 
 	it("returns 401 when the secret is wrong", async () => {
-		const response = await POST(
-			createRequest({ jobId: "job-1" }, "Bearer wrong-secret"),
-		);
+		const response = await POST(createRequest({ jobId: "job-1" }, "Bearer wrong-secret"));
 
 		expect(response.status).toBe(401);
 		const body = await response.json();
@@ -111,9 +114,7 @@ describe("Discogs import worker route", () => {
 	});
 
 	it("returns 400 when jobId is missing from body", async () => {
-		const response = await POST(
-			createRequest({}, "Bearer test-import-worker-secret"),
-		);
+		const response = await POST(createRequest({}, "Bearer test-import-worker-secret"));
 
 		expect(response.status).toBe(400);
 		const body = await response.json();

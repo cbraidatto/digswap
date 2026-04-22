@@ -46,7 +46,9 @@ export async function getCollectionComparison(
 				db
 					.select({ releaseId: collectionItems.releaseId })
 					.from(collectionItems)
-					.where(sql`${collectionItems.userId} = ${theirUserId} AND ${collectionItems.deletedAt} IS NULL`)
+					.where(
+						sql`${collectionItems.userId} = ${theirUserId} AND ${collectionItems.deletedAt} IS NULL`,
+					)
 					.as("theirs"),
 				sql`"theirs"."release_id" = ${collectionItems.releaseId}`,
 			)

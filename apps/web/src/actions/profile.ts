@@ -421,9 +421,7 @@ export async function removeCoverImage() {
 		if (!user) return { error: "Unauthenticated" };
 
 		// Remove all cover files for this user from storage (any extension)
-		const { data: files } = await supabase.storage
-			.from("profile-covers")
-			.list(user.id);
+		const { data: files } = await supabase.storage.from("profile-covers").list(user.id);
 
 		if (files && files.length > 0) {
 			const paths = files

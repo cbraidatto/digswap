@@ -5,10 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useTransition } from "react";
 import { toast } from "sonner";
-import {
-	removeRecordFromCollection,
-	setPersonalRating,
-} from "@/actions/collection";
+import { removeRecordFromCollection, setPersonalRating } from "@/actions/collection";
 import { PlayButton } from "@/components/player/play-button";
 import { FormatBadge } from "@/components/ui/format-badge";
 import { GemBadge } from "@/components/ui/gem-badge";
@@ -180,11 +177,7 @@ export function CollectionCardExpanded({ item, isOwner, variant }: CollectionCar
 
 					{/* Visibility selector + remove */}
 					<div className="flex items-center gap-0.5">
-						<VisibilitySelector
-							itemId={item.id}
-							currentVisibility={item.visibility}
-							compact
-						/>
+						<VisibilitySelector itemId={item.id} currentVisibility={item.visibility} compact />
 						<button
 							type="button"
 							onClick={handleRemove}

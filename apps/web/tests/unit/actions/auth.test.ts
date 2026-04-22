@@ -91,14 +91,9 @@ vi.mock("next/navigation", () => ({
 // ---------------------------------------------------------------------------
 // Import actions under test (after mocks)
 // ---------------------------------------------------------------------------
-const {
-	signUp,
-	signIn,
-	signOut,
-	forgotPassword,
-	resetPassword,
-	resendVerification,
-} = await import("@/actions/auth");
+const { signUp, signIn, signOut, forgotPassword, resetPassword, resendVerification } = await import(
+	"@/actions/auth"
+);
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -354,12 +349,9 @@ describe("auth actions", () => {
 
 			expect(result.success).toBe(true);
 			expect(result.message).toContain("reset link has been sent");
-			expect(mockResetPasswordForEmail).toHaveBeenCalledWith(
-				"test@example.com",
-				{
-					redirectTo: "http://localhost:3000/api/auth/callback?next=/reset-password",
-				},
-			);
+			expect(mockResetPasswordForEmail).toHaveBeenCalledWith("test@example.com", {
+				redirectTo: "http://localhost:3000/api/auth/callback?next=/reset-password",
+			});
 		});
 
 		it("rejects invalid email format", async () => {

@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { searchRecordsSchema, browseRecordsSchema } from "@/lib/validations/discovery";
+import { browseRecordsSchema, searchRecordsSchema } from "@/lib/validations/discovery";
 
 describe("searchRecordsSchema", () => {
 	it("accepts valid search term", () => {
@@ -17,9 +17,7 @@ describe("searchRecordsSchema", () => {
 
 describe("browseRecordsSchema", () => {
 	it("accepts with nullable fields set to null", () => {
-		expect(
-			browseRecordsSchema.safeParse({ genre: null, decade: null }).success,
-		).toBe(true);
+		expect(browseRecordsSchema.safeParse({ genre: null, decade: null }).success).toBe(true);
 	});
 
 	it("accepts genre + decade filters", () => {
@@ -27,14 +25,15 @@ describe("browseRecordsSchema", () => {
 	});
 
 	it("accepts page number with nullable fields", () => {
-		expect(
-			browseRecordsSchema.safeParse({ genre: null, decade: null, page: 5 }).success,
-		).toBe(true);
+		expect(browseRecordsSchema.safeParse({ genre: null, decade: null, page: 5 }).success).toBe(
+			true,
+		);
 	});
 
 	it("accepts genres array", () => {
 		expect(
-			browseRecordsSchema.safeParse({ genre: null, decade: null, genres: ["Jazz", "Soul"] }).success,
+			browseRecordsSchema.safeParse({ genre: null, decade: null, genres: ["Jazz", "Soul"] })
+				.success,
 		).toBe(true);
 	});
 });

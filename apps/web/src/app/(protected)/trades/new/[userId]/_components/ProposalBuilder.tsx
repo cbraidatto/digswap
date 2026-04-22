@@ -1,10 +1,10 @@
 "use client";
 
-import { useCallback, useState } from "react";
+import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import Image from "next/image";
-import { createProposalAction, createCounterproposalAction } from "@/actions/trade-proposals";
+import { useCallback, useState } from "react";
+import { createCounterproposalAction, createProposalAction } from "@/actions/trade-proposals";
 import type { TradeableItem } from "@/lib/trades/proposal-queries";
 import { CollectionColumn } from "./CollectionColumn";
 import { QualityDeclarationModal } from "./QualityDeclarationModal";
@@ -72,10 +72,7 @@ export function ProposalBuilder({
 	);
 
 	const handleQualityConfirm = useCallback(
-		(
-			item: TradeableItem,
-			quality: { declaredQuality: string; conditionNotes?: string },
-		) => {
+		(item: TradeableItem, quality: { declaredQuality: string; conditionNotes?: string }) => {
 			if (!pendingItem) return;
 			const { side } = pendingItem;
 
@@ -95,16 +92,13 @@ export function ProposalBuilder({
 		[pendingItem],
 	);
 
-	const handleRemoveFromBasket = useCallback(
-		(itemId: string, side: "offer" | "want") => {
-			if (side === "offer") {
-				setOfferBasket((prev) => prev.filter((b) => b.item.id !== itemId));
-			} else {
-				setWantBasket((prev) => prev.filter((b) => b.item.id !== itemId));
-			}
-		},
-		[],
-	);
+	const handleRemoveFromBasket = useCallback((itemId: string, side: "offer" | "want") => {
+		if (side === "offer") {
+			setOfferBasket((prev) => prev.filter((b) => b.item.id !== itemId));
+		} else {
+			setWantBasket((prev) => prev.filter((b) => b.item.id !== itemId));
+		}
+	}, []);
 
 	const handleSubmit = useCallback(async () => {
 		if (offerBasket.length === 0 || wantBasket.length === 0) return;
@@ -162,8 +156,7 @@ export function ProposalBuilder({
 		}
 	}, [offerBasket, wantBasket, message, targetUserId, router, isCounterMode, tradeId]);
 
-	const canSubmit =
-		offerBasket.length > 0 && wantBasket.length > 0 && !isSubmitting;
+	const canSubmit = offerBasket.length > 0 && wantBasket.length > 0 && !isSubmitting;
 
 	return (
 		<div className="space-y-6">
@@ -173,24 +166,19 @@ export function ProposalBuilder({
 					href={isCounterMode ? `/trades/${tradeId}` : "/trades"}
 					className="text-xs text-muted-foreground hover:text-foreground transition-colors inline-flex items-center gap-1 mb-3"
 				>
-					<span className="material-symbols-outlined text-sm">
-						arrow_back
-					</span>
+					<span className="material-symbols-outlined text-sm">arrow_back</span>
 					{isCounterMode ? "Back to Trade" : "Back to Trades"}
 				</Link>
 				<h1 className="font-heading text-xl font-bold text-foreground">
 					{isCounterMode ? (
 						<>
 							Counter Proposal{" "}
-							<span className="text-muted-foreground text-base font-normal">
-								with
-							</span>{" "}
+							<span className="text-muted-foreground text-base font-normal">with</span>{" "}
 							<span className="text-primary">{targetUsername}</span>
 						</>
 					) : (
 						<>
-							New Trade with{" "}
-							<span className="text-primary">{targetUsername}</span>
+							New Trade with <span className="text-primary">{targetUsername}</span>
 						</>
 					)}
 				</h1>
@@ -230,15 +218,10 @@ export function ProposalBuilder({
 				{/* Tier badge */}
 				{!isPremium && (
 					<div className="flex items-center gap-2 px-3 py-2 rounded bg-surface-container-high border border-outline-variant text-xs">
-						<span className="material-symbols-outlined text-sm text-muted-foreground">
-							info
-						</span>
+						<span className="material-symbols-outlined text-sm text-muted-foreground">info</span>
 						<span className="text-muted-foreground">
 							Free tier: 1 item per side.{" "}
-							<Link
-								href="/settings"
-								className="text-primary hover:underline"
-							>
+							<Link href="/settings" className="text-primary hover:underline">
 								Upgrade
 							</Link>{" "}
 							for 3:3 trades.
@@ -252,18 +235,14 @@ export function ProposalBuilder({
 						Offering ({offerBasket.length})
 					</h3>
 					{offerBasket.length === 0 ? (
-						<p className="text-xs text-muted-foreground/50 italic">
-							No records selected yet
-						</p>
+						<p className="text-xs text-muted-foreground/50 italic">No records selected yet</p>
 					) : (
 						<div className="space-y-1.5">
 							{offerBasket.map((b) => (
 								<BasketItemRow
 									key={b.item.id}
 									basketItem={b}
-									onRemove={() =>
-										handleRemoveFromBasket(b.item.id, "offer")
-									}
+									onRemove={() => handleRemoveFromBasket(b.item.id, "offer")}
 								/>
 							))}
 						</div>
@@ -276,18 +255,14 @@ export function ProposalBuilder({
 						Requesting ({wantBasket.length})
 					</h3>
 					{wantBasket.length === 0 ? (
-						<p className="text-xs text-muted-foreground/50 italic">
-							No records selected yet
-						</p>
+						<p className="text-xs text-muted-foreground/50 italic">No records selected yet</p>
 					) : (
 						<div className="space-y-1.5">
 							{wantBasket.map((b) => (
 								<BasketItemRow
 									key={b.item.id}
 									basketItem={b}
-									onRemove={() =>
-										handleRemoveFromBasket(b.item.id, "want")
-									}
+									onRemove={() => handleRemoveFromBasket(b.item.id, "want")}
 								/>
 							))}
 						</div>
@@ -297,8 +272,7 @@ export function ProposalBuilder({
 				{/* Optional message */}
 				<div className="space-y-2">
 					<label className="text-xs font-mono text-muted-foreground uppercase tracking-wider">
-						Message{" "}
-						<span className="text-muted-foreground/40">(optional)</span>
+						Message <span className="text-muted-foreground/40">(optional)</span>
 					</label>
 					<textarea
 						value={message}
@@ -317,9 +291,7 @@ export function ProposalBuilder({
 				{/* Error */}
 				{error && (
 					<div className="flex items-center gap-2 px-3 py-2 rounded bg-red-500/10 border border-red-500/20 text-xs text-red-400">
-						<span className="material-symbols-outlined text-sm">
-							error
-						</span>
+						<span className="material-symbols-outlined text-sm">error</span>
 						{error}
 					</div>
 				)}
@@ -344,9 +316,7 @@ export function ProposalBuilder({
 						</span>
 					) : (
 						<span className="inline-flex items-center gap-2">
-							<span className="material-symbols-outlined text-base">
-								send
-							</span>
+							<span className="material-symbols-outlined text-base">send</span>
 							{isCounterMode ? "Send Counteroffer" : "Send Proposal"}
 						</span>
 					)}
@@ -368,13 +338,7 @@ export function ProposalBuilder({
 // BasketItemRow -- inline sub-component for basket display
 // ---------------------------------------------------------------------------
 
-function BasketItemRow({
-	basketItem,
-	onRemove,
-}: {
-	basketItem: BasketItem;
-	onRemove: () => void;
-}) {
+function BasketItemRow({ basketItem, onRemove }: { basketItem: BasketItem; onRemove: () => void }) {
 	const { item, declaredQuality, conditionNotes } = basketItem;
 
 	return (
@@ -401,12 +365,9 @@ function BasketItemRow({
 
 			{/* Info */}
 			<div className="min-w-0 flex-1">
-				<p className="text-xs font-bold text-on-surface truncate">
-					{item.title}
-				</p>
+				<p className="text-xs font-bold text-on-surface truncate">{item.title}</p>
 				<p className="text-[10px] text-muted-foreground truncate">
-					{item.artist} {"\u00b7"}{" "}
-					<span className="font-mono">{declaredQuality}</span>
+					{item.artist} {"\u00b7"} <span className="font-mono">{declaredQuality}</span>
 					{conditionNotes && (
 						<span className="text-muted-foreground/50">
 							{" "}

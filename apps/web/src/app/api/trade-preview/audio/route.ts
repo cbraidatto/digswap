@@ -1,3 +1,4 @@
+import { createClient as createServiceClient } from "@supabase/supabase-js";
 import { and, eq, isNotNull, or } from "drizzle-orm";
 import { type NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
@@ -5,7 +6,6 @@ import { collectionItems } from "@/lib/db/schema/collections";
 import { tradeProposalItems, tradeProposals, tradeRequests } from "@/lib/db/schema/trades";
 import { env, publicEnv } from "@/lib/env";
 import { createClient } from "@/lib/supabase/server";
-import { createClient as createServiceClient } from "@supabase/supabase-js";
 
 /**
  * GET /api/trade-preview/audio?itemId=<proposalItemId>
@@ -26,7 +26,9 @@ export async function GET(request: NextRequest) {
 
 	// Authenticate user
 	const supabase = await createClient();
-	const { data: { user } } = await supabase.auth.getUser();
+	const {
+		data: { user },
+	} = await supabase.auth.getUser();
 	if (!user) {
 		return new NextResponse("Unauthorized", { status: 401 });
 	}
@@ -40,12 +42,7 @@ export async function GET(request: NextRequest) {
 		.from(tradeProposalItems)
 		.innerJoin(tradeProposals, eq(tradeProposalItems.proposalId, tradeProposals.id))
 		.innerJoin(tradeRequests, eq(tradeProposals.tradeId, tradeRequests.id))
-		.where(
-			and(
-				eq(tradeProposalItems.id, itemId),
-				isNotNull(tradeProposalItems.previewStoragePath),
-			),
-		)
+		.where(and(eq(tradeProposalItems.id, itemId), isNotNull(tradeProposalItems.previewStoragePath)))
 		.limit(1);
 
 	if (!item?.previewStoragePath) {

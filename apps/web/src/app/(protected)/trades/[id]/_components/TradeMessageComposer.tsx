@@ -88,7 +88,11 @@ export function TradeMessageComposer({ tradeId, status }: Props) {
 				{body.trim() && (
 					<button
 						type="button"
-						onClick={() => { setBody(""); setError(null); textareaRef.current?.focus(); }}
+						onClick={() => {
+							setBody("");
+							setError(null);
+							textareaRef.current?.focus();
+						}}
 						className="text-muted-foreground hover:text-foreground font-mono text-xs px-3 py-2 rounded border border-outline-variant/30 transition-colors"
 					>
 						Clear

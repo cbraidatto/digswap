@@ -3,10 +3,7 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
-import {
-	acceptProposalAction,
-	declineProposalAction,
-} from "@/actions/trade-proposals";
+import { acceptProposalAction, declineProposalAction } from "@/actions/trade-proposals";
 import type { ProposalWithItems } from "@/lib/trades/proposal-queries";
 
 // ---------------------------------------------------------------------------
@@ -94,9 +91,7 @@ export function ProposalActionBar({
 				</Link>
 			</div>
 
-			{error && (
-				<p className="font-mono text-xs text-destructive">{error}</p>
-			)}
+			{error && <p className="font-mono text-xs text-destructive">{error}</p>}
 		</div>
 	);
 }

@@ -334,7 +334,14 @@ describe("joinGroupAction", () => {
 		mockAuthUser = { id: USER_MEMBER };
 		selectResults = [
 			// Query 1: group lookup — private
-			[{ id: GROUP_ID, name: "Secret Vinyl Club", slug: "secret-vinyl-club", visibility: "private" }],
+			[
+				{
+					id: GROUP_ID,
+					name: "Secret Vinyl Club",
+					slug: "secret-vinyl-club",
+					visibility: "private",
+				},
+			],
 			// Query 2: existing member check
 			[],
 		];

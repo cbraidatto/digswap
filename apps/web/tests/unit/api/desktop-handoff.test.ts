@@ -117,9 +117,7 @@ describe("Desktop handoff consume route", () => {
 			error: { message: "Invalid token" },
 		});
 
-		const response = await POST(
-			createRequest({ tradeId: "t1", token: "tok1" }, "bad-token"),
-		);
+		const response = await POST(createRequest({ tradeId: "t1", token: "tok1" }, "bad-token"));
 
 		expect(response.status).toBe(401);
 		const body = await response.json();

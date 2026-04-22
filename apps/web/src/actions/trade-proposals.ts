@@ -5,16 +5,11 @@ import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import { requireUser } from "@/lib/auth/require-user";
 import { db } from "@/lib/db";
-import { notifications } from "@/lib/db/schema/notifications";
-import {
-	tradeProposalItems,
-	tradeProposals,
-	tradeRequests,
-} from "@/lib/db/schema/trades";
+import { tradeProposalItems, tradeProposals, tradeRequests } from "@/lib/db/schema/trades";
 import { getUserSubscription, isPremium } from "@/lib/entitlements";
 import { safeLimit, tradeRateLimit } from "@/lib/rate-limit";
-import { uuidSchema } from "@/lib/validations/common";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { uuidSchema } from "@/lib/validations/common";
 
 // ---------------------------------------------------------------------------
 // Zod schemas
@@ -70,10 +65,7 @@ async function loadTradeForParticipant(tradeId: string, userId: string) {
 		.where(
 			and(
 				eq(tradeRequests.id, tradeId),
-				or(
-					eq(tradeRequests.requesterId, userId),
-					eq(tradeRequests.providerId, userId),
-				),
+				or(eq(tradeRequests.requesterId, userId), eq(tradeRequests.providerId, userId)),
 			),
 		)
 		.limit(1);
@@ -101,12 +93,8 @@ async function getMaxItemsPerSide(userId: string): Promise<number> {
 /**
  * Validates that all proposal items have declaredQuality set.
  */
-function validateItemQuality(
-	items: Array<{ declaredQuality: string }>,
-): boolean {
-	return items.every(
-		(item) => item.declaredQuality && item.declaredQuality.trim().length > 0,
-	);
+function validateItemQuality(items: Array<{ declaredQuality: string }>): boolean {
+	return items.every((item) => item.declaredQuality && item.declaredQuality.trim().length > 0);
 }
 
 /**
@@ -201,10 +189,7 @@ export async function createProposalAction(input: {
 		}
 
 		// Validate quality declarations
-		if (
-			!validateItemQuality(offerItems) ||
-			!validateItemQuality(wantItems)
-		) {
+		if (!validateItemQuality(offerItems) || !validateItemQuality(wantItems)) {
 			return { error: "All items must have a declared quality." };
 		}
 
@@ -327,10 +312,7 @@ export async function createCounterproposalAction(input: {
 		}
 
 		// Validate quality
-		if (
-			!validateItemQuality(offerItems) ||
-			!validateItemQuality(wantItems)
-		) {
+		if (!validateItemQuality(offerItems) || !validateItemQuality(wantItems)) {
 			return { error: "All items must have a declared quality." };
 		}
 
@@ -375,12 +357,7 @@ export async function createCounterproposalAction(input: {
 		await db
 			.update(tradeProposals)
 			.set({ status: "superseded", updatedAt: new Date() })
-			.where(
-				and(
-					eq(tradeProposals.tradeId, tradeId),
-					eq(tradeProposals.status, "pending"),
-				),
-			);
+			.where(and(eq(tradeProposals.tradeId, tradeId), eq(tradeProposals.status, "pending")));
 
 		// Insert new counterproposal
 		const newSequence = latestProposal.sequenceNumber + 1;
@@ -403,9 +380,7 @@ export async function createCounterproposalAction(input: {
 		await insertProposalItems(proposalRow.id, offerItems, wantItems);
 
 		// Insert notification for the other participant
-		const otherUserId = trade.isRequester
-			? trade.providerId
-			: trade.requesterId;
+		const otherUserId = trade.isRequester ? trade.providerId : trade.requesterId;
 
 		try {
 			const admin = createAdminClient();

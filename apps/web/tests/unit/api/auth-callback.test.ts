@@ -86,9 +86,7 @@ describe("Auth callback route", () => {
 	it("prevents open redirect via absolute URL with protocol (https://evil.com)", async () => {
 		mockExchangeCodeForSession.mockResolvedValue({ error: null });
 
-		const response = await GET(
-			createRequest({ code: "valid-code", next: "https://evil.com" }),
-		);
+		const response = await GET(createRequest({ code: "valid-code", next: "https://evil.com" }));
 
 		const location = response.headers.get("location") ?? "";
 		expect(location).toContain("/onboarding");

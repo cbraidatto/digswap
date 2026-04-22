@@ -9,10 +9,7 @@ type Visibility = "not_trading" | "tradeable" | "private";
 
 const VISIBILITY_CYCLE: Visibility[] = ["not_trading", "tradeable", "private"];
 
-const VISIBILITY_CONFIG: Record<
-	Visibility,
-	{ icon: string; label: string; iconClass: string }
-> = {
+const VISIBILITY_CONFIG: Record<Visibility, { icon: string; label: string; iconClass: string }> = {
 	not_trading: {
 		icon: "swap_horiz",
 		label: "Not Trading",
@@ -84,9 +81,7 @@ export function VisibilitySelector({
 				{config.icon}
 			</span>
 			{!compact && (
-				<span className={`font-mono text-[10px] ${config.iconClass}`}>
-					{config.label}
-				</span>
+				<span className={`font-mono text-[10px] ${config.iconClass}`}>{config.label}</span>
 			)}
 		</button>
 	);

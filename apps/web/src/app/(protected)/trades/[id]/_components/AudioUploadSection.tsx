@@ -9,7 +9,10 @@ interface UploadItem {
 }
 
 interface DesktopBridge {
-	selectAndPrepareAudio(tradeId: string, proposalItemId: string): Promise<{
+	selectAndPrepareAudio(
+		tradeId: string,
+		proposalItemId: string,
+	): Promise<{
 		specs: { format: string; bitrate: number; sampleRate: number; duration: number };
 		sha256: string;
 		previewExpiresAt: string;
@@ -33,7 +36,16 @@ function formatDuration(s: number) {
 
 function MusicIcon() {
 	return (
-		<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+		<svg
+			width="16"
+			height="16"
+			viewBox="0 0 24 24"
+			fill="none"
+			stroke="currentColor"
+			strokeWidth="1.5"
+			strokeLinecap="round"
+			strokeLinejoin="round"
+		>
 			<path d="M9 18V5l12-2v13" />
 			<circle cx="6" cy="18" r="3" />
 			<circle cx="18" cy="16" r="3" />
@@ -43,7 +55,16 @@ function MusicIcon() {
 
 function CheckIcon() {
 	return (
-		<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+		<svg
+			width="14"
+			height="14"
+			viewBox="0 0 24 24"
+			fill="none"
+			stroke="currentColor"
+			strokeWidth="2.5"
+			strokeLinecap="round"
+			strokeLinejoin="round"
+		>
 			<polyline points="20 6 9 17 4 12" />
 		</svg>
 	);
@@ -51,7 +72,16 @@ function CheckIcon() {
 
 function UploadIcon() {
 	return (
-		<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+		<svg
+			width="13"
+			height="13"
+			viewBox="0 0 24 24"
+			fill="none"
+			stroke="currentColor"
+			strokeWidth="2"
+			strokeLinecap="round"
+			strokeLinejoin="round"
+		>
 			<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
 			<polyline points="17 8 12 3 7 8" />
 			<line x1="12" y1="3" x2="12" y2="15" />
@@ -62,7 +92,12 @@ function UploadIcon() {
 export function AudioUploadSection({ tradeId, items }: Props) {
 	const [states, setStates] = useState<Record<string, ItemState>>({});
 	const [errors, setErrors] = useState<Record<string, string>>({});
-	const [specs, setSpecs] = useState<Record<string, { format: string; bitrate: number; sampleRate: number; duration: number; sha256: string }>>({});
+	const [specs, setSpecs] = useState<
+		Record<
+			string,
+			{ format: string; bitrate: number; sampleRate: number; duration: number; sha256: string }
+		>
+	>({});
 
 	const bridge = typeof window !== "undefined" ? getDesktopBridge() : undefined;
 
@@ -88,7 +123,10 @@ export function AudioUploadSection({ tradeId, items }: Props) {
 
 		try {
 			const result = await bridge!.selectAndPrepareAudio(tradeId, item.proposalItemId);
-			setSpecs((s) => ({ ...s, [item.proposalItemId]: { ...result.specs, sha256: result.sha256 } }));
+			setSpecs((s) => ({
+				...s,
+				[item.proposalItemId]: { ...result.specs, sha256: result.sha256 },
+			}));
 			setStates((s) => ({ ...s, [item.proposalItemId]: "done" }));
 		} catch (err) {
 			const msg = err instanceof Error ? err.message : "Upload failed";
@@ -124,7 +162,8 @@ export function AudioUploadSection({ tradeId, items }: Props) {
 			{/* Subtitle */}
 			<div className="px-4 pt-3 pb-1">
 				<p className="text-xs text-muted-foreground">
-					A 2-minute preview will be generated and sent to your trade partner for approval before the full transfer.
+					A 2-minute preview will be generated and sent to your trade partner for approval before
+					the full transfer.
 				</p>
 			</div>
 
@@ -143,19 +182,21 @@ export function AudioUploadSection({ tradeId, items }: Props) {
 								state === "done"
 									? "border-green-500/25 bg-green-500/5"
 									: state === "error"
-									? "border-destructive/30 bg-destructive/5"
-									: "border-outline-variant bg-surface-container-lowest",
+										? "border-destructive/30 bg-destructive/5"
+										: "border-outline-variant bg-surface-container-lowest",
 							].join(" ")}
 						>
 							<div className="p-3 flex items-center justify-between gap-3">
 								{/* Track info */}
 								<div className="flex items-center gap-3 min-w-0">
-									<div className={[
-										"w-8 h-8 rounded flex items-center justify-center flex-shrink-0 transition-colors",
-										state === "done"
-											? "bg-green-500/15 text-green-500"
-											: "bg-surface-container text-muted-foreground",
-									].join(" ")}>
+									<div
+										className={[
+											"w-8 h-8 rounded flex items-center justify-center flex-shrink-0 transition-colors",
+											state === "done"
+												? "bg-green-500/15 text-green-500"
+												: "bg-surface-container text-muted-foreground",
+										].join(" ")}
+									>
 										{state === "done" ? <CheckIcon /> : <MusicIcon />}
 									</div>
 									<div className="min-w-0">
@@ -182,8 +223,8 @@ export function AudioUploadSection({ tradeId, items }: Props) {
 											state === "uploading"
 												? "bg-surface-container text-muted-foreground cursor-not-allowed"
 												: state === "error"
-												? "bg-destructive/15 border border-destructive/40 text-destructive hover:bg-destructive/25"
-												: "bg-amber-400/12 border border-amber-400/40 text-amber-400 hover:bg-amber-400/20 hover:border-amber-400/60",
+													? "bg-destructive/15 border border-destructive/40 text-destructive hover:bg-destructive/25"
+													: "bg-amber-400/12 border border-amber-400/40 text-amber-400 hover:bg-amber-400/20 hover:border-amber-400/60",
 										].join(" ")}
 									>
 										{state === "uploading" ? (
@@ -228,9 +269,7 @@ export function AudioUploadSection({ tradeId, items }: Props) {
 							)}
 
 							{/* Error */}
-							{error && (
-								<p className="px-3 pb-2.5 text-xs text-destructive">{error}</p>
-							)}
+							{error && <p className="px-3 pb-2.5 text-xs text-destructive">{error}</p>}
 						</div>
 					);
 				})}

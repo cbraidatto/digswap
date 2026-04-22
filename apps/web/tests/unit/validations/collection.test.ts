@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import {
-	searchDiscogsSchema,
 	addRecordSchema,
+	searchDiscogsSchema,
 	updateConditionSchema,
 } from "@/lib/validations/collection";
 

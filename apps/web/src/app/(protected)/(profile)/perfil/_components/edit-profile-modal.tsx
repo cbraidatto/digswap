@@ -116,8 +116,15 @@ export function EditProfileModal({ initial }: EditProfileModalProps) {
 			{open && (
 				<div
 					className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4"
-					onClick={(e) => { if (e.target === e.currentTarget) setOpen(false); }}
-					role="presentation"
+					onClick={(e) => {
+						if (e.target === e.currentTarget) setOpen(false);
+					}}
+					onKeyDown={(e) => {
+						if (e.key === "Escape") setOpen(false);
+					}}
+					role="button"
+					tabIndex={-1}
+					aria-label="Close modal"
 				>
 					<div className="w-full max-w-md bg-surface-container-low border border-outline/20 rounded-lg overflow-hidden">
 						{/* Header */}

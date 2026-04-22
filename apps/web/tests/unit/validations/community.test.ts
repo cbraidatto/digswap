@@ -1,14 +1,14 @@
 import { describe, expect, it } from "vitest";
 import {
+	createGroupSchema,
 	createPostSchema,
 	createReviewSchema,
-	createGroupSchema,
-	groupIdSchema,
-	inviteUserSchema,
-	inviteTokenSchema,
-	groupMemberSchema,
-	loadGroupPostsSchema,
 	genreFilterSchema,
+	groupIdSchema,
+	groupMemberSchema,
+	inviteTokenSchema,
+	inviteUserSchema,
+	loadGroupPostsSchema,
 	releaseIdSchema,
 } from "@/lib/validations/community";
 
@@ -16,7 +16,9 @@ const UUID = "550e8400-e29b-41d4-a716-446655440000";
 
 describe("createPostSchema", () => {
 	it("accepts valid post", () => {
-		expect(createPostSchema.safeParse({ groupId: UUID, content: "Hello world" }).success).toBe(true);
+		expect(createPostSchema.safeParse({ groupId: UUID, content: "Hello world" }).success).toBe(
+			true,
+		);
 	});
 
 	it("rejects empty content", () => {
@@ -24,11 +26,15 @@ describe("createPostSchema", () => {
 	});
 
 	it("rejects content over 5000 chars", () => {
-		expect(createPostSchema.safeParse({ groupId: UUID, content: "a".repeat(5001) }).success).toBe(false);
+		expect(createPostSchema.safeParse({ groupId: UUID, content: "a".repeat(5001) }).success).toBe(
+			false,
+		);
 	});
 
 	it("accepts optional releaseId", () => {
-		expect(createPostSchema.safeParse({ groupId: UUID, content: "Post", releaseId: UUID }).success).toBe(true);
+		expect(
+			createPostSchema.safeParse({ groupId: UUID, content: "Post", releaseId: UUID }).success,
+		).toBe(true);
 	});
 });
 
@@ -43,15 +49,21 @@ describe("createReviewSchema", () => {
 	});
 
 	it("rejects rating below 1", () => {
-		expect(createReviewSchema.safeParse({ releaseId: UUID, rating: 0, body: "Bad" }).success).toBe(false);
+		expect(createReviewSchema.safeParse({ releaseId: UUID, rating: 0, body: "Bad" }).success).toBe(
+			false,
+		);
 	});
 
 	it("rejects rating above 5", () => {
-		expect(createReviewSchema.safeParse({ releaseId: UUID, rating: 6, body: "Bad" }).success).toBe(false);
+		expect(createReviewSchema.safeParse({ releaseId: UUID, rating: 6, body: "Bad" }).success).toBe(
+			false,
+		);
 	});
 
 	it("rejects empty body", () => {
-		expect(createReviewSchema.safeParse({ releaseId: UUID, rating: 3, body: "" }).success).toBe(false);
+		expect(createReviewSchema.safeParse({ releaseId: UUID, rating: 3, body: "" }).success).toBe(
+			false,
+		);
 	});
 });
 

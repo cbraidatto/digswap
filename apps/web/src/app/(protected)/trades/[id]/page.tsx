@@ -3,13 +3,16 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { markTradeThreadRead } from "@/actions/trade-messages";
+import { getCounterpartyPreviews } from "@/actions/trade-preview";
 import { db } from "@/lib/db";
 import { profiles } from "@/lib/db/schema/users";
 import { createClient } from "@/lib/supabase/server";
 import { getTradeParticipantContext, getTradeThread } from "@/lib/trades/messages";
 import { deriveTradePresence } from "@/lib/trades/presence";
 import { getProposalHistory } from "@/lib/trades/proposal-queries";
-import { getCounterpartyPreviews } from "@/actions/trade-preview";
+import { AudioUploadSection } from "./_components/AudioUploadSection";
+import { DevTradePanel } from "./_components/DevTradePanel";
+import { PreviewApprovalSection } from "./_components/PreviewApprovalSection";
 import { ProposalActionBar } from "./_components/ProposalActionBar";
 import { ProposalHistoryThread } from "./_components/ProposalHistoryThread";
 import { TradeActionButtons } from "./_components/TradeActionButtons";
@@ -18,11 +21,8 @@ import { TradeMessageComposer } from "./_components/TradeMessageComposer";
 import { TradeMessageThread } from "./_components/TradeMessageThread";
 import { TradePresenceIndicator } from "./_components/TradePresenceIndicator";
 import { TradeReviewForm } from "./_components/TradeReviewForm";
-import { AudioUploadSection } from "./_components/AudioUploadSection"
-import { DevTradePanel } from "./_components/DevTradePanel"
-import { PreviewApprovalSection } from "./_components/PreviewApprovalSection"
-import { TransferSection } from "./_components/TransferSection"
 import { TradeStatusWatcher } from "./_components/TradeStatusWatcher";
+import { TransferSection } from "./_components/TransferSection";
 
 export const metadata: Metadata = {
 	title: "Trade — DigSwap",
@@ -119,9 +119,7 @@ export default async function TradeDetailPage({ params }: Props) {
 
 			{/* Proposal action bar — accept/decline/counter for pending proposal */}
 			{(() => {
-				const pendingProposal = proposalHistory.findLast(
-					(p) => p.status === "pending",
-				);
+				const pendingProposal = proposalHistory.findLast((p) => p.status === "pending");
 				if (!pendingProposal) return null;
 				return (
 					<div className="mb-4">
@@ -136,27 +134,28 @@ export default async function TradeDetailPage({ params }: Props) {
 			})()}
 
 			{/* Audio upload section — shown when trade is in lobby (both sides accepted) */}
-			{thread.status === "lobby" && (() => {
-				const acceptedProposal = proposalHistory.findLast((p) => p.status === "accepted");
-				if (!acceptedProposal) return null;
-				// Proposer uploads their "offer" items; non-proposer uploads the "want" items
-				// (which are the records the non-proposer owns)
-				const isProposer = acceptedProposal.proposerId === user.id;
-				const uploadSide = isProposer ? "offer" : "want";
-				const uploadItems = acceptedProposal.items
-					.filter((item) => item.side === uploadSide)
-					.map((item) => ({
-						proposalItemId: item.id,
-						title: item.title ?? "Unknown",
-						artist: item.artist ?? "",
-					}));
-				if (uploadItems.length === 0) return null;
-				return (
-					<div className="mb-4">
-						<AudioUploadSection tradeId={thread.tradeId} items={uploadItems} />
-					</div>
-				);
-			})()}
+			{thread.status === "lobby" &&
+				(() => {
+					const acceptedProposal = proposalHistory.findLast((p) => p.status === "accepted");
+					if (!acceptedProposal) return null;
+					// Proposer uploads their "offer" items; non-proposer uploads the "want" items
+					// (which are the records the non-proposer owns)
+					const isProposer = acceptedProposal.proposerId === user.id;
+					const uploadSide = isProposer ? "offer" : "want";
+					const uploadItems = acceptedProposal.items
+						.filter((item) => item.side === uploadSide)
+						.map((item) => ({
+							proposalItemId: item.id,
+							title: item.title ?? "Unknown",
+							artist: item.artist ?? "",
+						}));
+					if (uploadItems.length === 0) return null;
+					return (
+						<div className="mb-4">
+							<AudioUploadSection tradeId={thread.tradeId} items={uploadItems} />
+						</div>
+					);
+				})()}
 
 			{/* Transfer section — P2P file transfer via desktop bridge */}
 			{thread.status === "transferring" && (

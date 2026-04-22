@@ -84,9 +84,7 @@ export function ProposalItemCard({
 							</span>
 						)}
 						{audioLine && (
-							<span className="font-mono text-[9px] text-muted-foreground/70">
-								{audioLine}
-							</span>
+							<span className="font-mono text-[9px] text-muted-foreground/70">{audioLine}</span>
 						)}
 					</div>
 				</div>

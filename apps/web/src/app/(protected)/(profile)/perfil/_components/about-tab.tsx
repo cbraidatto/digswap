@@ -37,7 +37,7 @@ interface AboutTabProps {
 }
 
 export function AboutTab({
-	userId,
+	userId: _userId,
 	profile,
 	stats,
 	wantlistItems,

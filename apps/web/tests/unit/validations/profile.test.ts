@@ -1,10 +1,10 @@
 import { describe, expect, it } from "vitest";
 import {
-	updateProfileSchema,
+	coverPositionSchema,
+	holyGrailsSchema,
 	showcaseSearchSchema,
 	showcaseSlotSchema,
-	holyGrailsSchema,
-	coverPositionSchema,
+	updateProfileSchema,
 } from "@/lib/validations/profile";
 
 const UUID = "550e8400-e29b-41d4-a716-446655440000";
@@ -31,7 +31,9 @@ describe("updateProfileSchema", () => {
 	});
 
 	it("accepts HTTPS youtubeUrl", () => {
-		expect(updateProfileSchema.safeParse({ youtubeUrl: "https://youtube.com/@user" }).success).toBe(true);
+		expect(updateProfileSchema.safeParse({ youtubeUrl: "https://youtube.com/@user" }).success).toBe(
+			true,
+		);
 	});
 
 	it("accepts HTTPS websiteUrl", () => {

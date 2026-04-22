@@ -1,4 +1,4 @@
-import { describe, expect, it, vi, beforeEach } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 
 // Mock dependencies before importing the module under test
 vi.mock("@/lib/supabase/admin", () => ({
@@ -35,7 +35,11 @@ function makeTrack(overrides: Partial<TrackSyncPayload> = {}): TrackSyncPayload 
 
 describe("processSyncBatch", () => {
 	let processSyncBatch: typeof import("./process-sync-batch").processSyncBatch;
-	let mockDb: { select: ReturnType<typeof vi.fn>; insert: ReturnType<typeof vi.fn>; update: ReturnType<typeof vi.fn> };
+	let mockDb: {
+		select: ReturnType<typeof vi.fn>;
+		insert: ReturnType<typeof vi.fn>;
+		update: ReturnType<typeof vi.fn>;
+	};
 	let mockAdminClient: { from: ReturnType<typeof vi.fn> };
 
 	beforeEach(async () => {
@@ -48,7 +52,9 @@ describe("processSyncBatch", () => {
 		mockAdminClient = {
 			from: vi.fn().mockReturnThis(),
 		};
-		vi.mocked(createAdminClient).mockReturnValue(mockAdminClient as unknown as ReturnType<typeof createAdminClient>);
+		vi.mocked(createAdminClient).mockReturnValue(
+			mockAdminClient as unknown as ReturnType<typeof createAdminClient>,
+		);
 
 		mockDb = dbModule.db as unknown as typeof mockDb;
 

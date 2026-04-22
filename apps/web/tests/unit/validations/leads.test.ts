@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { saveLeadSchema, getLeadSchema, getLeadsFilterSchema } from "@/lib/validations/leads";
+import { getLeadSchema, getLeadsFilterSchema, saveLeadSchema } from "@/lib/validations/leads";
 
 describe("saveLeadSchema", () => {
 	it("accepts valid lead", () => {
@@ -15,7 +15,8 @@ describe("saveLeadSchema", () => {
 	it("accepts all valid targetTypes", () => {
 		for (const t of ["release", "user", "radar_match"]) {
 			expect(
-				saveLeadSchema.safeParse({ targetType: t, targetId: "x", note: null, status: "watching" }).success,
+				saveLeadSchema.safeParse({ targetType: t, targetId: "x", note: null, status: "watching" })
+					.success,
 			).toBe(true);
 		}
 	});
@@ -23,14 +24,16 @@ describe("saveLeadSchema", () => {
 	it("accepts all valid statuses", () => {
 		for (const s of ["watching", "contacted", "dead_end", "found"]) {
 			expect(
-				saveLeadSchema.safeParse({ targetType: "release", targetId: "x", note: null, status: s }).success,
+				saveLeadSchema.safeParse({ targetType: "release", targetId: "x", note: null, status: s })
+					.success,
 			).toBe(true);
 		}
 	});
 
 	it("rejects invalid targetType", () => {
 		expect(
-			saveLeadSchema.safeParse({ targetType: "invalid", targetId: "x", status: "watching" }).success,
+			saveLeadSchema.safeParse({ targetType: "invalid", targetId: "x", status: "watching" })
+				.success,
 		).toBe(false);
 	});
 

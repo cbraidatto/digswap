@@ -22,7 +22,7 @@ interface CollectionGridProps {
 export function CollectionGrid({
 	items,
 	isOwner,
-	renderAction,
+	renderAction: _renderAction,
 	filterToIds,
 	viewMode = "list",
 }: CollectionGridProps) {

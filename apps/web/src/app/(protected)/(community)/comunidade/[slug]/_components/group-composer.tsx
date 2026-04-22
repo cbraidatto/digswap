@@ -21,7 +21,7 @@ interface GroupComposerProps {
 	onPostCreated?: (post: GroupPost) => void;
 }
 
-export function GroupComposer({ groupId, groupName, onPostCreated }: GroupComposerProps) {
+export function GroupComposer({ groupId, groupName: _groupName, onPostCreated: _onPostCreated }: GroupComposerProps) {
 	const [content, setContent] = useState("");
 	const [linkedRecord, setLinkedRecord] = useState<LinkedRecord | null>(null);
 	const [isReviewMode, setIsReviewMode] = useState(false);

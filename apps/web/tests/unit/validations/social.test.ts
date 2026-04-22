@@ -1,10 +1,10 @@
 import { describe, expect, it } from "vitest";
 import {
+	exploreFeedSchema,
 	followUserSchema,
 	loadMoreFeedSchema,
-	userIdSchema,
 	searchUsersSchema,
-	exploreFeedSchema,
+	userIdSchema,
 } from "@/lib/validations/social";
 
 const UUID = "550e8400-e29b-41d4-a716-446655440000";

@@ -25,8 +25,7 @@ vi.mock("@/lib/supabase/server", () => ({
 vi.mock("@/lib/validations/discovery", () => ({
 	searchRecordsSchema: {
 		safeParse: vi.fn((val: { term: string }) => {
-			if (val.term && val.term.length >= 2)
-				return { success: true, data: { term: val.term } };
+			if (val.term && val.term.length >= 2) return { success: true, data: { term: val.term } };
 			return { success: false, error: { issues: [{ message: "Too short" }] } };
 		}),
 	},
@@ -52,8 +51,12 @@ vi.mock("@/actions/search-signals", () => ({
 
 const mockSearchRecords = vi.fn(async (..._args: unknown[]) => [{ id: "r1", title: "Jazz LP" }]);
 const mockBrowseRecords = vi.fn(async (..._args: unknown[]) => [{ id: "r2", title: "Funk LP" }]);
-const mockGetSuggestedRecords = vi.fn(async (..._args: unknown[]) => [{ id: "r3", title: "Soul LP" }]);
-const mockGetTrendingRecords = vi.fn(async (..._args: unknown[]) => [{ id: "r4", title: "Rock LP" }]);
+const mockGetSuggestedRecords = vi.fn(async (..._args: unknown[]) => [
+	{ id: "r3", title: "Soul LP" },
+]);
+const mockGetTrendingRecords = vi.fn(async (..._args: unknown[]) => [
+	{ id: "r4", title: "Rock LP" },
+]);
 
 vi.mock("@/lib/discovery/queries", () => ({
 	searchRecords: (...args: unknown[]) => mockSearchRecords(...args),
@@ -62,12 +65,8 @@ vi.mock("@/lib/discovery/queries", () => ({
 	getTrendingRecords: (...args: unknown[]) => mockGetTrendingRecords(...args),
 }));
 
-const {
-	searchRecordsAction,
-	browseRecordsAction,
-	getSuggestionsAction,
-	getTrendingAction,
-} = await import("@/actions/discovery");
+const { searchRecordsAction, browseRecordsAction, getSuggestionsAction, getTrendingAction } =
+	await import("@/actions/discovery");
 
 // ---------------------------------------------------------------------------
 // Tests

@@ -29,7 +29,8 @@ export function AppHeader({ userId, avatarUrl, displayName }: AppHeaderProps) {
 	const [isDesktop, setIsDesktop] = useState(false);
 
 	useEffect(() => {
-		const shell = (window as unknown as { desktopShell?: { isDesktop?: () => boolean } }).desktopShell;
+		const shell = (window as unknown as { desktopShell?: { isDesktop?: () => boolean } })
+			.desktopShell;
 		if (shell?.isDesktop?.()) setIsDesktop(true);
 	}, []);
 
@@ -68,19 +69,19 @@ export function AppHeader({ userId, avatarUrl, displayName }: AppHeaderProps) {
 							</Link>
 						);
 					})}
-						{isDesktop && (
-							<Link
-								href="/biblioteca"
-								className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full font-mono text-[11px] uppercase tracking-wider transition-all duration-200 ${
-									pathname.startsWith("/biblioteca")
-										? "bg-primary/15 text-primary font-semibold"
-										: "text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high/80"
-								}`}
-							>
-								<span className="material-symbols-outlined text-[16px]">library_music</span>
-								<span className="hidden xl:inline">Biblioteca</span>
-							</Link>
-						)}
+					{isDesktop && (
+						<Link
+							href="/biblioteca"
+							className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full font-mono text-[11px] uppercase tracking-wider transition-all duration-200 ${
+								pathname.startsWith("/biblioteca")
+									? "bg-primary/15 text-primary font-semibold"
+									: "text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high/80"
+							}`}
+						>
+							<span className="material-symbols-outlined text-[16px]">library_music</span>
+							<span className="hidden xl:inline">Biblioteca</span>
+						</Link>
+					)}
 				</nav>
 
 				{/* ── Search — centered, takes available space ── */}

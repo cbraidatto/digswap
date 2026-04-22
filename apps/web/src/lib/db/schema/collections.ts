@@ -63,7 +63,9 @@ export const collectionItems = pgTable(
 		uniqueIndex("collection_items_user_release_unique").on(table.userId, table.releaseId),
 		index("collection_items_user_id_idx").on(table.userId),
 		index("collection_items_release_id_idx").on(table.releaseId),
-		index("collection_items_visibility_idx").on(table.visibility).where(sql`visibility = 'tradeable'`),
+		index("collection_items_visibility_idx")
+			.on(table.visibility)
+			.where(sql`visibility = 'tradeable'`),
 		index("collection_items_deleted_at_idx").on(table.deletedAt).where(sql`deleted_at IS NOT NULL`),
 	],
 );

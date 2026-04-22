@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import {
-	GEM_TIERS,
 	computeGemScore,
+	GEM_TIERS,
 	getGemInfo,
 	getGemTier,
 	getGemWeight,

@@ -148,8 +148,7 @@ vi.mock("@/lib/validations/common", () => ({
 		nullable: vi.fn().mockReturnValue({
 			safeParse: vi.fn((v: unknown) => {
 				if (v === null) return { success: true, data: null };
-				const uuidRegex =
-					/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+				const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 				if (typeof v === "string" && uuidRegex.test(v)) {
 					return { success: true, data: v };
 				}
@@ -416,10 +415,7 @@ describe("uploadCoverImage", () => {
 	it("rejects file over 5MB", async () => {
 		const bigContent = new Uint8Array(6 * 1024 * 1024);
 		const formData = new FormData();
-		formData.append(
-			"cover",
-			new File([bigContent], "big.jpg", { type: "image/jpeg" }),
-		);
+		formData.append("cover", new File([bigContent], "big.jpg", { type: "image/jpeg" }));
 		const result = await uploadCoverImage(formData);
 		expect(result.error).toContain("5MB");
 	});
@@ -440,10 +436,7 @@ describe("uploadAvatar", () => {
 	it("rejects file over 2MB", async () => {
 		const bigContent = new Uint8Array(3 * 1024 * 1024);
 		const formData = new FormData();
-		formData.append(
-			"avatar",
-			new File([bigContent], "big.jpg", { type: "image/jpeg" }),
-		);
+		formData.append("avatar", new File([bigContent], "big.jpg", { type: "image/jpeg" }));
 		const result = await uploadAvatar(formData);
 		expect(result.error).toContain("2MB");
 	});

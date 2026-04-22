@@ -5,7 +5,7 @@ import { useCallback, useRef, useState, useTransition } from "react";
 import { type ShowcaseSlot, searchCollectionForShowcase, updateShowcase } from "@/actions/profile";
 import { CoverArt } from "@/components/ui/cover-art";
 
-interface ShowcaseRelease {
+export interface ShowcaseRelease {
 	id: string;
 	discogsId: number | null;
 	title: string;

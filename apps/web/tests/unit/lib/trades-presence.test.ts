@@ -143,9 +143,7 @@ describe("deriveTradePresence", () => {
 
 	it("normalizes lastSeenAt to ISO string", async () => {
 		mockRpcResult = {
-			data: [
-				{ user_id: USER_ME, is_active: true, last_heartbeat_at: "2024-06-01T12:34:56Z" },
-			],
+			data: [{ user_id: USER_ME, is_active: true, last_heartbeat_at: "2024-06-01T12:34:56Z" }],
 			error: null,
 		};
 

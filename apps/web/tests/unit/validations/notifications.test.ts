@@ -1,8 +1,8 @@
 import { describe, expect, it } from "vitest";
 import {
+	notificationIdSchema,
 	notificationPageSchema,
 	recentNotificationsSchema,
-	notificationIdSchema,
 	updatePreferencesSchema,
 } from "@/lib/validations/notifications";
 

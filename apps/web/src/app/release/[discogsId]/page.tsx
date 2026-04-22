@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
+import { BackButton } from "@/components/shell/back-button";
 import { getReviewCountForRelease, getReviewsForRelease } from "@/lib/community/queries";
 import { getReleaseByDiscogsId } from "@/lib/release/queries";
-import { BackButton } from "@/components/shell/back-button";
 import { createClient } from "@/lib/supabase/server";
 import { OwnersSection } from "./_components/owners-section";
 import { ReleaseActions } from "./_components/release-actions";

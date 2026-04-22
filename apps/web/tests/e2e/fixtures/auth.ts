@@ -1,4 +1,4 @@
-import { type Page, test as base, expect } from "@playwright/test";
+import { test as base, expect, type Page } from "@playwright/test";
 
 /**
  * Auth fixture for E2E tests requiring an authenticated session.

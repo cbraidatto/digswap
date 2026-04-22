@@ -1,5 +1,6 @@
 "use server";
 
+import { createClient as createServiceClient } from "@supabase/supabase-js";
 import { and, eq, isNotNull, ne, or } from "drizzle-orm";
 import { requireUser } from "@/lib/auth/require-user";
 import { db } from "@/lib/db";
@@ -7,7 +8,6 @@ import { collectionItems } from "@/lib/db/schema/collections";
 import { releases } from "@/lib/db/schema/releases";
 import { tradeProposalItems, tradeProposals, tradeRequests } from "@/lib/db/schema/trades";
 import { env, publicEnv } from "@/lib/env";
-import { createClient as createServiceClient } from "@supabase/supabase-js";
 
 function serviceClient() {
 	return createServiceClient(publicEnv.NEXT_PUBLIC_SUPABASE_URL, env.SUPABASE_SERVICE_ROLE_KEY);
@@ -94,9 +94,9 @@ export async function getCounterpartyPreviews(tradeId: string): Promise<PreviewI
 
 		const declaredFormat = formatPart?.toUpperCase();
 		const declaredSampleRate = sampleRatePart
-			? (parseFloat(sampleRatePart) * (sampleRatePart.toLowerCase().includes("k") ? 1000 : 1))
+			? parseFloat(sampleRatePart) * (sampleRatePart.toLowerCase().includes("k") ? 1000 : 1)
 			: undefined;
-		const declaredBitrate = bitratePart ? parseInt(bitratePart) : undefined;
+		const declaredBitrate = bitratePart ? parseInt(bitratePart, 10) : undefined;
 
 		// Use proxy URL so Electron doesn't block direct Supabase media loads
 		const proxyUrl = `/api/trade-preview/audio?itemId=${encodeURIComponent(row.id)}`;
@@ -136,7 +136,8 @@ export async function approvePreviewAction(
 			.limit(1);
 
 		if (!trade) return { success: false, error: "Trade not found." };
-		if (trade.status !== "previewing") return { success: false, error: "Trade is not in previewing state." };
+		if (trade.status !== "previewing")
+			return { success: false, error: "Trade is not in previewing state." };
 
 		await db
 			.update(tradeRequests)
@@ -171,7 +172,8 @@ export async function declinePreviewAction(
 			.limit(1);
 
 		if (!trade) return { success: false, error: "Trade not found." };
-		if (trade.status !== "previewing") return { success: false, error: "Trade is not in previewing state." };
+		if (trade.status !== "previewing")
+			return { success: false, error: "Trade is not in previewing state." };
 
 		await db
 			.update(tradeRequests)

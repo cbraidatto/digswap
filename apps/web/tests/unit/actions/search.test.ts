@@ -91,8 +91,19 @@ describe("globalSearchAction", () => {
 	});
 
 	it("returns records and users for valid query", async () => {
-		const mockRecords = [{ id: "r1", discogsId: 123, title: "Blue Train", artist: "Coltrane", coverImageUrl: null, year: 1957 }];
-		const mockUsers = [{ id: "u1", username: "digger1", displayName: "Digger One", avatarUrl: null }];
+		const mockRecords = [
+			{
+				id: "r1",
+				discogsId: 123,
+				title: "Blue Train",
+				artist: "Coltrane",
+				coverImageUrl: null,
+				year: 1957,
+			},
+		];
+		const mockUsers = [
+			{ id: "u1", username: "digger1", displayName: "Digger One", avatarUrl: null },
+		];
 		selectResults = [mockRecords, mockUsers];
 
 		const result = await globalSearchAction("blue train");

@@ -21,7 +21,7 @@ function buildAdminChain() {
 	return chain;
 }
 
-let adminChain = buildAdminChain();
+const adminChain = buildAdminChain();
 let badgeLookupResult: { data: unknown; error: unknown } = {
 	data: { id: "badge-001", name: "First Dig" },
 	error: null,

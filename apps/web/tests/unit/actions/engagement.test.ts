@@ -34,7 +34,16 @@ vi.mock("drizzle-orm", () => ({
 vi.mock("@/lib/db", () => {
 	const chain: Record<string, unknown> = {};
 
-	const methods = ["select", "from", "where", "orderBy", "limit", "innerJoin", "leftJoin", "groupBy"];
+	const methods = [
+		"select",
+		"from",
+		"where",
+		"orderBy",
+		"limit",
+		"innerJoin",
+		"leftJoin",
+		"groupBy",
+	];
 	for (const m of methods) {
 		chain[m] = vi.fn().mockImplementation(() => chain);
 	}
@@ -130,20 +139,50 @@ vi.mock("@/lib/db/schema/collections", () => ({
 }));
 vi.mock("@/lib/db/schema/engagement", () => ({
 	digs: { id: "id", userId: "user_id", feedItemId: "feed_item_id" },
-	diggerDna: { userId: "user_id", topGenres: "top_genres", topDecades: "top_decades", topCountries: "top_countries", rarityProfile: "rarity_profile", avgRarity: "avg_rarity", totalRecords: "total_records", updatedAt: "updated_at" },
+	diggerDna: {
+		userId: "user_id",
+		topGenres: "top_genres",
+		topDecades: "top_decades",
+		topCountries: "top_countries",
+		rarityProfile: "rarity_profile",
+		avgRarity: "avg_rarity",
+		totalRecords: "total_records",
+		updatedAt: "updated_at",
+	},
 }));
 vi.mock("@/lib/db/schema/releases", () => ({
-	releases: { id: "id", genre: "genre", style: "style", year: "year", country: "country", rarityScore: "rarity_score" },
+	releases: {
+		id: "id",
+		genre: "genre",
+		style: "style",
+		year: "year",
+		country: "country",
+		rarityScore: "rarity_score",
+	},
 }));
 vi.mock("@/lib/db/schema/listening-logs", () => ({
-	listeningLogs: { id: "id", userId: "user_id", releaseId: "release_id", caption: "caption", rating: "rating" },
+	listeningLogs: {
+		id: "id",
+		userId: "user_id",
+		releaseId: "release_id",
+		caption: "caption",
+		rating: "rating",
+	},
 }));
 vi.mock("@/lib/db/schema/social", () => ({
-	activityFeed: { id: "id", userId: "user_id", actionType: "action_type", targetType: "target_type", targetId: "target_id", metadata: "metadata" },
+	activityFeed: {
+		id: "id",
+		userId: "user_id",
+		actionType: "action_type",
+		targetType: "target_type",
+		targetId: "target_id",
+		metadata: "metadata",
+	},
 }));
 
-const { toggleDig, getDigState, computeDiggerDna, getDiggerDna, logListening } =
-	await import("@/actions/engagement");
+const { toggleDig, getDigState, computeDiggerDna, getDiggerDna, logListening } = await import(
+	"@/actions/engagement"
+);
 
 // ---------------------------------------------------------------------------
 // Tests
@@ -183,10 +222,7 @@ describe("getDigState", () => {
 
 	it("returns dig states for authenticated user", async () => {
 		// user digs query, counts query
-		selectResults = [
-			[{ feedItemId: FEED_ITEM_ID }],
-			[{ feedItemId: FEED_ITEM_ID, count: 3 }],
-		];
+		selectResults = [[{ feedItemId: FEED_ITEM_ID }], [{ feedItemId: FEED_ITEM_ID, count: 3 }]];
 		const result = await getDigState([FEED_ITEM_ID]);
 		expect(result[FEED_ITEM_ID]).toBeDefined();
 	});

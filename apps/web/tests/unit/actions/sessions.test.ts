@@ -131,8 +131,9 @@ vi.mock("@/lib/validations/sessions", () => ({
 	},
 }));
 
-const { getSessions, terminateSession, enforceSessionLimit, recordSession } =
-	await import("@/actions/sessions");
+const { getSessions, terminateSession, enforceSessionLimit, recordSession } = await import(
+	"@/actions/sessions"
+);
 
 // ---------------------------------------------------------------------------
 // Tests
@@ -199,9 +200,7 @@ describe("terminateSession", () => {
 	});
 
 	it("terminates session successfully", async () => {
-		selectResults = [
-			[{ id: SESSION_DB_ID, userId: USER_ID, sessionId: "jwt-session-to-kill" }],
-		];
+		selectResults = [[{ id: SESSION_DB_ID, userId: USER_ID, sessionId: "jwt-session-to-kill" }]];
 		const result = await terminateSession(SESSION_DB_ID);
 		expect(result.success).toBe(true);
 	});

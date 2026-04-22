@@ -8,7 +8,7 @@ import { EditProfileModal } from "./edit-profile-modal";
 import { FollowList } from "./follow-list";
 import { NowSpinning } from "./now-spinning";
 import { RankCard } from "./rank-card";
-import { ShowcaseCards } from "./showcase-cards";
+import { ShowcaseCards, type ShowcaseRelease } from "./showcase-cards";
 import { SocialLinks } from "./social-links";
 
 interface ProfileHeroProps {
@@ -42,9 +42,9 @@ interface ProfileHeroProps {
 	};
 	topGenres: { genre: string; count: number }[];
 	showcase: {
-		searching: unknown;
-		rarest: unknown;
-		favorite: unknown;
+		searching: ShowcaseRelease | null;
+		rarest: ShowcaseRelease | null;
+		favorite: ShowcaseRelease | null;
 	};
 	badges: UserBadge[];
 	isOwner: boolean;
@@ -284,9 +284,9 @@ export function ProfileHero({
 
 					{/* Showcase */}
 					<ShowcaseCards
-						searching={showcase.searching as any}
-						rarest={showcase.rarest as any}
-						favorite={showcase.favorite as any}
+						searching={showcase.searching}
+						rarest={showcase.rarest}
+						favorite={showcase.favorite}
 						isOwner={isOwner}
 					/>
 				</div>

@@ -104,13 +104,18 @@ describe("generateWrapped", () => {
 		const items = [
 			{ title: "Blue Train", artist: "Coltrane", genre: ["Jazz", "Hard Bop"], rarityScore: 0.8 },
 			{ title: "Kind of Blue", artist: "Miles Davis", genre: ["Jazz"], rarityScore: 0.6 },
-			{ title: "A Love Supreme", artist: "Coltrane", genre: ["Jazz", "Spiritual Jazz"], rarityScore: 0.9 },
+			{
+				title: "A Love Supreme",
+				artist: "Coltrane",
+				genre: ["Jazz", "Spiritual Jazz"],
+				rarityScore: 0.9,
+			},
 		];
 
 		selectResults = [
-			items,                      // collection items
-			[{ count: 5 }],           // reviews count
-			[{ count: 10 }],          // followers gained
+			items, // collection items
+			[{ count: 5 }], // reviews count
+			[{ count: 10 }], // followers gained
 		];
 
 		const result = await generateWrapped(USER_ID, 2025);

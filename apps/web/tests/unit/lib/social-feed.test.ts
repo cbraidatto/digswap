@@ -13,8 +13,15 @@ vi.mock("@/lib/db", () => {
 	const chain: Record<string, unknown> = {};
 
 	const methods = [
-		"select", "selectDistinctOn", "from", "where", "orderBy",
-		"limit", "offset", "innerJoin", "leftJoin",
+		"select",
+		"selectDistinctOn",
+		"from",
+		"where",
+		"orderBy",
+		"limit",
+		"offset",
+		"innerJoin",
+		"leftJoin",
 	];
 	for (const m of methods) {
 		chain[m] = vi.fn().mockImplementation(() => chain);
@@ -78,8 +85,14 @@ vi.mock("@/lib/db/schema/groups", () => ({
 	},
 }));
 
-const { getGlobalFeed, getPersonalFeed, getFollowCounts, getFollowers, getFollowing, checkIsFollowing } =
-	await import("@/lib/social/queries");
+const {
+	getGlobalFeed,
+	getPersonalFeed,
+	getFollowCounts,
+	getFollowers,
+	getFollowing,
+	checkIsFollowing,
+} = await import("@/lib/social/queries");
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -176,10 +189,7 @@ describe("getPersonalFeed", () => {
 
 describe("getFollowCounts", () => {
 	it("returns both following and follower counts", async () => {
-		selectResults = [
-			[{ count: 15 }],
-			[{ count: 42 }],
-		];
+		selectResults = [[{ count: 15 }], [{ count: 42 }]];
 
 		const result = await getFollowCounts(USER_ID);
 		expect(result.followingCount).toBe(15);
@@ -187,10 +197,7 @@ describe("getFollowCounts", () => {
 	});
 
 	it("returns 0 when no follows", async () => {
-		selectResults = [
-			[{ count: 0 }],
-			[{ count: 0 }],
-		];
+		selectResults = [[{ count: 0 }], [{ count: 0 }]];
 
 		const result = await getFollowCounts(USER_ID);
 		expect(result.followingCount).toBe(0);
@@ -208,9 +215,9 @@ describe("getFollowCounts", () => {
 
 describe("getFollowers", () => {
 	it("returns follower profiles", async () => {
-		selectResults = [[
-			{ id: "u-1", username: "crate_digger", displayName: "Crate Digger", avatarUrl: null },
-		]];
+		selectResults = [
+			[{ id: "u-1", username: "crate_digger", displayName: "Crate Digger", avatarUrl: null }],
+		];
 
 		const result = await getFollowers(USER_ID);
 		expect(result).toHaveLength(1);
@@ -227,9 +234,9 @@ describe("getFollowers", () => {
 
 describe("getFollowing", () => {
 	it("returns following profiles", async () => {
-		selectResults = [[
-			{ id: "u-2", username: "vinyl_hunter", displayName: "Vinyl Hunter", avatarUrl: null },
-		]];
+		selectResults = [
+			[{ id: "u-2", username: "vinyl_hunter", displayName: "Vinyl Hunter", avatarUrl: null }],
+		];
 
 		const result = await getFollowing(USER_ID);
 		expect(result).toHaveLength(1);

@@ -24,10 +24,7 @@ function truncate(str: string, max: number): string {
 // Status badge
 // ---------------------------------------------------------------------------
 
-const STATUS_STYLES: Record<
-	string,
-	{ className: string; label: string } | null
-> = {
+const STATUS_STYLES: Record<string, { className: string; label: string } | null> = {
 	pending: {
 		className:
 			"bg-primary/10 text-primary border border-primary/30 text-xs px-1.5 py-0.5 rounded font-mono",
@@ -63,13 +60,7 @@ function StatusBadge({ status }: { status: string }) {
 // Avatar helper
 // ---------------------------------------------------------------------------
 
-function ProposerAvatar({
-	avatarUrl,
-	username,
-}: {
-	avatarUrl: string | null;
-	username: string;
-}) {
+function ProposerAvatar({ avatarUrl, username }: { avatarUrl: string | null; username: string }) {
 	if (avatarUrl) {
 		return (
 			<Image
@@ -117,9 +108,7 @@ function ItemPill({
 				/>
 			) : (
 				<span className="w-6 h-6 rounded bg-surface-container flex-shrink-0 flex items-center justify-center">
-					<span className="material-symbols-outlined text-muted-foreground text-xs">
-						album
-					</span>
+					<span className="material-symbols-outlined text-muted-foreground text-xs">album</span>
 				</span>
 			)}
 			<span className="font-mono text-xs text-foreground truncate max-w-[120px]">
@@ -168,13 +157,8 @@ function ProposalCard({
 		>
 			{/* Header row */}
 			<div className="flex items-center gap-2 flex-wrap mb-3">
-				<ProposerAvatar
-					avatarUrl={proposerAvatarUrl}
-					username={proposerUsername}
-				/>
-				<span className="font-mono text-xs text-foreground font-medium">
-					{proposerUsername}
-				</span>
+				<ProposerAvatar avatarUrl={proposerAvatarUrl} username={proposerUsername} />
+				<span className="font-mono text-xs text-foreground font-medium">{proposerUsername}</span>
 				<span className="font-mono text-xs text-muted-foreground">
 					Round {proposal.sequenceNumber}
 				</span>
@@ -200,9 +184,7 @@ function ProposalCard({
 							/>
 						))}
 						{offerItems.length === 0 && (
-							<span className="font-mono text-xs text-muted-foreground/50 italic">
-								No items
-							</span>
+							<span className="font-mono text-xs text-muted-foreground/50 italic">No items</span>
 						)}
 					</div>
 				</div>
@@ -220,9 +202,7 @@ function ProposalCard({
 							/>
 						))}
 						{wantItems.length === 0 && (
-							<span className="font-mono text-xs text-muted-foreground/50 italic">
-								No items
-							</span>
+							<span className="font-mono text-xs text-muted-foreground/50 italic">No items</span>
 						)}
 					</div>
 				</div>
@@ -231,9 +211,7 @@ function ProposalCard({
 			{/* Optional message */}
 			{proposal.message && (
 				<div className="border-l-2 border-outline-variant pl-3 mt-2">
-					<p className="font-mono text-sm text-muted-foreground italic">
-						{proposal.message}
-					</p>
+					<p className="font-mono text-sm text-muted-foreground italic">{proposal.message}</p>
 				</div>
 			)}
 		</div>
@@ -283,12 +261,8 @@ export function ProposalHistoryThread({
 						<ProposalCard
 							key={proposal.id}
 							proposal={proposal}
-							proposerUsername={
-								isCurrentUser ? currentUserUsername : counterpartyUsername
-							}
-							proposerAvatarUrl={
-								isCurrentUser ? currentUserAvatarUrl : counterpartyAvatarUrl
-							}
+							proposerUsername={isCurrentUser ? currentUserUsername : counterpartyUsername}
+							proposerAvatarUrl={isCurrentUser ? currentUserAvatarUrl : counterpartyAvatarUrl}
 						/>
 					);
 				})}

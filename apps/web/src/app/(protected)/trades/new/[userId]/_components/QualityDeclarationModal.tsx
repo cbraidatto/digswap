@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { Button } from "@/components/ui/button";
 import {
 	Dialog,
 	DialogContent,
@@ -9,7 +10,6 @@ import {
 	DialogHeader,
 	DialogTitle,
 } from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
 import type { TradeableItem } from "@/lib/trades/proposal-queries";
 
 interface QualityDeclarationModalProps {
@@ -115,8 +115,7 @@ export function QualityDeclarationModal({
 					{/* Audio format */}
 					<div className="space-y-2">
 						<label className="text-xs font-mono text-muted-foreground uppercase tracking-wider">
-							Audio Format{" "}
-							<span className="text-muted-foreground/40">(optional)</span>
+							Audio Format <span className="text-muted-foreground/40">(optional)</span>
 						</label>
 						<div className="flex flex-wrap gap-1.5">
 							{AUDIO_FORMATS.map((fmt) => (
@@ -140,8 +139,7 @@ export function QualityDeclarationModal({
 					{showBitDepth && (
 						<div className="space-y-2">
 							<label className="text-xs font-mono text-muted-foreground uppercase tracking-wider">
-								Bit Depth{" "}
-								<span className="text-muted-foreground/40">(optional)</span>
+								Bit Depth <span className="text-muted-foreground/40">(optional)</span>
 							</label>
 							<div className="flex flex-wrap gap-1.5">
 								{BIT_DEPTHS.map((d) => (
@@ -175,8 +173,7 @@ export function QualityDeclarationModal({
 					{/* Condition notes */}
 					<div className="space-y-2">
 						<label className="text-xs font-mono text-muted-foreground uppercase tracking-wider">
-							Notes{" "}
-							<span className="text-muted-foreground/40">(optional)</span>
+							Notes <span className="text-muted-foreground/40">(optional)</span>
 						</label>
 						<textarea
 							value={conditionNotes}

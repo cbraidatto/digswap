@@ -1,10 +1,10 @@
-import type { Metadata } from "next";
 import { eq } from "drizzle-orm";
+import type { Metadata } from "next";
 import { redirect } from "next/navigation";
-import { createClient } from "@/lib/supabase/server";
 import { db } from "@/lib/db";
 import { profiles } from "@/lib/db/schema/users";
 import { getQuotaStatus } from "@/lib/entitlements";
+import { createClient } from "@/lib/supabase/server";
 import { getTradeableCollectionItems } from "@/lib/trades/proposal-queries";
 import { ProposalBuilder } from "./_components/ProposalBuilder";
 
@@ -35,20 +35,19 @@ export default async function NewTradePage({ params, searchParams }: NewTradePag
 	}
 
 	// Fetch both collections + target profile + quota in parallel
-	const [myItems, theirItems, targetProfileRow, quotaStatus] =
-		await Promise.all([
-			getTradeableCollectionItems(user.id),
-			getTradeableCollectionItems(targetUserId),
-			db
-				.select({
-					username: profiles.username,
-					avatarUrl: profiles.avatarUrl,
-				})
-				.from(profiles)
-				.where(eq(profiles.id, targetUserId))
-				.limit(1),
-			getQuotaStatus(user.id),
-		]);
+	const [myItems, theirItems, targetProfileRow, quotaStatus] = await Promise.all([
+		getTradeableCollectionItems(user.id),
+		getTradeableCollectionItems(targetUserId),
+		db
+			.select({
+				username: profiles.username,
+				avatarUrl: profiles.avatarUrl,
+			})
+			.from(profiles)
+			.where(eq(profiles.id, targetUserId))
+			.limit(1),
+		getQuotaStatus(user.id),
+	]);
 
 	const targetProfile = targetProfileRow[0];
 	const targetUsername = targetProfile?.username ?? "Unknown User";

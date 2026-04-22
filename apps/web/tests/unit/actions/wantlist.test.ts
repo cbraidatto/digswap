@@ -117,7 +117,12 @@ vi.mock("@/lib/validations/wantlist", () => ({
 	},
 	addFromYouTubeSchema: {
 		safeParse: vi.fn((data: unknown) => {
-			const d = data as { videoId?: string; title?: string; channelTitle?: string; thumbnail?: string };
+			const d = data as {
+				videoId?: string;
+				title?: string;
+				channelTitle?: string;
+				thumbnail?: string;
+			};
 			if (d?.videoId && d?.title && d?.channelTitle && d?.thumbnail) {
 				return { success: true, data: d };
 			}

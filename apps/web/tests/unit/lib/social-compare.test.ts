@@ -12,10 +12,7 @@ let promiseAllResults: unknown[][] = [];
 vi.mock("@/lib/db", () => {
 	const chain: Record<string, unknown> = {};
 
-	const methods = [
-		"select", "from", "where", "orderBy", "limit",
-		"innerJoin", "leftJoin", "as",
-	];
+	const methods = ["select", "from", "where", "orderBy", "limit", "innerJoin", "leftJoin", "as"];
 	for (const m of methods) {
 		chain[m] = vi.fn().mockImplementation(() => chain);
 	}

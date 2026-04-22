@@ -27,7 +27,10 @@ const {
 	mockAdminInsert,
 } = vi.hoisted(() => {
 	const mockState = {
-		authUser: { id: "aaaa0000-aaaa-4aaa-8aaa-aaaaaaaaaaaa" } as { id: string; email?: string } | null,
+		authUser: { id: "aaaa0000-aaaa-4aaa-8aaa-aaaaaaaaaaaa" } as {
+			id: string;
+			email?: string;
+		} | null,
 		tradeRow: {
 			id: "cccc0000-cccc-4ccc-8ccc-cccccccccccc",
 			requesterId: "aaaa0000-aaaa-4aaa-8aaa-aaaaaaaaaaaa",
@@ -225,9 +228,9 @@ vi.mock("@/lib/supabase/admin", () => ({
 // Import actions (after mocks)
 // ---------------------------------------------------------------------------
 import {
-	createProposalAction,
-	createCounterproposalAction,
 	acceptProposalAction,
+	createCounterproposalAction,
+	createProposalAction,
 	declineProposalAction,
 } from "@/actions/trade-proposals";
 

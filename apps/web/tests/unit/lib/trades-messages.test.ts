@@ -15,8 +15,15 @@ vi.mock("@/lib/db", () => {
 	const chain: Record<string, unknown> = {};
 
 	const methods = [
-		"select", "selectDistinctOn", "from", "where", "orderBy",
-		"limit", "offset", "innerJoin", "leftJoin",
+		"select",
+		"selectDistinctOn",
+		"from",
+		"where",
+		"orderBy",
+		"limit",
+		"offset",
+		"innerJoin",
+		"leftJoin",
 	];
 	for (const m of methods) {
 		chain[m] = vi.fn().mockImplementation(() => chain);
@@ -71,7 +78,12 @@ vi.mock("@/lib/db/schema/users", () => ({
 }));
 
 vi.mock("@/lib/db/schema/social", () => ({
-	follows: { id: "id", followerId: "follower_id", followingId: "following_id", createdAt: "created_at" },
+	follows: {
+		id: "id",
+		followerId: "follower_id",
+		followingId: "following_id",
+		createdAt: "created_at",
+	},
 	activityFeed: { id: "id" },
 }));
 
@@ -79,8 +91,7 @@ vi.mock("@/lib/db/schema/groups", () => ({
 	groupMembers: { groupId: "group_id", userId: "user_id" },
 }));
 
-const { getTradeParticipantContext, getTradeUnreadCount } =
-	await import("@/lib/trades/messages");
+const { getTradeParticipantContext, getTradeUnreadCount } = await import("@/lib/trades/messages");
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -177,10 +188,7 @@ describe("getTradeUnreadCount", () => {
 	});
 
 	it("returns 0 when no unread messages", async () => {
-		selectResults = [
-			[tradeRow()],
-			[{ count: 0 }],
-		];
+		selectResults = [[tradeRow()], [{ count: 0 }]];
 
 		const count = await getTradeUnreadCount(TRADE_ID, USER_A);
 		expect(count).toBe(0);

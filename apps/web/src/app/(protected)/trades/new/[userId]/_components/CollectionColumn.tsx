@@ -1,7 +1,7 @@
 "use client";
 
-import { useMemo, useState } from "react";
 import Link from "next/link";
+import { useMemo, useState } from "react";
 import type { TradeableItem } from "@/lib/trades/proposal-queries";
 import { ProposalItemCard } from "./ProposalItemCard";
 
@@ -28,9 +28,7 @@ export function CollectionColumn({
 		if (!search.trim()) return items;
 		const q = search.toLowerCase();
 		return items.filter(
-			(item) =>
-				item.title.toLowerCase().includes(q) ||
-				item.artist.toLowerCase().includes(q),
+			(item) => item.title.toLowerCase().includes(q) || item.artist.toLowerCase().includes(q),
 		);
 	}, [items, search]);
 
@@ -40,9 +38,7 @@ export function CollectionColumn({
 		<div className="flex flex-col gap-3">
 			{/* Header */}
 			<div className="flex items-center justify-between">
-				<h2 className="font-heading text-base font-bold text-foreground">
-					{title}
-				</h2>
+				<h2 className="font-heading text-base font-bold text-foreground">{title}</h2>
 				<span className="text-xs text-muted-foreground font-mono">
 					{selectedIds.length} / {maxSelectable}
 				</span>
@@ -65,13 +61,9 @@ export function CollectionColumn({
 			{/* Item grid */}
 			{filteredItems.length === 0 ? (
 				<div className="text-center py-10 border border-dashed border-outline-variant rounded">
-					<span className="material-symbols-outlined text-3xl text-muted-foreground/30">
-						album
-					</span>
+					<span className="material-symbols-outlined text-3xl text-muted-foreground/30">album</span>
 					<p className="text-muted-foreground text-sm mt-2">
-						{items.length === 0
-							? "No tradeable records"
-							: "No results match your search"}
+						{items.length === 0 ? "No tradeable records" : "No results match your search"}
 					</p>
 					{items.length === 0 && (
 						<p className="text-muted-foreground/50 text-xs mt-1">

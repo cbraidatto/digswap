@@ -1,14 +1,14 @@
 import { describe, expect, it } from "vitest";
 import {
-	createCrateSchema,
-	updateCrateSchema,
 	addToCrateSchema,
-	crateItemIdSchema,
-	createSetSchema,
-	updateSetTracksSchema,
 	crateIdSchema,
-	toggleCrateVisibilitySchema,
+	crateItemIdSchema,
+	createCrateSchema,
+	createSetSchema,
 	setIdSchema,
+	toggleCrateVisibilitySchema,
+	updateCrateSchema,
+	updateSetTracksSchema,
 } from "@/lib/validations/crates";
 
 const UUID = "550e8400-e29b-41d4-a716-446655440000";
@@ -25,31 +25,40 @@ describe("createCrateSchema", () => {
 
 	it("rejects empty name", () => {
 		expect(
-			createCrateSchema.safeParse({ name: "", date: "2026-04-13", sessionType: "digging_trip" }).success,
+			createCrateSchema.safeParse({ name: "", date: "2026-04-13", sessionType: "digging_trip" })
+				.success,
 		).toBe(false);
 	});
 
 	it("rejects name over 100 chars", () => {
 		expect(
-			createCrateSchema.safeParse({ name: "a".repeat(101), date: "2026-04-13", sessionType: "digging_trip" }).success,
+			createCrateSchema.safeParse({
+				name: "a".repeat(101),
+				date: "2026-04-13",
+				sessionType: "digging_trip",
+			}).success,
 		).toBe(false);
 	});
 
 	it("rejects invalid sessionType", () => {
 		expect(
-			createCrateSchema.safeParse({ name: "Test", date: "2026-04-13", sessionType: "invalid" }).success,
+			createCrateSchema.safeParse({ name: "Test", date: "2026-04-13", sessionType: "invalid" })
+				.success,
 		).toBe(false);
 	});
 
 	it("accepts all valid sessionTypes", () => {
 		for (const t of ["digging_trip", "event_prep", "wish_list", "other"]) {
-			expect(createCrateSchema.safeParse({ name: "Test", date: "2026-04-13", sessionType: t }).success).toBe(true);
+			expect(
+				createCrateSchema.safeParse({ name: "Test", date: "2026-04-13", sessionType: t }).success,
+			).toBe(true);
 		}
 	});
 
 	it("rejects invalid date format", () => {
 		expect(
-			createCrateSchema.safeParse({ name: "Test", date: "13-04-2026", sessionType: "other" }).success,
+			createCrateSchema.safeParse({ name: "Test", date: "13-04-2026", sessionType: "other" })
+				.success,
 		).toBe(false);
 	});
 });
@@ -125,9 +134,7 @@ describe("createSetSchema", () => {
 
 describe("updateSetTracksSchema", () => {
 	it("accepts valid setId + trackOrder", () => {
-		expect(
-			updateSetTracksSchema.safeParse({ setId: UUID, trackOrder: [UUID] }).success,
-		).toBe(true);
+		expect(updateSetTracksSchema.safeParse({ setId: UUID, trackOrder: [UUID] }).success).toBe(true);
 	});
 });
 
@@ -139,7 +146,9 @@ describe("crateIdSchema", () => {
 
 describe("toggleCrateVisibilitySchema", () => {
 	it("accepts valid toggle", () => {
-		expect(toggleCrateVisibilitySchema.safeParse({ crateId: UUID, isPublic: true }).success).toBe(true);
+		expect(toggleCrateVisibilitySchema.safeParse({ crateId: UUID, isPublic: true }).success).toBe(
+			true,
+		);
 	});
 
 	it("rejects missing isPublic", () => {

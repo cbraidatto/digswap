@@ -164,9 +164,7 @@ describe("verifyAndConsumeHandoffToken", () => {
 
 	it("returns false when token is expired", async () => {
 		const pastDate = new Date(Date.now() - 60_000);
-		selectResults = [
-			[{ id: "row-1", expiresAt: pastDate }],
-		];
+		selectResults = [[{ id: "row-1", expiresAt: pastDate }]];
 
 		const result = await verifyAndConsumeHandoffToken("c".repeat(64), TRADE_ID, USER_ID);
 		expect(result).toBe(false);

@@ -46,16 +46,7 @@ vi.mock("@/lib/supabase/admin", () => ({
 				const entry = adminChainResults[adminCallCount] ?? { data: null, error: null };
 				adminCallCount++;
 				const chain: Record<string, unknown> = {};
-				const methods = [
-					"select",
-					"eq",
-					"in",
-					"limit",
-					"delete",
-					"update",
-					"insert",
-					"single",
-				];
+				const methods = ["select", "eq", "in", "limit", "delete", "update", "insert", "single"];
 				for (const m of methods) {
 					chain[m] = vi.fn().mockReturnValue(chain);
 				}

@@ -410,7 +410,13 @@ export async function submitTradeReviewAction(input: {
 // DEV ONLY — force trade status (never call in production)
 // ---------------------------------------------------------------------------
 
-const DEV_ALLOWED_STATUSES = ["lobby", "previewing", "accepted", "transferring", "completed"] as const;
+const DEV_ALLOWED_STATUSES = [
+	"lobby",
+	"previewing",
+	"accepted",
+	"transferring",
+	"completed",
+] as const;
 
 export async function devForceTradeStatusAction(
 	tradeId: string,

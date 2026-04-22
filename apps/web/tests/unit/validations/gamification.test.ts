@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { leaderboardPageSchema, genreLeaderboardSchema } from "@/lib/validations/gamification";
+import { genreLeaderboardSchema, leaderboardPageSchema } from "@/lib/validations/gamification";
 
 describe("leaderboardPageSchema", () => {
 	it("accepts valid page", () => {

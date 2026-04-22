@@ -150,9 +150,7 @@ describe("FREE_TRADE_LIMIT", () => {
 describe("canInitiateTrade", () => {
 	it("allows premium users with no limit", async () => {
 		// getUserSubscription -> readSubscriptionRow
-		selectResults = [
-			[subscriptionRow({ plan: "premium_monthly", status: "active" })],
-		];
+		selectResults = [[subscriptionRow({ plan: "premium_monthly", status: "active" })]];
 
 		const result = await canInitiateTrade(USER_ID);
 		expect(result.allowed).toBe(true);
@@ -161,9 +159,7 @@ describe("canInitiateTrade", () => {
 	});
 
 	it("allows free user under limit", async () => {
-		selectResults = [
-			[subscriptionRow({ plan: "free", tradesThisMonth: 2 })],
-		];
+		selectResults = [[subscriptionRow({ plan: "free", tradesThisMonth: 2 })]];
 
 		const result = await canInitiateTrade(USER_ID);
 		expect(result.allowed).toBe(true);
@@ -173,9 +169,7 @@ describe("canInitiateTrade", () => {
 	});
 
 	it("rejects free user at limit", async () => {
-		selectResults = [
-			[subscriptionRow({ plan: "free", tradesThisMonth: 5 })],
-		];
+		selectResults = [[subscriptionRow({ plan: "free", tradesThisMonth: 5 })]];
 
 		const result = await canInitiateTrade(USER_ID);
 		expect(result.allowed).toBe(false);
@@ -195,9 +189,7 @@ describe("canInitiateTrade", () => {
 describe("checkAndIncrementTradeCount", () => {
 	it("allows premium user without incrementing", async () => {
 		// getUserSubscription -> readSubscriptionRow
-		selectResults = [
-			[subscriptionRow({ plan: "premium_annual", status: "active" })],
-		];
+		selectResults = [[subscriptionRow({ plan: "premium_annual", status: "active" })]];
 
 		const result = await checkAndIncrementTradeCount(USER_ID);
 		expect(result.allowed).toBe(true);
@@ -234,9 +226,7 @@ describe("checkAndIncrementTradeCount", () => {
 
 describe("getQuotaStatus", () => {
 	it("returns premium status with no limit", async () => {
-		selectResults = [
-			[subscriptionRow({ plan: "premium_monthly", status: "active" })],
-		];
+		selectResults = [[subscriptionRow({ plan: "premium_monthly", status: "active" })]];
 
 		const result = await getQuotaStatus(USER_ID);
 		expect(result.isPremium).toBe(true);
@@ -246,9 +236,7 @@ describe("getQuotaStatus", () => {
 	});
 
 	it("returns free user quota with percent", async () => {
-		selectResults = [
-			[subscriptionRow({ plan: "free", tradesThisMonth: 3 })],
-		];
+		selectResults = [[subscriptionRow({ plan: "free", tradesThisMonth: 3 })]];
 
 		const result = await getQuotaStatus(USER_ID);
 		expect(result.isPremium).toBe(false);
@@ -258,9 +246,7 @@ describe("getQuotaStatus", () => {
 	});
 
 	it("caps percentUsed at 100", async () => {
-		selectResults = [
-			[subscriptionRow({ plan: "free", tradesThisMonth: 10 })],
-		];
+		selectResults = [[subscriptionRow({ plan: "free", tradesThisMonth: 10 })]];
 
 		const result = await getQuotaStatus(USER_ID);
 		expect(result.percentUsed).toBe(100);

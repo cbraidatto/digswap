@@ -26,7 +26,10 @@ vi.mock("@/lib/validations/onboarding", () => ({
 		safeParse: vi.fn((val: Record<string, unknown>) => {
 			const name = val.display_name as string;
 			if (!name || name.length < 3 || name.length > 50) {
-				return { success: false, error: { issues: [{ message: "Display name must be 3-50 characters" }] } };
+				return {
+					success: false,
+					error: { issues: [{ message: "Display name must be 3-50 characters" }] },
+				};
 			}
 			return { success: true, data: { display_name: name, avatar_url: val.avatar_url ?? null } };
 		}),
@@ -70,7 +73,13 @@ vi.mock("@/lib/db", () => {
 });
 
 vi.mock("@/lib/db/schema/users", () => ({
-	profiles: { id: "id", displayName: "display_name", avatarUrl: "avatar_url", onboardingCompleted: "onboarding_completed", updatedAt: "updated_at" },
+	profiles: {
+		id: "id",
+		displayName: "display_name",
+		avatarUrl: "avatar_url",
+		onboardingCompleted: "onboarding_completed",
+		updatedAt: "updated_at",
+	},
 }));
 
 const { updateProfile, completeOnboarding, skipToStep } = await import("@/actions/onboarding");
@@ -111,7 +120,9 @@ describe("updateProfile", () => {
 	});
 
 	it("accepts profile with avatar URL", async () => {
-		const result = await updateProfile(makeFormData("CoolDigger", "https://example.com/avatar.jpg"));
+		const result = await updateProfile(
+			makeFormData("CoolDigger", "https://example.com/avatar.jpg"),
+		);
 		expect(result.success).toBe(true);
 	});
 });

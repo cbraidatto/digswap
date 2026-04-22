@@ -6,7 +6,7 @@ import { BadgeRow } from "./badge-row";
 import { FollowList } from "./follow-list";
 import { NowSpinning } from "./now-spinning";
 import { RankCard } from "./rank-card";
-import { ShowcaseCards } from "./showcase-cards";
+import { ShowcaseCards, type ShowcaseRelease } from "./showcase-cards";
 import { SocialLinks } from "./social-links";
 
 interface ProfileSidebarProps {
@@ -34,9 +34,9 @@ interface ProfileSidebarProps {
 		contributionScore: number;
 	};
 	showcase: {
-		searching: unknown;
-		rarest: unknown;
-		favorite: unknown;
+		searching: ShowcaseRelease | null;
+		rarest: ShowcaseRelease | null;
+		favorite: ShowcaseRelease | null;
 	};
 	badges: UserBadge[];
 	isOwner: boolean;
@@ -180,9 +180,9 @@ export function ProfileSidebar({ profile, stats, showcase, badges, isOwner }: Pr
 					Showcase
 				</p>
 				<ShowcaseCards
-					searching={showcase.searching as any}
-					rarest={showcase.rarest as any}
-					favorite={showcase.favorite as any}
+					searching={showcase.searching}
+					rarest={showcase.rarest}
+					favorite={showcase.favorite}
 					isOwner={isOwner}
 					compact
 				/>

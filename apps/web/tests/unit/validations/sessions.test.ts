@@ -1,8 +1,8 @@
 import { describe, expect, it } from "vitest";
 import {
-	sessionIdSchema,
 	enforceSessionLimitSchema,
 	recordSessionSchema,
+	sessionIdSchema,
 } from "@/lib/validations/sessions";
 
 const UUID = "550e8400-e29b-41d4-a716-446655440000";
@@ -47,8 +47,6 @@ describe("recordSessionSchema", () => {
 	});
 
 	it("rejects empty sessionId", () => {
-		expect(
-			recordSessionSchema.safeParse({ userId: UUID, sessionId: "" }).success,
-		).toBe(false);
+		expect(recordSessionSchema.safeParse({ userId: UUID, sessionId: "" }).success).toBe(false);
 	});
 });

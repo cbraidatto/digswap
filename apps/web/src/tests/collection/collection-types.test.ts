@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
-import type { CollectionItem } from "@/lib/collection/queries";
 import type { CollectionFilters } from "@/lib/collection/filters";
 import { collectionFilterSchema, VISIBILITY_OPTIONS } from "@/lib/collection/filters";
+import type { CollectionItem } from "@/lib/collection/queries";
 
 /**
  * Type-level + runtime tests for visibility and quality metadata on CollectionItem.

@@ -1,9 +1,9 @@
 import { describe, expect, it } from "vitest";
 import {
-	uuidSchema,
 	paginationSchema,
-	urlSchema,
 	sanitizeWildcards,
+	urlSchema,
+	uuidSchema,
 } from "@/lib/validations/common";
 
 describe("uuidSchema", () => {

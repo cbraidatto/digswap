@@ -113,7 +113,7 @@ export async function generateWrapped(userId: string, year?: number): Promise<Wr
 			? {
 					title: sorted[0].title,
 					artist: sorted[0].artist,
-					rarityScore: sorted[0].rarityScore!,
+					rarityScore: sorted[0].rarityScore ?? 0,
 				}
 			: null;
 

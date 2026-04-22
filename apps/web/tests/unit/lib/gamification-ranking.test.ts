@@ -2,9 +2,9 @@ import { describe, expect, it } from "vitest";
 import {
 	BADGE_DEFINITIONS,
 	CONTRIBUTION_POINTS,
-	RANK_TITLES,
 	computeGlobalScore,
 	getRankTitleFromScore,
+	RANK_TITLES,
 } from "@/lib/gamification/constants";
 
 // ---------------------------------------------------------------------------

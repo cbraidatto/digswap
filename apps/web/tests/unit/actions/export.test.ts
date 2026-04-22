@@ -42,10 +42,28 @@ vi.mock("@/lib/db", () => {
 });
 
 vi.mock("@/lib/db/schema/collections", () => ({
-	collectionItems: { userId: "user_id", releaseId: "release_id", conditionGrade: "condition_grade", addedVia: "added_via", createdAt: "created_at" },
+	collectionItems: {
+		userId: "user_id",
+		releaseId: "release_id",
+		conditionGrade: "condition_grade",
+		addedVia: "added_via",
+		createdAt: "created_at",
+	},
 }));
 vi.mock("@/lib/db/schema/releases", () => ({
-	releases: { id: "id", title: "title", artist: "artist", year: "year", genre: "genre", style: "style", format: "format", label: "label", country: "country", discogsId: "discogs_id", rarityScore: "rarity_score" },
+	releases: {
+		id: "id",
+		title: "title",
+		artist: "artist",
+		year: "year",
+		genre: "genre",
+		style: "style",
+		format: "format",
+		label: "label",
+		country: "country",
+		discogsId: "discogs_id",
+		rarityScore: "rarity_score",
+	},
 }));
 vi.mock("@/lib/db/schema/wantlist", () => ({
 	wantlistItems: { userId: "user_id", releaseId: "release_id", createdAt: "created_at" },

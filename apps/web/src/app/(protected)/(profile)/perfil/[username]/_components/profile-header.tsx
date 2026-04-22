@@ -24,7 +24,7 @@ export function ProfileHeader({
 	profile,
 	followCounts,
 	isFollowing,
-	collectionCount,
+	collectionCount: _collectionCount,
 	ranking,
 	badges,
 }: ProfileHeaderProps) {

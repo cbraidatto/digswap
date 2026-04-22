@@ -155,9 +155,9 @@ describe("Trade preview audio route", () => {
 			from: vi.fn().mockReturnThis(),
 			innerJoin: vi.fn().mockReturnThis(),
 			where: vi.fn().mockReturnThis(),
-			limit: vi.fn().mockResolvedValue([
-				{ previewStoragePath: "previews/audio.wav", tradeId: "trade-1" },
-			]),
+			limit: vi
+				.fn()
+				.mockResolvedValue([{ previewStoragePath: "previews/audio.wav", tradeId: "trade-1" }]),
 		};
 		// Second db.select() call: verify participant
 		const secondChain = {

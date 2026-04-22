@@ -1,8 +1,8 @@
 import { describe, expect, it } from "vitest";
 import {
+	diggerDnaSchema,
 	feedItemIdSchema,
 	feedItemIdsSchema,
-	diggerDnaSchema,
 	getDiggerDnaSchema,
 	logListeningSchema,
 } from "@/lib/validations/engagement";
@@ -77,6 +77,8 @@ describe("logListeningSchema", () => {
 	});
 
 	it("rejects caption over 500 chars", () => {
-		expect(logListeningSchema.safeParse({ releaseId: UUID, caption: "a".repeat(501) }).success).toBe(false);
+		expect(
+			logListeningSchema.safeParse({ releaseId: UUID, caption: "a".repeat(501) }).success,
+		).toBe(false);
 	});
 });

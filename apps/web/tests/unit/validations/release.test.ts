@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { releaseIdSchema, getMoreReviewsSchema } from "@/lib/validations/release";
+import { getMoreReviewsSchema, releaseIdSchema } from "@/lib/validations/release";
 
 const UUID = "550e8400-e29b-41d4-a716-446655440000";
 

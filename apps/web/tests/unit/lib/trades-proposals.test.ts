@@ -14,10 +14,7 @@ let queryCallCount = 0;
 vi.mock("@/lib/db", () => {
 	const chain: Record<string, unknown> = {};
 
-	const methods = [
-		"select", "from", "where", "orderBy", "limit",
-		"innerJoin", "leftJoin",
-	];
+	const methods = ["select", "from", "where", "orderBy", "limit", "innerJoin", "leftJoin"];
 	for (const m of methods) {
 		chain[m] = vi.fn().mockImplementation(() => chain);
 	}
@@ -80,8 +77,9 @@ vi.mock("@/lib/db/schema/releases", () => ({
 	},
 }));
 
-const { getTradeableCollectionItems, getProposalHistory } =
-	await import("@/lib/trades/proposal-queries");
+const { getTradeableCollectionItems, getProposalHistory } = await import(
+	"@/lib/trades/proposal-queries"
+);
 
 // ---------------------------------------------------------------------------
 // Tests
@@ -122,10 +120,34 @@ describe("getTradeableCollectionItems", () => {
 	});
 
 	it("maps multiple items", async () => {
-		selectResults = [[
-			{ id: "ci-1", releaseId: "r-1", title: "A", artist: "X", year: null, coverImageUrl: null, conditionGrade: null, audioFormat: null, bitrate: null, sampleRate: null },
-			{ id: "ci-2", releaseId: "r-2", title: "B", artist: "Y", year: 2020, coverImageUrl: null, conditionGrade: "M", audioFormat: "MP3", bitrate: 320, sampleRate: null },
-		]];
+		selectResults = [
+			[
+				{
+					id: "ci-1",
+					releaseId: "r-1",
+					title: "A",
+					artist: "X",
+					year: null,
+					coverImageUrl: null,
+					conditionGrade: null,
+					audioFormat: null,
+					bitrate: null,
+					sampleRate: null,
+				},
+				{
+					id: "ci-2",
+					releaseId: "r-2",
+					title: "B",
+					artist: "Y",
+					year: 2020,
+					coverImageUrl: null,
+					conditionGrade: "M",
+					audioFormat: "MP3",
+					bitrate: 320,
+					sampleRate: null,
+				},
+			],
+		];
 
 		const result = await getTradeableCollectionItems(VIEWER_ID);
 		expect(result).toHaveLength(2);
@@ -181,11 +203,7 @@ describe("getProposalHistory", () => {
 		// Step 1: trade exists
 		// Step 2: proposals
 		// Step 3: items
-		selectResults = [
-			[{ id: TRADE_ID }],
-			[proposal],
-			[item],
-		];
+		selectResults = [[{ id: TRADE_ID }], [proposal], [item]];
 
 		const result = await getProposalHistory(TRADE_ID, VIEWER_ID);
 		expect(result).toHaveLength(1);
@@ -197,30 +215,48 @@ describe("getProposalHistory", () => {
 
 	it("assembles items to correct proposals", async () => {
 		const prop1 = {
-			id: "prop-1", proposerId: VIEWER_ID, sequenceNumber: 1,
-			status: "rejected", message: null, createdAt: new Date("2024-06-01"),
+			id: "prop-1",
+			proposerId: VIEWER_ID,
+			sequenceNumber: 1,
+			status: "rejected",
+			message: null,
+			createdAt: new Date("2024-06-01"),
 		};
 		const prop2 = {
-			id: "prop-2", proposerId: OTHER_USER, sequenceNumber: 2,
-			status: "pending", message: "Counter", createdAt: new Date("2024-06-02"),
+			id: "prop-2",
+			proposerId: OTHER_USER,
+			sequenceNumber: 2,
+			status: "pending",
+			message: "Counter",
+			createdAt: new Date("2024-06-02"),
 		};
 
 		const item1 = {
-			id: "pi-1", proposalId: "prop-1", side: "offer",
-			collectionItemId: "ci-1", releaseId: "r-1", declaredQuality: null,
-			conditionNotes: null, title: "A", artist: "X", coverImageUrl: null,
+			id: "pi-1",
+			proposalId: "prop-1",
+			side: "offer",
+			collectionItemId: "ci-1",
+			releaseId: "r-1",
+			declaredQuality: null,
+			conditionNotes: null,
+			title: "A",
+			artist: "X",
+			coverImageUrl: null,
 		};
 		const item2 = {
-			id: "pi-2", proposalId: "prop-2", side: "want",
-			collectionItemId: null, releaseId: "r-2", declaredQuality: "M",
-			conditionNotes: null, title: "B", artist: "Y", coverImageUrl: null,
+			id: "pi-2",
+			proposalId: "prop-2",
+			side: "want",
+			collectionItemId: null,
+			releaseId: "r-2",
+			declaredQuality: "M",
+			conditionNotes: null,
+			title: "B",
+			artist: "Y",
+			coverImageUrl: null,
 		};
 
-		selectResults = [
-			[{ id: TRADE_ID }],
-			[prop1, prop2],
-			[item1, item2],
-		];
+		selectResults = [[{ id: TRADE_ID }], [prop1, prop2], [item1, item2]];
 
 		const result = await getProposalHistory(TRADE_ID, VIEWER_ID);
 		expect(result).toHaveLength(2);
@@ -232,8 +268,12 @@ describe("getProposalHistory", () => {
 
 	it("returns proposals with empty items when no items match", async () => {
 		const proposal = {
-			id: "prop-1", proposerId: VIEWER_ID, sequenceNumber: 1,
-			status: "pending", message: null, createdAt: new Date("2024-06-01"),
+			id: "prop-1",
+			proposerId: VIEWER_ID,
+			sequenceNumber: 1,
+			status: "pending",
+			message: null,
+			createdAt: new Date("2024-06-01"),
 		};
 
 		selectResults = [

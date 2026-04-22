@@ -34,7 +34,8 @@ vi.mock("@/lib/db", () => {
 	chain.insert = vi.fn().mockImplementation(() => ({
 		values: vi.fn().mockImplementation(() => ({
 			returning: vi.fn().mockImplementation(() => ({
-				then: (resolve: (v: unknown) => void) => resolve(mockInsertResult ? [mockInsertResult] : []),
+				then: (resolve: (v: unknown) => void) =>
+					resolve(mockInsertResult ? [mockInsertResult] : []),
 			})),
 		})),
 	}));

@@ -133,7 +133,13 @@ export default async function PerfilPage({ searchParams }: PerfilPageProps) {
 		db
 			.select({ weeklyAdds: count() })
 			.from(collectionItems)
-			.where(and(eq(collectionItems.userId, user.id), isNull(collectionItems.deletedAt), gte(collectionItems.createdAt, weekAgo))),
+			.where(
+				and(
+					eq(collectionItems.userId, user.id),
+					isNull(collectionItems.deletedAt),
+					gte(collectionItems.createdAt, weekAgo),
+				),
+			),
 		db
 			.select({ tradesThisWeek: count() })
 			.from(tradeRequests)
@@ -261,10 +267,7 @@ export default async function PerfilPage({ searchParams }: PerfilPageProps) {
 
 							/* ── Trading Tab ── */
 							trading: (
-								<TradingTab
-									tradeableItems={tradeableItems}
-									activeTradeCount={activeTradeCount}
-								/>
+								<TradingTab tradeableItems={tradeableItems} activeTradeCount={activeTradeCount} />
 							),
 
 							/* ── About Tab ── */

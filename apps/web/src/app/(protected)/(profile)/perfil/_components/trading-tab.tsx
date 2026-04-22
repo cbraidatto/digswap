@@ -18,9 +18,7 @@ export function TradingTab({ tradeableItems, activeTradeCount }: TradingTabProps
 						<h3 className="font-mono text-xs text-on-surface-variant uppercase tracking-widest">
 							Tradeable
 						</h3>
-						<span className="font-mono text-[10px] text-primary/60">
-							{tradeableItems.length}
-						</span>
+						<span className="font-mono text-[10px] text-primary/60">{tradeableItems.length}</span>
 					</div>
 				</div>
 

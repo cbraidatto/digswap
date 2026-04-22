@@ -175,7 +175,9 @@ describe("Discogs callback route", () => {
 		const mockSelect = vi.fn().mockReturnValue({ eq: mockSelectEq });
 		const mockInsertSingle = vi.fn().mockResolvedValue({ data: { id: "job-1" } });
 		const mockInsertSelect = vi.fn().mockReturnValue({ single: mockInsertSingle });
-		const mockInsert = vi.fn().mockReturnValue({ select: vi.fn().mockReturnValue({ single: mockInsertSingle }) });
+		const mockInsert = vi
+			.fn()
+			.mockReturnValue({ select: vi.fn().mockReturnValue({ single: mockInsertSingle }) });
 
 		mockAdminFrom.mockImplementation((table: string) => {
 			if (table === "profiles") return { update: mockUpdate };

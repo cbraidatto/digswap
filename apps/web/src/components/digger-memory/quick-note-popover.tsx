@@ -40,7 +40,9 @@ export function QuickNotePopover({ entityType, entityId, children }: QuickNotePo
 
 	return (
 		<Popover open={open} onOpenChange={setOpen}>
-			<PopoverTrigger nativeButton={false} render={<span className="inline-flex" />}>{children}</PopoverTrigger>
+			<PopoverTrigger nativeButton={false} render={<span className="inline-flex" />}>
+				{children}
+			</PopoverTrigger>
 			<PopoverContent className="w-72 p-4 bg-surface-container border-outline-variant/20">
 				<div className="space-y-3">
 					<p className="font-mono text-xs text-primary tracking-[0.15em]">[ADD_NOTE]</p>

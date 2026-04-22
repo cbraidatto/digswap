@@ -1,8 +1,8 @@
 import { describe, expect, it } from "vitest";
 import {
+	addFromYouTubeSchema,
 	addToWantlistSchema,
 	wantlistItemIdSchema,
-	addFromYouTubeSchema,
 } from "@/lib/validations/wantlist";
 
 const UUID = "550e8400-e29b-41d4-a716-446655440000";

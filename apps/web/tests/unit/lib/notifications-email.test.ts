@@ -34,12 +34,7 @@ beforeEach(() => {
 
 describe("sendWantlistMatchEmail", () => {
 	it("sends email with correct parameters", async () => {
-		await sendWantlistMatchEmail(
-			"user@example.com",
-			"Blue Train",
-			"John Coltrane",
-			"digger42",
-		);
+		await sendWantlistMatchEmail("user@example.com", "Blue Train", "John Coltrane", "digger42");
 
 		expect(mockSend).toHaveBeenCalledTimes(1);
 		const call = mockSend.mock.calls[0][0];
@@ -66,12 +61,7 @@ describe("sendWantlistMatchEmail", () => {
 	});
 
 	it("escapes HTML in artist name", async () => {
-		await sendWantlistMatchEmail(
-			"user@example.com",
-			"Title",
-			'Artist & "Friends"',
-			"user1",
-		);
+		await sendWantlistMatchEmail("user@example.com", "Title", 'Artist & "Friends"', "user1");
 
 		expect(mockSend).toHaveBeenCalledTimes(1);
 		const call = mockSend.mock.calls[0][0];
@@ -80,12 +70,7 @@ describe("sendWantlistMatchEmail", () => {
 	});
 
 	it("escapes HTML in username", async () => {
-		await sendWantlistMatchEmail(
-			"user@example.com",
-			"Title",
-			"Artist",
-			"<b>evil</b>",
-		);
+		await sendWantlistMatchEmail("user@example.com", "Title", "Artist", "<b>evil</b>");
 
 		expect(mockSend).toHaveBeenCalledTimes(1);
 		const call = mockSend.mock.calls[0][0];

@@ -5,11 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useTransition } from "react";
 import { toast } from "sonner";
-import {
-	removeRecordFromCollection,
-	setPersonalRating,
-	setVisibility,
-} from "@/actions/collection";
+import { removeRecordFromCollection, setPersonalRating, setVisibility } from "@/actions/collection";
 import { PlayButton } from "@/components/player/play-button";
 import { FormatBadge } from "@/components/ui/format-badge";
 import { GemBadge } from "@/components/ui/gem-badge";
@@ -183,11 +179,7 @@ export function CollectionCard({ item, isOwner }: CollectionCardProps) {
 								</button>
 							))}
 						</div>
-						<VisibilitySelector
-							itemId={item.id}
-							currentVisibility={item.visibility}
-							compact
-						/>
+						<VisibilitySelector itemId={item.id} currentVisibility={item.visibility} compact />
 					</div>
 				)}
 

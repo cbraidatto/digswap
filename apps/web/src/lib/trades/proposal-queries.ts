@@ -2,11 +2,7 @@ import { and, asc, eq, inArray, isNull, or } from "drizzle-orm";
 import { db } from "@/lib/db";
 import { collectionItems } from "@/lib/db/schema/collections";
 import { releases } from "@/lib/db/schema/releases";
-import {
-	tradeProposalItems,
-	tradeProposals,
-	tradeRequests,
-} from "@/lib/db/schema/trades";
+import { tradeProposalItems, tradeProposals, tradeRequests } from "@/lib/db/schema/trades";
 
 // ---------------------------------------------------------------------------
 // Types
@@ -55,9 +51,7 @@ export interface ProposalWithItems {
  * Returns all collection items marked as 'tradeable' for a given user,
  * joined with release metadata for display in the proposal item picker.
  */
-export async function getTradeableCollectionItems(
-	userId: string,
-): Promise<TradeableItem[]> {
+export async function getTradeableCollectionItems(userId: string): Promise<TradeableItem[]> {
 	const rows = await db
 		.select({
 			id: collectionItems.id,
@@ -118,10 +112,7 @@ export async function getProposalHistory(
 		.where(
 			and(
 				eq(tradeRequests.id, tradeId),
-				or(
-					eq(tradeRequests.requesterId, viewerId),
-					eq(tradeRequests.providerId, viewerId),
-				),
+				or(eq(tradeRequests.requesterId, viewerId), eq(tradeRequests.providerId, viewerId)),
 			),
 		)
 		.limit(1);

@@ -65,11 +65,7 @@ vi.mock("@/lib/social/log-activity", () => ({
 // ---------------------------------------------------------------------------
 // Import actions (after mocks are set up)
 // ---------------------------------------------------------------------------
-import {
-	setVisibility,
-	updateQualityMetadata,
-	toggleOpenForTrade,
-} from "@/actions/collection";
+import { setVisibility, toggleOpenForTrade, updateQualityMetadata } from "@/actions/collection";
 
 // ---------------------------------------------------------------------------
 // Reset mocks between tests
@@ -87,25 +83,19 @@ describe("setVisibility", () => {
 	it("updates visibility to tradeable", async () => {
 		const result = await setVisibility(ITEM_ID, "tradeable");
 		expect(result).toEqual({ success: true });
-		expect(mockUpdate).toHaveBeenCalledWith(
-			expect.objectContaining({ visibility: "tradeable" }),
-		);
+		expect(mockUpdate).toHaveBeenCalledWith(expect.objectContaining({ visibility: "tradeable" }));
 	});
 
 	it("updates visibility to private", async () => {
 		const result = await setVisibility(ITEM_ID, "private");
 		expect(result).toEqual({ success: true });
-		expect(mockUpdate).toHaveBeenCalledWith(
-			expect.objectContaining({ visibility: "private" }),
-		);
+		expect(mockUpdate).toHaveBeenCalledWith(expect.objectContaining({ visibility: "private" }));
 	});
 
 	it("updates visibility to not_trading", async () => {
 		const result = await setVisibility(ITEM_ID, "not_trading");
 		expect(result).toEqual({ success: true });
-		expect(mockUpdate).toHaveBeenCalledWith(
-			expect.objectContaining({ visibility: "not_trading" }),
-		);
+		expect(mockUpdate).toHaveBeenCalledWith(expect.objectContaining({ visibility: "not_trading" }));
 	});
 
 	it("rejects invalid visibility value", async () => {
@@ -189,16 +179,12 @@ describe("toggleOpenForTrade backward compat", () => {
 	it("true delegates to tradeable visibility", async () => {
 		const result = await toggleOpenForTrade(ITEM_ID, true);
 		expect(result).toEqual({ success: true });
-		expect(mockUpdate).toHaveBeenCalledWith(
-			expect.objectContaining({ visibility: "tradeable" }),
-		);
+		expect(mockUpdate).toHaveBeenCalledWith(expect.objectContaining({ visibility: "tradeable" }));
 	});
 
 	it("false delegates to not_trading visibility", async () => {
 		const result = await toggleOpenForTrade(ITEM_ID, false);
 		expect(result).toEqual({ success: true });
-		expect(mockUpdate).toHaveBeenCalledWith(
-			expect.objectContaining({ visibility: "not_trading" }),
-		);
+		expect(mockUpdate).toHaveBeenCalledWith(expect.objectContaining({ visibility: "not_trading" }));
 	});
 });

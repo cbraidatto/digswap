@@ -13,7 +13,7 @@ interface CrateHeaderActionsProps {
 
 export function CrateHeaderActions({
 	crateId,
-	crateTitle,
+	crateTitle: _crateTitle,
 	initialIsPublic,
 }: CrateHeaderActionsProps) {
 	const [isPublic, setIsPublic] = useState(initialIsPublic);

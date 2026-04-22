@@ -43,9 +43,7 @@ vi.mock("@/lib/supabase/server", () => ({
 					error: mockVerifyError,
 				})),
 				listFactors: vi.fn(async () => ({
-					data: mockFactorsError
-						? null
-						: { totp: [{ id: FACTOR_ID, status: "verified" }] },
+					data: mockFactorsError ? null : { totp: [{ id: FACTOR_ID, status: "verified" }] },
 					error: mockFactorsError,
 				})),
 				unenroll: vi.fn(async () => ({ error: null })),
@@ -119,7 +117,12 @@ vi.mock("@/lib/db", () => {
 });
 
 vi.mock("@/lib/db/schema/users", () => ({
-	profiles: { id: "id", twoFactorEnabled: "two_factor_enabled", onboardingCompleted: "onboarding_completed", updatedAt: "updated_at" },
+	profiles: {
+		id: "id",
+		twoFactorEnabled: "two_factor_enabled",
+		onboardingCompleted: "onboarding_completed",
+		updatedAt: "updated_at",
+	},
 }));
 vi.mock("@/lib/db/schema/sessions", () => ({
 	backupCodes: { userId: "user_id", used: "used", usedAt: "used_at" },

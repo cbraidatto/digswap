@@ -1,4 +1,17 @@
-import { and, count, countDistinct, desc, eq, gte, ilike, inArray, isNull, ne, or, sql } from "drizzle-orm";
+import {
+	and,
+	count,
+	countDistinct,
+	desc,
+	eq,
+	gte,
+	ilike,
+	inArray,
+	isNull,
+	ne,
+	or,
+	sql,
+} from "drizzle-orm";
 import { getDecadeRange } from "@/lib/collection/filters";
 import { db } from "@/lib/db";
 import { collectionItems } from "@/lib/db/schema/collections";
@@ -327,7 +340,14 @@ export async function getSuggestedRecords(userId: string, limit = 8): Promise<Su
 			})
 			.from(releases)
 			.innerJoin(collectionItems, eq(collectionItems.releaseId, releases.id))
-			.where(and(or(...genreConditions), notOwnedExpr, ne(collectionItems.userId, userId), isNull(collectionItems.deletedAt)))
+			.where(
+				and(
+					or(...genreConditions),
+					notOwnedExpr,
+					ne(collectionItems.userId, userId),
+					isNull(collectionItems.deletedAt),
+				),
+			)
 			.groupBy(
 				releases.id,
 				releases.discogsId,
@@ -377,7 +397,13 @@ export async function getSuggestedRecords(userId: string, limit = 8): Promise<Su
 			})
 			.from(collectionItems)
 			.innerJoin(releases, eq(collectionItems.releaseId, releases.id))
-			.where(and(inArray(collectionItems.userId, followedIds), notOwnedExpr, isNull(collectionItems.deletedAt)))
+			.where(
+				and(
+					inArray(collectionItems.userId, followedIds),
+					notOwnedExpr,
+					isNull(collectionItems.deletedAt),
+				),
+			)
 			.groupBy(
 				releases.id,
 				releases.discogsId,

@@ -9,7 +9,7 @@ interface InviteControlsProps {
 	groupSlug: string;
 }
 
-export function InviteControls({ groupId, groupSlug }: InviteControlsProps) {
+export function InviteControls({ groupId, groupSlug: _groupSlug }: InviteControlsProps) {
 	const [showInviteInput, setShowInviteInput] = useState(false);
 	const [username, setUsername] = useState("");
 	const [inviteError, setInviteError] = useState<string | null>(null);

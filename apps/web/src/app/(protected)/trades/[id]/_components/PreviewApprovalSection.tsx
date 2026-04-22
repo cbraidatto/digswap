@@ -115,12 +115,7 @@ function SpectrogramCanvas({ audioRef }: { audioRef: React.RefObject<HTMLAudioEl
 	}, [audioRef]);
 
 	return (
-		<canvas
-			ref={canvasRef}
-			width={560}
-			height={80}
-			className="w-full h-20 rounded bg-[#0d0a07]"
-		/>
+		<canvas ref={canvasRef} width={560} height={80} className="w-full h-20 rounded bg-[#0d0a07]" />
 	);
 }
 
@@ -186,7 +181,8 @@ function AudioPlayer({
 				>
 					{playing ? (
 						<svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
-							<rect x="6" y="4" width="4" height="16" /><rect x="14" y="4" width="4" height="16" />
+							<rect x="6" y="4" width="4" height="16" />
+							<rect x="14" y="4" width="4" height="16" />
 						</svg>
 					) : (
 						<svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
@@ -240,9 +236,15 @@ function AudioPlayer({
 				onEnded={() => setPlaying(false)}
 				onError={(e) => {
 					const a = e.currentTarget;
-					console.error("[AudioPlayer] media error:", a.error?.code, a.error?.message, "networkState:", a.networkState);
+					console.error(
+						"[AudioPlayer] media error:",
+						a.error?.code,
+						a.error?.message,
+						"networkState:",
+						a.networkState,
+					);
 				}}
-				/>
+			/>
 		</div>
 	);
 }
@@ -260,16 +262,15 @@ function SpecRow({
 	declared: string;
 	actual: string | null;
 }) {
-	const pass =
-		actual !== null &&
-		actual !== "–" &&
-		actual.toLowerCase() !== "unknown";
+	const pass = actual !== null && actual !== "–" && actual.toLowerCase() !== "unknown";
 
 	return (
 		<div className="grid grid-cols-4 gap-2 py-2 border-b border-outline-variant/50 last:border-0 text-xs font-mono">
 			<span className="text-muted-foreground/70 uppercase tracking-wider">{label}</span>
 			<span className="text-muted-foreground">{declared}</span>
-			<span className={actual ? "text-foreground" : "text-muted-foreground/40"}>{actual ?? "–"}</span>
+			<span className={actual ? "text-foreground" : "text-muted-foreground/40"}>
+				{actual ?? "–"}
+			</span>
 			<span className={pass ? "text-primary font-bold" : "text-muted-foreground/40"}>
 				{pass ? "[PASS]" : "[–]"}
 			</span>
@@ -317,7 +318,8 @@ export function PreviewApprovalSection({ tradeId, items }: Props) {
 
 			<div className="px-4 py-3 flex flex-col gap-5">
 				<p className="text-xs text-muted-foreground">
-					Listen to the 2-minute preview. Approve to proceed to file transfer, or decline to cancel the trade.
+					Listen to the 2-minute preview. Approve to proceed to file transfer, or decline to cancel
+					the trade.
 				</p>
 
 				{items.map((item) => (
@@ -367,8 +369,16 @@ export function PreviewApprovalSection({ tradeId, items }: Props) {
 							/>
 							<SpecRow
 								label="Sample Rate"
-								declared={item.declaredSampleRate ? `${(item.declaredSampleRate / 1000).toFixed(1)} kHz` : "–"}
-								actual={item.declaredSampleRate ? `${(item.declaredSampleRate / 1000).toFixed(1)} kHz` : null}
+								declared={
+									item.declaredSampleRate
+										? `${(item.declaredSampleRate / 1000).toFixed(1)} kHz`
+										: "–"
+								}
+								actual={
+									item.declaredSampleRate
+										? `${(item.declaredSampleRate / 1000).toFixed(1)} kHz`
+										: null
+								}
 							/>
 						</div>
 					</div>

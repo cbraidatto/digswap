@@ -96,7 +96,10 @@ export default async function StatsPage() {
 			.where(and(eq(collectionItems.userId, userId), isNull(collectionItems.deletedAt))),
 
 		// Total records
-		db.select({ total: count() }).from(collectionItems).where(and(eq(collectionItems.userId, userId), isNull(collectionItems.deletedAt))),
+		db
+			.select({ total: count() })
+			.from(collectionItems)
+			.where(and(eq(collectionItems.userId, userId), isNull(collectionItems.deletedAt))),
 
 		// Total listens
 		db.select({ total: count() }).from(listeningLogs).where(eq(listeningLogs.userId, userId)),

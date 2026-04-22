@@ -122,7 +122,9 @@ describe("saveLead", () => {
 
 describe("getLead", () => {
 	it("returns lead for authenticated user", async () => {
-		selectResults = [[{ userId: USER_ID, targetType: "release", targetId: TARGET_ID, status: "watching" }]];
+		selectResults = [
+			[{ userId: USER_ID, targetType: "release", targetId: TARGET_ID, status: "watching" }],
+		];
 		const result = await getLead("release", TARGET_ID);
 		expect(result).not.toBeNull();
 	});

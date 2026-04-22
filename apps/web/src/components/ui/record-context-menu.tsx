@@ -190,9 +190,7 @@ export function RecordContextMenu({
 								>
 									<span
 										className={`material-symbols-outlined text-[16px] ${
-											currentVisibility === vi.value
-												? "text-primary"
-												: "text-on-surface-variant"
+											currentVisibility === vi.value ? "text-primary" : "text-on-surface-variant"
 										}`}
 									>
 										{vi.icon}

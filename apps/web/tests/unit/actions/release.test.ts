@@ -81,9 +81,7 @@ vi.mock("@/lib/validations/release", () => ({
 			const d = data as { releaseInternalId?: string };
 			if (
 				d?.releaseInternalId &&
-				/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(
-					d.releaseInternalId,
-				)
+				/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(d.releaseInternalId)
 			) {
 				return { success: true, data: d };
 			}
@@ -133,7 +131,9 @@ describe("searchYouTubeForRelease", () => {
 	});
 
 	it("returns cached videoId when release already has one", async () => {
-		selectResults = [[{ id: RELEASE_ID, title: "Test", artist: "Artist", youtubeVideoId: "abc123" }]];
+		selectResults = [
+			[{ id: RELEASE_ID, title: "Test", artist: "Artist", youtubeVideoId: "abc123" }],
+		];
 		const result = await searchYouTubeForRelease(RELEASE_ID);
 		expect(result.videoId).toBe("abc123");
 		expect(result.error).toBeUndefined();
@@ -147,7 +147,9 @@ describe("searchYouTubeForRelease", () => {
 	});
 
 	it("calls YouTube API and returns videoId when no cache", async () => {
-		selectResults = [[{ id: RELEASE_ID, title: "Blue Train", artist: "Coltrane", youtubeVideoId: null }]];
+		selectResults = [
+			[{ id: RELEASE_ID, title: "Blue Train", artist: "Coltrane", youtubeVideoId: null }],
+		];
 		mockFetch.mockResolvedValueOnce({
 			ok: true,
 			json: async () => ({ items: [{ id: { videoId: "yt-video-1" } }] }),
@@ -158,7 +160,9 @@ describe("searchYouTubeForRelease", () => {
 	});
 
 	it("returns null videoId when YouTube API fails", async () => {
-		selectResults = [[{ id: RELEASE_ID, title: "Blue Train", artist: "Coltrane", youtubeVideoId: null }]];
+		selectResults = [
+			[{ id: RELEASE_ID, title: "Blue Train", artist: "Coltrane", youtubeVideoId: null }],
+		];
 		mockFetch.mockResolvedValueOnce({ ok: false });
 
 		const result = await searchYouTubeForRelease(RELEASE_ID);

@@ -1,4 +1,4 @@
-import { test, expect } from "../e2e/fixtures/auth";
+import { expect, test } from "../e2e/fixtures/auth";
 
 /**
  * Collection management E2E tests.

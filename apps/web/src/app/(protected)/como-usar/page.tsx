@@ -54,7 +54,7 @@ const COLLECTION_GEMS: TutorialStep[] = [
 		title: "Sua Coleção",
 		description:
 			"Veja todos os seus discos com badge de gema, filtro por gênero, década, país e formato, e ordenação por raridade, data ou A-Z. Adicione discos manualmente buscando no catálogo do Discogs. Defina a condição física de cada disco (Mint a Poor).",
-		tip: "Use o filtro de formato para separar LPs de 7\" e 12\". Combine filtros para encontrar exatamente o que procura.",
+		tip: 'Use o filtro de formato para separar LPs de 7" e 12". Combine filtros para encontrar exatamente o que procura.',
 	},
 	{
 		icon: "visibility",
@@ -307,10 +307,10 @@ export default function ComoUsarPage() {
 				</div>
 
 				<p className="font-mono text-xs text-on-surface-variant leading-relaxed max-w-lg">
-					O DigSwap é uma rede social para vinyl diggers. Importe sua coleção do Discogs ou
-					escaneie sua biblioteca local, descubra quem tem os discos que você procura, e
-					conecte-se com a comunidade. O app desktop permite troca de arquivos via P2P e
-					enriquecimento de metadados com IA.
+					O DigSwap é uma rede social para vinyl diggers. Importe sua coleção do Discogs ou escaneie
+					sua biblioteca local, descubra quem tem os discos que você procura, e conecte-se com a
+					comunidade. O app desktop permite troca de arquivos via P2P e enriquecimento de metadados
+					com IA.
 				</p>
 			</div>
 

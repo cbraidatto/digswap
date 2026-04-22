@@ -3,8 +3,16 @@
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 
-interface TransferProgressEvent { bytesReceived: number; totalBytes: number; peerConnected: boolean; }
-interface TransferCompleteEvent { filePath: string; sha256: string; tradeId: string; }
+interface TransferProgressEvent {
+	bytesReceived: number;
+	totalBytes: number;
+	peerConnected: boolean;
+}
+interface TransferCompleteEvent {
+	filePath: string;
+	sha256: string;
+	tradeId: string;
+}
 interface DesktopBridge {
 	startTransfer(tradeId: string): Promise<void>;
 	cancelTransfer(tradeId: string): Promise<void>;
@@ -128,8 +136,17 @@ export function TransferSection({ tradeId }: Props) {
 		return (
 			<div className="rounded-lg border border-secondary/25 bg-secondary/5 p-5 flex items-start gap-4">
 				<div className="w-9 h-9 rounded-full bg-secondary/10 border border-secondary/20 flex items-center justify-center flex-shrink-0 text-secondary mt-0.5">
-					<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-						<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/>
+					<svg
+						width="16"
+						height="16"
+						viewBox="0 0 24 24"
+						fill="none"
+						stroke="currentColor"
+						strokeWidth="1.5"
+					>
+						<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+						<polyline points="7 10 12 15 17 10" />
+						<line x1="12" y1="15" x2="12" y2="3" />
 					</svg>
 				</div>
 				<div>
@@ -147,8 +164,18 @@ export function TransferSection({ tradeId }: Props) {
 		return (
 			<div className="rounded-lg border border-primary/25 overflow-hidden">
 				<div className="px-4 py-3 bg-primary/8 border-b border-primary/20 flex items-center gap-2.5">
-					<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="text-primary">
-						<polyline points="20 6 9 17 4 12"/>
+					<svg
+						width="14"
+						height="14"
+						viewBox="0 0 24 24"
+						fill="none"
+						stroke="currentColor"
+						strokeWidth="2.5"
+						strokeLinecap="round"
+						strokeLinejoin="round"
+						className="text-primary"
+					>
+						<polyline points="20 6 9 17 4 12" />
 					</svg>
 					<span className="text-xs font-mono font-bold uppercase tracking-widest text-primary">
 						Transfer Complete
@@ -188,7 +215,9 @@ export function TransferSection({ tradeId }: Props) {
 									onClick={() => setRating(star)}
 									className={[
 										"text-2xl transition-colors leading-none",
-										star <= rating ? "text-amber-400" : "text-muted-foreground/20 hover:text-amber-400/50",
+										star <= rating
+											? "text-amber-400"
+											: "text-muted-foreground/20 hover:text-amber-400/50",
 									].join(" ")}
 								>
 									★
@@ -234,14 +263,18 @@ export function TransferSection({ tradeId }: Props) {
 
 				{/* Peer indicator */}
 				{(phase === "connecting" || phase === "transferring") && (
-					<span className={[
-						"text-[10px] font-mono flex items-center gap-1.5",
-						peerConnected ? "text-primary" : "text-muted-foreground/50",
-					].join(" ")}>
-						<span className={[
-							"w-1.5 h-1.5 rounded-full flex-shrink-0",
-							peerConnected ? "bg-primary" : "bg-muted-foreground/30 animate-pulse",
-						].join(" ")} />
+					<span
+						className={[
+							"text-[10px] font-mono flex items-center gap-1.5",
+							peerConnected ? "text-primary" : "text-muted-foreground/50",
+						].join(" ")}
+					>
+						<span
+							className={[
+								"w-1.5 h-1.5 rounded-full flex-shrink-0",
+								peerConnected ? "bg-primary" : "bg-muted-foreground/30 animate-pulse",
+							].join(" ")}
+						/>
 						{peerConnected ? "Peer connected" : "Waiting for peer…"}
 					</span>
 				)}
@@ -251,7 +284,8 @@ export function TransferSection({ tradeId }: Props) {
 				{phase === "ready" && (
 					<>
 						<p className="text-xs text-muted-foreground">
-							Both previews were approved. Start the P2P transfer to send or receive the full audio file.
+							Both previews were approved. Start the P2P transfer to send or receive the full audio
+							file.
 						</p>
 						<button
 							type="button"
@@ -268,7 +302,9 @@ export function TransferSection({ tradeId }: Props) {
 						{/* Progress bar */}
 						<div className="flex flex-col gap-1.5">
 							<div className="flex items-center justify-between text-xs font-mono text-muted-foreground">
-								<span>{formatBytes(bytesReceived)} / {totalBytes > 0 ? formatBytes(totalBytes) : "—"}</span>
+								<span>
+									{formatBytes(bytesReceived)} / {totalBytes > 0 ? formatBytes(totalBytes) : "—"}
+								</span>
 								<span>{totalBytes > 0 ? `${progress.toFixed(1)}%` : "—"}</span>
 							</div>
 							<div className="w-full h-2 bg-surface-container rounded-full overflow-hidden">
@@ -297,7 +333,10 @@ export function TransferSection({ tradeId }: Props) {
 						<p className="text-xs text-destructive font-mono">{error}</p>
 						<button
 							type="button"
-							onClick={() => { setPhase("ready"); setError(null); }}
+							onClick={() => {
+								setPhase("ready");
+								setError(null);
+							}}
 							className="text-xs text-muted-foreground/60 hover:text-foreground transition-colors font-mono"
 						>
 							Try again

@@ -133,7 +133,7 @@ export function CoverBanner({ initialCoverUrl, initialPositionY, isOwner }: Cove
 		}
 		window.addEventListener("keydown", onKeyDown);
 		return () => window.removeEventListener("keydown", onKeyDown);
-	}, [isRepositioning]);
+	}, [isRepositioning, handleCancel]);
 
 	async function handleRemove() {
 		if (!confirm("Remover foto de capa?")) return;
@@ -261,7 +261,7 @@ export function CoverBanner({ initialCoverUrl, initialPositionY, isOwner }: Cove
 								}
 							}}
 						>
-							{/* eslint-disable-next-line @next/next/no-img-element */}
+							{/* biome-ignore lint/performance/noImgElement: needs raw <img> for draggable preview + imperative ref; next/image does not support this use case */}
 							<img
 								ref={imgRef}
 								src={pendingPreview}

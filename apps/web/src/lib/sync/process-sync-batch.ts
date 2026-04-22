@@ -63,7 +63,10 @@ export async function processSyncBatch(
 	};
 
 	// Step 1: Group tracks by album key
-	const albumGroups = new Map<string, { tracks: TrackSyncPayload[]; artist: string | null; album: string | null; year: number | null }>();
+	const albumGroups = new Map<
+		string,
+		{ tracks: TrackSyncPayload[]; artist: string | null; album: string | null; year: number | null }
+	>();
 
 	for (const track of tracks) {
 		const key = makeAlbumKey(track.artist, track.album);

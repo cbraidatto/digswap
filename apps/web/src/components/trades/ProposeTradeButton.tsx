@@ -9,10 +9,7 @@ interface ProposeTradeButtonProps {
 	compact?: boolean;
 }
 
-export function ProposeTradeButton({
-	providerId,
-	compact = false,
-}: ProposeTradeButtonProps) {
+export function ProposeTradeButton({ providerId, compact = false }: ProposeTradeButtonProps) {
 	if (compact) {
 		return (
 			<Link
