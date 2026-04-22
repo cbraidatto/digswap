@@ -13,12 +13,12 @@ Requirements for milestone v1.4 (Production Launch). Each maps to exactly one ro
 Independent verification of the baseline before touching any prod infrastructure. Commit `35ed595` claims pre-deploy blockers fixed — this gate verifies that claim.
 
 - [ ] **DEP-AUD-01**: All 4 CI gates green against main (typecheck, build, test, lint)
-- [ ] **DEP-AUD-02**: Migration trail applies cleanly on empty Supabase (`supabase db reset` succeeds end-to-end)
+- [x] **DEP-AUD-02**: Migration trail applies cleanly on empty Supabase (`supabase db reset` succeeds end-to-end)
 - [ ] **DEP-AUD-03**: Cold-start 500 fix from 35ed595 independently verified via curl on public routes (`/`, `/signin`, `/signup`, `/pricing`)
-- [ ] **DEP-AUD-04**: Session revocation E2E passes (logged-out token returns 401 on protected routes within 60s)
+- [x] **DEP-AUD-04**: Session revocation E2E passes (logged-out token returns 401 on protected routes within 60s)
 - [ ] **DEP-AUD-05**: Discogs OAuth tokens encrypted via Supabase Vault (no plaintext fallback in `discogs_tokens`)
 - [ ] **DEP-AUD-06**: Outstanding CSP issue from 2026-03-28 security audit confirmed resolved or documented as accepted risk
-- [ ] **DEP-AUD-07**: Git history scanned — no historical secret commits (service_role, Stripe, handoff)
+- [x] **DEP-AUD-07**: Git history scanned — no historical secret commits (service_role, Stripe, handoff)
 - [ ] **DEP-AUD-08**: Environment variable inventory complete — every var in `.env.local.example` has a planned prod value
 
 ### Supabase Production Setup
@@ -146,12 +146,12 @@ Empty initially. Populated during roadmap creation.
 | Requirement | Phase | Status |
 |-------------|-------|--------|
 | DEP-AUD-01 | Phase 33 | Pending |
-| DEP-AUD-02 | Phase 33 | Pending |
+| DEP-AUD-02 | Phase 33 | Complete |
 | DEP-AUD-03 | Phase 33 | Pending |
-| DEP-AUD-04 | Phase 33 | Pending |
+| DEP-AUD-04 | Phase 33 | Complete |
 | DEP-AUD-05 | Phase 33 | Pending |
 | DEP-AUD-06 | Phase 33 | Pending |
-| DEP-AUD-07 | Phase 33 | Pending |
+| DEP-AUD-07 | Phase 33 | Complete |
 | DEP-AUD-08 | Phase 33 | Pending |
 | DEP-SB-01 | Phase 34 | Pending |
 | DEP-SB-02 | Phase 34 | Pending |

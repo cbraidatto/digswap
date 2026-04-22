@@ -569,7 +569,16 @@ Plans:
   6. Git history scan (`git log --all -p` + gitleaks) finds zero committed secrets across service_role, Stripe, HANDOFF_HMAC_SECRET, IMPORT_WORKER_SECRET, and Discogs credentials
   7. Outstanding CSP issue from 2026-03-28 security audit is confirmed resolved or explicitly documented as accepted risk with sign-off in RUNBOOK.md
   8. Inventory document lists every variable in `.env.local.example` alongside its planned prod value source (Supabase dashboard, Stripe dashboard, `openssl rand -hex 32`, etc.) — zero `TBD` rows
-**Plans**: TBD
+**Plans**: 8 plans
+Plans:
+- [x] 033-01-wave0-drift-fix-scaffolding-PLAN.md — Wave 0: delete orphan drizzle migration, write prod-guard script + ADR-003, scaffold .gitleaks.toml + AUDIT-REPORT.md + evidence/ + session-revocation spec, Docker pre-flight
+- [ ] 033-02-ci-gates-prod-audit-PLAN.md — DEP-AUD-01: run typecheck/lint/test/build + pnpm audit --prod --audit-level high against main HEAD
+- [ ] 033-03-migration-reset-tests-PLAN.md — DEP-AUD-02: supabase db reset on local Docker + throwaway cloud project (the GATE per D-07)
+- [ ] 033-04-cold-start-session-revocation-PLAN.md — DEP-AUD-03 + DEP-AUD-04: cold-start curl on 4 public routes after 15-min idle + Playwright session-revocation E2E
+- [ ] 033-05-vault-discogs-tokens-PLAN.md — DEP-AUD-05: psql probe for plaintext vs Vault-wrapped Discogs token counts on dev
+- [ ] 033-06-csp-re-confirmation-PLAN.md — DEP-AUD-06: curl CSP header + DevTools Console check across 5 routes
+- [ ] 033-07-gitleaks-history-scan-PLAN.md — DEP-AUD-07: gitleaks v8 Docker full-history scan with 7 custom rules
+- [ ] 033-08-env-inventory-finalization-PLAN.md — DEP-AUD-08 + AUDIT-REPORT.md finalization: 25-row env inventory, flip top-of-file verdict to GREEN, populate Sign-Off
 **P0 pitfalls to flag during plan-phase**: Pitfall 1 (service-role NEXT_PUBLIC_ misprefix, grep `.next/static`), Pitfall 2 (`.env.local` committed, gitleaks history scan), Pitfall 3 (migration drift, `supabase db reset` on empty), Pitfall 8 (cold-start 500s, curl verification), Pitfall 10 (session revocation, E2E), Pitfall 11 (Discogs plaintext fallback, Vault check)
 **UI hint**: no
 
@@ -720,7 +729,7 @@ Phases execute in numeric order: 1 → 20 (v1.0), then 21 → 24 (v1.1 Deploy Re
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|----------|
-| 33. Pre-Deploy Audit Gate | 0/0 | Not Started |  |
+| 33. Pre-Deploy Audit Gate | 0/8 | Not Started |  |
 | 34. Supabase Production Setup | 0/0 | Not Started |  |
 | 35. Vercel + Environment Wiring | 0/0 | Not Started |  |
 | 36. DNS + SSL Cutover | 0/0 | Not Started |  |
