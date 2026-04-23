@@ -1,0 +1,10 @@
+
+Running 1 test using 1 worker
+
+[audit] pre-logout status: 200
+[audit] supabase logout status: 204
+[audit] post-logout status: 401 after 344ms
+  ok 1 [chromium] › tests\e2e\audit\session-revocation.audit.spec.ts:24:5 › logged-out JWT is rejected within 60s (9.2s)
+
+  1 passed (10.8s)
+playwright exit=0
