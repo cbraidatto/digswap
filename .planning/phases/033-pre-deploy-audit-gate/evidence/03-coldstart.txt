@@ -1,0 +1,66 @@
+curl loop started at: 2026-04-23T01:55:38Z
+=== / ===
+  % Total    % Received % Xferd  Average Speed  Time    Time    Time   Current
+                                 Dload  Upload  Total   Spent   Left   Speed
+  0      0   0      0   0      0      0      0                              0100  38814   0  38814   0      0 856.6k      0                              0100  38814   0  38814   0      0 854.2k      0                              0100  38814   0  38814   0      0 851.9k      0                              0
+HTTP 200  time_total=0.044493s  time_starttransfer=0.038531s
+--- headers ---
+HTTP/1.1 200 OK
+X-DNS-Prefetch-Control: on
+Strict-Transport-Security: max-age=63072000; includeSubDomains; preload
+X-Frame-Options: DENY
+x-content-type-options: nosniff
+permissions-policy: camera=(), microphone=(), geolocation=()
+content-security-policy: default-src 'self'; script-src 'self' 'nonce-ODkzYzk1ODctZjMyZS00ZDEyLTgxYWMtYTE2MmRlYmJiMDFl' 'strict-dynamic'; style-src 'self' 'nonce-ODkzYzk1ODctZjMyZS00ZDEyLTgxYWMtYTE2MmRlYmJiMDFl' https://fonts.googleapis.com; img-src 'self' data: https://i.discogs.com https://st.discogs.com https://*.supabase.co https://i.ytimg.com; font-src 'self' https://fonts.gstatic.com https://fonts.googleapis.com; connect-src 'self' https://mrkgoucqcbqjhrdjcnpw.supabase.co wss://mrkgoucqcbqjhrdjcnpw.supabase.co; media-src 'self'; worker-src 'self'; frame-src 'self' https://www.youtube-nocookie.com https://www.youtube.com; object-src 'none'; base-uri 'self'; frame-ancestors 'none'; form-action 'self'
+referrer-policy: strict-origin-when-cross-origin
+x-nonce: ODkzYzk1ODctZjMyZS00ZDEyLTgxYWMtYTE2MmRlYmJiMDFl
+Vary: rsc, next-router-state-tree, next-router-prefetch, next-router-segment-prefetch, Accept-Encoding
+=== /signin ===
+  % Total    % Received % Xferd  Average Speed  Time    Time    Time   Current
+                                 Dload  Upload  Total   Spent   Left   Speed
+  0      0   0      0   0      0      0      0                              0100  29831   0  29831   0      0 648.0k      0                              0100  29831   0  29831   0      0 646.5k      0                              0100  29831   0  29831   0      0 644.8k      0                              0
+HTTP 200  time_total=0.045175s  time_starttransfer=0.041399s
+--- headers ---
+HTTP/1.1 200 OK
+X-DNS-Prefetch-Control: on
+Strict-Transport-Security: max-age=63072000; includeSubDomains; preload
+X-Frame-Options: DENY
+x-content-type-options: nosniff
+permissions-policy: camera=(), microphone=(), geolocation=()
+content-security-policy: default-src 'self'; script-src 'self' 'nonce-ZGFkMGFkNmEtMDQ5Zi00MzA4LWE1OTMtMTU3NDZhNzlmNjYz' 'strict-dynamic'; style-src 'self' 'nonce-ZGFkMGFkNmEtMDQ5Zi00MzA4LWE1OTMtMTU3NDZhNzlmNjYz' https://fonts.googleapis.com; img-src 'self' data: https://i.discogs.com https://st.discogs.com https://*.supabase.co https://i.ytimg.com; font-src 'self' https://fonts.gstatic.com https://fonts.googleapis.com; connect-src 'self' https://mrkgoucqcbqjhrdjcnpw.supabase.co wss://mrkgoucqcbqjhrdjcnpw.supabase.co; media-src 'self'; worker-src 'self'; frame-src 'self' https://www.youtube-nocookie.com https://www.youtube.com; object-src 'none'; base-uri 'self'; frame-ancestors 'none'; form-action 'self'
+referrer-policy: strict-origin-when-cross-origin
+x-nonce: ZGFkMGFkNmEtMDQ5Zi00MzA4LWE1OTMtMTU3NDZhNzlmNjYz
+Vary: rsc, next-router-state-tree, next-router-prefetch, next-router-segment-prefetch, Accept-Encoding
+=== /signup ===
+  % Total    % Received % Xferd  Average Speed  Time    Time    Time   Current
+                                 Dload  Upload  Total   Spent   Left   Speed
+  0      0   0      0   0      0      0      0                              0100  31069   0  31069   0      0  1.09M      0                              0100  31069   0  31069   0      0  1.09M      0                              0100  31069   0  31069   0      0  1.08M      0                              0
+HTTP 200  time_total=0.027240s  time_starttransfer=0.024558s
+--- headers ---
+HTTP/1.1 200 OK
+X-DNS-Prefetch-Control: on
+Strict-Transport-Security: max-age=63072000; includeSubDomains; preload
+X-Frame-Options: DENY
+x-content-type-options: nosniff
+permissions-policy: camera=(), microphone=(), geolocation=()
+content-security-policy: default-src 'self'; script-src 'self' 'nonce-MzgxZGUwMWUtOWMwMy00YWM1LTk3YTUtMmZkMmU5M2EwZmI4' 'strict-dynamic'; style-src 'self' 'nonce-MzgxZGUwMWUtOWMwMy00YWM1LTk3YTUtMmZkMmU5M2EwZmI4' https://fonts.googleapis.com; img-src 'self' data: https://i.discogs.com https://st.discogs.com https://*.supabase.co https://i.ytimg.com; font-src 'self' https://fonts.gstatic.com https://fonts.googleapis.com; connect-src 'self' https://mrkgoucqcbqjhrdjcnpw.supabase.co wss://mrkgoucqcbqjhrdjcnpw.supabase.co; media-src 'self'; worker-src 'self'; frame-src 'self' https://www.youtube-nocookie.com https://www.youtube.com; object-src 'none'; base-uri 'self'; frame-ancestors 'none'; form-action 'self'
+referrer-policy: strict-origin-when-cross-origin
+x-nonce: MzgxZGUwMWUtOWMwMy00YWM1LTk3YTUtMmZkMmU5M2EwZmI4
+Vary: rsc, next-router-state-tree, next-router-prefetch, next-router-segment-prefetch, Accept-Encoding
+=== /pricing ===
+  % Total    % Received % Xferd  Average Speed  Time    Time    Time   Current
+                                 Dload  Upload  Total   Spent   Left   Speed
+  0      0   0      0   0      0      0      0                              0100  20954   0  20954   0      0 794.3k      0                              0100  20954   0  20954   0      0 789.4k      0                              0100  20954   0  20954   0      0 784.1k      0                              0
+HTTP 200  time_total=0.026095s  time_starttransfer=0.023812s
+--- headers ---
+HTTP/1.1 200 OK
+X-DNS-Prefetch-Control: on
+Strict-Transport-Security: max-age=63072000; includeSubDomains; preload
+X-Frame-Options: DENY
+x-content-type-options: nosniff
+permissions-policy: camera=(), microphone=(), geolocation=()
+content-security-policy: default-src 'self'; script-src 'self' 'nonce-ZGRjNDkxOGQtODAxNS00OTg1LWIwZjEtNGMxZDIzNWY4YjRh' 'strict-dynamic'; style-src 'self' 'nonce-ZGRjNDkxOGQtODAxNS00OTg1LWIwZjEtNGMxZDIzNWY4YjRh' https://fonts.googleapis.com; img-src 'self' data: https://i.discogs.com https://st.discogs.com https://*.supabase.co https://i.ytimg.com; font-src 'self' https://fonts.gstatic.com https://fonts.googleapis.com; connect-src 'self' https://mrkgoucqcbqjhrdjcnpw.supabase.co wss://mrkgoucqcbqjhrdjcnpw.supabase.co; media-src 'self'; worker-src 'self'; frame-src 'self' https://www.youtube-nocookie.com https://www.youtube.com; object-src 'none'; base-uri 'self'; frame-ancestors 'none'; form-action 'self'
+referrer-policy: strict-origin-when-cross-origin
+x-nonce: ZGRjNDkxOGQtODAxNS00OTg1LWIwZjEtNGMxZDIzNWY4YjRh
+Vary: rsc, next-router-state-tree, next-router-prefetch, next-router-segment-prefetch, Accept-Encoding
+curl loop ended at: 2026-04-23T01:55:39Z

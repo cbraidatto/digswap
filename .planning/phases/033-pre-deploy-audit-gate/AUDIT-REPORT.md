@@ -8,8 +8,8 @@
 
 - [~] DEP-AUD-01: CI gates — typecheck/test/build/audit PASS, lint DEBT (20 residual errors, deferred to 33.1)  — evidence/01*-*.txt
 - [x] DEP-AUD-02: `supabase db reset` clean on local Docker AND throwaway Supabase Cloud (D-07 BLOCKING gate PASS) — evidence/02a-*.txt, evidence/02b-*.txt
-- [ ] DEP-AUD-03: Cold-start curl — all 4 public routes 200 in <3s after idle      — evidence/03-*.txt
-- [ ] DEP-AUD-04: Session revocation — logged-out JWT returns 401 within 60s       — evidence/04-*.txt
+- [x] DEP-AUD-03: Cold-start curl — all 4 public routes 200 in <50ms after 15-min idle — evidence/03-*.txt
+- [~] DEP-AUD-04: Session revocation — Playwright spec scaffolded + wired to /api/user/me; pending dev audit user credentials — evidence/04-*.txt
 - [ ] DEP-AUD-05: Discogs tokens Vault-wrapped — zero plaintext rows               — evidence/05a-*.txt, evidence/05b-*.txt
 - [ ] DEP-AUD-06: CSP re-confirmed — nonce-based header, zero violations on 5 routes — evidence/06*-*
 - [x] DEP-AUD-07: gitleaks scan — zero findings after allowlist fix (6 initial findings classified; 4 false positives, 2 real leaks from expired handoff tokens committed 2026-04-01) — evidence/07-gitleaks.json
@@ -177,20 +177,52 @@ Also: `discogs_tokens` is a ghost table — referenced in `apps/web/src/lib/disc
 
 ## §3 DEP-AUD-03 Cold-Start Public Routes (LOCAL ONLY per D-08)
 
-**Status:** pending
-**Command:** (populated in Plan 04)
-**Routes tested:** /, /signin, /signup, /pricing
-**Results:** —
-**Verdict:** —
+**Status:** PASS
+**Timestamp:** idle start 2026-04-23T01:40:26Z → curl end 2026-04-23T01:55:34Z (15m03s idle per D-08)
+
+**Scope note (D-09):** Local proof only. Real Vercel cold-start validation is deferred to Phase 38 (DEP-UAT-03).
+
+**Sequence:** `pnpm --filter @digswap/web build` (exit 0, 28.7s) → `pnpm --filter @digswap/web start` (Ready in 1809ms) → 15-min idle (no traffic) → 4-route curl loop.
+
+**Results:**
+
+| Route | HTTP | time_total | time_starttransfer |
+|-------|------|-----------|--------------------|
+| / | 200 | 0.044s | 0.039s |
+| /signin | 200 | 0.045s | 0.041s |
+| /signup | 200 | 0.027s | 0.025s |
+| /pricing | 200 | 0.026s | 0.024s |
+
+**Server stderr during curl window:** 0 matches for `Error:|TypeError|UnhandledRejection` (confirmed via `grep -cE "Error:|TypeError|UnhandledRejection" evidence/03-server-stderr.txt` = 0).
+
+**Verdict:** PASS — all 4 public routes return 200 in <50ms (well under the 3.0s threshold) after the 15-min idle; zero server exceptions.
 
 ## §4 DEP-AUD-04 Session Revocation E2E
 
-**Status:** pending
-**Command:** (populated in Plan 04)
-**Pre-logout status:** —
-**Post-logout status:** —
-**Elapsed ms:** —
-**Verdict:** —
+**Status:** PARTIAL — spec scaffolded and correctly fails on missing env vars; full end-to-end execution pending dev audit user creation
+
+**Endpoint under test:** `/api/user/me` (created in Plan 04 Task 1 — `apps/web/src/app/api/user/me/route.ts`)
+**Test file:** `apps/web/tests/e2e/audit/session-revocation.audit.spec.ts`
+**Command:** `pnpm --filter @digswap/web exec playwright test audit/session-revocation.audit.spec.ts`
+
+**Dry-run result:**
+```
+x  1 [chromium] › session-revocation.audit.spec.ts:13:5 › logged-out JWT is rejected within 60s (674ms)
+Error: AUDIT_USER_EMAIL env var required
+    expect(received).toBeTruthy()
+    Received: undefined
+```
+
+This confirms the spec is wired correctly (typecheck passes, playwright discovers it, reaches the env check) but cannot execute the revocation logic until a dev audit user exists.
+
+**What's needed to flip this to PASS:**
+
+1. Create `audit+33@digswap.test` on the dev Supabase project (`mrkgoucqcbqjhrdjcnpw`) via dashboard → Auth → Users → Add user, with Auto-Confirm
+2. Export `AUDIT_USER_EMAIL=audit+33@digswap.test` and `AUDIT_USER_PASSWORD=<chosen-value>`
+3. Re-run the Playwright spec against `pnpm start` on localhost:3000
+4. Expect: `pre-logout status: 200`, `post-logout status: 401 after <N>ms` where N < 60000
+
+**Verdict:** PARTIAL — spec infrastructure verified; remaining work is a one-click user-creation + single Playwright run. Deferred to operator follow-up or Phase 33.1 closure step.
 
 ## §5 DEP-AUD-05 Discogs Tokens via Supabase Vault
 

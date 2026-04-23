@@ -1,0 +1,29 @@
+
+Running 1 test using 1 worker
+
+  x  1 [chromium] › tests\e2e\audit\session-revocation.audit.spec.ts:13:5 › logged-out JWT is rejected within 60s (674ms)
+
+
+  1) [chromium] › tests\e2e\audit\session-revocation.audit.spec.ts:13:5 › logged-out JWT is rejected within 60s 
+
+    Error: AUDIT_USER_EMAIL env var required
+
+    [2mexpect([22m[31mreceived[39m[2m).[22mtoBeTruthy[2m()[22m
+
+    Received: [31mundefined[39m
+
+      14 | 	const AUDIT_EMAIL = process.env.AUDIT_USER_EMAIL;
+      15 | 	const AUDIT_PASSWORD = process.env.AUDIT_USER_PASSWORD;
+    > 16 | 	expect(AUDIT_EMAIL, "AUDIT_USER_EMAIL env var required").toBeTruthy();
+         | 	                                                         ^
+      17 | 	expect(AUDIT_PASSWORD, "AUDIT_USER_PASSWORD env var required").toBeTruthy();
+      18 |
+      19 | 	// 1. Sign in with the audit user
+        at C:\Users\INTEL\Desktop\Get Shit DOne\.claude\worktrees\nice-franklin-2075c5\apps\web\tests\e2e\audit\session-revocation.audit.spec.ts:16:59
+
+  1 failed
+    [chromium] › tests\e2e\audit\session-revocation.audit.spec.ts:13:5 › logged-out JWT is rejected within 60s 
+undefined
+C:\Users\INTEL\Desktop\Get Shit DOne\.claude\worktrees\nice-franklin-2075c5\apps\web:
+ ERR_PNPM_RECURSIVE_EXEC_FIRST_FAIL  Command "playwright" not found
+playwright exit=1
