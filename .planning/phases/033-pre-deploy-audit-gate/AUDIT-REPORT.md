@@ -7,7 +7,7 @@
 ## Checklist
 
 - [~] DEP-AUD-01: CI gates — typecheck/test/build/audit PASS, lint DEBT (20 residual errors, deferred to 33.1)  — evidence/01*-*.txt
-- [F] DEP-AUD-02: `supabase db reset` FAILS — migration trail incomplete (leads table + more missing); deferred to 33.1 reconstruction — evidence/02a-start.txt
+- [~] DEP-AUD-02: `supabase db reset` local PASS (after extensive drift fixes); throwaway cloud reset (D-07) still pending — evidence/02a-reset.txt
 - [ ] DEP-AUD-03: Cold-start curl — all 4 public routes 200 in <3s after idle      — evidence/03-*.txt
 - [ ] DEP-AUD-04: Session revocation — logged-out JWT returns 401 within 60s       — evidence/04-*.txt
 - [ ] DEP-AUD-05: Discogs tokens Vault-wrapped — zero plaintext rows               — evidence/05a-*.txt, evidence/05b-*.txt
@@ -81,12 +81,13 @@ audit exit=0
 
 ## §2 DEP-AUD-02 Supabase Migration Reset
 
-**Status:** FAIL — migration trail fundamentally incomplete; reconstruction deferred to Phase 33.1
+**Status:** Audit 2a (local) PASS · Audit 2b (cloud) pending — D-07 BLOCKING gate not yet attempted
 
 **Local reset command:** `pnpm dlx supabase start` + `supabase db reset`
-**Cloud reset command:** NOT ATTEMPTED (local failed first; D-07 gate blocked)
-**Teardown proof:** N/A
-**Verdict:** FAIL
+**Local result:** `Finished supabase db reset on branch main.` · reset exit=0 · evidence/02a-reset.txt
+**Cloud reset command:** (populated in Plan 03 Task 3 — requires SUPABASE_ORG_ID from Task 2 checkpoint)
+**Teardown proof:** pending (Task 4 checkpoint after Task 3 teardown)
+**Verdict:** PARTIAL — local gate PASS after extensive drift fixes (see Findings below); cloud gate still pending
 
 ### Findings (layered — each fix revealed a deeper issue)
 
@@ -144,6 +145,26 @@ These close Layers 1 and 2 but NOT Layer 3. Reset still fails on the first dev-o
 7. Close DEP-AUD-02 as PASS
 
 **Estimated effort for 33.1 DEP-AUD-02 portion:** 4–8 hours depending on how many hidden tables/columns exist.
+
+### Resolution landed 2026-04-23 (commit 090bdcc)
+
+Local gate ultimately resolved inline inside this plan (against the earlier "deferred to 33.1" call). Seven distinct drift categories surfaced and were fixed:
+
+| # | Symptom | Root cause | Fix |
+|---|---------|------------|-----|
+| 1 | `ERROR: relation "collection_items" does not exist` on 030_purge_soft_deleted.sql | Lexical ordering + drizzle-only base schema | Copied drizzle/0000–0005 into supabase/migrations with pre-dated prefixes; renamed 030_* to 20260419_* |
+| 2 | `CREATE INDEX CONCURRENTLY cannot be executed within a pipeline` | Supabase CLI wraps migrations in a transaction | Removed CONCURRENTLY keyword from 20260105_drizzle_0004_gin_indexes.sql |
+| 3 | `ERROR: relation "leads" does not exist` | `leads` only existed on dev Supabase via ad-hoc drizzle-kit push | Created leads + 5 other drift tables in new 20260107_drift_capture_missing_tables.sql |
+| 4 | `policy "backup_codes_select_own" already exists` | Drizzle/0000 already creates the policy; 20260405 tried to create it again | Prepended `DROP POLICY IF EXISTS` to every CREATE POLICY in 20260405 (later superseded by #6) |
+| 5 | `ERROR: duplicate key value violates unique constraint "schema_migrations_pkey"` | Two files share the same `20260401_` version prefix (trade_messages.sql + trade_presence_rpc.sql) | Renamed 20260401, 20260406, 20260409, 20260416 duplicate-prefix files to 14-digit timestamps (format `YYYYMMDDHHMMSS`) |
+| 6 | `ERROR: column "invited_by" does not exist` (group_invites), then `column "created_by" does not exist` (groups) | 20260405 policies reference columns that never existed — the migration is out-of-sync with the schema | Archived 20260405 to .planning/phases/033-pre-deploy-audit-gate/deprecated-migrations/; added explicit policies for drift tables to 20260107 |
+| 7 | `ERROR: column "open_for_trade" does not exist` on 20260409000002 | 20260415_open_for_trade_and_rating.sql adds the column five dates AFTER 20260409 uses it | Moved 20260415 earlier to 20260405000000 |
+
+Also: `discogs_tokens` is a ghost table — referenced in `apps/web/src/lib/discogs/oauth.ts` but NOT present in drizzle/*.ts schema nor any SQL migration. Inferred schema from `.upsert()` call and added to drift-capture migration.
+
+**ADR-003 is still false as a statement about history.** `supabase/migrations/` was not authoritative as of 2026-04-22; it became authoritative via this plan's work. A 33.1 task should revise ADR-003 to reflect the new state (supabase/migrations now includes a drift-capture migration, drizzle/* is still useful for schema diffing but not as a separate trail).
+
+**Audit 2b (throwaway cloud — D-07 BLOCKING gate) has NOT been attempted yet.** It requires the Task 2 checkpoint (operator runs `supabase login` and captures SUPABASE_ORG_ID) before Task 3's automated provision/link/reset/teardown can run.
 
 ## §3 DEP-AUD-03 Cold-Start Public Routes (LOCAL ONLY per D-08)
 
