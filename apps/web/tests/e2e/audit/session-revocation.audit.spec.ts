@@ -39,12 +39,9 @@ test("logged-out JWT is rejected within 60s", async ({ page }) => {
 	const accessToken = Array.isArray(parsed) ? parsed[0] : parsed.access_token;
 	expect(accessToken, "must extract access_token").toBeTruthy();
 
-	// 3. Confirm the token works BEFORE logout.
-	// Plan 04 will replace PROTECTED_ENDPOINT with a concrete route after grepping
-	// apps/web/src/app/api/*/route.ts for a route NOT in the middleware bypass list
-	// (middleware bypasses /api/stripe/, /api/og/, /api/discogs/import, /api/desktop/).
-	const PROTECTED_ENDPOINT =
-		process.env.AUDIT_PROTECTED_ENDPOINT ?? "http://localhost:3000/api/user/me";
+	// Picked in Plan 04 Task 1: /api/user/me (created specifically for this audit — returns 401 without a valid session).
+	// See .planning/phases/033-pre-deploy-audit-gate/evidence/04-protected-endpoint.txt.
+	const PROTECTED_ENDPOINT = "http://localhost:3000/api/user/me";
 
 	const apiClient = await pwRequest.newContext();
 	const preLogoutResp = await apiClient.get(PROTECTED_ENDPOINT, {

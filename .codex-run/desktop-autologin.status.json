@@ -1,5 +1,0 @@
-{
-  "ok": false,
-  "error": "TimeoutError: page.fill: Timeout 30000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('input#email')\u001b[22m\n",
-  "at": "2026-04-01T01:04:20.450Z"
-}

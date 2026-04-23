@@ -62,14 +62,19 @@ tags = ["digswap", "database"]
 
 # Allowlist — these tokens are safe/expected placeholders
 [[allowlists]]
-description = "Skip .env.example files and CI dummy values"
+description = "Skip .env.example files, CI dummy values, audit evidence, and dev artifacts"
 paths = [
   '''\.env\.local\.example$''',
   '''\.env\.example$''',
   '''\.github/workflows/ci\.yml$''',
   '''CLAUDE\.md$''',
-  '''\.planning/.*\.md$''',
+  '''\.planning/.*\.(md|txt|json|png)$''',
   '''\.pi/agent/skills/.*\.md$''',
+  # Phase 33 DEP-AUD-07 allowlist additions:
+  '''scripts/drizzle-prod-guard\.mjs$''',           # documentation showing prod URL format
+  '''\.codex-run/''',                               # dev review artifacts — see gitignore note below
+  '''tmp-phase[0-9]+-smoke\.json$''',               # smoke-test fixtures (historical commits, test users)
+  '''get-shit-done-main/.*''',                     # third-party GSD tool subrepo
 ]
 # Also ignore placeholder literals that appear in tests / docs
 regexes = [

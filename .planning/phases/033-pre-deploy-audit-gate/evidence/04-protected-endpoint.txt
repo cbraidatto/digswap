@@ -1,0 +1,22 @@
+Phase 33 DEP-AUD-04 Task 1 — protected endpoint selection
+===========================================================
+
+Candidates grepped from apps/web/src/app/api/ (createClient/getUser/getClaims usage):
+  apps/web/src/app/api/auth/callback/route.ts       — OAuth callback, not user-scoped-data
+  apps/web/src/app/api/desktop/handoff/consume/route.ts   — BYPASSED by middleware
+  apps/web/src/app/api/desktop/library/sync/route.ts       — BYPASSED
+  apps/web/src/app/api/desktop/session/exchange/route.ts   — BYPASSED
+  apps/web/src/app/api/desktop/session/route.ts            — BYPASSED
+  apps/web/src/app/api/discogs/callback/route.ts           — OAuth callback, not user-scoped-data
+  apps/web/src/app/api/trade-preview/audio/route.ts        — user-scoped but streaming media, unsuitable
+
+None of the existing endpoints returns a clean user-scoped JSON (401 on logout). Per RESEARCH.md
+§Audit 4 Open Question 1, the canonical recommendation is to create /api/user/me that returns
+the current user id+email (401 when no session).
+
+Created: apps/web/src/app/api/user/me/route.ts
+  - GET handler calls `createClient()` (server-side supabase ssr)
+  - `await supabase.auth.getUser()` and returns 401 when user is null
+  - Returns { id, email } when authenticated
+
+CHOSEN: /api/user/me

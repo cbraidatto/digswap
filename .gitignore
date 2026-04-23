@@ -93,3 +93,7 @@ tmp/
 *.png
 !apps/web/public/*.png
 !apps/desktop/resources/*.png
+
+# Phase 33 DEP-AUD-07 — ensure dev-review artifacts + smoke fixtures stay out of git
+.codex-run/
+tmp-phase*-smoke.json
