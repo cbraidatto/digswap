@@ -1,0 +1,364 @@
+
+> @digswap/web@0.1.0 lint C:\Users\INTEL\Desktop\Get Shit DOne\.claude\worktrees\nice-franklin-2075c5\apps\web
+> biome check src/ tests/
+
+src\app\(protected)\(profile)\perfil\page.tsx:91:6 lint/correctness/noUnusedVariables ━━━━━━━━━━━━━━
+
+  ! This variable weeklyAdds is unused.
+  
+    89 │ 		gemDistribution,
+    90 │ 		gemScore,
+  > 91 │ 		[{ weeklyAdds }],
+       │ 		   ^^^^^^^^^^
+    92 │ 		[{ tradesThisWeek }],
+    93 │ 		[{ wantlistFound }],
+  
+  i Unused variables are often the result of typos, incomplete refactors, or other sources of bugs.
+  
+
+src\app\(protected)\(profile)\perfil\page.tsx:92:6 lint/correctness/noUnusedVariables ━━━━━━━━━━━━━━
+
+  ! This variable tradesThisWeek is unused.
+  
+    90 │ 		gemScore,
+    91 │ 		[{ weeklyAdds }],
+  > 92 │ 		[{ tradesThisWeek }],
+       │ 		   ^^^^^^^^^^^^^^
+    93 │ 		[{ wantlistFound }],
+    94 │ 	] = await Promise.all([
+  
+  i Unused variables are often the result of typos, incomplete refactors, or other sources of bugs.
+  
+
+src\app\(protected)\(profile)\perfil\page.tsx:93:6 lint/correctness/noUnusedVariables ━━━━━━━━━━━━━━
+
+  ! This variable wantlistFound is unused.
+  
+    91 │ 		[{ weeklyAdds }],
+    92 │ 		[{ tradesThisWeek }],
+  > 93 │ 		[{ wantlistFound }],
+       │ 		   ^^^^^^^^^^^^^
+    94 │ 	] = await Promise.all([
+    95 │ 		getCollectionPage(user.id, filters),
+  
+  i Unused variables are often the result of typos, incomplete refactors, or other sources of bugs.
+  
+
+src\app\(protected)\(profile)\perfil\stats\page.tsx:204:38 lint/style/noNonNullAssertion ━━━━━━━━━━━
+
+  ! Forbidden non-null assertion.
+  
+    202 │ 					{topLabels.length > 0 ? (
+    203 │ 						topLabels.map((l) => (
+  > 204 │ 							<StatRow key={l.label} label={l.label!} count={l.count} max={maxLabelCount} />
+        │ 							                              ^^^^^^^^
+    205 │ 						))
+    206 │ 					) : (
+  
+
+src\app\(protected)\biblioteca\page.tsx:125:39 lint/correctness/noUnusedFunctionParameters  FIXABLE  ━━━━━━━━━━
+
+  ! This parameter is unused.
+  
+    123 │ 	}, []);
+    124 │ 
+  > 125 │ 	const startScan = useCallback(async (folder: string, mode: "incremental" | "full") => {
+        │ 	                                     ^^^^^^
+    126 │ 		const bridge = bridgeRef.current;
+    127 │ 		if (!bridge) return;
+  
+  i Unused parameters might be the result of an incomplete refactoring.
+  
+  i Unsafe fix: If this is intentional, prepend folder with an underscore.
+  
+    123 123 │     }, []);
+    124 124 │   
+    125     │ - → const·startScan·=·useCallback(async·(folder:·string,·mode:·"incremental"·|·"full")·=>·{
+        125 │ + → const·startScan·=·useCallback(async·(_folder:·string,·mode:·"incremental"·|·"full")·=>·{
+    126 126 │       const bridge = bridgeRef.current;
+    127 127 │       if (!bridge) return;
+  
+
+src\app\(protected)\settings\_components\notification-preferences.tsx:203:41 lint/style/noNonNullAssertion ━━━━━━━━━━
+
+  ! Forbidden non-null assertion.
+  
+    201 │ 										disabled={!group.enabled}
+    202 │ 										aria-disabled={!group.enabled}
+  > 203 │ 										onChange={(e) => handleToggle(group.emailField!, e.target.checked)}
+        │ 										                              ^^^^^^^^^^^^^^^^^
+    204 │ 									/>
+    205 │ 									<span className="font-mono text-xs text-on-surface-variant">Email</span>
+  
+
+src\app\(protected)\trades\[id]\_components\AudioUploadSection.tsx:125:25 lint/style/noNonNullAssertion  FIXABLE  ━━━━━━━━━━
+
+  ! Forbidden non-null assertion.
+  
+    124 │ 		try {
+  > 125 │ 			const result = await bridge!.selectAndPrepareAudio(tradeId, item.proposalItemId);
+        │ 			                     ^^^^^^^
+    126 │ 			setSpecs((s) => ({
+    127 │ 				...s,
+  
+  i Unsafe fix: Replace with optional chain operator ?. This operator includes runtime checks, so it is safer than the compile-only non-null assertion operator
+  
+    123 123 │   
+    124 124 │       try {
+    125     │ - → → → const·result·=·await·bridge!.selectAndPrepareAudio(tradeId,·item.proposalItemId);
+        125 │ + → → → const·result·=·await·bridge?.selectAndPrepareAudio(tradeId,·item.proposalItemId);
+    126 126 │         setSpecs((s) => ({
+    127 127 │           ...s,
+  
+
+src\app\(protected)\trades\[id]\_components\PreviewApprovalSection.tsx:60:53 lint/style/noNonNullAssertion ━━━━━━━━━━
+
+  ! Forbidden non-null assertion.
+  
+    58 │ 			analyserRef.current = analyser;
+    59 │ 
+  > 60 │ 			const source = audioCtx.createMediaElementSource(audio!);
+       │ 			                                                 ^^^^^^
+    61 │ 			sourceRef.current = source;
+    62 │ 			source.connect(analyser);
+  
+
+src\app\(protected)\trades\[id]\_components\PreviewApprovalSection.tsx:86:5 lint/style/noNonNullAssertion ━━━━━━━━━━
+
+  ! Forbidden non-null assertion.
+  
+    84 │ 				const h = canvas.height;
+    85 │ 
+  > 86 │ 				ctx2d!.fillStyle = "rgba(13, 10, 7, 0.3)";
+       │ 				^^^^^^
+    87 │ 				ctx2d!.fillRect(0, 0, w, h);
+    88 │ 
+  
+
+src\app\(protected)\trades\[id]\_components\TradeDetailHeader.tsx:27:8 lint/correctness/noUnusedVariables  FIXABLE  ━━━━━━━━━━
+
+  ! This variable isTerminal is unused.
+  
+    25 │ export function TradeDetailHeader({ thread }: Props) {
+    26 │ 	const status = STATUS_CONFIG[thread.status] ?? STATUS_CONFIG.pending;
+  > 27 │ 	const isTerminal = TERMINAL_STATUSES.has(thread.status);
+       │ 	      ^^^^^^^^^^
+    28 │ 
+    29 │ 	return (
+  
+  i Unused variables are often the result of typos, incomplete refactors, or other sources of bugs.
+  
+  i Unsafe fix: If this is intentional, prepend isTerminal with an underscore.
+  
+    25 25 │   export function TradeDetailHeader({ thread }: Props) {
+    26 26 │     const status = STATUS_CONFIG[thread.status] ?? STATUS_CONFIG.pending;
+    27    │ - → const·isTerminal·=·TERMINAL_STATUSES.has(thread.status);
+       27 │ + → const·_isTerminal·=·TERMINAL_STATUSES.has(thread.status);
+    28 28 │   
+    29 29 │     return (
+  
+
+src\app\(protected)\trades\[id]\_components\TradeStatusWatcher.tsx:12:10 lint/correctness/noUnusedVariables  FIXABLE  ━━━━━━━━━━
+
+  ! This function getDesktopShell is unused.
+  
+    10 │ }
+    11 │ 
+  > 12 │ function getDesktopShell(): DesktopShell | undefined {
+       │          ^^^^^^^^^^^^^^^
+    13 │ 	return (window as Window & { desktopShell?: DesktopShell }).desktopShell;
+    14 │ }
+  
+  i Unused variables are often the result of typos, incomplete refactors, or other sources of bugs.
+  
+  i Unsafe fix: If this is intentional, prepend getDesktopShell with an underscore.
+  
+    10 10 │   }
+    11 11 │   
+    12    │ - function·getDesktopShell():·DesktopShell·|·undefined·{
+       12 │ + function·_getDesktopShell():·DesktopShell·|·undefined·{
+    13 13 │   	return (window as Window & { desktopShell?: DesktopShell }).desktopShell;
+    14 14 │   }
+  
+
+src\app\(protected)\(community)\comunidade\[slug]\_components\group-composer.tsx format ━━━━━━━━━━━━
+
+  × Formatter would have printed the following content:
+  
+     22  22 │   }
+     23  23 │   
+     24     │ - export·function·GroupComposer({·groupId,·groupName:·_groupName,·onPostCreated:·_onPostCreated·}:·GroupComposerProps)·{
+         24 │ + export·function·GroupComposer({
+         25 │ + → groupId,
+         26 │ + → groupName:·_groupName,
+         27 │ + → onPostCreated:·_onPostCreated,
+         28 │ + }:·GroupComposerProps)·{
+     25  29 │     const [content, setContent] = useState("");
+     26  30 │     const [linkedRecord, setLinkedRecord] = useState<LinkedRecord | null>(null);
+  
+
+src\app\(protected)\(community)\join\[token]\invite-accept-button.tsx format ━━━━━━━━━━━━━━━━━━━━━━━
+
+  × Formatter would have printed the following content:
+  
+    12 12 │   }
+    13 13 │   
+    14    │ - export·function·InviteAcceptButton({·token,·groupName,·groupSlug:·_groupSlug·}:·InviteAcceptButtonProps)·{
+       14 │ + export·function·InviteAcceptButton({
+       15 │ + → token,
+       16 │ + → groupName,
+       17 │ + → groupSlug:·_groupSlug,
+       18 │ + }:·InviteAcceptButtonProps)·{
+    15 19 │     const router = useRouter();
+    16 20 │     const [isPending, startTransition] = useTransition();
+  
+
+src\app\(protected)\(profile)\perfil\_components\cover-banner.tsx:136:23 lint/correctness/useExhaustiveDependencies ━━━━━━━━━━
+
+  × handleCancel changes on every re-render and should not be used as a hook dependency.
+  
+    134 │ 		window.addEventListener("keydown", onKeyDown);
+    135 │ 		return () => window.removeEventListener("keydown", onKeyDown);
+  > 136 │ 	}, [isRepositioning, handleCancel]);
+        │ 	                     ^^^^^^^^^^^^
+    137 │ 
+    138 │ 	async function handleRemove() {
+  
+  i To fix this, wrap the definition of handleCancel in its own useCallback() hook.
+  
+
+src\app\(protected)\(profile)\perfil\_components\edit-profile-modal.tsx:125:6 lint/a11y/useSemanticElements ━━━━━━━━━━
+
+  × The elements with this role can be changed to the following elements:
+    <button>
+  
+    123 │ 						if (e.key === "Escape") setOpen(false);
+    124 │ 					}}
+  > 125 │ 					role="button"
+        │ 					^^^^^^^^^^^^^
+    126 │ 					tabIndex={-1}
+    127 │ 					aria-label="Close modal"
+  
+  i For examples and more information, see WAI-ARIA Roles
+  
+
+src\app\(protected)\biblioteca\page.tsx:116:29 lint/correctness/useExhaustiveDependencies  FIXABLE  ━━━━━━━━━━
+
+  × This hook does not specify its dependency on startScan.
+  
+    114 │ 	}, []);
+    115 │ 
+  > 116 │ 	const handleSelectFolder = useCallback(async () => {
+        │ 	                           ^^^^^^^^^^^
+    117 │ 		const bridge = bridgeRef.current;
+    118 │ 		if (!bridge) return;
+  
+  i This dependency is being used here, but is not specified in the hook dependency list.
+  
+    120 │ 		if (!folder) return;
+    121 │ 		setLibraryRoot(folder);
+  > 122 │ 		startScan(folder, "full");
+        │ 		^^^^^^^^^
+    123 │ 	}, []);
+    124 │ 
+  
+  i React relies on hook dependencies to determine when to re-compute Effects.
+    Failing to specify dependencies can result in Effects not updating correctly when state changes.
+    These "stale closures" are a common source of surprising bugs.
+  
+  i Either include it or remove the dependency array.
+  
+  i Unsafe fix: Add the missing dependency startScan to the list.
+  
+    123 │ → },·[startScan]);
+        │       +++++++++   
+
+src\app\(protected)\trades\[id]\_components\AudioUploadSection.tsx:39:3 lint/a11y/noSvgWithoutTitle ━━━━━━━━━━
+
+  × Alternative text title element cannot be empty
+  
+    37 │ function MusicIcon() {
+    38 │ 	return (
+  > 39 │ 		<svg
+       │ 		^^^^
+  > 40 │ 			width="16"
+        ...
+  > 47 │ 			strokeLinejoin="round"
+  > 48 │ 		>
+       │ 		^
+    49 │ 			<path d="M9 18V5l12-2v13" />
+    50 │ 			<circle cx="6" cy="18" r="3" />
+  
+  i For accessibility purposes, SVGs should have an alternative text, provided via title element. If the svg element has role="img", you should add the aria-label or aria-labelledby attribute.
+  
+
+src\app\(protected)\trades\[id]\_components\AudioUploadSection.tsx:58:3 lint/a11y/noSvgWithoutTitle ━━━━━━━━━━
+
+  × Alternative text title element cannot be empty
+  
+    56 │ function CheckIcon() {
+    57 │ 	return (
+  > 58 │ 		<svg
+       │ 		^^^^
+  > 59 │ 			width="14"
+        ...
+  > 66 │ 			strokeLinejoin="round"
+  > 67 │ 		>
+       │ 		^
+    68 │ 			<polyline points="20 6 9 17 4 12" />
+    69 │ 		</svg>
+  
+  i For accessibility purposes, SVGs should have an alternative text, provided via title element. If the svg element has role="img", you should add the aria-label or aria-labelledby attribute.
+  
+
+src\app\(protected)\trades\[id]\_components\AudioUploadSection.tsx:75:3 lint/a11y/noSvgWithoutTitle ━━━━━━━━━━
+
+  × Alternative text title element cannot be empty
+  
+    73 │ function UploadIcon() {
+    74 │ 	return (
+  > 75 │ 		<svg
+       │ 		^^^^
+  > 76 │ 			width="13"
+        ...
+  > 83 │ 			strokeLinejoin="round"
+  > 84 │ 		>
+       │ 		^
+    85 │ 			<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+    86 │ 			<polyline points="17 8 12 3 7 8" />
+  
+  i For accessibility purposes, SVGs should have an alternative text, provided via title element. If the svg element has role="img", you should add the aria-label or aria-labelledby attribute.
+  
+
+src\app\(protected)\trades\[id]\_components\ProposalHistoryThread.tsx:154:3 lint/a11y/useAriaPropsSupportedByRole ━━━━━━━━━━
+
+  × The ARIA attribute 'aria-label' is not supported by this element.
+  
+    153 │ 	return (
+  > 154 │ 		<div
+        │ 		^^^^
+  > 155 │ 			className={cardClasses}
+  > 156 │ 			aria-label={`Proposal round ${proposal.sequenceNumber}, status: ${proposal.status}`}
+  > 157 │ 		>
+        │ 		^
+    158 │ 			{/* Header row */}
+    159 │ 			<div className="flex items-center gap-2 flex-wrap mb-3">
+  
+  i Ensure that ARIA attributes are valid for the role of the element.
+  
+
+The number of diagnostics exceeds the limit allowed. Use --max-diagnostics to increase it.
+Diagnostics not shown: 107.
+Checked 615 files in 552ms. No fixes applied.
+Found 20 errors.
+Found 105 warnings.
+Found 2 infos.
+check ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  × Some errors were emitted while running checks.
+  
+
+C:\Users\INTEL\Desktop\Get Shit DOne\.claude\worktrees\nice-franklin-2075c5\apps\web:
+ ERR_PNPM_RECURSIVE_RUN_FIRST_FAIL  @digswap/web@0.1.0 lint: `biome check src/ tests/`
+Exit status 1
+lint exit=1

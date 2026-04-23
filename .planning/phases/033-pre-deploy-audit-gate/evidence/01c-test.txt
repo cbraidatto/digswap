@@ -1,0 +1,14 @@
+
+> @digswap/web@0.1.0 test C:\Users\INTEL\Desktop\Get Shit DOne\.claude\worktrees\nice-franklin-2075c5\apps\web
+> vitest run
+
+
+ RUN  v4.1.2 C:/Users/INTEL/Desktop/Get Shit DOne/.claude/worktrees/nice-franklin-2075c5/apps/web
+
+
+ Test Files  149 passed | 1 skipped (150)
+      Tests  1568 passed | 4 skipped | 7 todo (1579)
+   Start at  20:55:14
+   Duration  55.62s (transform 10.11s, setup 38.49s, import 70.04s, tests 16.07s, environment 368.50s)
+
+test exit=0

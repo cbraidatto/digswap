@@ -1,0 +1,5 @@
+
+> @digswap/web@0.1.0 typecheck C:\Users\INTEL\Desktop\Get Shit DOne\.claude\worktrees\nice-franklin-2075c5\apps\web
+> tsc --noEmit
+
+typecheck exit=0

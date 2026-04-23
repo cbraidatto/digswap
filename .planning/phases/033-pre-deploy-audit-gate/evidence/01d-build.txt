@@ -1,0 +1,132 @@
+
+> @digswap/web@0.1.0 build C:\Users\INTEL\Desktop\Get Shit DOne\.claude\worktrees\nice-franklin-2075c5\apps\web
+> next build
+
+[@sentry/nextjs] DEPRECATION WARNING: disableLogger is deprecated and will be removed in a future version. Use webpack.treeshake.removeDebugLogging instead.
+[@sentry/nextjs] ACTION REQUIRED: To instrument navigations, the Sentry SDK requires you to export an `onRouterTransitionStart` hook from your `instrumentation-client.(js|ts)` file. You can do so by adding `export const onRouterTransitionStart = Sentry.captureRouterTransitionStart;` to the file.
+ ⚠ Warning: Next.js inferred your workspace root, but it may not be correct.
+ We detected multiple lockfiles and selected the directory of C:\Users\INTEL\Desktop\Get Shit DOne\pnpm-lock.yaml as the root directory.
+ To silence this warning, set `outputFileTracingRoot` in your Next.js config, or consider removing one of the lockfiles if it's not needed.
+   See https://nextjs.org/docs/app/api-reference/config/next-config-js/output#caveats for more information.
+ Detected additional lockfiles: 
+   * C:\Users\INTEL\Desktop\Get Shit DOne\.claude\worktrees\nice-franklin-2075c5\pnpm-lock.yaml
+
+   ▲ Next.js 15.5.15
+   - Environments: .env.local
+   - Experiments (use with caution):
+     · serverActions
+     · clientTraceMetadata
+
+   Creating an optimized production build ...
+<w> [webpack.cache.PackFileCacheStrategy] Serializing big strings (184kiB) impacts deserialization performance (consider using Buffer instead and decode when needed)
+<w> [webpack.cache.PackFileCacheStrategy] Serializing big strings (139kiB) impacts deserialization performance (consider using Buffer instead and decode when needed)
+<w> [webpack.cache.PackFileCacheStrategy] Serializing big strings (215kiB) impacts deserialization performance (consider using Buffer instead and decode when needed)
+ ✓ Compiled successfully in 48s
+   Linting and checking validity of types ...
+   Collecting page data ...
+ ⚠ Using edge runtime on a page currently disables static generation for that page
+   Generating static pages (0/46) ...
+ ⚠ metadataBase property in metadata export is not set for resolving social open graph or twitter images, using "http://localhost:3000". See https://nextjs.org/docs/app/api-reference/functions/generate-metadata#metadatabase
+ ⚠ metadataBase property in metadata export is not set for resolving social open graph or twitter images, using "http://localhost:3000". See https://nextjs.org/docs/app/api-reference/functions/generate-metadata#metadatabase
+   Generating static pages (11/46) 
+[loadGenreGroupsAction] error: Error: Dynamic server usage: Route /comunidade couldn't be rendered statically because it used `cookies`. See more info here: https://nextjs.org/docs/messages/dynamic-server-error
+    at s (C:\Users\INTEL\Desktop\Get Shit DOne\.claude\worktrees\nice-franklin-2075c5\apps\web\.next\server\chunks\2205.js:1:3395)
+    at n (C:\Users\INTEL\Desktop\Get Shit DOne\.claude\worktrees\nice-franklin-2075c5\apps\web\.next\server\chunks\341.js:1:6716)
+    at f (C:\Users\INTEL\Desktop\Get Shit DOne\.claude\worktrees\nice-franklin-2075c5\apps\web\.next\server\chunks\9125.js:9:47015)
+    at e (C:\Users\INTEL\Desktop\Get Shit DOne\.claude\worktrees\nice-franklin-2075c5\apps\web\.next\server\app\(protected)\(community)\comunidade\page.js:2:1386)
+    at K (C:\Users\INTEL\Desktop\Get Shit DOne\.claude\worktrees\nice-franklin-2075c5\apps\web\.next\server\app\(protected)\(community)\comunidade\page.js:3:26487)
+    at m (C:\Users\INTEL\Desktop\Get Shit DOne\.claude\worktrees\nice-franklin-2075c5\apps\web\.next\server\app\(protected)\(community)\comunidade\page.js:2:16450)
+    at <unknown> (C:\Users\INTEL\Desktop\Get Shit DOne\.claude\worktrees\nice-franklin-2075c5\apps\web\.next\server\chunks\7654.js:4:111054)
+    at b.handleCallbackErrors (C:\Users\INTEL\Desktop\Get Shit DOne\.claude\worktrees\nice-franklin-2075c5\apps\web\.next\server\chunks\7654.js:7:24999)
+    at Object.apply (C:\Users\INTEL\Desktop\Get Shit DOne\.claude\worktrees\nice-franklin-2075c5\apps\web\.next\server\chunks\7654.js:4:111027)
+    at Object.apply (C:\Users\INTEL\Desktop\Get Shit DOne\.claude\worktrees\nice-franklin-2075c5\apps\web\.next\server\app\(protected)\(community)\comunidade\page.js:2:17624) {
+  description: "Route /comunidade couldn't be rendered statically because it used `cookies`. See more info here: https://nextjs.org/docs/messages/dynamic-server-error",
+  digest: 'DYNAMIC_SERVER_USAGE'
+}
+[loadMemberGroupsAction] error: Error: Dynamic server usage: Route /comunidade couldn't be rendered statically because it used `cookies`. See more info here: https://nextjs.org/docs/messages/dynamic-server-error
+    at s (C:\Users\INTEL\Desktop\Get Shit DOne\.claude\worktrees\nice-franklin-2075c5\apps\web\.next\server\chunks\2205.js:1:3395)
+    at n (C:\Users\INTEL\Desktop\Get Shit DOne\.claude\worktrees\nice-franklin-2075c5\apps\web\.next\server\chunks\341.js:1:6716)
+    at f (C:\Users\INTEL\Desktop\Get Shit DOne\.claude\worktrees\nice-franklin-2075c5\apps\web\.next\server\chunks\9125.js:9:47015)
+    at e (C:\Users\INTEL\Desktop\Get Shit DOne\.claude\worktrees\nice-franklin-2075c5\apps\web\.next\server\app\(protected)\(community)\comunidade\page.js:2:1386)
+    at L (C:\Users\INTEL\Desktop\Get Shit DOne\.claude\worktrees\nice-franklin-2075c5\apps\web\.next\server\app\(protected)\(community)\comunidade\page.js:3:26618)
+    at m (C:\Users\INTEL\Desktop\Get Shit DOne\.claude\worktrees\nice-franklin-2075c5\apps\web\.next\server\app\(protected)\(community)\comunidade\page.js:2:16461)
+    at <unknown> (C:\Users\INTEL\Desktop\Get Shit DOne\.claude\worktrees\nice-franklin-2075c5\apps\web\.next\server\chunks\7654.js:4:111054)
+    at b.handleCallbackErrors (C:\Users\INTEL\Desktop\Get Shit DOne\.claude\worktrees\nice-franklin-2075c5\apps\web\.next\server\chunks\7654.js:7:24999)
+    at Object.apply (C:\Users\INTEL\Desktop\Get Shit DOne\.claude\worktrees\nice-franklin-2075c5\apps\web\.next\server\chunks\7654.js:4:111027)
+    at Object.apply (C:\Users\INTEL\Desktop\Get Shit DOne\.claude\worktrees\nice-franklin-2075c5\apps\web\.next\server\app\(protected)\(community)\comunidade\page.js:2:17624) {
+  description: "Route /comunidade couldn't be rendered statically because it used `cookies`. See more info here: https://nextjs.org/docs/messages/dynamic-server-error",
+  digest: 'DYNAMIC_SERVER_USAGE'
+}
+   Generating static pages (22/46) 
+   Generating static pages (34/46) 
+ ✓ Generating static pages (46/46)
+   Finalizing page optimization ...
+   Collecting build traces ...
+
+Route (app)                                 Size  First Load JS
+┌ ƒ /                                      364 B         178 kB
+├ ƒ /_not-found                            428 B         176 kB
+├ ƒ /api/auth/callback                     430 B         176 kB
+├ ƒ /api/desktop/handoff/consume           430 B         176 kB
+├ ƒ /api/desktop/library/sync              430 B         176 kB
+├ ƒ /api/desktop/session                   428 B         176 kB
+├ ƒ /api/desktop/session/exchange          430 B         176 kB
+├ ƒ /api/discogs/callback                  428 B         176 kB
+├ ƒ /api/discogs/import                    429 B         176 kB
+├ ƒ /api/health                            429 B         176 kB
+├ ƒ /api/og/rarity/[username]              429 B         176 kB
+├ ƒ /api/stripe/webhook                    429 B         176 kB
+├ ƒ /api/trade-preview/audio               430 B         176 kB
+├ ƒ /biblioteca                          2.76 kB         179 kB
+├ ƒ /como-usar                             364 B         178 kB
+├ ƒ /comunidade                          2.17 kB         182 kB
+├ ƒ /comunidade/[slug]                   9.39 kB         237 kB
+├ ƒ /comunidade/new                         2 kB         229 kB
+├ ƒ /crates                              2.83 kB         230 kB
+├ ƒ /crates/[id]                         21.7 kB         227 kB
+├ ƒ /desktop/open                         1.7 kB         180 kB
+├ ƒ /explorar                            11.1 kB         296 kB
+├ ƒ /explorar/crates                       357 B         184 kB
+├ ƒ /feed                                10.2 kB         282 kB
+├ ƒ /forgot-password                     2.79 kB         248 kB
+├ ƒ /import-progress                     6.74 kB         257 kB
+├ ƒ /join/[token]                        1.03 kB         188 kB
+├ ○ /manifest.webmanifest                  429 B         176 kB
+├ ƒ /notifications                       2.23 kB         187 kB
+├ ƒ /onboarding                          5.29 kB         209 kB
+├ ƒ /onboarding/2fa                      3.95 kB         209 kB
+├ ƒ /opengraph-image                       430 B         176 kB
+├ ƒ /perfil                              16.2 kB         321 kB
+├ ƒ /perfil/[username]                   2.67 kB         304 kB
+├ ƒ /perfil/[username]/compare             363 B         178 kB
+├ ƒ /perfil/stats                          364 B         178 kB
+├ ƒ /pricing                             1.83 kB         178 kB
+├ ƒ /radar                                 931 B         273 kB
+├ ƒ /release/[discogsId]                 5.06 kB         253 kB
+├ ƒ /reset-password                      2.94 kB         248 kB
+├ ○ /robots.txt                            429 B         176 kB
+├ ƒ /settings                            7.84 kB         235 kB
+├ ƒ /settings/billing                      781 B         179 kB
+├ ƒ /settings/sessions                   4.83 kB         195 kB
+├ ƒ /signin                              4.62 kB         311 kB
+├ ƒ /signin/2fa                          3.38 kB         209 kB
+├ ƒ /signup                              4.59 kB         310 kB
+├ ○ /sitemap.xml                           429 B         176 kB
+├ ƒ /trades                                357 B         184 kB
+├ ƒ /trades/[id]                         10.6 kB         255 kB
+├ ƒ /trades/new/[userId]                  7.9 kB         231 kB
+├ ƒ /u/[username]/bounty                   803 B         184 kB
+├ ƒ /verify-email                        3.13 kB         203 kB
+└ ƒ /wrapped                               430 B         176 kB
++ First Load JS shared by all             176 kB
+  ├ chunks/1178-79d7c25f48659a24.js       119 kB
+  ├ chunks/17b2f0c5-25ee598eb8a2e879.js  54.4 kB
+  └ other shared chunks (total)           3.1 kB
+
+
+ƒ Middleware                              142 kB
+
+○  (Static)   prerendered as static content
+ƒ  (Dynamic)  server-rendered on demand
+
+build exit=0
