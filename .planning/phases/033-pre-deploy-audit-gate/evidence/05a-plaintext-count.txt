@@ -1,0 +1,12 @@
+Phase 33 DEP-AUD-05 — plaintext count against dev Supabase
+==========================================================
+
+Project: mrkgoucqcbqjhrdjcnpw (dev — confirmed via DATABASE_URL prefix)
+Executed: 2026-04-23T01:58Z via node postgres client (psql not on PATH)
+
+Query: SELECT COUNT(*)::int AS plaintext_count FROM public.discogs_tokens;
+
+Result: plaintext_count = 2
+
+PASS CRITERION: plaintext_count == 0
+VERDICT: FAIL — Pitfall #11 is LIVE on dev Supabase

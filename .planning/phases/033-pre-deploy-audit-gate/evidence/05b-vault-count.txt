@@ -1,0 +1,22 @@
+Phase 33 DEP-AUD-05 — Vault count against dev Supabase
+======================================================
+
+Project: mrkgoucqcbqjhrdjcnpw (dev)
+Executed: 2026-04-23T01:58Z
+
+Query: SELECT COUNT(*)::int AS vault_count FROM vault.decrypted_secrets WHERE name LIKE 'discogs_token:%';
+
+Result: vault_count = 0
+
+Interpretation: zero Vault entries for Discogs tokens means the fallback path
+(public.discogs_tokens) has been the ONLY code path exercised for every
+Discogs OAuth flow on dev. This means either:
+  - vault_create_secret RPC is not installed on the dev project
+  - or the service-role used by the app lacks Vault permissions
+  - or the Vault call is silently failing and the try/catch at
+    apps/web/src/lib/discogs/oauth.ts:84-130 is falling through
+
+All three are Pitfall #11 surfaces that must be resolved before Phase 34 pushes
+the same codebase against prod.
+
+VERDICT: FAIL — combined with 05a (2 plaintext rows), Vault is effectively bypassed.

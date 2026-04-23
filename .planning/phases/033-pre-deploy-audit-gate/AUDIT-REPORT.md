@@ -10,7 +10,7 @@
 - [x] DEP-AUD-02: `supabase db reset` clean on local Docker AND throwaway Supabase Cloud (D-07 BLOCKING gate PASS) — evidence/02a-*.txt, evidence/02b-*.txt
 - [x] DEP-AUD-03: Cold-start curl — all 4 public routes 200 in <50ms after 15-min idle — evidence/03-*.txt
 - [~] DEP-AUD-04: Session revocation — Playwright spec scaffolded + wired to /api/user/me; pending dev audit user credentials — evidence/04-*.txt
-- [ ] DEP-AUD-05: Discogs tokens Vault-wrapped — zero plaintext rows               — evidence/05a-*.txt, evidence/05b-*.txt
+- [F] DEP-AUD-05: FAIL — plaintext_count=2 (expected 0), vault_count=0; Pitfall #11 LIVE on dev, must fix before Phase 34 — evidence/05a-*.txt, evidence/05b-*.txt
 - [ ] DEP-AUD-06: CSP re-confirmed — nonce-based header, zero violations on 5 routes — evidence/06*-*
 - [x] DEP-AUD-07: gitleaks scan — zero findings after allowlist fix (6 initial findings classified; 4 false positives, 2 real leaks from expired handoff tokens committed 2026-04-01) — evidence/07-gitleaks.json
 - [x] DEP-AUD-08: Env inventory — 25 vars mapped to actionable prod-value source; zero `|·TBD·|` rows — §8 table below
@@ -226,11 +226,42 @@ This confirms the spec is wired correctly (typecheck passes, playwright discover
 
 ## §5 DEP-AUD-05 Discogs Tokens via Supabase Vault
 
-**Status:** pending
-**Project queried:** dev Supabase (not prod — see D-06 scope)
-**plaintext_count:** —
-**vault_count:** —
-**Verdict:** —
+**Status:** FAIL — Pitfall #11 LIVE on dev; must fix before Phase 34 promotes the same codebase
+**Project queried:** dev Supabase `mrkgoucqcbqjhrdjcnpw` (NOT the throwaway audit project — confirmed via DATABASE_URL prefix)
+**Timestamp:** 2026-04-23T01:58Z
+**Execution path:** node `postgres` client (psql not on PATH); inline script read DATABASE_URL from `apps/web/.env.local`
+
+**Query 1 — plaintext fallback:**
+```sql
+SELECT COUNT(*)::int AS plaintext_count FROM public.discogs_tokens;
+```
+Result: **`plaintext_count = 2`** (expected 0)
+
+**Query 2 — Vault-backed entries:**
+```sql
+SELECT COUNT(*)::int AS vault_count FROM vault.decrypted_secrets
+WHERE name LIKE 'discogs_token:%';
+```
+Result: **`vault_count = 0`** (empty set)
+
+**Findings:**
+
+1. Both plaintext rows are real user data — `user_id 5c2f62d1…` (created 2026-03-25) and `user_id 04520b1a…` (created 2026-04-07). Token prefixes (8 chars) match the shape of real Discogs OAuth 1.0a access tokens. Full sample in `evidence/05c-plaintext-sample.txt` (gitignored per Plan 01).
+2. Zero Vault entries means the Vault-first path in `apps/web/src/lib/discogs/oauth.ts:84-113` has NEVER successfully executed on this project. Every Discogs OAuth flow fell through the `try/catch` into the plaintext upsert (line 115+).
+
+**Root-cause hypotheses (to investigate in 33.1):**
+- `vault_create_secret` RPC is not installed on the dev project (Supabase Vault is opt-in — requires `CREATE EXTENSION` + function definition)
+- The service-role JWT the app uses lacks the schema grant on `vault.*`
+- The RPC call format is wrong for the installed Supabase version (API drift)
+
+**Required fix before Phase 34:**
+1. Install Vault extension on the prod project (and back-fill dev for parity)
+2. Grant service-role `USAGE` on `vault` schema + `EXECUTE` on `vault.create_secret` RPC
+3. Migrate the 2 existing plaintext rows into Vault (or invalidate + force re-auth for those 2 users)
+4. Harden the fallback in `oauth.ts` — remove the silent fallback; if Vault fails, abort the OAuth exchange with 500
+5. Re-run these two SQL queries against both dev AND prod — both must show `plaintext_count=0` before Phase 34 promotion
+
+**Verdict:** FAIL — Phase 34 is BLOCKED on this axis in addition to the existing DEP-AUD-02 gate. Deferred fix scope to Phase 33.1.
 
 ## §6 DEP-AUD-06 CSP Re-Confirmation
 
