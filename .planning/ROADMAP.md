@@ -574,11 +574,11 @@ Plans:
 - [x] 033-01-wave0-drift-fix-scaffolding-PLAN.md — Wave 0: delete orphan drizzle migration, write prod-guard script + ADR-003, scaffold .gitleaks.toml + AUDIT-REPORT.md + evidence/ + session-revocation spec, Docker pre-flight
 - [x] 033-02-ci-gates-prod-audit-PLAN.md — DEP-AUD-01: run typecheck/lint/test/build + pnpm audit --prod --audit-level high against main HEAD
 - [x] 033-03-migration-reset-tests-PLAN.md — DEP-AUD-02: supabase db reset on local Docker + throwaway cloud project (the GATE per D-07)
-- [ ] 033-04-cold-start-session-revocation-PLAN.md — DEP-AUD-03 + DEP-AUD-04: cold-start curl on 4 public routes after 15-min idle + Playwright session-revocation E2E
-- [ ] 033-05-vault-discogs-tokens-PLAN.md — DEP-AUD-05: psql probe for plaintext vs Vault-wrapped Discogs token counts on dev
-- [ ] 033-06-csp-re-confirmation-PLAN.md — DEP-AUD-06: curl CSP header + DevTools Console check across 5 routes
-- [ ] 033-07-gitleaks-history-scan-PLAN.md — DEP-AUD-07: gitleaks v8 Docker full-history scan with 7 custom rules
-- [ ] 033-08-env-inventory-finalization-PLAN.md — DEP-AUD-08 + AUDIT-REPORT.md finalization: 25-row env inventory, flip top-of-file verdict to GREEN, populate Sign-Off
+- [x] 033-04-cold-start-session-revocation-PLAN.md — DEP-AUD-03 + DEP-AUD-04: cold-start curl on 4 public routes after 15-min idle + Playwright session-revocation E2E
+- [x] 033-05-vault-discogs-tokens-PLAN.md — DEP-AUD-05: psql probe for plaintext vs Vault-wrapped Discogs token counts on dev
+- [x] 033-06-csp-re-confirmation-PLAN.md — DEP-AUD-06: curl CSP header + DevTools Console check across 5 routes
+- [x] 033-07-gitleaks-history-scan-PLAN.md — DEP-AUD-07: gitleaks v8 Docker full-history scan with 7 custom rules
+- [x] 033-08-env-inventory-finalization-PLAN.md — DEP-AUD-08 + AUDIT-REPORT.md finalization: 25-row env inventory, flip top-of-file verdict to GREEN, populate Sign-Off
 **P0 pitfalls to flag during plan-phase**: Pitfall 1 (service-role NEXT_PUBLIC_ misprefix, grep `.next/static`), Pitfall 2 (`.env.local` committed, gitleaks history scan), Pitfall 3 (migration drift, `supabase db reset` on empty), Pitfall 8 (cold-start 500s, curl verification), Pitfall 10 (session revocation, E2E), Pitfall 11 (Discogs plaintext fallback, Vault check)
 **UI hint**: no
 
