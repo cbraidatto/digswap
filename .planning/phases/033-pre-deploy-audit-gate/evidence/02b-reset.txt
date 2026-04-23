@@ -1,0 +1,405 @@
+Initialising login role...
+Do you want to reset the remote database? [y/N] y
+Resetting remote database...
+NOTICE (00000): dropping extension: pg_cron
+NOTICE (00000): dropping extension: pg_trgm
+NOTICE (00000): drop cascades to index profiles_username_trgm_idx
+NOTICE (00000): dropping function: public.release_trade_lease
+NOTICE (00000): dropping function: public.list_desktop_pending_trades
+NOTICE (00000): dropping function: public.heartbeat_trade_lease
+NOTICE (00000): dropping function: public.acquire_trade_lease
+NOTICE (00000): dropping function: public.finalize_trade_transfer
+NOTICE (00000): dropping function: public.get_trade_presence
+NOTICE (00000): dropping function: public.handle_new_user_subscription
+NOTICE (00000): drop cascades to trigger on_auth_user_created_subscription on table auth.users
+NOTICE (00000): dropping function: public.update_trade_peer_id
+NOTICE (00000): dropping function: public.finalize_trade_transfer
+NOTICE (00000): dropping function: public.recalculate_rankings
+NOTICE (00000): dropping function: public.is_mutual_follow
+NOTICE (00000): drop cascades to policy dm_insert_mutual_follow on table direct_messages
+NOTICE (00000): dropping function: public.acquire_trade_lease
+NOTICE (00000): dropping function: public.invoke_trade_preview_cleanup
+NOTICE (00000): dropping materialized view: public.genre_leaderboard_mv
+NOTICE (00000): dropping table: public.trade_reviews
+NOTICE (00000): dropping table: public.notification_preferences
+NOTICE (00000): dropping table: public.reviews
+NOTICE (00000): drop cascades to constraint group_posts_review_id_reviews_id_fk on table group_posts
+NOTICE (00000): dropping table: public.stripe_event_log
+NOTICE (00000): dropping table: public.challenge_entries
+NOTICE (00000): dropping table: public.user_rankings
+NOTICE (00000): dropping table: public.crates
+NOTICE (00000): drop cascades to 2 other objects
+NOTICE (00000): dropping table: public.crate_items
+NOTICE (00000): drop cascades to constraint set_tracks_crate_item_id_fkey on table set_tracks
+NOTICE (00000): dropping table: public.user_sessions
+NOTICE (00000): dropping table: public.follows
+NOTICE (00000): dropping table: public.digger_dna
+NOTICE (00000): dropping table: public.subscriptions
+NOTICE (00000): dropping table: public.search_signals
+NOTICE (00000): dropping table: public.notifications
+NOTICE (00000): dropping table: public.wantlist_items
+NOTICE (00000): dropping table: public.set_tracks
+NOTICE (00000): dropping table: public.import_jobs
+NOTICE (00000): dropping table: public.challenges
+NOTICE (00000): dropping table: public.leads
+NOTICE (00000): dropping table: public.collection_items
+NOTICE (00000): drop cascades to 3 other objects
+NOTICE (00000): dropping table: public.digs
+NOTICE (00000): dropping table: public.releases
+NOTICE (00000): drop cascades to 5 other objects
+NOTICE (00000): dropping table: public.group_posts
+NOTICE (00000): dropping table: public.groups
+NOTICE (00000): drop cascades to 2 other objects
+NOTICE (00000): dropping table: public.discogs_tokens
+NOTICE (00000): dropping table: public.handoff_tokens
+NOTICE (00000): dropping table: public.group_invites
+NOTICE (00000): dropping table: public.backup_codes
+NOTICE (00000): dropping table: public.trade_proposals
+NOTICE (00000): drop cascades to 3 other objects
+NOTICE (00000): dropping table: public.sets
+NOTICE (00000): dropping table: public.profiles
+NOTICE (00000): dropping table: public.trade_transfer_receipts
+NOTICE (00000): dropping table: public.listening_logs
+NOTICE (00000): dropping table: public.trade_messages
+NOTICE (00000): dropping table: public.trade_runtime_sessions
+NOTICE (00000): dropping table: public.activity_feed
+NOTICE (00000): dropping table: public.badges
+NOTICE (00000): drop cascades to constraint user_badges_badge_id_badges_id_fk on table user_badges
+NOTICE (00000): dropping table: public.trade_requests
+NOTICE (00000): dropping table: public.direct_messages
+NOTICE (00000): dropping table: public.trade_proposal_items
+NOTICE (00000): dropping table: public.user_badges
+NOTICE (00000): dropping table: public.group_members
+NOTICE (00000): dropping table: public.releases_youtube_video_id_unique
+NOTICE (00000): table "releases_youtube_video_id_unique" does not exist, skipping
+NOTICE (00000): dropping table: public.releases_genre_gin_idx
+NOTICE (00000): table "releases_genre_gin_idx" does not exist, skipping
+NOTICE (00000): dropping table: public.releases_style_gin_idx
+NOTICE (00000): table "releases_style_gin_idx" does not exist, skipping
+NOTICE (00000): dropping table: public.crates_pkey
+NOTICE (00000): table "crates_pkey" does not exist, skipping
+NOTICE (00000): dropping table: public.crates_user_id_idx
+NOTICE (00000): table "crates_user_id_idx" does not exist, skipping
+NOTICE (00000): dropping table: public.crates_is_public_idx
+NOTICE (00000): table "crates_is_public_idx" does not exist, skipping
+NOTICE (00000): dropping table: public.stripe_event_log_pkey
+NOTICE (00000): table "stripe_event_log_pkey" does not exist, skipping
+NOTICE (00000): dropping table: public.crate_items_pkey
+NOTICE (00000): table "crate_items_pkey" does not exist, skipping
+NOTICE (00000): dropping table: public.crate_items_crate_id_idx
+NOTICE (00000): table "crate_items_crate_id_idx" does not exist, skipping
+NOTICE (00000): dropping table: public.crate_items_user_id_idx
+NOTICE (00000): table "crate_items_user_id_idx" does not exist, skipping
+NOTICE (00000): dropping table: public.crate_items_release_id_idx
+NOTICE (00000): table "crate_items_release_id_idx" does not exist, skipping
+NOTICE (00000): dropping table: public.leads_pkey
+NOTICE (00000): table "leads_pkey" does not exist, skipping
+NOTICE (00000): dropping table: public.leads_user_target_unique
+NOTICE (00000): table "leads_user_target_unique" does not exist, skipping
+NOTICE (00000): dropping table: public.leads_user_id_idx
+NOTICE (00000): table "leads_user_id_idx" does not exist, skipping
+NOTICE (00000): dropping table: public.handoff_tokens_pkey
+NOTICE (00000): table "handoff_tokens_pkey" does not exist, skipping
+NOTICE (00000): dropping table: public.handoff_tokens_trade_id_idx
+NOTICE (00000): table "handoff_tokens_trade_id_idx" does not exist, skipping
+NOTICE (00000): dropping table: public.handoff_tokens_token_hmac_idx
+NOTICE (00000): table "handoff_tokens_token_hmac_idx" does not exist, skipping
+NOTICE (00000): dropping table: public.handoff_tokens_expires_at_idx
+NOTICE (00000): table "handoff_tokens_expires_at_idx" does not exist, skipping
+NOTICE (00000): dropping table: public.discogs_tokens_pkey
+NOTICE (00000): table "discogs_tokens_pkey" does not exist, skipping
+NOTICE (00000): dropping table: public.trade_transfer_receipts_pkey
+NOTICE (00000): table "trade_transfer_receipts_pkey" does not exist, skipping
+NOTICE (00000): dropping table: public.trade_messages_trade_id_created_at_idx
+NOTICE (00000): table "trade_messages_trade_id_created_at_idx" does not exist, skipping
+NOTICE (00000): dropping table: public.trade_transfer_receipts_idempotency_idx
+NOTICE (00000): table "trade_transfer_receipts_idempotency_idx" does not exist, skipping
+NOTICE (00000): dropping table: public.idx_releases_genre_gin
+NOTICE (00000): table "idx_releases_genre_gin" does not exist, skipping
+NOTICE (00000): dropping table: public.trade_messages_sender_trade_created_at_idx
+NOTICE (00000): table "trade_messages_sender_trade_created_at_idx" does not exist, skipping
+NOTICE (00000): dropping table: public.trade_runtime_sessions_pkey
+NOTICE (00000): table "trade_runtime_sessions_pkey" does not exist, skipping
+NOTICE (00000): dropping table: public.trade_runtime_sessions_active_user_idx
+NOTICE (00000): table "trade_runtime_sessions_active_user_idx" does not exist, skipping
+NOTICE (00000): dropping table: public.collection_items_open_for_trade_idx
+NOTICE (00000): table "collection_items_open_for_trade_idx" does not exist, skipping
+NOTICE (00000): dropping table: public.trade_messages_pkey
+NOTICE (00000): table "trade_messages_pkey" does not exist, skipping
+NOTICE (00000): dropping table: public.challenge_entries_pkey
+NOTICE (00000): table "challenge_entries_pkey" does not exist, skipping
+NOTICE (00000): dropping table: public.challenge_entries_user_challenge
+NOTICE (00000): table "challenge_entries_user_challenge" does not exist, skipping
+NOTICE (00000): dropping table: public.listening_logs_pkey
+NOTICE (00000): table "listening_logs_pkey" does not exist, skipping
+NOTICE (00000): dropping table: public.listening_logs_user_id_idx
+NOTICE (00000): table "listening_logs_user_id_idx" does not exist, skipping
+NOTICE (00000): dropping table: public.listening_logs_listened_at_idx
+NOTICE (00000): table "listening_logs_listened_at_idx" does not exist, skipping
+NOTICE (00000): dropping table: public.challenge_entries_challenge_id_idx
+NOTICE (00000): table "challenge_entries_challenge_id_idx" does not exist, skipping
+NOTICE (00000): dropping table: public.digger_dna_pkey
+NOTICE (00000): table "digger_dna_pkey" does not exist, skipping
+NOTICE (00000): dropping table: public.digger_dna_user_id_key
+NOTICE (00000): table "digger_dna_user_id_key" does not exist, skipping
+NOTICE (00000): dropping table: public.search_signals_pkey
+NOTICE (00000): table "search_signals_pkey" does not exist, skipping
+NOTICE (00000): dropping table: public.search_signals_user_id_idx
+NOTICE (00000): table "search_signals_user_id_idx" does not exist, skipping
+NOTICE (00000): dropping table: public.trade_messages_trade_id_idx
+NOTICE (00000): table "trade_messages_trade_id_idx" does not exist, skipping
+NOTICE (00000): dropping table: public.collection_items_user_release_unique
+NOTICE (00000): table "collection_items_user_release_unique" does not exist, skipping
+NOTICE (00000): dropping table: public.challenges_pkey
+NOTICE (00000): table "challenges_pkey" does not exist, skipping
+NOTICE (00000): dropping table: public.digs_pkey
+NOTICE (00000): table "digs_pkey" does not exist, skipping
+NOTICE (00000): dropping table: public.digs_user_feed_item
+NOTICE (00000): table "digs_user_feed_item" does not exist, skipping
+NOTICE (00000): dropping table: public.digs_user_id_idx
+NOTICE (00000): table "digs_user_id_idx" does not exist, skipping
+NOTICE (00000): dropping table: public.digs_feed_item_id_idx
+NOTICE (00000): table "digs_feed_item_id_idx" does not exist, skipping
+NOTICE (00000): dropping table: public.wantlist_items_user_release_unique
+NOTICE (00000): table "wantlist_items_user_release_unique" does not exist, skipping
+NOTICE (00000): dropping table: public.activity_feed_rarity_time_idx
+NOTICE (00000): table "activity_feed_rarity_time_idx" does not exist, skipping
+NOTICE (00000): dropping table: public.collection_items_user_discogs_instance_unique
+NOTICE (00000): table "collection_items_user_discogs_instance_unique" does not exist, skipping
+NOTICE (00000): dropping table: public.collection_items_visibility_idx
+NOTICE (00000): table "collection_items_visibility_idx" does not exist, skipping
+NOTICE (00000): dropping table: public.trade_proposals_pkey
+NOTICE (00000): table "trade_proposals_pkey" does not exist, skipping
+NOTICE (00000): dropping table: public.trade_proposals_trade_id_idx
+NOTICE (00000): table "trade_proposals_trade_id_idx" does not exist, skipping
+NOTICE (00000): dropping table: public.trade_proposal_items_pkey
+NOTICE (00000): table "trade_proposal_items_pkey" does not exist, skipping
+NOTICE (00000): dropping table: public.trade_proposal_items_proposal_id_idx
+NOTICE (00000): table "trade_proposal_items_proposal_id_idx" does not exist, skipping
+NOTICE (00000): dropping table: public.search_signals_user_id_unique
+NOTICE (00000): table "search_signals_user_id_unique" does not exist, skipping
+NOTICE (00000): dropping table: public.direct_messages_pkey
+NOTICE (00000): table "direct_messages_pkey" does not exist, skipping
+NOTICE (00000): dropping table: public.dm_sender_receiver_idx
+NOTICE (00000): table "dm_sender_receiver_idx" does not exist, skipping
+NOTICE (00000): dropping table: public.dm_receiver_sender_idx
+NOTICE (00000): table "dm_receiver_sender_idx" does not exist, skipping
+NOTICE (00000): dropping table: public.dm_created_at_idx
+NOTICE (00000): table "dm_created_at_idx" does not exist, skipping
+NOTICE (00000): dropping table: public.trade_proposal_items_preview_expires_at_idx
+NOTICE (00000): table "trade_proposal_items_preview_expires_at_idx" does not exist, skipping
+NOTICE (00000): dropping table: public.collection_items_pkey
+NOTICE (00000): table "collection_items_pkey" does not exist, skipping
+NOTICE (00000): dropping table: public.collection_items_deleted_at_idx
+NOTICE (00000): table "collection_items_deleted_at_idx" does not exist, skipping
+NOTICE (00000): dropping table: public.badges_pkey
+NOTICE (00000): table "badges_pkey" does not exist, skipping
+NOTICE (00000): dropping table: public.badges_slug_unique
+NOTICE (00000): table "badges_slug_unique" does not exist, skipping
+NOTICE (00000): dropping table: public.user_badges_pkey
+NOTICE (00000): table "user_badges_pkey" does not exist, skipping
+NOTICE (00000): dropping table: public.user_rankings_pkey
+NOTICE (00000): table "user_rankings_pkey" does not exist, skipping
+NOTICE (00000): dropping table: public.user_rankings_user_id_unique
+NOTICE (00000): table "user_rankings_user_id_unique" does not exist, skipping
+NOTICE (00000): dropping table: public.group_members_pkey
+NOTICE (00000): table "group_members_pkey" does not exist, skipping
+NOTICE (00000): dropping table: public.group_posts_pkey
+NOTICE (00000): table "group_posts_pkey" does not exist, skipping
+NOTICE (00000): dropping table: public.groups_pkey
+NOTICE (00000): table "groups_pkey" does not exist, skipping
+NOTICE (00000): dropping table: public.import_jobs_pkey
+NOTICE (00000): table "import_jobs_pkey" does not exist, skipping
+NOTICE (00000): dropping table: public.profiles_pkey
+NOTICE (00000): table "profiles_pkey" does not exist, skipping
+NOTICE (00000): dropping table: public.profiles_username_unique
+NOTICE (00000): table "profiles_username_unique" does not exist, skipping
+NOTICE (00000): dropping table: public.backup_codes_pkey
+NOTICE (00000): table "backup_codes_pkey" does not exist, skipping
+NOTICE (00000): dropping table: public.user_sessions_pkey
+NOTICE (00000): table "user_sessions_pkey" does not exist, skipping
+NOTICE (00000): dropping table: public.user_sessions_session_id_unique
+NOTICE (00000): table "user_sessions_session_id_unique" does not exist, skipping
+NOTICE (00000): dropping table: public.releases_pkey
+NOTICE (00000): table "releases_pkey" does not exist, skipping
+NOTICE (00000): dropping table: public.releases_discogs_id_unique
+NOTICE (00000): table "releases_discogs_id_unique" does not exist, skipping
+NOTICE (00000): dropping table: public.activity_feed_pkey
+NOTICE (00000): table "activity_feed_pkey" does not exist, skipping
+NOTICE (00000): dropping table: public.follows_pkey
+NOTICE (00000): table "follows_pkey" does not exist, skipping
+NOTICE (00000): dropping table: public.follows_unique_pair
+NOTICE (00000): table "follows_unique_pair" does not exist, skipping
+NOTICE (00000): dropping table: public.trade_requests_pkey
+NOTICE (00000): table "trade_requests_pkey" does not exist, skipping
+NOTICE (00000): dropping table: public.trade_reviews_pkey
+NOTICE (00000): table "trade_reviews_pkey" does not exist, skipping
+NOTICE (00000): dropping table: public.notification_preferences_pkey
+NOTICE (00000): table "notification_preferences_pkey" does not exist, skipping
+NOTICE (00000): dropping table: public.notification_preferences_user_id_unique
+NOTICE (00000): table "notification_preferences_user_id_unique" does not exist, skipping
+NOTICE (00000): dropping table: public.notifications_pkey
+NOTICE (00000): table "notifications_pkey" does not exist, skipping
+NOTICE (00000): dropping table: public.subscriptions_pkey
+NOTICE (00000): table "subscriptions_pkey" does not exist, skipping
+NOTICE (00000): dropping table: public.subscriptions_user_id_unique
+NOTICE (00000): table "subscriptions_user_id_unique" does not exist, skipping
+NOTICE (00000): dropping table: public.subscriptions_stripe_customer_id_unique
+NOTICE (00000): table "subscriptions_stripe_customer_id_unique" does not exist, skipping
+NOTICE (00000): dropping table: public.subscriptions_stripe_subscription_id_unique
+NOTICE (00000): table "subscriptions_stripe_subscription_id_unique" does not exist, skipping
+NOTICE (00000): dropping table: public.wantlist_items_pkey
+NOTICE (00000): table "wantlist_items_pkey" does not exist, skipping
+NOTICE (00000): dropping table: public.reviews_pkey
+NOTICE (00000): table "reviews_pkey" does not exist, skipping
+NOTICE (00000): dropping table: public.sets_crate_id_idx
+NOTICE (00000): table "sets_crate_id_idx" does not exist, skipping
+NOTICE (00000): dropping table: public.sets_user_id_idx
+NOTICE (00000): table "sets_user_id_idx" does not exist, skipping
+NOTICE (00000): dropping table: public.group_invites_pkey
+NOTICE (00000): table "group_invites_pkey" does not exist, skipping
+NOTICE (00000): dropping table: public.group_invites_token_unique
+NOTICE (00000): table "group_invites_token_unique" does not exist, skipping
+NOTICE (00000): dropping table: public.set_tracks_pkey
+NOTICE (00000): table "set_tracks_pkey" does not exist, skipping
+NOTICE (00000): dropping table: public.sets_pkey
+NOTICE (00000): table "sets_pkey" does not exist, skipping
+NOTICE (00000): dropping table: public.set_tracks_set_id_idx
+NOTICE (00000): table "set_tracks_set_id_idx" does not exist, skipping
+NOTICE (00000): dropping table: public.set_tracks_user_id_idx
+NOTICE (00000): table "set_tracks_user_id_idx" does not exist, skipping
+NOTICE (00000): dropping table: public.groups_slug_unique
+NOTICE (00000): table "groups_slug_unique" does not exist, skipping
+NOTICE (00000): dropping table: public.reviews_user_release
+NOTICE (00000): table "reviews_user_release" does not exist, skipping
+NOTICE (00000): dropping table: public.user_badges_user_badge_unique
+NOTICE (00000): table "user_badges_user_badge_unique" does not exist, skipping
+NOTICE (00000): truncating table: auth.saml_relay_states
+NOTICE (00000): truncating table: auth.saml_providers
+NOTICE (00000): truncating table: auth.instances
+NOTICE (00000): truncating table: auth.refresh_tokens
+NOTICE (00000): truncating table: auth.sessions
+NOTICE (00000): truncate cascades to table "refresh_tokens"
+NOTICE (00000): truncate cascades to table "mfa_amr_claims"
+NOTICE (00000): truncating table: auth.users
+NOTICE (00000): truncate cascades to table "identities"
+NOTICE (00000): truncate cascades to table "sessions"
+NOTICE (00000): truncate cascades to table "mfa_factors"
+NOTICE (00000): truncate cascades to table "one_time_tokens"
+NOTICE (00000): truncate cascades to table "oauth_authorizations"
+NOTICE (00000): truncate cascades to table "oauth_consents"
+NOTICE (00000): truncate cascades to table "webauthn_credentials"
+NOTICE (00000): truncate cascades to table "webauthn_challenges"
+NOTICE (00000): truncate cascades to table "refresh_tokens"
+NOTICE (00000): truncate cascades to table "mfa_challenges"
+NOTICE (00000): truncate cascades to table "mfa_amr_claims"
+NOTICE (00000): truncating table: auth.audit_log_entries
+NOTICE (00000): truncating table: auth.sso_domains
+NOTICE (00000): truncating table: auth.mfa_amr_claims
+NOTICE (00000): truncating table: auth.identities
+NOTICE (00000): truncating table: auth.one_time_tokens
+NOTICE (00000): truncating table: auth.sso_providers
+NOTICE (00000): truncate cascades to table "sso_domains"
+NOTICE (00000): truncate cascades to table "saml_providers"
+NOTICE (00000): truncate cascades to table "saml_relay_states"
+NOTICE (00000): truncating table: auth.mfa_challenges
+NOTICE (00000): truncating table: auth.mfa_factors
+NOTICE (00000): truncate cascades to table "mfa_challenges"
+NOTICE (00000): truncating table: auth.flow_state
+NOTICE (00000): truncate cascades to table "saml_relay_states"
+NOTICE (00000): truncating table: auth.oauth_consents
+NOTICE (00000): truncating table: auth.oauth_authorizations
+NOTICE (00000): truncating table: auth.oauth_client_states
+NOTICE (00000): truncating table: auth.oauth_clients
+NOTICE (00000): truncate cascades to table "sessions"
+NOTICE (00000): truncate cascades to table "oauth_authorizations"
+NOTICE (00000): truncate cascades to table "oauth_consents"
+NOTICE (00000): truncate cascades to table "refresh_tokens"
+NOTICE (00000): truncate cascades to table "mfa_amr_claims"
+NOTICE (00000): truncating table: auth.custom_oauth_providers
+NOTICE (00000): truncating table: auth.webauthn_credentials
+NOTICE (00000): truncating table: auth.webauthn_challenges
+NOTICE (00000): truncating table: supabase_migrations.schema_migrations
+Applying migration 20260101_drizzle_0000_initial.sql...
+Applying migration 20260102_drizzle_0001_groups_slug.sql...
+Applying migration 20260103_drizzle_0002_profile_showcase.sql...
+Applying migration 20260104_drizzle_0003_trade_tos.sql...
+Applying migration 20260105_drizzle_0004_gin_indexes.sql...
+Applying migration 20260106_drizzle_0005_stripe_event_log.sql...
+Applying migration 20260107_drift_capture_missing_tables.sql...
+Applying migration 20260327_ranking_function.sql...
+Applying migration 20260328_leads_rls.sql...
+Applying migration 20260329_trade_v2_schema.sql...
+Applying migration 20260331_desktop_trade_runtime.sql...
+NOTICE (00000): policy "trade_runtime_sessions_no_direct_select" for relation "public.trade_runtime_sessions" does not exist, skipping
+NOTICE (00000): policy "trade_runtime_sessions_no_direct_insert" for relation "public.trade_runtime_sessions" does not exist, skipping
+NOTICE (00000): policy "trade_runtime_sessions_no_direct_update" for relation "public.trade_runtime_sessions" does not exist, skipping
+NOTICE (00000): policy "trade_runtime_sessions_no_direct_delete" for relation "public.trade_runtime_sessions" does not exist, skipping
+NOTICE (00000): policy "trade_transfer_receipts_no_direct_select" for relation "public.trade_transfer_receipts" does not exist, skipping
+NOTICE (00000): policy "trade_transfer_receipts_no_direct_insert" for relation "public.trade_transfer_receipts" does not exist, skipping
+NOTICE (00000): policy "trade_transfer_receipts_no_direct_update" for relation "public.trade_transfer_receipts" does not exist, skipping
+NOTICE (00000): policy "trade_transfer_receipts_no_direct_delete" for relation "public.trade_transfer_receipts" does not exist, skipping
+Applying migration 20260401000000_trade_messages.sql...
+NOTICE (00000): policy "trade_messages_select_participants" for relation "public.trade_messages" does not exist, skipping
+NOTICE (00000): policy "trade_messages_insert_participants" for relation "public.trade_messages" does not exist, skipping
+Applying migration 20260401000001_trade_presence_rpc.sql...
+Applying migration 20260402_subscriptions_schema.sql...
+NOTICE (42P07): relation "subscriptions" already exists, skipping
+Applying migration 20260403_subscription_init_trigger.sql...
+NOTICE (00000): trigger "on_auth_user_created_subscription" for relation "auth.users" does not exist, skipping
+Applying migration 20260404_fix_trade_requests_rls.sql...
+NOTICE (00000): policy "trade_requests_update_participant" for relation "public.trade_requests" does not exist, skipping
+Applying migration 20260405000000_open_for_trade_and_rating.sql...
+Applying migration 20260406000000_gem_ranking_function.sql...
+Applying migration 20260406000001_missing_tables_and_columns.sql...
+NOTICE (42701): column "is_public" of relation "crates" already exists, skipping
+NOTICE (42701): column "requester_last_read_at" of relation "trade_requests" already exists, skipping
+NOTICE (42701): column "provider_last_read_at" of relation "trade_requests" already exists, skipping
+Applying migration 20260407_trade_messages_and_challenges.sql...
+NOTICE (42P07): relation "trade_messages" already exists, skipping
+NOTICE (42P07): relation "trade_messages_trade_id_created_at_idx" already exists, skipping
+NOTICE (42P07): relation "trade_messages_sender_trade_created_at_idx" already exists, skipping
+Applying migration 20260408_digs_table.sql...
+Applying migration 20260409000000_deploy_readiness_fixes.sql...
+NOTICE (00000): function public.acquire_trade_lease(uuid,text,uuid) does not exist, skipping
+Applying migration 20260409000001_perf_and_security.sql...
+NOTICE (42701): column "added_via" of relation "collection_items" already exists, skipping
+NOTICE (00000): constraint "collection_items_user_release_unique" of relation "collection_items" does not exist, skipping
+NOTICE (00000): constraint "wantlist_items_user_release_unique" of relation "wantlist_items" does not exist, skipping
+NOTICE (42P07): relation "releases_genre_gin_idx" already exists, skipping
+NOTICE (42P07): relation "releases_style_gin_idx" already exists, skipping
+NOTICE (42701): column "discogs_instance_id" of relation "collection_items" already exists, skipping
+NOTICE (00000): constraint "collection_items_user_discogs_instance_unique" of relation "collection_items" does not exist, skipping
+Applying migration 20260409000002_visibility_and_trade_proposals.sql...
+NOTICE (00000): policy "collection_items_select_own" for relation "public.collection_items" does not exist, skipping
+Applying migration 20260410_trade_peer_id_coordination.sql...
+NOTICE (00000): policy "trade_runtime_sessions_participants_select" for relation "public.trade_runtime_sessions" does not exist, skipping
+Applying migration 20260411_security_audit_fixes.sql...
+NOTICE (00000): policy "handoff_tokens_no_direct_access" for relation "public.handoff_tokens" does not exist, skipping
+NOTICE (00000): policy "trade_requests_update_policy" for relation "public.trade_requests" does not exist, skipping
+Applying migration 20260412_security_audit_phase2.sql...
+NOTICE (00000): policy "Users can view wantlist items" for relation "wantlist_items" does not exist, skipping
+NOTICE (00000): policy "wantlist_items_select_own" for relation "wantlist_items" does not exist, skipping
+NOTICE (00000): policy "Users can insert own notifications" for relation "notifications" does not exist, skipping
+NOTICE (00000): policy "Users can insert notifications" for relation "notifications" does not exist, skipping
+NOTICE (00000): policy "Users can view own notifications" for relation "notifications" does not exist, skipping
+NOTICE (00000): policy "Users can update own notifications" for relation "notifications" does not exist, skipping
+NOTICE (00000): policy "Users can view own listening logs" for relation "listening_logs" does not exist, skipping
+NOTICE (00000): policy "listening_logs_select_own" for relation "listening_logs" does not exist, skipping
+NOTICE (00000): policy "Users can view listening logs" for relation "listening_logs" does not exist, skipping
+Applying migration 20260413_direct_messages.sql...
+Applying migration 20260414_tracklist.sql...
+Applying migration 20260416000000_dm_mutual_follow_rls.sql...
+Applying migration 20260416000001_trade_reviews_rls_upgrade.sql...
+Applying migration 20260417_trade_preview_infrastructure.sql...
+NOTICE (00000): policy "trade_previews_insert_owner" for relation "storage.objects" does not exist, skipping
+NOTICE (00000): policy "trade_previews_select_participant" for relation "storage.objects" does not exist, skipping
+NOTICE (42710): extension "pg_cron" already exists, skipping
+NOTICE (42710): extension "pg_net" already exists, skipping
+Applying migration 20260418_collection_deleted_at.sql...
+NOTICE (42P07): relation "collection_items_user_release_unique" already exists, skipping
+Applying migration 20260419_purge_soft_deleted.sql...
+NOTICE (42701): column "deleted_at" of relation "collection_items" already exists, skipping
+NOTICE (42P07): relation "collection_items_deleted_at_idx" already exists, skipping
+WARN: no files matched pattern: supabase/seed.sql
+reset exit=0

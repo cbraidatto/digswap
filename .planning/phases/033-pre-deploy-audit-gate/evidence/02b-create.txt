@@ -1,0 +1,9 @@
+Creating project:    digswap-audit-20260422-2215
+Created a new project at https://supabase.com/dashboard/project/dfgcarnjahflocnsdhxs
+
+  
+   ORG ID               | REFERENCE ID         | NAME                        | REGION                   | CREATED AT (UTC)    
+  ----------------------|----------------------|-----------------------------|--------------------------|---------------------
+   waevgaqloxyszeutagko | dfgcarnjahflocnsdhxs | digswap-audit-20260422-2215 | East US (North Virginia) | 2026-04-22 21:14:29 
+
+create exit=0

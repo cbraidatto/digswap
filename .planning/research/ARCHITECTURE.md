@@ -1,623 +1,589 @@
-# Architecture: Local Library Integration
+# Architecture Research — Production Deploy Topology
 
-**Domain:** Local folder scan, AI metadata, system tray daemon, file watcher, collection sync
-**Researched:** 2026-04-13
-**Confidence:** HIGH (existing patterns well-established, new components follow proven Electron idioms)
+**Domain:** First production deploy of a Next.js 15 + Supabase Cloud webapp on Vercel
+**Researched:** 2026-04-20
+**Confidence:** HIGH — grounded in the existing repo, current Vercel/Supabase docs, and the 2026-04-06 deploy-readiness audit
+**Scope:** Deploy topology only. Application-level architecture (RLS model, P2P trade flow, feature boundaries) is already documented elsewhere and out of scope here.
 
-## Existing Architecture Summary
+---
 
-The desktop app follows a clean separation:
+## 1. Executive Answer
 
-```
-index.ts (app lifecycle)
-  -> DesktopSessionStore (electron-store, encrypted vault)
-  -> DesktopSupabaseAuth (auth runtime)
-  -> DesktopTradeRuntime (trade lifecycle, WebRTC)
-  -> registerDesktopIpc() (IPC handler registration)
-  -> createMainWindow() (BrowserWindow, remote/local shell)
+- **Exactly two pieces of infrastructure carry load in prod:** the Vercel project (hosts the Next.js app, all API route handlers, all server actions, cron-like via Vercel Cron not used yet) and the Supabase Cloud project (Postgres + Auth + Realtime + Storage + Edge Functions + pg_cron). Everything else (Hostinger, Stripe, Discogs, Resend, Upstash, Sentry) is a managed third party reached over HTTPS from one of those two.
+- **The monorepo maps cleanly:** only `apps/web` is deployed to Vercel. `apps/desktop` is not deployed (Electron, v1.5 milestone). `packages/trade-domain` is a workspace package consumed by `apps/web` at build time — it does not deploy anywhere. `supabase/functions/` is deployed to Supabase (not Vercel). `supabase/migrations/` is applied to the Supabase Postgres project via `supabase db push`.
+- **Dev → Prod changes are mostly environmental, not architectural:** a new Supabase project, a new Vercel project, a real domain, new OAuth client credentials, a real Stripe webhook endpoint, and a real Upstash DB. The code does not fork between environments — it reads from `process.env`.
+- **Two hard sequencing constraints:** (1) Supabase prod project must exist and have the schema applied before Vercel env vars can point at it; (2) DNS must resolve to Vercel and SSL must be live before the Discogs OAuth callback, the Google/GitHub OAuth redirect URIs, and the Stripe webhook endpoint can be finalized, because those all require the production URL as input.
+- **One drift risk still open from the audit:** `drizzle/` (Drizzle Kit journal) and `supabase/migrations/` are two separate migration trails for the same database. Prod must be applied through exactly one trail — recommend `supabase/migrations/` (via `supabase db push`) as the source of truth because it already contains all hand-written RLS, pg_cron, pg_net wiring, and Vault reads that Drizzle Kit cannot generate.
 
-Preload (trade.ts):
-  -> contextBridge exposes desktopBridge + desktopShell
-  -> All IPC via ipcRenderer.invoke / ipcRenderer.on
+---
 
-Renderer (AppShell):
-  -> React screens: Login, Inbox, Lobby, AudioPrep, Transfer, Completion, Settings
-  -> Calls window.desktopBridge.* methods
-```
+## 2. Deploy Topology
 
-**Key patterns already established:**
-- Runtime classes in main process (DesktopTradeRuntime pattern)
-- IPC registration via a single `registerDesktopIpc()` function
-- Bridge interfaces typed in `shared/ipc-types.ts`
-- electron-store for persistent local state
-- music-metadata already a dependency (used in ffmpeg-pipeline)
-- `addedVia` field on collection_items supports multiple sources ("discogs", "manual", "crate", "youtube")
-
-## Recommended Architecture
-
-### New Components Overview
+### 2.1 Where each thing runs
 
 ```
-apps/desktop/src/main/
-  index.ts                    [MODIFY] -- add tray, library runtime init, close-to-tray
-  ipc.ts                      [MODIFY] -- register library IPC channels
-  window.ts                   [MODIFY] -- close-to-tray behavior
-  tray.ts                     [NEW]    -- system tray icon + context menu
-  library/
-    library-runtime.ts        [NEW]    -- orchestrates scan, watch, sync (like TradeRuntime)
-    folder-scanner.ts         [NEW]    -- recursive audio file discovery
-    metadata-extractor.ts     [NEW]    -- music-metadata tag reading + filename parsing
-    ai-metadata.ts            [NEW]    -- Gemini Flash API for ambiguous metadata
-    file-watcher.ts           [NEW]    -- chokidar watcher for real-time changes
-    local-index.ts            [NEW]    -- electron-store based file index (hash -> metadata)
-    sync-engine.ts            [NEW]    -- diff local index vs server, push changes
-    youtube-search.ts         [NEW]    -- YouTube Data API v3 search per release
-
-apps/desktop/src/shared/
-  ipc-types.ts                [MODIFY] -- add library bridge types
-
-apps/desktop/src/preload/
-  trade.ts                    [MODIFY] -- expose library bridge methods
-
-apps/desktop/src/renderer/src/
-  LibraryScreen.tsx           [NEW]    -- folder selection, scan progress, file list
-  SettingsScreen.tsx          [MODIFY] -- add library folder, auto-start, tray settings
-
-apps/web/src/
-  lib/db/schema/
-    collections.ts            [NO CHANGE] -- addedVia "local" just a new string value
-    releases.ts               [NO CHANGE] -- discogsId already nullable
-  actions/
-    library-sync.ts           [NEW]    -- server action to receive local collection batch upserts
-  app/api/desktop/
-    library-sync/route.ts     [NEW]    -- API route for batch sync from desktop
+┌────────────────────────────────────────────────────────────────────────────┐
+│                                  INTERNET                                   │
+│                                                                             │
+│   digger (browser)           Stripe           Discogs           Google       │
+│        │                       │                │                │           │
+│        │ HTTPS                 │ webhook        │ OAuth          │ OAuth     │
+│        ▼                       ▼                ▼                ▼           │
+│  ┌──────────────┐                                                            │
+│  │ Hostinger    │  DNS only. A / CNAME → Vercel edge.                        │
+│  │   DNS zone   │  No hosting, no mail, no TLS termination here.             │
+│  └──────┬───────┘                                                            │
+│         │                                                                    │
+└─────────┼────────────────────────────────────────────────────────────────────┘
+          │ resolves to
+          ▼
+┌────────────────────────────────────────────────────────────────────────────┐
+│                                VERCEL (prod project)                        │
+│  ┌──────────────────────────────────────────────────────────────────────┐  │
+│  │  Vercel Edge Network (TLS, CDN, static /_next/static, images)        │  │
+│  └──────────────────────────────────────────────────────────────────────┘  │
+│            │                                                                │
+│            ▼                                                                │
+│  ┌──────────────────────────────────────────────────────────────────────┐  │
+│  │  Next.js 15 App Router runtime  (apps/web, built from packages/*)     │  │
+│  │    • Server Components + Server Actions  (Node.js serverless)         │  │
+│  │    • Route Handlers under src/app/api/*                               │  │
+│  │    • middleware.ts  (runs on Edge runtime by default)                  │  │
+│  │    • Sentry wrapper (withSentryConfig) → Sentry SaaS                   │  │
+│  └──────────────────────────────────────────────────────────────────────┘  │
+└──┬─────────────────────────────────────────────────────────────────────────┘
+   │ outbound HTTPS / Postgres wire
+   │
+   ├────────────────────────┬────────────────────┬──────────────────┬────────┐
+   ▼                        ▼                    ▼                  ▼        ▼
+┌─────────────────┐   ┌────────────────┐   ┌────────────────┐   ┌──────┐  ┌──────┐
+│ SUPABASE CLOUD  │   │ UPSTASH REDIS  │   │ RESEND         │   │STRIPE│  │DISCOGS│
+│ (prod project)  │   │ (serverless)   │   │ (transactional │   │ API  │  │ API   │
+│                 │   │                │   │  email)        │   │      │  │       │
+│ • Postgres 15   │   │ • rate limits  │   └────────────────┘   └──────┘  └──────┘
+│   + pg_cron     │   │ • session/cache│
+│   + pg_net      │   │ • leaderboards │   (All four are pure outbound calls
+│   + vault       │   └────────────────┘    from Vercel serverless functions.)
+│ • Auth (GoTrue) │
+│ • Realtime WS   │
+│ • Storage       │
+│ • Edge Functions│ ← cleanup-trade-previews, validate-preview (Deno)
+└─────────────────┘
 ```
 
-### Component Boundaries
+### 2.2 Monorepo → Deploy target mapping
 
-| Component | Responsibility | Communicates With |
-|-----------|---------------|-------------------|
-| `LibraryRuntime` | Orchestrates scan/watch/sync lifecycle, holds state | FolderScanner, FileWatcher, MetadataExtractor, AiMetadata, SyncEngine, LocalIndex |
-| `FolderScanner` | Recursive directory walk, discovers audio files | LibraryRuntime (returns file list) |
-| `MetadataExtractor` | Reads ID3/Vorbis tags + parses filename/path structure | LibraryRuntime (returns structured metadata) |
-| `AiMetadata` | Calls Gemini Flash for ambiguous/missing metadata | MetadataExtractor (enriches failed extractions) |
-| `FileWatcher` | Monitors folders for add/remove/rename events | LibraryRuntime (emits change events) |
-| `LocalIndex` | Persists file index to electron-store (path, hash, metadata, lastModified) | LibraryRuntime, SyncEngine |
-| `SyncEngine` | Diffs local index against server, pushes batch upserts | LibraryRuntime, Supabase client |
-| `TrayManager` | System tray icon, context menu, notifications | index.ts lifecycle |
-| `YouTubeSearch` | Finds YouTube video for identified releases | SyncEngine (enriches before push) |
+| Repo path | Where it runs in prod | Deploy mechanism | Notes |
+|---|---|---|---|
+| `apps/web/` | Vercel | `vercel --prod` (auto on push to `main` once Git integration is wired) | Root Directory in Vercel project = `apps/web`. Build command = `pnpm --filter @digswap/web build`. Install command must be pnpm-aware. |
+| `apps/desktop/` | **Not deployed** | — | Electron. Out of scope for v1.4. CI still typechecks + builds it. |
+| `packages/trade-domain/` | Bundled into `apps/web` build | Nothing separate | Workspace dep. Vercel must `pnpm install --frozen-lockfile` so the workspace resolution works. |
+| `supabase/migrations/*.sql` | Supabase Cloud Postgres | `supabase db push --linked` (CLI from dev machine or CI) | 28 migrations as of 2026-04-18. Applied in filename order. |
+| `supabase/functions/cleanup-trade-previews/` | Supabase Edge Runtime (Deno) | `supabase functions deploy cleanup-trade-previews` | Invoked hourly by pg_cron via pg_net (not by Vercel). |
+| `supabase/functions/validate-preview/` | Supabase Edge Runtime (Deno) | `supabase functions deploy validate-preview` | Invoked by the Next.js server when validating trade previews. |
+| `supabase/functions/_shared/` | Bundled into the two functions above | Automatic via supabase CLI | Not a deployable unit by itself. |
+| `drizzle/` + `drizzle.config.ts` | Dev laptop only | `pnpm drizzle-kit push` in dev | **Do not use in prod.** See §7 migration pipeline. |
+| `.github/workflows/ci.yml` | GitHub Actions | — | Runs on PR and push to main. Does not deploy today — Vercel handles deploy via Git integration. |
 
-### Data Flow
+### 2.3 Component responsibilities in prod
 
-#### Initial Scan
+| Component | Owns | Implementation |
+|---|---|---|
+| Vercel Edge | TLS, HTTP/2, CDN, static assets, middleware execution | Managed. Region auto-selected unless pinned. |
+| Next.js serverless functions (Vercel) | Server Components rendering, Server Actions, all `src/app/api/*` route handlers (Stripe webhook, Discogs callback, OAuth callback, `/api/health`, `/api/desktop/handoff/*`, `/api/og`, `/api/trade-preview`) | Node.js runtime. 10s timeout on Hobby, 60s on Pro. Must be Pro for any production commerce. |
+| Middleware (`apps/web/src/middleware.ts`) | CSP nonce generation, session validation via `supabase.auth.getClaims()`, per-request Referrer-Policy override | Edge runtime. Touches Supabase on every request — audit flagged this as a cold-start risk on public routes. |
+| Supabase Postgres | All relational data, RLS enforcement, materialized views (rankings), pg_cron schedule, pg_net outbound HTTP calls, Vault secret storage | Managed. Connection pooler (PgBouncer, transaction mode) on port 6543 is what `DATABASE_URL` must point to in prod serverless. |
+| Supabase Auth (GoTrue) | Sessions, OAuth flows for Google + GitHub, email verification, TOTP 2FA | Managed. Configured via the Supabase dashboard per project. Redirect URLs list is per-project — dev and prod must each carry the correct allow-list. |
+| Supabase Realtime | `notifications` subscription, trade presence, direct messages | Managed. WebSocket. 200 concurrent connections on free tier, 500 on Pro. |
+| Supabase Storage | Avatars, trade preview audio clips (short, ephemeral). **Never** full rip files — those go P2P. | Managed. RLS policies on buckets. |
+| Supabase Edge Functions | `cleanup-trade-previews` (hourly), `validate-preview` (on demand from Next.js) | Deno, deployed per function. Receive `SUPABASE_URL` and `SUPABASE_SERVICE_ROLE_KEY` from the runtime — never from Vercel. |
+| Upstash Redis | Rate limit counters (`rate-limit.ts` uses `failClosed=true` on critical auth flows), session cache, leaderboard sorted sets | Serverless REST API. No VPC needed. |
+| Stripe | Subscription billing. `/api/stripe/webhook` on Vercel receives events. | External. Webhook signing secret is per endpoint — dev and prod have different secrets. |
+| Discogs | OAuth 1.0a authentication + collection data. Callback at `/api/discogs/callback`. | External. Consumer key/secret issued once per app — same credentials for dev and prod is possible but not recommended; register two apps in the Discogs developer portal. |
+| Resend | Transactional email (wantlist match, invites, auth notifications) | External. API key. Domain (`digswap.com`) must be verified via DNS (SPF/DKIM records on Hostinger). |
+| Sentry | Error tracking for both client and server bundles | External. Configured via `withSentryConfig` in `next.config.ts`. Source maps uploaded at build time using `SENTRY_AUTH_TOKEN`. |
+| Hostinger | **Domain registrar + DNS zone only.** Not a host. | External. NS records stay at Hostinger; A/CNAME point to Vercel. Plus TXT/CNAME records for Resend domain verification. |
 
-```
-User clicks "Add Folder" in LibraryScreen
-  -> IPC: desktop:library-select-folder
-  -> dialog.showOpenDialog (main process)
-  -> LibraryRuntime.addFolder(path)
-    -> FolderScanner.scan(path)
-      -> Walks directory tree, filters audio extensions
-      -> Returns: { path, size, mtime }[]
-    -> For each file:
-      -> MetadataExtractor.extract(filePath)
-        -> music-metadata.parseFile() for ID3/Vorbis tags
-        -> If tags incomplete: parse filename (Artist - Album - Track.flac)
-        -> If still ambiguous: queue for AI
-      -> If AI queue non-empty:
-        -> AiMetadata.inferBatch(items)
-          -> Gemini Flash structured output: { artist, album, track, year, genre }
-      -> LocalIndex.upsert(path, hash, metadata)
-    -> SyncEngine.pushBatch(newItems)
-      -> POST /api/desktop/library-sync
-      -> Upserts releases + collection_items with addedVia="local"
-    -> IPC event: desktop:library-scan-progress { scanned, total, current }
-    -> IPC event: desktop:library-scan-complete { added, updated, errors }
-  -> FileWatcher.watch(path) starts
-```
+---
 
-#### Real-time File Watch (Tray Mode)
+## 3. Request Flow in Production
+
+### 3.1 Anonymous hit on the landing page
 
 ```
-chokidar detects file add/unlink/change
-  -> FileWatcher emits "file-added" | "file-removed" | "file-changed"
-  -> LibraryRuntime handles event:
-    - file-added: extract metadata, index, queue sync
-    - file-removed: mark removed in index, queue sync (delete from server)
-    - file-changed: re-extract metadata if mtime changed, queue sync
-  -> SyncEngine debounces (5s window) then pushes batch
-  -> If window is open: IPC event desktop:library-file-changed
+digger types digswap.com in browser
+    │
+    ▼
+Hostinger DNS   (A record → 76.76.21.x, Vercel anycast)
+    │
+    ▼
+Vercel Edge     (TLS terminates, routes to closest POP)
+    │
+    ▼
+middleware.ts   (runs on Edge runtime)
+    ├─ generate CSP nonce
+    ├─ supabase.auth.getClaims()   ← HTTP to Supabase Auth (hot path issue, see §8)
+    └─ attach security headers
+    │
+    ▼
+Next.js RSC     ("/" route, Server Component)
+    ├─ if anonymous → render public landing
+    └─ if authed    → redirect to /feed
+    │
+    ▼
+Response        (HTML + streamed payload, cached at edge where possible)
 ```
 
-#### Startup Diff Scan
+### 3.2 Authenticated action (e.g. "follow user")
 
 ```
-app.whenReady()
-  -> LibraryRuntime.initialize()
-    -> Load persisted watched folders from LocalIndex
-    -> For each folder:
-      -> FolderScanner.scan(path)
-      -> Diff against LocalIndex:
-        - New files (path not in index): extract, index, queue add
-        - Removed files (in index but not on disk): queue delete
-        - Changed files (mtime differs): re-extract, queue update
-      -> SyncEngine.pushBatch(changes)
-    -> FileWatcher.watch(allFolders) -- resume watching
+Button click (Client Component)
+    │ invokes server action
+    ▼
+Vercel serverless (Node.js fn, apps/web bundle)
+    ├─ middleware already ran, claims are on the request
+    ├─ server action validates input (zod)
+    ├─ rate-limit check   → Upstash Redis (REST)
+    ├─ DB write           → Supabase Postgres (via Drizzle, DATABASE_URL pooler)
+    └─ revalidatePath / revalidateTag
+    │
+    ▼
+Client receives result; Realtime push fires to the followed user
+    │
+    ▼
+followed user's browser (WebSocket open to Supabase Realtime)
+    └─ notification bell updates live
 ```
 
-## New IPC Channels
-
-### Invoke (renderer -> main, returns Promise)
-
-| Channel | Args | Returns | Purpose |
-|---------|------|---------|---------|
-| `desktop:library-select-folder` | none | `string \| null` | Native folder picker dialog |
-| `desktop:library-add-folder` | `folderPath: string` | `void` | Start scanning + watching a folder |
-| `desktop:library-remove-folder` | `folderPath: string` | `void` | Stop watching, optionally remove items |
-| `desktop:library-get-folders` | none | `WatchedFolder[]` | List all watched folders with stats |
-| `desktop:library-get-items` | `{ offset, limit, folder? }` | `LocalLibraryItem[]` | Paginated local index items |
-| `desktop:library-rescan` | `folderPath?: string` | `void` | Force rescan (one folder or all) |
-| `desktop:library-get-sync-status` | none | `LibrarySyncStatus` | Last sync time, pending count, errors |
-| `desktop:tray-get-settings` | none | `TraySettings` | Close-to-tray, auto-start prefs |
-| `desktop:tray-set-settings` | `Partial<TraySettings>` | `void` | Update tray preferences |
-
-### Events (main -> renderer, push via webContents.send)
-
-| Channel | Payload | Purpose |
-|---------|---------|---------|
-| `desktop:library-scan-progress` | `{ folder, scanned, total, currentFile }` | Scan progress bar |
-| `desktop:library-scan-complete` | `{ folder, added, updated, removed, errors }` | Scan finished |
-| `desktop:library-file-changed` | `{ type, path, metadata? }` | Real-time file change notification |
-| `desktop:library-sync-status` | `LibrarySyncStatus` | Sync state changed |
-| `desktop:library-ai-progress` | `{ processed, total, current }` | AI metadata inference progress |
-
-## New IPC Types (ipc-types.ts additions)
-
-```typescript
-export interface WatchedFolder {
-  path: string;
-  fileCount: number;
-  lastScannedAt: string | null;
-  watching: boolean;
-}
-
-export interface LocalLibraryItem {
-  filePath: string;
-  fileHash: string;
-  fileSizeBytes: number;
-  lastModified: string;
-  metadata: LocalAudioMetadata;
-  syncedAt: string | null;
-  serverCollectionItemId: string | null;
-}
-
-export interface LocalAudioMetadata {
-  artist: string | null;
-  album: string | null;
-  title: string | null;
-  trackNumber: number | null;
-  year: number | null;
-  genre: string[];
-  format: string;                 // codec: flac, mp3, etc.
-  bitrate: number;
-  sampleRate: number;
-  duration: number;
-  source: "tags" | "filename" | "ai";
-  confidence: number;             // 0-1, 1 = from clean tags
-}
-
-export interface LibrarySyncStatus {
-  lastSyncAt: string | null;
-  pendingAdds: number;
-  pendingDeletes: number;
-  pendingUpdates: number;
-  syncing: boolean;
-  lastError: string | null;
-}
-
-export interface TraySettings {
-  closeToTray: boolean;
-  autoStartOnLogin: boolean;
-  showNotifications: boolean;
-}
-
-export interface LibraryScanProgress {
-  folder: string;
-  scanned: number;
-  total: number;
-  currentFile: string;
-}
-
-export interface LibraryScanComplete {
-  folder: string;
-  added: number;
-  updated: number;
-  removed: number;
-  errors: string[];
-}
-
-export interface DesktopBridgeLibrary {
-  librarySelectFolder(): Promise<string | null>;
-  libraryAddFolder(folderPath: string): Promise<void>;
-  libraryRemoveFolder(folderPath: string): Promise<void>;
-  libraryGetFolders(): Promise<WatchedFolder[]>;
-  libraryGetItems(opts: { offset: number; limit: number; folder?: string }): Promise<LocalLibraryItem[]>;
-  libraryRescan(folderPath?: string): Promise<void>;
-  libraryGetSyncStatus(): Promise<LibrarySyncStatus>;
-  trayGetSettings(): Promise<TraySettings>;
-  traySetSettings(settings: Partial<TraySettings>): Promise<void>;
-  onLibraryScanProgress(listener: (event: LibraryScanProgress) => void): () => void;
-  onLibraryScanComplete(listener: (event: LibraryScanComplete) => void): () => void;
-  onLibraryFileChanged(listener: (event: { type: string; path: string }) => void): () => void;
-  onLibrarySyncStatus(listener: (event: LibrarySyncStatus) => void): () => void;
-}
-```
-
-## DB Schema Changes
-
-### collection_items -- NO migration needed
-
-The `addedVia` column is `varchar(20)`. Adding "local" as a value is just a new string. Existing RLS policies work unchanged (they check `userId = auth.uid()`).
-
-### releases table -- NO migration needed
-
-The `discogsId` column is already nullable. Local-only releases can be created with `discogsId = null`. The `youtubeVideoId` column is also nullable and ready for YouTube search results.
-
-### Local file index -- electron-store (NOT PostgreSQL)
-
-The local file index lives on the user's machine. Only resolved metadata is synced to the server.
-
-```typescript
-// PersistedDesktopState additions in session-store.ts
-interface PersistedDesktopState {
-  // ... existing fields ...
-  watchedFolders: string[];
-  localFileIndex: Record<string, LocalFileIndexEntry>;  // keyed by file path
-  traySettings: TraySettings;
-}
-
-interface LocalFileIndexEntry {
-  fileSizeBytes: number;
-  lastModified: number;        // mtime as epoch ms
-  metadata: LocalAudioMetadata;
-  serverReleaseId: string | null;
-  serverCollectionItemId: string | null;
-  syncedAt: string | null;
-}
-```
-
-**Performance note:** For large collections (5000+ files), electron-store serializes to a single JSON file. If performance degrades, migrate to `better-sqlite3`. Start with electron-store -- it is proven in this codebase and sufficient for typical vinyl collections (most diggers have 500-3000 files).
-
-### New API endpoint: POST /api/desktop/library-sync
-
-```typescript
-interface LibrarySyncRequest {
-  items: LibrarySyncItem[];
-  deletedItemIds: string[];     // server collection_item IDs to remove
-}
-
-interface LibrarySyncItem {
-  localPath: string;            // dedup key (per-user unique)
-  metadata: {
-    artist: string;
-    album: string;
-    title: string | null;
-    year: number | null;
-    genre: string[];
-    format: string;
-    country: string | null;
-  };
-  audioSpecs: {
-    codec: string;
-    bitrate: number;
-    sampleRate: number;
-    duration: number;
-  };
-}
-
-interface LibrarySyncResponse {
-  synced: number;
-  created: number;
-  updated: number;
-  deleted: number;
-  items: Array<{ localPath: string; releaseId: string; collectionItemId: string }>;
-  errors: Array<{ path: string; error: string }>;
-}
-```
-
-**Sync logic on the server:**
-1. For each item, match release: exact match on `artist + title + year` in `releases` table
-2. No match: create new release (`discogsId = null`)
-3. Upsert `collection_items` with `addedVia = 'local'`, audio specs in existing columns
-4. Return server IDs so desktop can update its local index
-5. Batch limit: 100 items per request
-
-## System Tray Integration
-
-### tray.ts (new file)
-
-```typescript
-import { Tray, Menu, nativeImage, app } from "electron";
-
-export class TrayManager {
-  private tray: Tray | null = null;
-
-  create(iconPath: string, callbacks: {
-    onShow: () => void;
-    onRescan: () => void;
-    onQuit: () => void;
-  }) {
-    const icon = nativeImage.createFromPath(iconPath);
-    this.tray = new Tray(icon.resize({ width: 16, height: 16 }));
-    
-    const contextMenu = Menu.buildFromTemplate([
-      { label: "Open DigSwap", click: callbacks.onShow },
-      { type: "separator" },
-      { label: "Library: watching 0 folders", enabled: false, id: "status" },
-      { label: "Rescan Now", click: callbacks.onRescan },
-      { type: "separator" },
-      { label: "Quit", click: callbacks.onQuit },
-    ]);
-    
-    this.tray.setToolTip("DigSwap Desktop");
-    this.tray.setContextMenu(contextMenu);
-    this.tray.on("double-click", callbacks.onShow);
-  }
-
-  updateStatus(folderCount: number, fileCount: number) {
-    // Rebuild context menu with updated status label
-  }
-
-  destroy() {
-    this.tray?.destroy();
-    this.tray = null;
-  }
-}
-```
-
-### index.ts modifications
-
-```typescript
-// In app.whenReady():
-const trayManager = new TrayManager();
-const libraryRuntime = new LibraryRuntime(sessionStore, authRuntime);
-await libraryRuntime.initialize();
-
-// Create tray after window
-trayManager.create(trayIconPath, {
-  onShow: () => focusMainWindow(),
-  onRescan: () => libraryRuntime.rescanAll(),
-  onQuit: () => { app.isQuitting = true; app.quit(); },
-});
-
-// Pass libraryRuntime to registerDesktopIpc
-registerDesktopIpc({ authRuntime, sessionStore, tradeRuntime, libraryRuntime });
-
-// Modify window-all-closed:
-app.on("window-all-closed", () => {
-  const traySettings = sessionStore.getTraySettings();
-  if (traySettings.closeToTray) return; // Stay alive in tray
-  if (process.platform !== "darwin") app.quit();
-});
-
-// Auto-start:
-app.setLoginItemSettings({
-  openAtLogin: sessionStore.getTraySettings().autoStartOnLogin,
-  openAsHidden: true,
-});
-
-// Shutdown:
-app.on("before-quit", () => {
-  libraryRuntime.shutdown();
-  trayManager.destroy();
-});
-```
-
-### window.ts modifications
-
-```typescript
-// In createMainBrowserWindow, add close interception:
-window.on("close", (event) => {
-  if (sessionStore.getTraySettings().closeToTray && !app.isQuitting) {
-    event.preventDefault();
-    window.hide();
-  }
-});
-```
-
-## Patterns to Follow
-
-### Pattern 1: Runtime Class (established by TradeRuntime)
-
-`LibraryRuntime` follows the exact same shape as `DesktopTradeRuntime`:
-- Constructor takes `sessionStore` + `authRuntime`
-- `initialize()` called during app startup
-- `shutdown()` called during app quit
-- Event emitter methods: `onScanProgress()`, `onScanComplete()`, `onSyncStatus()`
-- Registered in `registerDesktopIpc()` alongside trade runtime
-
-### Pattern 2: IPC Registration (single point)
-
-All library IPC handlers go in `registerDesktopIpc()` in `ipc.ts`, not in a separate file. This keeps the single-point registration pattern.
-
-### Pattern 3: Debounced Batch Sync
-
-```typescript
-// In SyncEngine
-private syncTimer: NodeJS.Timeout | null = null;
-private pendingChanges: Map<string, "add" | "update" | "delete"> = new Map();
-
-queueChange(path: string, type: "add" | "update" | "delete") {
-  this.pendingChanges.set(path, type);
-  if (this.syncTimer) clearTimeout(this.syncTimer);
-  this.syncTimer = setTimeout(() => this.flush(), 5_000);
-}
-```
-
-## Anti-Patterns to Avoid
-
-### Anti-Pattern 1: Computing SHA-256 for every file during scan
-
-**Why bad:** SHA-256 of a 50MB FLAC takes ~200ms. 5000 files = 17 minutes.
-**Instead:** Use `mtime + size` as the fast change detection key. Only compute full hash when needed for trade integrity (existing pipeline already does this).
-
-### Anti-Pattern 2: Syncing on every file event
-
-**Why bad:** Copying 500 files triggers 500 events in seconds.
-**Instead:** Debounce with 5s window, batch into single API call (max 100 items).
-
-### Anti-Pattern 3: Calling Gemini Flash for every file
-
-**Why bad:** Wasteful API calls for files with clean tags.
-**Instead:** Only invoke AI when no ID3 tags present AND filename parsing produced low confidence (<0.5).
-
-### Anti-Pattern 4: Watching system directories or unbounded depth
-
-**Why bad:** CPU/memory exhaustion, inotify limits on Linux.
-**Instead:** Limit depth to 10 levels, ignore non-audio files, only watch user-selected folders.
-
-### Anti-Pattern 5: Creating a separate BrowserWindow for library UI
-
-**Why bad:** Contradicts existing AppShell pattern, adds complexity.
-**Instead:** Add LibraryScreen as a new screen within AppShell (same as Settings, Inbox, etc.).
-
-## AI Metadata Pipeline
-
-### When to invoke AI
+### 3.3 Stripe webhook
 
 ```
-1. ID3v2 / Vorbis / FLAC tags (via music-metadata)  -> confidence: 1.0  -> NO AI
-2. ID3v1 tags (minimal)                               -> confidence: 0.8  -> NO AI
-3. Filename pattern matching successful                -> confidence: 0.6  -> NO AI
-4. Filename parsing + folder structure                 -> confidence: 0.5  -> MAYBE AI
-5. No tags, no parseable filename                      -> confidence: 0.1  -> YES AI
+Stripe event fires
+    │
+    ▼
+HTTPS POST https://digswap.com/api/stripe/webhook
+    │
+    ▼
+Vercel serverless (raw body, not parsed)
+    ├─ verify signature using STRIPE_WEBHOOK_SECRET (prod-specific!)
+    ├─ upsert into stripe_event_log  (idempotency table, migration 0005)
+    ├─ apply subscription state change → subscriptions table
+    └─ return 200
 ```
 
-Only items with confidence < 0.5 get queued for AI. Batch up to 20 items per Gemini Flash call.
-
-### Gemini Flash configuration
-
-```typescript
-import { GoogleGenAI } from "@google/genai";
-
-const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
-
-// Use structured output (responseMimeType: "application/json")
-// Model: gemini-2.5-flash (cheapest, fastest)
-// Cost: ~$0.075/1M input tokens
-// 20 files per batch = ~2000 tokens = ~$0.00015 per batch
-// 10,000 files worst case = ~$0.075 total
-```
-
-**New dependency:** `@google/genai` -- add to desktop package.json.
-**New env var:** `GEMINI_API_KEY` -- add to desktop config resolution.
-
-## File Watcher Configuration
-
-### chokidar v4
-
-```typescript
-import { watch } from "chokidar";
-
-const AUDIO_EXTENSIONS = /\.(flac|wav|mp3|aiff|aif|ogg|opus|m4a|wma|ape|wv)$/i;
-
-const watcher = watch(folderPath, {
-  ignored: [
-    /(^|[\/\\])\../,           // dotfiles
-    (path: string) => !AUDIO_EXTENSIONS.test(path) && !isDirectory(path),
-  ],
-  persistent: true,
-  depth: 10,
-  ignoreInitial: true,          // we do our own initial scan
-  awaitWriteFinish: {
-    stabilityThreshold: 2000,   // wait 2s after last write
-    pollInterval: 500,
-  },
-  usePolling: false,
-});
-```
-
-**New dependency:** `chokidar@^4.0.0` -- add to desktop package.json.
-
-## YouTube Search Integration
-
-The `releases` table already has a `youtubeVideoId` column. YouTube search slots directly in.
+### 3.4 OAuth callback (Google / GitHub)
 
 ```
-YouTube Data API v3: 10,000 units/day free
-Search costs 100 units = 100 searches/day
-Strategy: Queue searches, 1 per 2s, cache results
-Most vinyl releases will have YouTube matches
+digger clicks "Continue with Google"
+    │
+    ▼
+Supabase Auth sends 302 → accounts.google.com with redirect_uri = https://<supabase-project>.supabase.co/auth/v1/callback
+    │
+    ▼
+Google validates, redirects to Supabase
+    │
+    ▼
+Supabase handles the exchange, then redirects to the app at NEXT_PUBLIC_SITE_URL + "/api/auth/callback"
+    │
+    ▼
+Vercel serverless (/api/auth/callback)
+    ├─ exchange code for session with supabase.auth.exchangeCodeForSession()
+    ├─ set cookies
+    └─ redirect to /feed or intended destination
 ```
 
-**New env var:** `YOUTUBE_API_KEY` -- add to desktop config resolution.
+**The production-unique piece:** the Supabase dashboard `Auth → URL Configuration → Redirect URLs` allow-list must contain the prod domain. And Google / GitHub developer consoles must include the Supabase prod project's `<project>.supabase.co/auth/v1/callback` as an authorized redirect URI.
 
-## New Dependencies Summary
+### 3.5 Discogs OAuth callback
 
-| Package | Version | Purpose |
-|---------|---------|---------|
-| `chokidar` | `^4.0.0` | File watching |
-| `@google/genai` | `^1.48.0` | Gemini Flash AI metadata |
+```
+digger clicks "Connect Discogs"
+    │
+    ▼
+Server action mints request token via /api/discogs/callback (OAuth 1.0a)
+    │
+    ▼
+Redirect to discogs.com/oauth/authorize?oauth_token=…
+    │
+    ▼
+Discogs redirects back to callback_url (set when registering the Discogs app)
+    │   → must be https://digswap.com/api/discogs/callback in prod
+    ▼
+Vercel serverless exchanges request token for access token; stores encrypted
+```
 
-Both added to `apps/desktop/package.json`. No new dependencies for the web app.
+**Production-unique piece:** the callback URL is set in the Discogs developer portal. A single Discogs app cannot serve both dev (localhost) and prod (digswap.com) at the same time because Discogs only accepts one callback URL. Register a second Discogs app for prod.
 
-## Scalability Considerations
+### 3.6 pg_cron → Edge Function (preview cleanup)
 
-| Concern | 100 files | 5,000 files | 50,000 files |
-|---------|-----------|-------------|--------------|
-| Scan time | < 5s | ~30s | ~5min |
-| Local index | electron-store OK | electron-store OK (~2MB) | Consider better-sqlite3 |
-| AI calls | ~5 items | ~500 items (25 batches) | ~5000 items (queue overnight) |
-| Server sync | 1 API call | 50 calls | 500 calls (throttle 2/sec) |
-| chokidar memory | Negligible | ~10MB | ~50MB |
+```
+Postgres scheduler fires every hour
+    │
+    ▼
+public.invoke_trade_preview_cleanup()  (SECURITY DEFINER)
+    ├─ read vault.decrypted_secrets for trade_preview_project_url + publishable_key
+    ├─ net.http_post → <project>.supabase.co/functions/v1/cleanup-trade-previews
+    ▼
+Supabase Edge Runtime (Deno) runs the function
+    ├─ query expired preview rows
+    ├─ delete from Storage bucket `trade-previews`
+    └─ null out the paths in trade_proposal_items
+```
 
-## Build Order
+**This flow does not touch Vercel at all.** Everything happens inside the Supabase project. The only prod setup step is: after running the migration that creates the cron job, insert the prod Vault secrets (`trade_preview_project_url`, `trade_preview_publishable_key`). Until those secrets exist, the cron job logs "Skipping" and does nothing — safe fail.
 
-### Phase 1: Local Index + Folder Scanner (no server, no AI)
-1. `local-index.ts` -- electron-store wrapper for file index
-2. `metadata-extractor.ts` -- music-metadata tag reading + filename parsing
-3. `folder-scanner.ts` -- recursive walk + metadata extraction
-4. IPC channels: select-folder, add-folder, get-folders, get-items
-5. `LibraryScreen.tsx` -- folder picker, scan progress, file list display
-6. **Testable:** Scan a folder, read tags, display in UI
+---
 
-### Phase 2: Sync Engine (server integration)
-1. `POST /api/desktop/library-sync` API route + server action
-2. `sync-engine.ts` -- batch upsert to server
-3. Extend LibraryScreen to show sync status
-4. **Testable:** Local items appear on web collection page with addedVia="local"
+## 4. Dev vs Prod: What Actually Changes
 
-### Phase 3: File Watcher + Tray
-1. `file-watcher.ts` -- chokidar integration
-2. `tray.ts` -- system tray icon + context menu
-3. Modify `index.ts` -- close-to-tray, tray lifecycle
-4. Modify `window.ts` -- hide on close
-5. Startup diff scan in LibraryRuntime.initialize()
-6. **Testable:** Add file to watched folder, appears in collection. Close to tray, app runs.
+Nothing in the codebase is forked. Everything branches on environment variables or on dashboard configuration.
 
-### Phase 4: AI Metadata + YouTube
-1. `ai-metadata.ts` -- Gemini Flash integration
-2. Extend MetadataExtractor with AI fallback
-3. `youtube-search.ts` -- YouTube Data API
-4. **Testable:** Files with no tags get AI-inferred metadata. Releases get YouTube links.
+| Concern | Dev | Prod | Where to change |
+|---|---|---|---|
+| Supabase project | `your-dev-project.supabase.co` | `digswap-prod.supabase.co` (new project) | Supabase dashboard; then `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`, `SUPABASE_SERVICE_ROLE_KEY`, `DATABASE_URL` in Vercel env |
+| Database migrations | `pnpm drizzle-kit push` against local or dev Supabase | `supabase db push --linked` against prod | CLI, linked via `supabase link --project-ref <prod-ref>` |
+| Edge Functions | `supabase functions serve` locally (optional) | `supabase functions deploy <name>` per function | CLI, same link |
+| pg_cron jobs | present but can point at dev URL via Vault | must point at prod URL via Vault | Insert Vault secrets post-migration in prod only |
+| Site URL | `http://localhost:3000` | `https://digswap.com` | `NEXT_PUBLIC_SITE_URL`, `NEXT_PUBLIC_APP_URL` in Vercel env |
+| Supabase redirect URLs allow-list | `http://localhost:3000/**` | `https://digswap.com/**` | Supabase dashboard → Auth → URL Configuration |
+| Google OAuth client | "DigSwap dev" with localhost redirect | "DigSwap prod" with digswap.com redirect (or same client with both URIs whitelisted) | Google Cloud Console |
+| GitHub OAuth app | separate app | separate app | GitHub Developer settings |
+| Discogs OAuth app | app with `http://localhost:3000/api/discogs/callback` | **separate** app with `https://digswap.com/api/discogs/callback` | Discogs developer portal. Single callback URL per app. |
+| Stripe mode | Test mode keys + Stripe CLI webhook forwarding | Live mode keys + real webhook endpoint at `https://digswap.com/api/stripe/webhook` | Stripe dashboard + Vercel env |
+| Stripe price IDs | test price IDs | live price IDs | Vercel env (`NEXT_PUBLIC_STRIPE_PRICE_MONTHLY`, `_ANNUAL`) |
+| Upstash Redis | one DB, maybe shared | dedicated prod DB | Upstash console → Vercel env |
+| Resend | API key, sandbox mode, emails only to verified addresses | API key + verified domain | Resend dashboard + DNS records on Hostinger |
+| Sentry | one project | separate prod project (or same project with `environment=production`) | Sentry dashboard + Vercel env (`SENTRY_ORG`, `SENTRY_PROJECT`, `SENTRY_AUTH_TOKEN`) |
+| Source maps | not uploaded | uploaded at build time for stack trace symbolication | `withSentryConfig` already handles this; needs `SENTRY_AUTH_TOKEN` in Vercel build env |
+| CSP | nonce-based, strict | nonce-based, strict (same) | No change — middleware already emits this |
+| `HANDOFF_HMAC_SECRET` | optional (dev default allowed) | **required, ≥32 chars** — enforced by `env.ts` when `VERCEL=1` | Vercel env |
 
-### Phase 5: Auto-Start + Polish
-1. `app.setLoginItemSettings()` for Windows auto-start
-2. Tray notifications for wantlist matches
-3. Settings UI for all new preferences
-4. Error handling, retry logic
-5. **Testable:** App starts with Windows, watches folders, syncs silently
+---
 
-**Rationale:** Phase 1 delivers visible value (see local files). Phase 2 connects to existing collection system. Phase 3 adds daemon behavior. Phase 4 enhances with AI. Phase 5 polishes UX.
+## 5. Secrets: Where Each One Originates and Where It Is Consumed
 
-## Sources
+Key question: "which keys are `NEXT_PUBLIC_`, which are server-only, which go in Vercel vs Supabase?" Answer table:
 
-- [Chokidar v4 GitHub](https://github.com/paulmillr/chokidar) -- HIGH confidence
-- [Electron Tray API](https://www.electronjs.org/docs/latest/api/tray) -- HIGH confidence
-- [Electron app.setLoginItemSettings](https://www.electronjs.org/docs/latest/api/app) -- HIGH confidence
-- [Electron minimize to tray](https://dev.to/jenueldev/electronjs-how-to-minimizeclose-window-to-system-tray-or-in-the-background-11c6) -- MEDIUM confidence
-- [@google/genai npm](https://www.npmjs.com/package/@google/genai) -- HIGH confidence
-- [Gemini API docs](https://ai.google.dev/gemini-api/docs/quickstart) -- HIGH confidence
-- [music-metadata npm](https://www.npmjs.com/package/music-metadata) -- HIGH confidence, already in use
-- [YouTube Data API v3](https://developers.google.com/youtube/v3) -- HIGH confidence
-- [Chokidar and Electron integration](https://www.hendrik-erz.de/post/electron-chokidar-and-native-nodejs-modules-a-horror-story-from-integration-hell) -- MEDIUM confidence
+| Secret | Tier | Originates at | Consumed by | Set in |
+|---|---|---|---|---|
+| `NEXT_PUBLIC_SUPABASE_URL` | public (bundled in JS) | Supabase dashboard (prod project) | Browser + server | Vercel env (all envs) |
+| `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` | public (anon/RLS key) | Supabase dashboard | Browser + server | Vercel env |
+| `SUPABASE_SERVICE_ROLE_KEY` | SECRET — full-DB bypass | Supabase dashboard | **Server only** (server actions, API routes, never middleware, never sent to client) | Vercel env (server, prod) **and** separately in Supabase Edge Function env |
+| `DATABASE_URL` | SECRET (contains password) | Supabase dashboard → Connection Pooler (port 6543, transaction mode) | Drizzle client on server | Vercel env |
+| `NEXT_PUBLIC_SITE_URL` / `NEXT_PUBLIC_APP_URL` | public | You choose (`https://digswap.com`) | Anywhere that builds absolute URLs (OAuth callbacks, emails, meta tags) | Vercel env |
+| `STRIPE_SECRET_KEY` | SECRET | Stripe dashboard (live mode) | Server actions + webhook | Vercel env (prod) |
+| `STRIPE_WEBHOOK_SECRET` | SECRET | **Created when you register the webhook endpoint** at `https://digswap.com/api/stripe/webhook` — so this exists only after Vercel is live and DNS resolves | `/api/stripe/webhook` signature verification | Vercel env (prod) |
+| `NEXT_PUBLIC_STRIPE_PRICE_MONTHLY` / `_ANNUAL` | public | Stripe dashboard | Client-side upgrade flow | Vercel env |
+| `DISCOGS_CONSUMER_KEY` / `DISCOGS_CONSUMER_SECRET` | SECRET | Discogs developer portal (prod app) | Server — OAuth dance + API calls | Vercel env |
+| `IMPORT_WORKER_SECRET` | SECRET | Generated (`openssl rand -hex 32`) | Self-invocation auth between Next.js pages and background workers | Vercel env |
+| `HANDOFF_HMAC_SECRET` | SECRET, ≥32 chars in prod (enforced) | Generated | HMAC signing on desktop handoff tokens | Vercel env |
+| `UPSTASH_REDIS_REST_URL` | public-ish (not strictly secret but keep private) | Upstash console | Server rate limit / leaderboards | Vercel env |
+| `UPSTASH_REDIS_REST_TOKEN` | SECRET | Upstash console | Server only | Vercel env |
+| `RESEND_API_KEY` | SECRET | Resend dashboard | Server actions that send mail | Vercel env |
+| `RESEND_FROM_EMAIL` | public (`noreply@digswap.com`) | You choose; domain must be verified in Resend | Email sender | Vercel env |
+| `NEXT_PUBLIC_SENTRY_DSN` | public (DSN is safe to expose) | Sentry dashboard | Client + server | Vercel env |
+| `SENTRY_ORG` / `SENTRY_PROJECT` / `SENTRY_AUTH_TOKEN` | SECRET (auth token only) | Sentry | Build time (source map upload) | Vercel env (build scope) |
+| `YOUTUBE_API_KEY` | SECRET (optional) | Google Cloud Console | Server | Vercel env |
+| **Edge Function envs:** `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY` | | Supabase provides automatically at runtime | `cleanup-trade-previews`, `validate-preview` | **Supabase**, not Vercel |
+| **Vault secrets:** `trade_preview_project_url`, `trade_preview_publishable_key` | | Inserted by you post-migration | `public.invoke_trade_preview_cleanup()` pg_cron job | **Supabase vault**, not Vercel |
+
+### 5.1 Three secret boundaries (critical mental model)
+
+1. **Vercel env (Next.js serverless + build):** everything the Next.js app reads at runtime or build time. This is the biggest bag. Use Vercel's Environment Variables UI with `Production` / `Preview` / `Development` scopes set correctly.
+2. **Supabase Edge Function env:** `SUPABASE_URL` + `SUPABASE_SERVICE_ROLE_KEY` are injected automatically — do not re-add them manually unless overriding. Set these via `supabase secrets set --env-file` if the function needs extra vars (e.g. a third-party API key used only from the edge function).
+3. **Supabase Vault:** only secrets consumed by Postgres itself (SECURITY DEFINER functions, pg_cron callbacks). Today: `trade_preview_project_url` and `trade_preview_publishable_key`. Insert via the Supabase dashboard → Vault UI or SQL.
+
+---
+
+## 6. Build / CI / Deploy Pipeline
+
+### 6.1 Current CI (`.github/workflows/ci.yml`)
+
+Does **not** deploy. It runs on every PR and push to main:
+
+```
+push to main  or  pull_request → main
+    │
+    ▼
+┌──────────┬───────────┬─────────┬────────────┬────────────────┐
+│  lint    │ typecheck │  test   │ build-web  │ build-desktop  │
+│  (web)   │ (all 3)   │ (all 3) │            │                │
+└──────────┴───────────┴─────────┴────────────┴────────────────┘
+                                      │
+                                      ▼ needs: build-web
+                                  ┌────────┐
+                                  │  e2e   │  (Playwright, chromium only)
+                                  └────────┘
+```
+
+All jobs run against **dummy env vars** hard-coded in the workflow env block. This is fine for build-time validation (Zod schema accepts them in the `VERCEL !== "1"` branch), but means CI cannot smoke-test against real services.
+
+### 6.2 Vercel Git integration (recommended path — add this)
+
+Vercel's GitHub integration is the simplest deploy mechanism for a solo dev:
+
+```
+git push origin main
+    │
+    ├─→ GitHub Actions (CI) runs in parallel — gates PRs but not deploys
+    │
+    └─→ Vercel webhook receives push event
+            │
+            ▼
+        Vercel build runner
+            ├─ pnpm install --frozen-lockfile  (root, uses pnpm-workspace.yaml)
+            ├─ pnpm --filter @digswap/web build
+            │     ├─ Sentry uploads source maps (needs SENTRY_AUTH_TOKEN)
+            │     ├─ Next.js compiles RSC + client bundles
+            │     └─ env.ts Zod validates — fails build if any required env is missing
+            ├─ output captured to .vercel/output
+            └─ atomic deploy to Production
+```
+
+For **preview** deployments (every PR gets a unique URL), Vercel uses the "Preview" env scope — set a separate `NEXT_PUBLIC_SITE_URL=https://<branch>-digswap.vercel.app` or better, rely on the auto-populated `VERCEL_URL`. Preview deploys should **never** point at the prod Supabase project — create a "staging" Supabase project or point previews at dev.
+
+### 6.3 Supabase deploys (manual in v1.4, script in v1.5)
+
+Supabase has no Git integration. Deploys happen via the Supabase CLI. For a solo dev doing first production deploy, run them manually from your laptop:
+
+```
+supabase link --project-ref <prod-ref>     # one-time
+supabase db push                            # apply supabase/migrations/*.sql
+supabase functions deploy cleanup-trade-previews
+supabase functions deploy validate-preview
+```
+
+Post-deploy, insert Vault secrets via the dashboard (one-time):
+
+```sql
+select vault.create_secret('https://<prod-ref>.supabase.co', 'trade_preview_project_url');
+select vault.create_secret('<publishable-key>',              'trade_preview_publishable_key');
+```
+
+Later (v1.5 or whenever), move this into a GitHub Action that runs on push to main after CI passes. For v1.4, manual is correct — a solo dev doing a first deploy should see every step.
+
+### 6.4 Build order constraints (do not reorder)
+
+1. **Supabase prod project exists** — just click "New project" in the dashboard. Until this exists, you cannot generate any URL/keys to put in Vercel.
+2. **Run `supabase db push` against prod** — applies all 28 migrations. Required before Vercel can boot because `/api/health` and most server actions query tables.
+3. **Deploy Edge Functions** — `cleanup-trade-previews` and `validate-preview`. Next.js validate-preview route (`/api/trade-preview/...`) calls these. Safe to deploy pre-DNS since they're addressed by Supabase URL, not your domain.
+4. **Populate Vault secrets** — required by the hourly cron job. Job is idempotent and safe-fails without them.
+5. **Set Vercel env vars** — all of them. Run `vercel env pull` locally to sanity check.
+6. **Trigger first Vercel build** — either push to main or `vercel --prod` manually. Sentry source map upload needs `SENTRY_AUTH_TOKEN`; if missing, build succeeds but stack traces are minified.
+7. **Verify `https://<project>.vercel.app` works** on the Vercel-assigned URL before touching DNS. Run smoke tests there.
+8. **DNS cutover on Hostinger** — A record (or ALIAS/ANAME if Hostinger supports it) for `digswap.com` → `76.76.21.21`; CNAME for `www` → `cname.vercel-dns.com`. Wait for propagation (minutes to hours).
+9. **Vercel verifies domain, issues SSL** — automatic once DNS resolves.
+10. **Update OAuth redirects in Supabase dashboard** — add `https://digswap.com/**` to allow-list. Add to Google + GitHub OAuth clients too.
+11. **Register Discogs prod app** with callback `https://digswap.com/api/discogs/callback`. Put its key/secret in Vercel env. Redeploy Vercel to pick up the new env.
+12. **Register Stripe webhook** at `https://digswap.com/api/stripe/webhook`. Get `STRIPE_WEBHOOK_SECRET`. Put in Vercel env. Redeploy.
+13. **Verify Resend domain** — add DKIM/SPF records on Hostinger DNS. Resend will verify automatically once they propagate.
+
+Steps 11–12 require Vercel to be live on the real domain, so they cannot happen earlier. This is the tightest sequencing constraint and must be documented as a checklist in the runbook.
+
+---
+
+## 7. Migration Pipeline: Resolving The Drift
+
+The deploy-readiness audit (P0 item 2) called out drift between `drizzle/` and `supabase/migrations/`. For the first production deploy, pick exactly one trail and stop writing to the other.
+
+### 7.1 Why `supabase/migrations/` must be the source of truth
+
+- **Contains RLS, pg_cron, pg_net, Vault reads, SECURITY DEFINER functions, materialized views, GIN indexes.** Drizzle Kit generates none of these — they are hand-written SQL.
+- **Is the only trail Supabase CLI can apply** to a Supabase Cloud project. `supabase db push` reads `supabase/migrations/` exclusively.
+- **Has more recent content.** `drizzle/` stops at `0005_stripe_event_log.sql`; `supabase/migrations/` has 23 migrations after that date.
+
+### 7.2 Recommended pattern going forward
+
+```
+Dev (solo dev laptop)                     Prod (Supabase Cloud)
+┌───────────────────────┐                ┌────────────────────────┐
+│ Author Drizzle schema │                │                        │
+│ in apps/web/src/lib/  │                │                        │
+│      db/schema/       │                │                        │
+└──────────┬────────────┘                │                        │
+           │ drizzle-kit generate         │                        │
+           ▼                              │                        │
+┌───────────────────────┐                │                        │
+│ Emit SQL to drizzle/  │   Review,       │                        │
+│ for type-check diffs  │   then hand-   │                        │
+│ (but do NOT apply)    │   copy/merge   │                        │
+└──────────┬────────────┘   into a new   │                        │
+           │                 hand-       │                        │
+           ▼                 written     │                        │
+┌───────────────────────┐   file in      │                        │
+│ Hand-author matching  │   supabase/    │                        │
+│ file with RLS/cron/   │   migrations/  │                        │
+│ etc. in supabase/     │   (timestamp   │                        │
+│   migrations/         │   naming)      │                        │
+└──────────┬────────────┘                │                        │
+           │ supabase db push --local     │                        │
+           ▼                              │                        │
+┌───────────────────────┐                │                        │
+│ Verify on local       │   then on      │ supabase db push        │
+│ Supabase (Docker)     │   main:        │ --linked                │
+└──────────┬────────────┘                │     ↓                   │
+                                         │  Applies migrations     │
+                                         │  to prod in order       │
+                                         └────────────────────────┘
+```
+
+**Concrete action items for v1.4:**
+
+1. Delete or archive `drizzle/0002_showcase_cards.sql` — it's orphaned per the audit (not in `_journal.json`) and duplicates columns already created downstream.
+2. Add a top-of-repo note (or a linter rule) saying "`drizzle/` is informational; `supabase/migrations/` is authoritative."
+3. Add a `supabase/config.toml` (audit P2 flagged its absence). Without it, `supabase link` has to guess project settings.
+
+### 7.3 Bootstrap-from-empty sanity check (required before first prod deploy)
+
+Before pointing Vercel at the prod Supabase project, verify the migration trail applies cleanly to an empty database:
+
+```
+# against a fresh local Supabase
+supabase db reset
+# or against a throwaway cloud project
+supabase db push --linked
+```
+
+If this fails, the same failure will hit prod. The audit (P0 item 2) did not confirm this passes today — treat it as unvalidated.
+
+---
+
+## 8. Cold Start and Public-Route Architecture (audit P0 item 3)
+
+The deploy-readiness audit flagged that `/`, `/signup`, `/signin`, `/pricing` returned 500 on cold start because middleware and some pages call `supabase.auth.getUser()` / `getClaims()` on every request, which requires a roundtrip to Supabase.
+
+This is a deploy-topology concern because in production:
+- Every cold serverless invocation adds 100–400ms to reach Supabase for auth validation.
+- `/pricing` is a public marketing page; if Supabase is slow, the landing experience degrades.
+- Sentry will fire alerts on every 500, blurring real issues.
+
+**Architectural fix (recommended for v1.4):**
+- Middleware should run on as narrow a route matcher as possible. Exclude `/`, `/pricing`, `/api/health`, `/api/og`, and any other truly-anonymous path.
+- Public route handlers should not call `getUser()` unless they actually need the user. The pricing page uses it to render a "Current plan" badge — gate that behind an `is-authed` cookie check or move the badge to a client component that fetches after hydration.
+- Keep `/api/health` completely decoupled: no auth, no middleware — already the case, confirmed in `route.ts`.
+
+This is a Next.js architecture decision, not a Vercel config. The middleware matcher is a one-line change but catches a real prod risk.
+
+---
+
+## 9. Anti-Patterns for This Deploy Topology
+
+### 9.1 "Apply Drizzle Kit to prod"
+**What people do:** `drizzle-kit push` pointed at the prod `DATABASE_URL`.
+**Why it's wrong:** Drizzle Kit diffs the schema and applies DDL directly. It has no concept of RLS policies, SECURITY DEFINER functions, pg_cron, or Vault. It will happily drop policies it doesn't know about. It also fights with the `supabase/migrations/` trail — running both causes prod drift within days.
+**Do this instead:** `supabase db push` exclusively in prod. Keep Drizzle Kit in dev for schema authoring and type generation.
+
+### 9.2 "One Supabase project for dev and prod"
+**What people do:** save money by pointing Vercel preview + prod + local dev at the same Supabase project.
+**Why it's wrong:** Supabase migrations are global to the project. A bad migration kills prod users. Preview deployments writing into prod tables contaminate data. RLS testing becomes guesswork. Row count bills scale weirdly.
+**Do this instead:** two projects minimum — dev and prod. Preview deploys point at dev. When you have revenue, add a staging project.
+
+### 9.3 "Long-running work inside a Next.js API route"
+**What people do:** implement Discogs bulk-import as a single `/api/discogs/import` route that fetches 5000 records.
+**Why it's wrong:** Vercel serverless timeout is 10s (Hobby) or 60s (Pro). 5000 records at Discogs' 60 req/min = 83 minutes. The request will be killed every time.
+**Do this instead:** move background work to Supabase Edge Functions (`supabase/functions/discogs-import-worker/`) which have a 150s timeout on the hosted runtime, or chunk the work and self-invoke via `IMPORT_WORKER_SECRET` so each invocation stays under 60s. This is already partially modeled in the repo (`IMPORT_WORKER_SECRET` exists) — extend the pattern instead of moving to a different paradigm.
+
+### 9.4 "Single-region everything"
+**What people do:** leave Vercel + Supabase in their default US regions while targeting a global vinyl community.
+**Why it's wrong:** for an EU digger, every request is 150ms more than it needs to be. Supabase Realtime over a transatlantic link is particularly painful.
+**Do this instead (in v1.4, safe minimum):** pick a Supabase region matching your largest user cohort (EU or US East) and **match the Vercel serverless function region** to it (`vercel.json` → `regions: ["iad1"]` or `["fra1"]`). Do not set Vercel to multi-region until you have a read-replica strategy, because every fn would take a transatlantic DB hit on cold start.
+
+### 9.5 "Put Supabase service role key in `NEXT_PUBLIC_`"
+**What people do:** accidental typo, or copy-paste from docs that use a different key naming convention.
+**Why it's wrong:** the service role key bypasses all RLS. Bundling it to the browser is a full database compromise.
+**Do this instead:** the `env.ts` Zod schema already segregates server vars from `NEXT_PUBLIC_`. Keep it that way. Add a CI check (`grep -r "NEXT_PUBLIC_.*SERVICE_ROLE" apps/web/src`) as a belt-and-braces safeguard.
+
+### 9.6 "Deploy Edge Functions via the Vercel pipeline"
+**What people do:** try to deploy `supabase/functions/` from Vercel because it's the only CI they've wired up.
+**Why it's wrong:** Vercel has no Supabase integration. Edge Functions run on Deno inside Supabase — Vercel cannot deploy them.
+**Do this instead:** add a GitHub Actions job that runs `supabase functions deploy` on push to main (needs `SUPABASE_ACCESS_TOKEN` in repo secrets). For v1.4 first deploy, manual CLI is fine.
+
+---
+
+## 10. Scaling Considerations (Relevant to First Deploy)
+
+| Scale | Topology implications |
+|---|---|
+| 0–1k users (v1.4 target) | Current topology holds as-is. Free tiers everywhere except Vercel Pro (needed for commerce + 60s function timeout). Supabase free plan's 500MB DB is enough for the first 1000 diggers if we don't store record art — `i.discogs.com` URLs instead. |
+| 1k–10k users | First bottleneck: Supabase Realtime (200 concurrent → 500 on Pro). Upgrade Supabase to Pro. Monitor Upstash command budget (500k/mo free). |
+| 10k–100k users | Second bottleneck: Postgres connections in serverless. Must use PgBouncer **transaction mode** (the pooler URL on port 6543) — any `prepare: false` gotcha in Drizzle config surfaces here. Consider read replicas for the feed query. |
+| 100k+ users | Split compute: move Discogs import + ranking recompute + trade preview validation out of Next.js entirely into dedicated workers (Supabase Edge Functions scaled up, or a Railway/Fly side service). Out of scope for v1.4. |
+
+**What does not need to change to reach 10k:** the request-flow topology. No microservices, no separate backend, no message broker. The monorepo + Vercel + Supabase stack carries the product to at least tens of thousands of users before any structural rework.
+
+---
+
+## 11. Integration Points (Summary Table)
+
+### External Services
+
+| Service | Integration pattern | Prod gotchas |
+|---|---|---|
+| Supabase Postgres | Drizzle ORM over `postgres` driver, connection pooler URL | Must use `prepare: false` in Drizzle config because PgBouncer transaction mode does not support prepared statements across connections. |
+| Supabase Auth | `@supabase/ssr` server client + middleware | Redirect URL allow-list is per-project dashboard setting — not in code. Easy to miss. |
+| Supabase Realtime | `createClient(...).channel(...)` | WebSocket; survives serverless cold starts because it's opened from the client. |
+| Supabase Storage | service role client on server (`trade_preview_storage_path`), RLS client from browser for user-owned assets | Storage bucket policies are separate from table RLS. |
+| Supabase Edge Functions | Next.js `fetch(<project>.supabase.co/functions/v1/<name>)` with service role header | Edge Functions need CORS for browser calls; for server-to-server (Next.js → Edge Function) no CORS concern. |
+| Stripe | Stripe SDK for mutations; webhook receives events at `/api/stripe/webhook` | Webhook needs raw body (Next.js `export const runtime = "nodejs"` + `export const dynamic = "force-dynamic"`). Idempotency via `stripe_event_log` table. |
+| Discogs | `@lionralfs/discogs-client` on server; OAuth 1.0a at `/api/discogs/callback` | 60 req/min rate limit. Respect it — Discogs bans violators. One callback URL per Discogs app; separate dev and prod apps. |
+| Resend | REST from server actions | Domain verification on Hostinger DNS is a prerequisite, ~20 min propagation. |
+| Upstash Redis | REST (`@upstash/redis`) | `failClosed=true` in `rate-limit.ts` means missing Upstash = auth fails. Set envs before first user. |
+| Sentry | `withSentryConfig` wraps Next.js build | Source maps require `SENTRY_AUTH_TOKEN` in the Vercel build env (not runtime). |
+| Hostinger | DNS zone only | Keep TTLs low (300s) during cutover week, raise to 3600s once stable. |
+
+### Internal boundaries
+
+| Boundary | Communication | Notes |
+|---|---|---|
+| apps/web ↔ packages/trade-domain | Direct TS imports (workspace) | Bundled into the Vercel build. No runtime boundary. |
+| Next.js server ↔ Supabase Postgres | Drizzle (SQL) | Everything goes through the pooler URL in prod. |
+| Next.js server ↔ Supabase Edge Functions | HTTPS + service role header | Prefer this over embedding Deno-only logic in Next.js routes when wall-clock > 60s or when scheduling via pg_cron. |
+| Supabase Postgres ↔ Supabase Edge Functions | pg_net (outbound from DB) | Only for cron-triggered flows. `public.invoke_trade_preview_cleanup()` is the only one today. |
+| Vercel build ↔ Sentry | HTTPS at build time | Uploads source maps. Runtime does not talk to Sentry unless errors fire. |
+| Vercel ↔ Upstash | HTTPS REST from every serverless invocation | Low latency — Upstash picks a region close to Vercel. |
+
+---
+
+## 12. Open Risks / Unresolved Items for Deploy
+
+Flag these in the roadmap phase that covers them:
+
+1. **Migration trail sanity check not yet run against empty Supabase.** Audit P0 item 2. Must pass before pointing Vercel at prod DB.
+2. **Public-route cold start regression.** Audit P0 item 3. Middleware narrowing required before external traffic, or monitoring pages will 500 during warm-up.
+3. **`supabase/config.toml` missing.** Audit P2 item 2. Without it, `supabase link` relies on dashboard state instead of repo state. Harmless for a solo dev but breaks when onboarding a collaborator or a CI runner.
+4. **No smoke-test suite runs against the deployed URL.** CI runs Playwright against a local `pnpm start`. A minimal "curl the health endpoint, login flow, and pricing page" smoke test should run against the Vercel-assigned URL **before** DNS cutover.
+5. **Edge Function deploy is manual.** Acceptable for v1.4; add to CI in v1.5.
+6. **Vault secrets must be inserted post-migration.** Not wired into the migration file itself (migration safe-fails without them). Add to deploy runbook.
+7. **No rollback plan documented.** Vercel has one-click rollback per deployment. Supabase migrations do not — you need a `DOWN` migration, a dashboard-level point-in-time restore (Pro only), or a tested `pg_dump` restore. For v1.4, the safe posture is: take a `pg_dump` snapshot immediately after first successful schema push; document the restore command in the runbook.
+
+---
+
+## 13. Sources
+
+- Supabase Cloud docs — [Deploying Edge Functions](https://supabase.com/docs/guides/functions/deploy) — HIGH confidence
+- Supabase Cloud docs — [Database Migrations](https://supabase.com/docs/guides/deployment/database-migrations) — HIGH confidence
+- Supabase Cloud docs — [Connection Pooling](https://supabase.com/docs/guides/database/connecting-to-postgres#connection-pool) — HIGH confidence, confirms PgBouncer transaction-mode URL on port 6543
+- Supabase Cloud docs — [Vault](https://supabase.com/docs/guides/database/vault) — HIGH confidence
+- Supabase Cloud docs — [pg_cron](https://supabase.com/docs/guides/cron) and [pg_net](https://supabase.com/docs/guides/database/extensions/pg_net) — HIGH confidence
+- Vercel docs — [Environments & Environment Variables](https://vercel.com/docs/environment-variables) — HIGH confidence
+- Vercel docs — [Git Integration](https://vercel.com/docs/git) and [Monorepo / Root Directory](https://vercel.com/docs/monorepos) — HIGH confidence
+- Vercel docs — [Serverless Function Limits](https://vercel.com/docs/functions/runtimes#serverless-functions) — HIGH confidence, confirms 10s Hobby / 60s Pro / 900s Max
+- Next.js 15 docs — [Middleware](https://nextjs.org/docs/app/building-your-application/routing/middleware) — HIGH confidence
+- Next.js 15 docs — [Route Handlers](https://nextjs.org/docs/app/building-your-application/routing/route-handlers) and Webhook patterns — HIGH confidence
+- Stripe docs — [Webhook Signing](https://stripe.com/docs/webhooks#verify-official-libraries) — HIGH confidence
+- Discogs developer docs — [OAuth 1.0a authentication](https://www.discogs.com/developers#page:authentication) — HIGH confidence, single callback URL per app confirmed
+- Sentry docs — [Next.js integration](https://docs.sentry.io/platforms/javascript/guides/nextjs/) — HIGH confidence
+- Resend docs — [Domain verification via DNS](https://resend.com/docs/dashboard/domains/introduction) — HIGH confidence
+- Internal repo:
+    - `.planning/quick/260406-aud-deploy-readiness-audit/260406-aud-SUMMARY.md` (2026-04-06 audit)
+    - `apps/web/next.config.ts`, `.env.local.example`, `src/lib/env.ts`
+    - `supabase/migrations/20260417_trade_preview_infrastructure.sql` (pg_cron → Edge Function pattern)
+    - `supabase/functions/cleanup-trade-previews/index.ts`
+    - `.github/workflows/ci.yml`
+    - `drizzle.config.ts`
+    - `CLAUDE.md` (stack + constraints, HIGH confidence)
+
+---
+
+*Architecture research for: first production deploy of DigSwap v1.4*
+*Researched: 2026-04-20*

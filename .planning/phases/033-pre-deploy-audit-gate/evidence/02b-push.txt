@@ -1,0 +1,121 @@
+Initialising login role...
+Connecting to remote database...
+Do you want to push these migrations to the remote database?
+ • 20260101_drizzle_0000_initial.sql
+ • 20260102_drizzle_0001_groups_slug.sql
+ • 20260103_drizzle_0002_profile_showcase.sql
+ • 20260104_drizzle_0003_trade_tos.sql
+ • 20260105_drizzle_0004_gin_indexes.sql
+ • 20260106_drizzle_0005_stripe_event_log.sql
+ • 20260107_drift_capture_missing_tables.sql
+ • 20260327_ranking_function.sql
+ • 20260328_leads_rls.sql
+ • 20260329_trade_v2_schema.sql
+ • 20260331_desktop_trade_runtime.sql
+ • 20260401000000_trade_messages.sql
+ • 20260401000001_trade_presence_rpc.sql
+ • 20260402_subscriptions_schema.sql
+ • 20260403_subscription_init_trigger.sql
+ • 20260404_fix_trade_requests_rls.sql
+ • 20260405000000_open_for_trade_and_rating.sql
+ • 20260406000000_gem_ranking_function.sql
+ • 20260406000001_missing_tables_and_columns.sql
+ • 20260407_trade_messages_and_challenges.sql
+ • 20260408_digs_table.sql
+ • 20260409000000_deploy_readiness_fixes.sql
+ • 20260409000001_perf_and_security.sql
+ • 20260409000002_visibility_and_trade_proposals.sql
+ • 20260410_trade_peer_id_coordination.sql
+ • 20260411_security_audit_fixes.sql
+ • 20260412_security_audit_phase2.sql
+ • 20260413_direct_messages.sql
+ • 20260414_tracklist.sql
+ • 20260416000000_dm_mutual_follow_rls.sql
+ • 20260416000001_trade_reviews_rls_upgrade.sql
+ • 20260417_trade_preview_infrastructure.sql
+ • 20260418_collection_deleted_at.sql
+ • 20260419_purge_soft_deleted.sql
+
+ [Y/n] y
+Applying migration 20260101_drizzle_0000_initial.sql...
+Applying migration 20260102_drizzle_0001_groups_slug.sql...
+Applying migration 20260103_drizzle_0002_profile_showcase.sql...
+Applying migration 20260104_drizzle_0003_trade_tos.sql...
+Applying migration 20260105_drizzle_0004_gin_indexes.sql...
+Applying migration 20260106_drizzle_0005_stripe_event_log.sql...
+Applying migration 20260107_drift_capture_missing_tables.sql...
+Applying migration 20260327_ranking_function.sql...
+Applying migration 20260328_leads_rls.sql...
+Applying migration 20260329_trade_v2_schema.sql...
+Applying migration 20260331_desktop_trade_runtime.sql...
+NOTICE (00000): policy "trade_runtime_sessions_no_direct_select" for relation "public.trade_runtime_sessions" does not exist, skipping
+NOTICE (00000): policy "trade_runtime_sessions_no_direct_insert" for relation "public.trade_runtime_sessions" does not exist, skipping
+NOTICE (00000): policy "trade_runtime_sessions_no_direct_update" for relation "public.trade_runtime_sessions" does not exist, skipping
+NOTICE (00000): policy "trade_runtime_sessions_no_direct_delete" for relation "public.trade_runtime_sessions" does not exist, skipping
+NOTICE (00000): policy "trade_transfer_receipts_no_direct_select" for relation "public.trade_transfer_receipts" does not exist, skipping
+NOTICE (00000): policy "trade_transfer_receipts_no_direct_insert" for relation "public.trade_transfer_receipts" does not exist, skipping
+NOTICE (00000): policy "trade_transfer_receipts_no_direct_update" for relation "public.trade_transfer_receipts" does not exist, skipping
+NOTICE (00000): policy "trade_transfer_receipts_no_direct_delete" for relation "public.trade_transfer_receipts" does not exist, skipping
+Applying migration 20260401000000_trade_messages.sql...
+NOTICE (00000): policy "trade_messages_select_participants" for relation "public.trade_messages" does not exist, skipping
+NOTICE (00000): policy "trade_messages_insert_participants" for relation "public.trade_messages" does not exist, skipping
+Applying migration 20260401000001_trade_presence_rpc.sql...
+Applying migration 20260402_subscriptions_schema.sql...
+NOTICE (42P07): relation "subscriptions" already exists, skipping
+Applying migration 20260403_subscription_init_trigger.sql...
+NOTICE (00000): trigger "on_auth_user_created_subscription" for relation "auth.users" does not exist, skipping
+Applying migration 20260404_fix_trade_requests_rls.sql...
+NOTICE (00000): policy "trade_requests_update_participant" for relation "public.trade_requests" does not exist, skipping
+Applying migration 20260405000000_open_for_trade_and_rating.sql...
+Applying migration 20260406000000_gem_ranking_function.sql...
+Applying migration 20260406000001_missing_tables_and_columns.sql...
+NOTICE (42701): column "is_public" of relation "crates" already exists, skipping
+NOTICE (42701): column "requester_last_read_at" of relation "trade_requests" already exists, skipping
+NOTICE (42701): column "provider_last_read_at" of relation "trade_requests" already exists, skipping
+Applying migration 20260407_trade_messages_and_challenges.sql...
+NOTICE (42P07): relation "trade_messages" already exists, skipping
+NOTICE (42P07): relation "trade_messages_trade_id_created_at_idx" already exists, skipping
+NOTICE (42P07): relation "trade_messages_sender_trade_created_at_idx" already exists, skipping
+Applying migration 20260408_digs_table.sql...
+Applying migration 20260409000000_deploy_readiness_fixes.sql...
+NOTICE (00000): function public.acquire_trade_lease(uuid,text,uuid) does not exist, skipping
+Applying migration 20260409000001_perf_and_security.sql...
+NOTICE (42701): column "added_via" of relation "collection_items" already exists, skipping
+NOTICE (00000): constraint "collection_items_user_release_unique" of relation "collection_items" does not exist, skipping
+NOTICE (00000): constraint "wantlist_items_user_release_unique" of relation "wantlist_items" does not exist, skipping
+NOTICE (42P07): relation "releases_genre_gin_idx" already exists, skipping
+NOTICE (42P07): relation "releases_style_gin_idx" already exists, skipping
+NOTICE (42701): column "discogs_instance_id" of relation "collection_items" already exists, skipping
+NOTICE (00000): constraint "collection_items_user_discogs_instance_unique" of relation "collection_items" does not exist, skipping
+Applying migration 20260409000002_visibility_and_trade_proposals.sql...
+NOTICE (00000): policy "collection_items_select_own" for relation "public.collection_items" does not exist, skipping
+Applying migration 20260410_trade_peer_id_coordination.sql...
+NOTICE (00000): policy "trade_runtime_sessions_participants_select" for relation "public.trade_runtime_sessions" does not exist, skipping
+Applying migration 20260411_security_audit_fixes.sql...
+NOTICE (00000): policy "handoff_tokens_no_direct_access" for relation "public.handoff_tokens" does not exist, skipping
+NOTICE (00000): policy "trade_requests_update_policy" for relation "public.trade_requests" does not exist, skipping
+Applying migration 20260412_security_audit_phase2.sql...
+NOTICE (00000): policy "Users can view wantlist items" for relation "wantlist_items" does not exist, skipping
+NOTICE (00000): policy "wantlist_items_select_own" for relation "wantlist_items" does not exist, skipping
+NOTICE (00000): policy "Users can insert own notifications" for relation "notifications" does not exist, skipping
+NOTICE (00000): policy "Users can insert notifications" for relation "notifications" does not exist, skipping
+NOTICE (00000): policy "Users can view own notifications" for relation "notifications" does not exist, skipping
+NOTICE (00000): policy "Users can update own notifications" for relation "notifications" does not exist, skipping
+NOTICE (00000): policy "Users can view own listening logs" for relation "listening_logs" does not exist, skipping
+NOTICE (00000): policy "listening_logs_select_own" for relation "listening_logs" does not exist, skipping
+NOTICE (00000): policy "Users can view listening logs" for relation "listening_logs" does not exist, skipping
+Applying migration 20260413_direct_messages.sql...
+Applying migration 20260414_tracklist.sql...
+Applying migration 20260416000000_dm_mutual_follow_rls.sql...
+Applying migration 20260416000001_trade_reviews_rls_upgrade.sql...
+Applying migration 20260417_trade_preview_infrastructure.sql...
+NOTICE (00000): policy "trade_previews_insert_owner" for relation "storage.objects" does not exist, skipping
+NOTICE (00000): policy "trade_previews_select_participant" for relation "storage.objects" does not exist, skipping
+NOTICE (42710): extension "pg_cron" already exists, skipping
+Applying migration 20260418_collection_deleted_at.sql...
+NOTICE (42P07): relation "collection_items_user_release_unique" already exists, skipping
+Applying migration 20260419_purge_soft_deleted.sql...
+NOTICE (42701): column "deleted_at" of relation "collection_items" already exists, skipping
+NOTICE (42P07): relation "collection_items_deleted_at_idx" already exists, skipping
+Finished supabase db push.
+push exit=0

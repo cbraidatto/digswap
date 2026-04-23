@@ -7,7 +7,7 @@
 ## Checklist
 
 - [~] DEP-AUD-01: CI gates — typecheck/test/build/audit PASS, lint DEBT (20 residual errors, deferred to 33.1)  — evidence/01*-*.txt
-- [~] DEP-AUD-02: `supabase db reset` local PASS (after extensive drift fixes); throwaway cloud reset (D-07) still pending — evidence/02a-reset.txt
+- [x] DEP-AUD-02: `supabase db reset` clean on local Docker AND throwaway Supabase Cloud (D-07 BLOCKING gate PASS) — evidence/02a-*.txt, evidence/02b-*.txt
 - [ ] DEP-AUD-03: Cold-start curl — all 4 public routes 200 in <3s after idle      — evidence/03-*.txt
 - [ ] DEP-AUD-04: Session revocation — logged-out JWT returns 401 within 60s       — evidence/04-*.txt
 - [ ] DEP-AUD-05: Discogs tokens Vault-wrapped — zero plaintext rows               — evidence/05a-*.txt, evidence/05b-*.txt
@@ -81,13 +81,22 @@ audit exit=0
 
 ## §2 DEP-AUD-02 Supabase Migration Reset
 
-**Status:** Audit 2a (local) PASS · Audit 2b (cloud) pending — D-07 BLOCKING gate not yet attempted
+**Status:** PASS — Audit 2a (local Docker) AND Audit 2b (throwaway Supabase Cloud — D-07 BLOCKING gate) both clean
 
 **Local reset command:** `pnpm dlx supabase start` + `supabase db reset`
 **Local result:** `Finished supabase db reset on branch main.` · reset exit=0 · evidence/02a-reset.txt
-**Cloud reset command:** (populated in Plan 03 Task 3 — requires SUPABASE_ORG_ID from Task 2 checkpoint)
-**Teardown proof:** pending (Task 4 checkpoint after Task 3 teardown)
-**Verdict:** PARTIAL — local gate PASS after extensive drift fixes (see Findings below); cloud gate still pending
+
+**Cloud sequence:** `projects create --org-id waevgaqloxyszeutagko --region us-east-1` → `link --project-ref dfgcarnjahflocnsdhxs` → `db push --linked --yes` → `db reset --linked --yes` → `projects delete`
+**Cloud project:** `digswap-audit-20260422-2215` (ref `dfgcarnjahflocnsdhxs`), East US (North Virginia), free-tier default size
+**Cloud results:**
+- create exit=0 (evidence/02b-create.txt)
+- link exit=0 (evidence/02b-link.txt) — paranoia marker `●` confirmed on throwaway, NOT on `vinyldig` dev project
+- push exit=0 (evidence/02b-push.txt) — `Finished supabase db push.` with 40 migrations applied
+- reset exit=0 (evidence/02b-reset.txt) — `Finished supabase db reset` — **D-07 BLOCKING gate PASSED**
+- delete exit=0 (evidence/02b-delete.txt) — `Deleted project: digswap-audit-20260422-2215`, post-delete `projects list` shows only `vinyldig`
+
+**Teardown proof:** evidence/02b-teardown.txt (user visually confirmed via dashboard screenshot pasted inline 2026-04-23; PNG file skipped — dashboard state matches the CLI `DELETE CONFIRMED` automatic check)
+**Verdict:** PASS — SYSTEMIC #0 drift resolved end-to-end; the 40-migration trail applies cleanly on both local and cloud.
 
 ### Findings (layered — each fix revealed a deeper issue)
 

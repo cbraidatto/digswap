@@ -1,0 +1,10 @@
+Finished supabase link.
+link exit=0
+---paranoia check---
+
+  
+   LINKED | ORG ID               | REFERENCE ID         | NAME                        | REGION                   | CREATED AT (UTC)    
+  --------|----------------------|----------------------|-----------------------------|--------------------------|---------------------
+          | waevgaqloxyszeutagko | mrkgoucqcbqjhrdjcnpw | vinyldig                    | West US (Oregon)         | 2026-03-25 16:29:33 
+     ●    | waevgaqloxyszeutagko | dfgcarnjahflocnsdhxs | digswap-audit-20260422-2215 | East US (North Virginia) | 2026-04-22 21:14:29 
+

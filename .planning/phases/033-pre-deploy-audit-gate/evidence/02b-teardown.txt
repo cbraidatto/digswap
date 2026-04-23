@@ -1,0 +1,17 @@
+Phase 33 DEP-AUD-02 Audit 2b — Task 4 human-verify checkpoint
+==============================================================
+
+Dashboard teardown visually confirmed by user 2026-04-23 (via chat screenshot):
+
+Dashboard URL: https://supabase.com/dashboard/projects
+Projects listed in dashboard: vinyldig (AWS | us-west-2, nano, ref mrkgoucqcbqjhrdjcnpw)
+Project NOT listed: digswap-audit-20260422-2215 (ref dfgcarnjahflocnsdhxs)
+
+Matches post-delete CLI output in evidence/02b-delete.txt:
+- Delete command returned "Deleted project: digswap-audit-20260422-2215"
+- `supabase projects list` after delete shows only `vinyldig`
+- Automated check DELETE CONFIRMED also passed
+
+Saving the raw screenshot PNG to evidence/02b-teardown.png was skipped
+(user pasted the screenshot inline in chat rather than to the filesystem);
+this .txt file serves as the human-verify signal evidence.

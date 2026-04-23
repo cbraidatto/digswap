@@ -573,7 +573,7 @@ Plans:
 Plans:
 - [x] 033-01-wave0-drift-fix-scaffolding-PLAN.md — Wave 0: delete orphan drizzle migration, write prod-guard script + ADR-003, scaffold .gitleaks.toml + AUDIT-REPORT.md + evidence/ + session-revocation spec, Docker pre-flight
 - [x] 033-02-ci-gates-prod-audit-PLAN.md — DEP-AUD-01: run typecheck/lint/test/build + pnpm audit --prod --audit-level high against main HEAD
-- [ ] 033-03-migration-reset-tests-PLAN.md — DEP-AUD-02: supabase db reset on local Docker + throwaway cloud project (the GATE per D-07)
+- [x] 033-03-migration-reset-tests-PLAN.md — DEP-AUD-02: supabase db reset on local Docker + throwaway cloud project (the GATE per D-07)
 - [ ] 033-04-cold-start-session-revocation-PLAN.md — DEP-AUD-03 + DEP-AUD-04: cold-start curl on 4 public routes after 15-min idle + Playwright session-revocation E2E
 - [ ] 033-05-vault-discogs-tokens-PLAN.md — DEP-AUD-05: psql probe for plaintext vs Vault-wrapped Discogs token counts on dev
 - [ ] 033-06-csp-re-confirmation-PLAN.md — DEP-AUD-06: curl CSP header + DevTools Console check across 5 routes

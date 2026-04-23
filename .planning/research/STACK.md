@@ -1,225 +1,328 @@
-# Stack Research
+# Stack Research — First Production Deploy
 
-**Domain:** Social network for vinyl diggers with P2P file sharing, Discogs integration, gamification, and freemium monetization
-**Researched:** 2026-03-25
-**Confidence:** HIGH (core stack), MEDIUM (WebRTC infrastructure, gamification specifics)
+**Domain:** Production deployment of DigSwap webapp (Next.js 15 + Supabase Cloud) to Vercel + Hostinger domain
+**Researched:** 2026-04-20
+**Confidence:** HIGH (on deployment mechanics), MEDIUM (on cost/timing triggers — depends on traffic)
 
-## Recommended Stack
+## Context
 
-### Core Technologies
+This stack research is **additive**, not foundational. The application stack is already validated and shipped in the repo (see `apps/web/package.json`). The question this file answers is:
 
-| Technology | Version | Purpose | Why Recommended | Confidence |
-|------------|---------|---------|-----------------|------------|
-| Next.js | 15.x (latest 15.5+) | Full-stack framework | Server-first architecture, App Router, Server Actions, API routes, Turbopack dev server. Next.js 16 is available but 15 is the safer production choice for a solo developer -- 16 removes synchronous request APIs and renames middleware to proxy, creating migration friction with less ecosystem coverage. Start on 15, upgrade to 16 once the ecosystem stabilizes. | HIGH |
-| React | 18.x | UI library | Next.js 15 ships with React 18. React 19 is available but Next.js 15 officially supports 18. Stick with what the framework bundles. | HIGH |
-| TypeScript | 5.x | Type safety | Non-negotiable for a solo developer. Catches bugs at compile time, self-documents the codebase, and makes refactoring safe. Every file should be .ts/.tsx. | HIGH |
-| Supabase | Latest (self-updating hosted) | Backend-as-a-Service | PostgreSQL database + Auth + Realtime subscriptions + Edge Functions + Storage -- all in one platform. A solo developer cannot afford to manage 4+ separate services. Supabase consolidates auth, database, realtime, and serverless functions with a generous free tier (500MB DB, 50K MAU auth, 1GB storage). Row Level Security provides database-level authorization that eliminates custom auth middleware. | HIGH |
-| Drizzle ORM | 0.45.x | Database ORM | ~7.4KB bundle, zero dependencies, SQL-like syntax ("if you know SQL, you know Drizzle"). 90% smaller than Prisma, cold starts under 500ms vs Prisma's 1-3s. Critical for serverless/edge where Next.js API routes run. Works natively with Supabase PostgreSQL. Prisma 7 improved but Drizzle is still lighter and faster for serverless. | HIGH |
-| Tailwind CSS | 4.2.x | Styling | 5x faster full builds, 100x faster incremental builds vs v3. CSS-first configuration via @theme directives -- no JavaScript config file needed. Perfect for the retro/analog aesthetic: define warm color palettes and vinyl textures as theme variables that auto-generate utility classes. | HIGH |
-| shadcn/ui | Latest | Component library | Not a dependency -- copies component source directly into your project. Full ownership, zero runtime overhead, Tailwind-first. Provides 40+ production-ready components (cards, dialogs, forms, navigation, tables, badges) that can be restyled for the retro vinyl aesthetic. Saves months of building from scratch. | HIGH |
+> **"What do I need to install, configure, or sign up for to take the existing `apps/web` and run it on a real domain, served by Vercel, backed by a production Supabase project, for the first time — as a solo developer?"**
 
-### Database & Caching
+Everything listed below is scoped to getting to **first deploy + smoke-test green + UAT ready**. Post-launch observability/scaling triggers are flagged but not treated as required.
 
-| Technology | Version | Purpose | Why Recommended | Confidence |
-|------------|---------|---------|-----------------|------------|
-| Supabase PostgreSQL | 15+ (managed) | Primary database | Relational data model fits social networks perfectly: users, collections, wantlists, trades, reviews, rankings. PostgreSQL's JSON columns handle flexible metadata. Full-text search for record discovery. Materialized views for pre-computed rankings. | HIGH |
-| Upstash Redis | Serverless | Caching + Leaderboards | Redis sorted sets (ZADD/ZRANK/ZRANGE) are purpose-built for leaderboards -- O(log N) rank lookups with no expensive ORDER BY. Upstash free tier: 500K commands/month, 200GB bandwidth. Use for: leaderboard rankings, rate limiting Discogs API calls, session caching, hot data caching. Serverless model means no server to manage. | HIGH |
+---
 
-### Authentication & Payments
+## Recommended Stack (Production Deploy Layer Only)
 
-| Technology | Version | Purpose | Why Recommended | Confidence |
-|------------|---------|---------|-----------------|------------|
-| Supabase Auth | Bundled with Supabase | Authentication | 50K MAU free tier. Integrated Row Level Security means auth decisions happen at the database level -- users can only see their own data without writing middleware. Supports OAuth (for Discogs OAuth flow), email/password, magic links. One fewer service to manage vs Auth.js or Clerk. | HIGH |
-| Stripe | Latest SDK | Payments/Subscriptions | Industry standard for freemium/subscription billing. Vercel provides an official Next.js subscription starter template (next.js + Supabase + Stripe). Webhooks sync subscription state to your database. Free until you process payments (2.9% + 30c per transaction). Supabase dashboard now has one-click Stripe Sync Engine integration. | HIGH |
+### Hosting & Edge (REQUIRED)
 
-### WebRTC / P2P File Transfer
+| Technology | Version | Purpose | Why Recommended |
+|------------|---------|---------|-----------------|
+| **Vercel** (platform) | n/a (SaaS) | Host Next.js app, CDN, edge, SSL, previews | Native Next.js 15 optimization (ISR, Fluid Compute, Edge Functions). Automatic preview deploy per git push. Instant rollback at routing layer (seconds, no rebuild). Automatic SSL via Let's Encrypt. No server to manage — critical for solo dev. |
+| **Vercel Pro plan** | $20/mo/seat | Commercial use license + real function budgets | **NOT optional once users pay.** Hobby plan is explicitly non-commercial per Fair Use Guidelines — Stripe revenue triggers a mandatory upgrade regardless of traffic. Pro also unlocks: 300s HTTP function timeout (vs 60s Hobby), 1 TB bandwidth (vs 100 GB), rollback to any prior deploy (Hobby = only the immediate previous), and pay-as-you-go overage. Safe pattern: start on Hobby for smoke/UAT, flip to Pro before the first paying user. |
+| **Vercel CLI** | `vercel@latest` (v40+) | `vercel link`, `vercel env`, `vercel rollback`, `vercel logs`, local env pull | Install globally (`pnpm i -g vercel`). Lets you script env-var sync from `.env.local.example` into Vercel without pasting 20 values into the dashboard, and run `vercel rollback` from the terminal if the dashboard is down. |
 
-| Technology | Version | Purpose | Why Recommended | Confidence |
-|------------|---------|---------|-----------------|------------|
-| PeerJS | 1.5.x | WebRTC abstraction | Wraps RTCPeerConnection + RTCDataChannel with a clean API. Includes built-in signaling server (PeerServer) that can be self-hosted or cloud-hosted. 13K+ GitHub stars, actively maintained. Handles ICE negotiation, DTLS encryption (mandatory in WebRTC spec), and data channel setup. For file transfer: chunk files into 64KB segments, send via data channel, reassemble on receiver. | MEDIUM |
-| PeerJS Server | 1.0.x | Signaling server | Open-source Node.js signaling server. Deploy alongside your app or as a separate service. Handles peer discovery and connection brokering only -- no file data passes through it. Self-hosting is critical for the "mere conduit" legal posture. | MEDIUM |
-| Metered.ca TURN | Managed service | NAT traversal | ~15-20% of WebRTC connections fail without a TURN relay (symmetric NATs, restrictive firewalls). Start with Metered.ca's free tier or Google's free STUN servers for development. For production, either self-host coturn on a VPS or use Metered.ca's managed TURN. Budget $5-20/month for a low-traffic TURN relay. | MEDIUM |
+### Domain & DNS (REQUIRED)
 
-### State Management & Data Fetching
+| Technology | Version | Purpose | Why Recommended |
+|------------|---------|---------|-----------------|
+| **Hostinger DNS panel** | n/a | Authoritative DNS for the registered domain | Already owned (per milestone scope). No need to transfer the domain — just point records at Vercel. |
+| **A record → 76.76.21.21** | — | Apex domain (`digswap.com`) pointing at Vercel | Vercel's official apex IP. Set in Hostinger DNS zone editor. Replace any existing A record for `@`. |
+| **CNAME record → cname.vercel-dns.com** | — | `www` subdomain redirect target | Standard Vercel CNAME. Set in Hostinger as CNAME on host `www`. Vercel will handle `www → apex` 308 redirect automatically once the domain is added in the project settings. |
 
-| Technology | Version | Purpose | Why Recommended | Confidence |
-|------------|---------|---------|-----------------|------------|
-| Zustand | 5.x | Client-side state | 3KB bundle, minimal boilerplate, selector-based re-renders. Use for: WebRTC connection state, UI state (modals, filters, active tabs), client-side caches of frequently accessed data. Do NOT use for server data -- that belongs in React Server Components or SWR/React Query. | HIGH |
-| TanStack Query (React Query) | 5.x | Server state management | Handles caching, background refetching, optimistic updates, and pagination for client-side data fetching. Use for: Discogs API calls from the client, paginated collection views, search results. Pairs with Supabase client for real-time data. | HIGH |
+**Propagation:** 5 min to 48 hr. Plan to add the domain in Vercel first, then update Hostinger, then wait. Do NOT add production env vars that reference the domain (e.g. `NEXT_PUBLIC_SITE_URL`) before the domain resolves — you will chase ghosts.
 
-### Discogs Integration
+### Database & Secret Storage (REQUIRED)
 
-| Technology | Version | Purpose | Why Recommended | Confidence |
-|------------|---------|---------|-----------------|------------|
-| @lionralfs/discogs-client | 4.1.x | Discogs API client | The only actively maintained JavaScript Discogs client. Supports OAuth 1.0a, rate limit tracking via response headers, exponential backoff on 429s. Works in both Node.js and browsers (ESM + CommonJS). Use server-side only to protect OAuth secrets. | MEDIUM |
+| Technology | Version | Purpose | Why Recommended |
+|------------|---------|---------|-----------------|
+| **Supabase Cloud — new project (Prod)** | latest hosted | Production PostgreSQL + Auth + Storage + Realtime, fully isolated from dev | A separate project — not a branch, not a schema — is the cheapest/safest isolation. RLS policies, auth users, storage buckets are all per-project. The free tier (500 MB DB, 50K MAU, 1 GB storage) is sufficient to *launch*, but the free tier **pauses projects after 7 days of inactivity** — unacceptable for a live marketing-linked domain. Plan to upgrade to Pro ($25/mo) the day the domain goes live to the public. |
+| **Supabase CLI** | `supabase@latest` (2.x, Apr 2026) | `supabase link`, `supabase db push`, `supabase migration list` — applies local migrations to prod | Already implied by the `supabase/migrations/` folder in the repo. Install globally or via `pnpm dlx supabase`. The production workflow is: `supabase link --project-ref <prod-ref>` → `supabase db push --dry-run` (review) → `supabase db push` (apply). Never run this on the dev project. |
+| **Supabase Pro plan** | $25/mo (at trigger) | Daily automated backups, point-in-time recovery, no auto-pause, custom SMTP domain | **Required before public launch.** Free tier pausing = your domain goes down silently. Pro also unlocks custom SMTP (so Resend delivers `noreply@digswap.com` instead of via Supabase default domain on password reset emails). |
 
-### Email & Notifications
+### Caching / Rate Limiting (REQUIRED)
 
-| Technology | Version | Purpose | Why Recommended | Confidence |
-|------------|---------|---------|-----------------|------------|
-| Supabase Realtime | Bundled | In-app notifications | Subscribe to database changes via WebSocket. When a wantlist match occurs (new INSERT into matches table), the subscribed client gets notified instantly. Uses PostgreSQL's LISTEN/NOTIFY under the hood. RLS ensures users only receive their own notifications. | HIGH |
-| Resend | Latest SDK | Transactional email | 3,000 emails/month free (100/day). Built for developers, React Email templates, Next.js SDK. Use for: wantlist match notifications, trade requests, weekly digests, account verification. | HIGH |
+| Technology | Version | Purpose | Why Recommended |
+|------------|---------|---------|-----------------|
+| **Upstash Redis — new database (Prod)** | serverless, latest | Rate limiting for `/api/*`, Discogs API backoff, session cache | Already wired via `@upstash/ratelimit@^2.0.8` + `@upstash/redis@^1.37.0`. Audit finding P1 notes `rate-limit.ts` **fails closed** when Redis is missing — meaning without a prod Redis, login/signup/webhooks will 5xx. This makes a production Upstash DB **non-negotiable**, not optional. Free tier (500K commands/month) is enough for MVP; pay-per-request scales smoothly. Create as a separate DB from dev. |
 
-### Development Tools
+### Observability & Error Tracking (REQUIRED for prod — already wired)
 
-| Tool | Purpose | Notes |
-|------|---------|-------|
-| Drizzle Kit | Database migrations | `drizzle-kit push` for development, `drizzle-kit generate` + `drizzle-kit migrate` for production. Generates SQL migrations from TypeScript schema. |
-| Biome | Linting + formatting | Replaces ESLint + Prettier with a single tool. 10-100x faster than ESLint. Single config file. Less tooling overhead for a solo developer. |
-| Vitest | Unit/integration testing | Vite-native test runner, compatible with Jest API. Fast, works with TypeScript out of the box. |
-| Playwright | E2E testing | Browser automation for testing WebRTC flows, auth flows, Stripe checkout. Chromium, Firefox, WebKit support. |
-| Supabase CLI | Local development | Run Supabase locally with Docker. Database, Auth, Edge Functions all available offline. `supabase db diff` for migration generation. |
+| Technology | Version | Purpose | Why Recommended |
+|------------|---------|---------|-----------------|
+| **Sentry** (SaaS) | `@sentry/nextjs@^10.47.0` (pinned) | Error capture (server + client), source maps, performance traces | Already a dependency and wired in `next.config.ts` via `withSentryConfig`. Free developer tier: 5K errors/mo, 10K perf events, 50 replays — sufficient for soft launch. What's missing to finish the wiring: `sentry.server.config.ts`, `sentry.client.config.ts`, `sentry.edge.config.ts`, `app/global-error.tsx`, and `/sentry-example-page` for the post-deploy smoke. In 2026 the Sentry Next.js wizard generates all of these. |
+| **SENTRY_AUTH_TOKEN** (env) | — | Source-map upload during build | Must be set in Vercel as a **secret** env var (build-only). Already in `.env.local.example`. Regenerate for prod — do not reuse the dev token. |
+| **Vercel Analytics** (optional for v1) | bundled | Pageview + Web Vitals | Free on Hobby, included on Pro. Enable with one click in Vercel project settings. Provides Core Web Vitals without adding a second analytics vendor. Add only if UAT surfaces performance regressions — not a launch blocker. |
 
-### Deployment & Infrastructure
+### Email (REQUIRED — already wired)
 
-| Technology | Purpose | Why Recommended | Confidence |
-|------------|---------|-----------------|------------|
-| Vercel | Hosting + CDN | Native Next.js optimization (ISR, Edge Functions, Fluid Compute). Free Hobby tier: unlimited deployments, 100GB bandwidth, 1M function invocations. Automatic preview deployments for every git push. Note: Hobby plan is non-commercial; upgrade to Pro ($20/mo) before charging users. | HIGH |
-| Supabase Cloud | Database + Auth + Realtime | Managed PostgreSQL, automatic backups, connection pooling via PgBouncer. Free tier sufficient for MVP. Pro plan ($25/mo) when you need more than 500MB database or custom domains. | HIGH |
-| Upstash | Redis + Rate Limiting | Serverless Redis, pay-per-request. Free tier: 500K commands/month. No server to maintain. | HIGH |
+| Technology | Version | Purpose | Why Recommended |
+|------------|---------|---------|-----------------|
+| **Resend** | `resend@^6.9.4` (pinned) | Transactional email: wantlist matches, password reset fallback, notifications | Already a dependency. Free tier: 3K emails/month / 100/day — enough for launch week. What's needed before first deploy: verify the **sending domain** (`digswap.com`) in Resend dashboard (DKIM + SPF + DMARC records added at Hostinger). Without domain verification, emails go to spam or fail. This takes ~15 min of DNS editing and usually propagates in under an hour. |
 
-## Installation
+### Payments (REQUIRED only when activating billing — already wired)
+
+| Technology | Version | Purpose | Why Recommended |
+|------------|---------|---------|-----------------|
+| **Stripe** | `stripe@^21.0.1` (pinned) | Subscription billing, webhook intake at `/api/stripe/webhook` | Already a dependency. **Two distinct environments**: Test (dev) and Live (prod). You need to flip to Live keys in Vercel, create a *second* webhook endpoint in Stripe dashboard (`https://digswap.com/api/stripe/webhook` or wherever the route lives), copy that webhook's **signing secret** into `STRIPE_WEBHOOK_SECRET` in Vercel, and recreate the two Price IDs in Live mode (Test Price IDs don't work in Live). After any env var change: **redeploy without build cache** — Next.js bakes `NEXT_PUBLIC_*` at build time. |
+| **Stripe CLI** (optional) | `stripe@latest` | Replay webhooks to prod during debugging | Install locally. `stripe listen --forward-to ...` is dev-only; for prod debugging use `stripe events resend <event_id> --live` when a webhook fails delivery. |
+
+### CI/CD (REQUIRED — already partially wired)
+
+| Technology | Version | Purpose | Why Recommended |
+|------------|---------|---------|-----------------|
+| **GitHub Actions** | `.github/workflows/ci.yml` (present) | Typecheck, lint, test, build, e2e on every push/PR | Already exists. Gaps for production: (a) no migration-apply job (migrations are applied manually via `supabase db push` from a workstation, which is fine for solo but should be documented); (b) no deploy job because Vercel's Git integration handles that natively — do not duplicate it in Actions. |
+| **Vercel Git integration** | n/a | Auto-deploy `main` to production; every PR → preview URL | Set up once when importing the repo. Preview URLs are the UAT substrate — every PR becomes a click-testable deploy with its own Supabase? **No** — previews share the prod Supabase unless you explicitly set different env vars per environment (see §Env-var strategy below). For DigSwap, previews should point at the **dev** Supabase to avoid cross-contaminating prod data during PR review. |
+
+### Version Pinning (Production-Critical)
+
+| Package | Exact version present | Production Status |
+|---------|----------------------|-------------------|
+| `next` | `15.5.15` | HIGH — current 15.5.x line, stable for prod. Do NOT upgrade to 16 before launch (ecosystem still catching up on renamed middleware/proxy). |
+| `react` + `react-dom` | `19.1.0` | Note: `package.json` declares React 19, not 18 as the old CLAUDE.md stack doc said. React 19 is supported by Next.js 15.5. Leave as-is; do not downgrade — that would require re-testing every component. |
+| `@sentry/nextjs` | `^10.47.0` | HIGH — caret OK. |
+| `@supabase/ssr` | `^0.9.0` | HIGH — this is the correct package for App Router (replaces deprecated `auth-helpers-nextjs`). |
+| `drizzle-orm` | `^0.45.1` / `drizzle-kit@^0.31.10` | HIGH — versions are aligned. |
+| `stripe` | `^21.0.1` | HIGH — current Stripe Node SDK. |
+| `@upstash/ratelimit` | `^2.0.8` | HIGH. |
+| `@upstash/redis` | `^1.37.0` | HIGH. |
+| `resend` | `^6.9.4` | HIGH. |
+| `zod` | `^4.3.6` | MEDIUM — Zod 4 is current but has breaking changes vs 3. Already adopted; keep as-is. |
+
+**Lock file:** `pnpm-lock.yaml` must be committed (it is). CI uses `--frozen-lockfile` — any `package.json` change without a lockfile update will break Vercel's install step.
+
+---
+
+## Env-Var Strategy (REQUIRED)
+
+The application's `.env.local.example` lists **21 env vars** across 8 domains. For Vercel, these split into three audiences: build-time/public, runtime/secret, and preview-vs-prod. Getting this wrong is the #1 cause of "works locally, 500s in production."
+
+### Public vs Server Split
+
+| Prefix | Where it lives | Rule |
+|--------|----------------|------|
+| `NEXT_PUBLIC_*` | Inlined into the client JS bundle at **build** time | Never put a secret here. Anyone viewing page source sees it. Baked at build, so changing it requires a redeploy (NOT just a restart). |
+| (no prefix) | Server only, read at runtime | Safe for secrets. Changes take effect on next function cold start. |
+
+### Variable Set for First Deploy
+
+Organize Vercel env vars by **Environment** (Production / Preview / Development) — do NOT set them all as "All Environments" or previews will write to prod Supabase.
+
+**Production-only (all secrets):**
+- `DATABASE_URL` → prod Supabase pooler URL (`postgres://...pooler.supabase.com:6543/postgres?pgbouncer=true`)
+- `NEXT_PUBLIC_SUPABASE_URL` → prod project URL
+- `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` → prod anon key (public-safe)
+- `SUPABASE_SERVICE_ROLE_KEY` → prod service role key (secret — bypasses RLS)
+- `STRIPE_SECRET_KEY` → Live mode key (`sk_live_...`)
+- `STRIPE_WEBHOOK_SECRET` → from the prod webhook endpoint in Stripe dashboard
+- `NEXT_PUBLIC_STRIPE_PRICE_MONTHLY` + `NEXT_PUBLIC_STRIPE_PRICE_ANNUAL` → Live mode Price IDs
+- `UPSTASH_REDIS_REST_URL` + `UPSTASH_REDIS_REST_TOKEN` → prod Upstash DB
+- `DISCOGS_CONSUMER_KEY` + `DISCOGS_CONSUMER_SECRET` → same Discogs app as dev is acceptable if the callback list includes both dev + prod URLs; otherwise create a second Discogs app for prod
+- `RESEND_API_KEY` → prod Resend API key (restricted-scope recommended)
+- `RESEND_FROM_EMAIL` → `noreply@digswap.com` (domain must be verified in Resend)
+- `NEXT_PUBLIC_SENTRY_DSN` → prod Sentry project DSN
+- `SENTRY_ORG` + `SENTRY_PROJECT` → Sentry org/project slugs
+- `SENTRY_AUTH_TOKEN` → **mark as "Sensitive" in Vercel** (build-only)
+- `IMPORT_WORKER_SECRET` → **new** random 32-char string (do NOT reuse dev)
+- `HANDOFF_HMAC_SECRET` → **new** random 32-char string, minimum 32 chars
+- `NEXT_PUBLIC_SITE_URL` → `https://digswap.com`
+- `NEXT_PUBLIC_APP_URL` → `https://digswap.com`
+- `NEXT_PUBLIC_MIN_DESKTOP_VERSION` → `1` (already default)
+
+**Preview-only (point at dev Supabase, test-mode Stripe):**
+- Same set, but `NEXT_PUBLIC_SITE_URL` = `https://$VERCEL_URL` (Vercel auto-injects `VERCEL_URL`; wire it in a small helper: `process.env.NEXT_PUBLIC_SITE_URL ?? \`https://${process.env.VERCEL_URL}\``)
+- Supabase = dev project keys
+- Stripe = test-mode keys
+- Redis = dev Upstash DB
+
+**Secret generation** (use on any Unix host or Git Bash):
+```bash
+openssl rand -hex 32    # for IMPORT_WORKER_SECRET
+openssl rand -hex 32    # for HANDOFF_HMAC_SECRET
+```
+Store in a password manager *before* pasting into Vercel.
+
+---
+
+## Installation (What to Install Beyond the Repo)
 
 ```bash
-# Create Next.js 15 project with TypeScript + Tailwind CSS v4
-npx create-next-app@15 vinyldig --typescript --tailwind --app --src-dir
+# Required globally (one-time)
+pnpm add -g vercel            # Vercel CLI (v40+ as of Apr 2026)
+pnpm add -g supabase          # Supabase CLI (v2+)
 
-# Core dependencies
-npm install @supabase/supabase-js @supabase/ssr drizzle-orm postgres
-npm install zustand @tanstack/react-query
-npm install stripe @stripe/stripe-js
-npm install peerjs
-npm install @lionralfs/discogs-client
-npm install @upstash/redis
-npm install resend
+# Optional but recommended for debugging prod
+pnpm add -g stripe            # Stripe CLI — for webhook replay/event inspection
 
-# UI components (shadcn/ui -- adds components into your project)
-npx shadcn@latest init
-npx shadcn@latest add button card dialog form input badge avatar tabs table navigation-menu dropdown-menu sheet skeleton sonner
-
-# Dev dependencies
-npm install -D drizzle-kit @types/node
-npm install -D vitest @testing-library/react @testing-library/jest-dom
-npm install -D playwright @playwright/test
-npm install -D @biomejs/biome
+# One-time account setup (each has a CLI login flow)
+vercel login                  # → opens browser, auths GitHub
+supabase login                # → opens browser for access token
+stripe login                  # → optional, for CLI-based webhook work
 ```
+
+**No new runtime dependencies need to be added to `package.json`** for first deploy — the app already has everything it needs. The work is configuration, not code.
+
+---
 
 ## Alternatives Considered
 
 | Recommended | Alternative | When to Use Alternative |
 |-------------|-------------|-------------------------|
-| Next.js 15 | Next.js 16 | When the ecosystem (shadcn, Auth.js, tutorials) fully supports 16's renamed middleware/proxy pattern and removed sync APIs. Likely safe in 6 months. |
-| Supabase | Firebase | If you need better mobile SDK support or are building React Native. Firebase's NoSQL model (Firestore) is a poor fit for the relational data in a social network with rankings. |
-| Supabase Auth | Auth.js (NextAuth v5) | If you need to support 10+ OAuth providers beyond what Supabase offers, or if you leave Supabase entirely. Auth.js gives maximum flexibility but requires more integration work. |
-| Drizzle ORM | Prisma 7 | If you prefer schema-first development with automated migrations. Prisma 7 removed the Rust engine and is now pure TypeScript, but Drizzle's serverless performance edge remains. |
-| PeerJS | simple-peer | If you want lower-level WebRTC control and will build your own signaling server. simple-peer has higher weekly npm downloads (200K vs 34K) but requires you to wire up signaling from scratch. For a solo developer, PeerJS's built-in signaling is a significant time saver. |
-| Zustand | Jotai | If your client state becomes deeply interconnected with many derived atoms. Jotai's atomic model prevents unnecessary re-renders in complex state graphs. For this project's relatively straightforward client state, Zustand's simplicity wins. |
-| Upstash Redis | PostgreSQL-only rankings | If your leaderboard has under 10K users and updates infrequently. PostgreSQL with an indexed score column and RANK() window functions works fine at small scale. Add Redis when latency matters. |
-| Vercel | Railway or Fly.io | If you need to run long-lived processes (e.g., background workers for Discogs sync jobs). Vercel's serverless model has execution time limits. Railway provides persistent containers. Consider Railway for a dedicated PeerJS signaling server. |
-| Resend | Supabase Edge Functions + generic SMTP | If email volume exceeds 3K/month and you want to avoid Resend's paid tier. But Resend's DX with React Email templates is significantly better than raw SMTP. |
+| **Vercel** | Netlify / Cloudflare Pages / Railway | Netlify: if you hit a Next-15-specific Vercel bug. Cloudflare: if bandwidth cost explodes (Cloudflare has generous free bandwidth, but Next.js 15 on Workers requires `@opennextjs/cloudflare` adapter and not every Next feature works). Railway: if you eventually need long-lived processes (background workers for Discogs imports, PeerJS signaling). For first deploy, Vercel's Next-native integration beats all three. |
+| **Hostinger DNS (current)** | Cloudflare DNS | Cloudflare as DNS-only (not proxied) gives faster propagation, better DNSSEC support, free. Move later if Hostinger's TTL or interface becomes painful — but not a launch blocker. |
+| **Supabase Cloud Pro ($25/mo)** | Self-hosted Supabase on a VPS | Only if you're already comfortable running Postgres + PgBouncer + GoTrue + Realtime on your own infra. For a solo dev on first deploy: do not self-host. The $25/mo is cheaper than 4 hours of your debugging time. |
+| **Sentry** | Vercel Log Drains → Datadog/BetterStack, or Logtail, or Axiom | If Sentry's error-capture model is overkill and you just want log streams. But Sentry is already wired — don't add a second vendor unless you have a reason. Datadog has a $31/mo minimum — not solo-dev friendly. |
+| **Resend (current)** | Postmark / SendGrid / AWS SES | Postmark has better deliverability reputation but starts at $15/mo. SES is pennies-cheap but requires AWS account + sandbox-removal ticket. Resend's free tier + React Email integration is the solo-dev winner. |
+| **Vercel Git integration auto-deploy** | GitHub Actions → `vercel deploy --prebuilt` | If you need a pre-deploy gate (e.g. require passing E2E before promoting to prod), move deploy into GHA and have it promote manually. For v1: Vercel's auto-deploy-on-push-to-main is simpler and still gives you instant rollback. |
+| **Vercel Pro instant-rollback** | Feature flags (LaunchDarkly, Unleash) | Flags let you disable a broken feature without reverting code. Add in a later milestone; rollback is enough for v1.4. |
+
+---
 
 ## What NOT to Use
 
 | Avoid | Why | Use Instead |
 |-------|-----|-------------|
-| Socket.IO for realtime | Adds a separate WebSocket server to manage. Supabase Realtime already provides WebSocket subscriptions backed by PostgreSQL LISTEN/NOTIFY. Don't run two real-time systems. | Supabase Realtime |
-| MongoDB / Firestore | Social networks are inherently relational (users follow users, users own collections, collections reference records, records have reviews). Document databases create painful N+1 queries and data duplication for these patterns. | PostgreSQL via Supabase |
-| Redux / Redux Toolkit | Massive boilerplate (actions, reducers, selectors, thunks) for what this app needs. Zustand provides the same centralized store pattern in 1/10th the code. | Zustand |
-| Clerk for auth | $25/month after 10K MAU (Supabase Auth is free to 50K MAU). Clerk adds another vendor dependency and doesn't integrate with PostgreSQL RLS. Clerk is excellent but overkill when Supabase Auth is already in your stack. | Supabase Auth |
-| ESLint + Prettier (separate) | Two tools, two configs, potential conflicts. Biome does both in a single binary, 10-100x faster. Fewer config files = less maintenance for a solo developer. | Biome |
-| simple-peer-files | Thin wrapper around simple-peer with minimal maintenance (last commit years ago). Better to implement chunked file transfer directly with PeerJS's data channel -- it's ~50 lines of code. | PeerJS data channels + custom chunking |
-| WebTorrent | Designed for BitTorrent-over-WebRTC. Overkill for 1-to-1 file transfers. Adds torrent protocol complexity (trackers, DHT, piece selection) that provides no benefit for direct peer-to-peer vinyl rip sharing. | PeerJS |
-| Tailwind CSS v3 | v4 is stable (4.2.x), 5x faster builds, CSS-first config. No reason to start a new project on v3. | Tailwind CSS v4 |
-| next lint (built-in) | Deprecated in Next.js 15.5+ (removal warning for v16). The built-in lint wrapper is being phased out in favor of using ESLint/Biome directly. | Biome |
+| **Multiple environment.env files committed to git** | Even with `.gitignore` correct, one slip = secrets on GitHub forever. | `.env.local` (gitignored) + Vercel dashboard + local secret manager (1Password, Bitwarden) for backups. |
+| **Supabase dev project reused for prod** | Dev data bleeds into prod user list, RLS bugs can expose internal test accounts to real users, and any seed/truncate destroys real users. | Separate Supabase project (new org slot on free tier, then Pro). |
+| **Vercel Hobby with real users paying via Stripe** | Violates Vercel Fair Use Guidelines. They can suspend the project — and your domain stops resolving. | Flip to Pro before the first paid signup. Monthly cost is less than one Premium subscription. |
+| **`getSession()` in new code** | Already a project convention (per CLAUDE.md key decision) — doesn't validate JWT signature. | `getClaims()` — enforced in middleware and server actions. |
+| **Running `supabase db push` against prod from a feature branch** | There's no dry-run gate, and a half-merged branch can push a partial migration. | Only push from `main` after merge. Always `--dry-run` first. |
+| **Setting env vars as "All Environments" in Vercel** | Previews will write to prod Supabase / trigger real Stripe charges. | Set prod vars as "Production", set preview vars as "Preview" — duplicated with dev values. |
+| **`productionBrowserSourceMaps: true`** | Leaks original source code in browser devtools. Already `false` in `next.config.ts` — keep it. | Upload source maps to Sentry only (via `SENTRY_AUTH_TOKEN`), not to the public bundle. |
+| **Same `HANDOFF_HMAC_SECRET` / `IMPORT_WORKER_SECRET` in dev and prod** | Dev log exposure compromises prod. | Generate fresh 32-byte secrets per environment. |
+| **Setting Vercel Rolling Releases on v1** | Adds gradual rollout complexity. | Instant rollback is enough for a solo dev on first deploy. Add Rolling Releases when you have real traffic. |
+| **Next.js 16** | Renames middleware→proxy, removes sync request APIs, shadcn/Auth ecosystem still catching up as of Apr 2026. | Stay on 15.5.x until Q3 2026 at earliest. |
+
+---
 
 ## Stack Patterns by Variant
 
-**If P2P connections fail frequently (>20% NAT traversal failures):**
-- Self-host coturn on a $5/month VPS (e.g., Hetzner, DigitalOcean)
-- Configure PeerJS to use your coturn instance as TURN relay
-- Monitor TURN relay bandwidth -- this is where costs can surprise you
-- Because TURN relays all data through your server, which defeats "mere conduit" slightly but is necessary for connectivity
+**If launching with a closed private UAT first (recommended):**
+- Deploy to a Vercel preview URL (`digswap-<hash>.vercel.app`) — no domain yet
+- Use dev Supabase temporarily so UAT data isn't locked into prod
+- Point 3–5 trusted testers at the preview URL
+- Fix issues, then flip to prod Supabase + custom domain
 
-**If Discogs API rate limits become a bottleneck (60 req/min):**
-- Implement a background sync queue using Supabase Edge Functions + pg_cron
-- Cache Discogs data aggressively in PostgreSQL (records rarely change)
-- Sync collections incrementally (only fetch changes since last sync timestamp)
-- Because bulk imports of large collections (5000+ records) at 60 req/min take 80+ minutes
+**If launching directly to public `digswap.com`:**
+- Must have prod Supabase Pro (no auto-pause), domain DNS live, Stripe Live webhook registered, Sentry prod DSN wired, and a `/api/health` endpoint returning 200 from a post-deploy smoke script — all before first tweet.
 
-**If leaderboard queries slow down at scale (>50K users):**
-- Migrate ranking computation to Upstash Redis sorted sets entirely
-- Use PostgreSQL materialized views refreshed on a schedule (pg_cron every 15 min)
-- Because Redis ZRANK is O(log N) vs PostgreSQL RANK() window function which scans the entire table
+**If Stripe billing is deferred (launch without payments):**
+- Stripe env vars still need to be set with Test-mode values (env.ts Zod validation requires them present, per CI config)
+- `STRIPE_WEBHOOK_SECRET` can be any valid-looking placeholder as long as the webhook route is not publicly linked
+- Saves $0 but defers ~1 hr of configuration
 
-**If the retro/analog aesthetic requires heavy custom CSS:**
-- Extend shadcn/ui components with custom Tailwind theme tokens (grain textures, warm amber/brown palette, serif typography)
-- Use CSS backdrop-filter + noise SVGs for vinyl grain effects
-- Because the "Claude aesthetics prompting" approach means generating distinctive CSS, not picking a pre-built theme
+**If launching from Brazil / LATAM:**
+- Set Vercel project region to `gru1` (São Paulo) or `iad1` (US-East)
+- Set Supabase project region to closest — database latency dominates cold-start perf. If users are global-first (digger audience is worldwide), `iad1` + Supabase `us-east-1` is the neutral default.
+
+---
 
 ## Version Compatibility
 
 | Package A | Compatible With | Notes |
 |-----------|-----------------|-------|
-| Next.js 15.5.x | React 18.x | Next.js 15 officially supports React 18. React 19 is available but introduces breaking changes. |
-| Next.js 15.5.x | Tailwind CSS 4.2.x | Works via `@tailwindcss/postcss` plugin. shadcn/ui CLI initializes with Tailwind v4 support. |
-| Drizzle ORM 0.45.x | Supabase PostgreSQL | Use `postgres` driver (not `pg`). Set `prepare: false` in connection config when using Supabase's connection pooler (PgBouncer in transaction mode). |
-| Drizzle ORM 0.45.x | Drizzle Kit 0.30.x | Kit version must match ORM version track. Check release notes when upgrading either. |
-| PeerJS 1.5.x | PeerJS Server 1.0.x | Client and server versions are loosely coupled. Server provides REST API for peer discovery. |
-| @supabase/supabase-js | @supabase/ssr | Use `@supabase/ssr` for Next.js App Router server-side auth. It replaces the deprecated `@supabase/auth-helpers-nextjs`. |
-| Zustand 5.x | React 18.x | Zustand 5 dropped legacy React support. Requires React 18+. |
-| shadcn/ui | Tailwind CSS 4.x | The CLI detects Tailwind v4 and uses `@theme` directives instead of `tailwind.config.js`. Components use updated v4 class names. |
-| Stripe SDK | Supabase | Vercel's official subscription starter template validates this pairing. Use Stripe webhooks to sync to Supabase via API routes. |
+| `next@15.5.15` | `react@19.1.0` + `react-dom@19.1.0` | Next 15.5 supports React 19. Already pinned. |
+| `@sentry/nextjs@^10.47` | `next@15.5.x` | Supports App Router + Turbopack dev. Requires source maps enabled for release (`widenClientFileUpload: true` already set). |
+| `@supabase/ssr@^0.9` | `@supabase/supabase-js@^2.100` | Correct SSR adapter for Next App Router. |
+| `drizzle-orm@^0.45.1` | `postgres@^3.4.8` + Supabase PgBouncer | Connection string MUST include `?pgbouncer=true&connection_limit=1` against pooler; direct connection (port 5432) if running migrations. |
+| `stripe@^21.0.1` | Node 20+ | CI uses Node 20 — good. |
+| `@upstash/ratelimit@^2.0.8` | `@upstash/redis@^1.37` | Major versions of both aligned. |
+| `resend@^6.9.4` | React Email 3+ (if used for templates) | Not in the current dep list; templates are plain HTML/string — fine. |
+| Vercel Node runtime | Node 22 default as of 2026 | Next.js 15.5 supports Node 20 + 22; CI uses 20. **Pin Vercel runtime to 20** under Project Settings → General → Node.js Version for parity with CI. |
 
-## Architecture Decisions Driven by Stack
+---
 
-### Why This Stack Works for a Solo Developer
+## Pre-Deploy Audit Already Passed (per commit `35ed595`)
 
-1. **One platform for backend (Supabase):** Auth, database, realtime, storage, edge functions. One dashboard, one SDK, one billing relationship. Context-switching between 4+ services is a productivity killer.
+These are flagged here so the research file stays accurate — no action needed, but the milestone inherits the work:
 
-2. **Server-first rendering (Next.js App Router):** Server Components fetch data without client-side loading states. Server Actions handle mutations without API route boilerplate. Less client JavaScript = better performance on vinyl collectors' older devices.
+- [x] Build blocker in `gems/queries.ts` (P0)
+- [x] Drizzle vs `supabase/migrations/` drift (P0)
+- [x] Cold-start 500s on public routes (P0)
+- [x] Playwright E2E config stability (P0)
+- [x] Private invite flow with correct token URL (P1)
+- [x] Session revocation correctness (P1)
+- [x] Env validation + rate-limit fail-closed behavior (P1)
+- [x] Trade/follow FK integrity (P1)
+- [x] Discogs token encryption at rest (P1)
 
-3. **Type safety end-to-end (TypeScript + Drizzle):** Drizzle schemas generate TypeScript types that flow from database to API to UI. Refactoring a column name shows every broken reference at compile time, not in production.
+**Outstanding from audit before deploy:** per memory/project_security_posture.md, one CSP item still open — verify before shipping.
 
-4. **Progressive complexity for P2P:** PeerJS abstracts WebRTC complexity for the initial implementation. If you outgrow it, the underlying RTCPeerConnection API is standard -- you can replace PeerJS without rewriting the file transfer logic.
+---
 
-5. **Free tier runway:** Supabase free + Vercel Hobby + Upstash free + Resend free = $0/month until you have real users. First dollar of cost comes when you need Vercel Pro ($20/mo) for commercial use or Supabase Pro ($25/mo) for more storage.
+## Required vs Optional (Solo-Dev Triage)
 
-### Key Technical Constraints
+### REQUIRED before touching prod domain
+1. Vercel account + Vercel CLI installed + project imported from GitHub
+2. Supabase prod project created + linked via CLI
+3. Production migrations applied (`supabase db push`) + RLS spot-checked (run the 59-policy smoke from `digswap-dba` skill)
+4. Upstash prod Redis DB created
+5. Sentry prod project created + DSN + auth token generated
+6. Resend prod API key + sending domain verified (DKIM/SPF/DMARC in Hostinger)
+7. Stripe Live mode enabled (account fully activated — requires tax info, bank account, business details — can take 1–3 business days; do this **first**)
+8. Stripe Live webhook endpoint registered + signing secret copied
+9. Discogs app callback URL list includes prod URL
+10. All 21 env vars set in Vercel (Production scope)
+11. Hostinger A + CNAME records updated
+12. `/api/health` endpoint exists and returns 200 with dependency checks (DB + Redis + Supabase ping)
+13. Instant rollback tested once (deploy → rollback → redeploy) before touching the domain
 
-- **Discogs API rate limit:** 60 authenticated requests/minute. Large collection imports (5000+ records) must be queued and processed over time. This is a background job problem -- Supabase Edge Functions + pg_cron handle it without a separate worker service.
-- **WebRTC file size limits:** Browser data channels have no hard size limit, but large files (>100MB) should use chunked transfer with progress tracking. 64KB chunks are the standard practice.
-- **Vercel function timeout:** 10 seconds on Hobby, 60 seconds on Pro. Long-running Discogs sync jobs must be broken into small batches or moved to Supabase Edge Functions (no timeout limit on self-hosted, 150s on hosted).
-- **Supabase Realtime connection limit:** 200 concurrent connections on free tier, 500 on Pro. Sufficient for MVP but monitor as user base grows.
+### OPTIONAL for first deploy — add after traction
+- Vercel Analytics (free on Hobby)
+- Vercel Log Drains → external log store
+- Vercel Rolling Releases (gradual rollout)
+- Cloudflare in front of Vercel (DDoS + cache layer)
+- UptimeRobot / BetterStack external ping on `/api/health` (free tiers exist — 50-ping checks). Strongly recommended within week 1, just not a launch gate.
+- Supabase database branching (not needed until multiple devs)
+- Status page (only useful once you have >10 concurrent users)
+
+### Cost Summary (month 1)
+
+| Service | Plan | Monthly | Triggers upgrade |
+|---------|------|---------|------------------|
+| Vercel | Hobby → Pro | $0 → $20 | First paying user or public launch |
+| Supabase | Free → Pro | $0 → $25 | Public launch (auto-pause risk) |
+| Upstash Redis | Free | $0 | >500K commands/month |
+| Sentry | Developer (free) | $0 | >5K errors/mo |
+| Resend | Free | $0 | >3K emails/mo or >100/day |
+| Stripe | Pay-per-transaction | $0 | Per-charge 2.9% + 30¢ |
+| Hostinger domain | existing | — | N/A |
+| **Total floor (launched publicly)** | | **~$45/mo** | Plus usage overages if they happen |
+
+Compared to $10–30K for an enterprise stack. $45/mo is the correct order of magnitude for a solo-dev MVP serving real users.
+
+---
 
 ## Sources
 
-- [Next.js 15 App Router Documentation](https://nextjs.org/docs/app/getting-started) -- HIGH confidence, official docs
-- [Next.js 15 vs 16 Comparison](https://www.descope.com/blog/post/nextjs15-vs-nextjs16) -- HIGH confidence, verified with official upgrade guide
-- [Supabase Documentation](https://supabase.com/docs) -- HIGH confidence, official docs
-- [Supabase Realtime Docs](https://supabase.com/docs/guides/realtime) -- HIGH confidence, official docs
-- [Supabase Auth Quick Start for Next.js](https://supabase.com/docs/guides/auth/quickstarts/nextjs) -- HIGH confidence, official docs
-- [Drizzle ORM Documentation](https://orm.drizzle.team/) -- HIGH confidence, official docs
-- [Drizzle vs Prisma Comparison](https://designrevision.com/blog/prisma-vs-drizzle) -- MEDIUM confidence, third-party but corroborated by multiple sources
-- [PeerJS Documentation](https://peerjs.com/) -- MEDIUM confidence, official but smaller project
-- [PeerJS GitHub](https://github.com/peers/peerjs) -- MEDIUM confidence, verified maintenance status
-- [@lionralfs/discogs-client GitHub](https://github.com/lionralfs/discogs-client) -- MEDIUM confidence, actively maintained but niche library
-- [Discogs API Documentation](https://www.discogs.com/developers) -- HIGH confidence, official API docs
-- [Discogs API Rate Limits Forum](https://www.discogs.com/forum/thread/1104957) -- HIGH confidence, official forum
-- [Tailwind CSS v4.0 Blog Post](https://tailwindcss.com/blog/tailwindcss-v4) -- HIGH confidence, official announcement
-- [shadcn/ui Tailwind v4 Support](https://ui.shadcn.com/docs/tailwind-v4) -- HIGH confidence, official docs
-- [Zustand npm](https://www.npmjs.com/package/zustand) -- HIGH confidence, package registry
-- [Stripe Subscription Docs](https://docs.stripe.com/billing/subscriptions/build-subscriptions) -- HIGH confidence, official docs
-- [Vercel Subscription Starter Template](https://github.com/vercel/nextjs-subscription-payments) -- HIGH confidence, official Vercel template
-- [Upstash Redis Pricing](https://upstash.com/pricing/redis) -- HIGH confidence, official pricing page
-- [Resend Next.js Integration](https://resend.com/nextjs) -- HIGH confidence, official docs
-- [Redis Leaderboard System Design](https://systemdesign.one/leaderboard-system-design/) -- MEDIUM confidence, well-known system design reference
-- [PostgreSQL vs Redis for Leaderboards](https://nickb.dev/blog/favoring-sql-over-redis-for-an-evergreen-leaderboard/) -- MEDIUM confidence, practitioner blog with benchmarks
-- [WebRTC TURN Server Setup Guide](https://webrtc.ventures/2025/01/how-to-set-up-self-hosted-stun-turn-servers-for-webrtc-applications/) -- MEDIUM confidence, specialist blog
-- [Metered.ca Open Relay Project](https://www.metered.ca/tools/openrelay/) -- MEDIUM confidence, service provider docs
-- [Supabase vs PlanetScale Comparison](https://www.leanware.co/insights/supabase-vs-planetscale) -- MEDIUM confidence, third-party analysis
-- [Auth Solutions Comparison (Clerk vs Supabase vs NextAuth)](https://medium.com/better-dev-nextjs-react/clerk-vs-supabase-auth-vs-nextauth-js-the-production-reality-nobody-tells-you-a4b8f0993e1b) -- MEDIUM confidence, practitioner analysis
-- [State Management 2025 Guide](https://dev.to/hijazi313/state-management-in-2025-when-to-use-context-redux-zustand-or-jotai-2d2k) -- MEDIUM confidence, community analysis
+- [Vercel Pricing & Hobby Plan limits](https://vercel.com/pricing) — HIGH confidence, official
+- [Vercel Hobby Plan non-commercial clause](https://vercel.com/docs/plans/hobby) — HIGH confidence, official
+- [Vercel Instant Rollback docs](https://vercel.com/docs/instant-rollback) — HIGH confidence, official
+- [Vercel Environment Variables docs](https://vercel.com/docs/environment-variables) — HIGH confidence, official
+- [Vercel Domains — Adding a domain](https://vercel.com/docs/domains/working-with-domains/add-a-domain) — HIGH confidence, official
+- [Vercel DNS records reference](https://vercel.com/docs/domains/managing-dns-records) — HIGH confidence, official (apex IP `76.76.21.21`, CNAME `cname.vercel-dns.com`)
+- [Supabase Pricing](https://supabase.com/pricing) — HIGH confidence, official (Pro $25/mo, free tier 7-day pause)
+- [Supabase Database Migrations](https://supabase.com/docs/guides/deployment/database-migrations) — HIGH confidence, official
+- [Supabase CLI `db push` reference](https://supabase.com/docs/reference/cli/supabase-db-push) — HIGH confidence, official
+- [Supabase Managing Environments](https://supabase.com/docs/guides/deployment/managing-environments) — HIGH confidence, official
+- [Sentry Next.js manual setup](https://docs.sentry.io/platforms/javascript/guides/nextjs/manual-setup/) — HIGH confidence, official
+- [Sentry Next.js build options](https://docs.sentry.dev/platforms/javascript/guides/nextjs/configuration/build/) — HIGH confidence, official (source map handling for Turbopack vs Webpack)
+- [Stripe Subscription Starter (Vercel official template)](https://vercel.com/templates/next.js/subscription-starter) — HIGH confidence, official
+- [Stripe webhook signature verification in Next.js](https://maxkarlsson.dev/blog/verify-stripe-webhook-signature-in-next-js-api-routes) — MEDIUM confidence, practitioner, verified against Stripe docs
+- [Next.js health check endpoint pattern](https://nurbak.com/en/blog/health-check-endpoint/) — MEDIUM confidence, practitioner
+- [Upstash Redis pricing](https://upstash.com/pricing/redis) — HIGH confidence, official
+- [Resend Next.js integration + domain verification](https://resend.com/nextjs) — HIGH confidence, official
+- [Hostinger → Vercel setup walkthrough](https://medium.com/@rajanraj8979/learn-how-to-connect-your-hostinger-domain-to-your-vercel-deployed-project-with-this-easy-966f082919f3) — MEDIUM confidence, practitioner, cross-verified with Vercel docs
+- Repo file `apps/web/package.json` — current dependency set (HIGH, source of truth)
+- Repo file `apps/web/.env.local.example` — 21 env vars required (HIGH, source of truth)
+- Repo file `apps/web/next.config.ts` — Sentry + security headers already wired (HIGH)
+- Repo file `.github/workflows/ci.yml` — CI gates: lint/typecheck/test/build/e2e (HIGH)
+- Repo file `.planning/quick/260406-aud-deploy-readiness-audit/260406-aud-SUMMARY.md` — pre-deploy blocker list, most fixed per commit `35ed595` (HIGH)
 
 ---
-*Stack research for: VinylDig -- Vinyl Digger Social Network*
-*Researched: 2026-03-25*
+
+*Stack research for: first production deploy of DigSwap webapp*
+*Researched: 2026-04-20*
+*Scope: deploy-layer only — application stack was validated in prior milestones*
