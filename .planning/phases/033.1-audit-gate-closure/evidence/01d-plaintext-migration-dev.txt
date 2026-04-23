@@ -1,0 +1,19 @@
+Phase 33.1 / DEP-AUD-05 — plaintext row migration strategy
+============================================================
+
+Project ref:  mrkgoucqcbqjhrdjcnpw (dev)
+Created:      2026-04-23T18:38Z (Task 2 checkpoint — pending user decision)
+
+CONTEXT
+-------
+Task 1 closed the root cause (added public.vault_create_secret PostgREST wrapper).
+Two existing plaintext rows remain in public.discogs_tokens:
+  - 5c2f62d1-5d31-4743-9f96-22b29fd478cf  (created 2026-03-25, prefix "QnjMnTXe")
+  - 04520b1a-f2be-4d34-b897-a23dd33f47ef  (created 2026-04-07, prefix "zXKgDsIr")
+Both are real Discogs OAuth 1.0a credentials from human testers during Phase 9-12.
+
+PENDING USER DECISION
+---------------------
+Awaiting user response: "Option A" (migrate-and-rewrap) or "Option B" (invalidate-and-force-reauth).
+
+Once user responds, Task 3 will append the chosen strategy + execution output to this file.
