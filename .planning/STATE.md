@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.1
 milestone_name: Deploy Readiness
 status: executing
-stopped_at: Completed 033.1-02-lint-debt-cleanup-PLAN.md — pnpm lint exits 0, DEP-AUD-01 closes
-last_updated: "2026-04-23T18:49:26.191Z"
+stopped_at: Completed 033.1-03-docs-carry-over-PLAN.md — all 8 DEP-AUD-NN [x], ADR-003 has Historical Note, RUNBOOK.md exists
+last_updated: "2026-04-23T19:16:26.481Z"
 last_activity: 2026-04-23
 progress:
   total_phases: 34
-  completed_phases: 31
+  completed_phases: 32
   total_plans: 133
-  completed_plans: 130
+  completed_plans: 131
   percent: 0
 ---
 
@@ -26,7 +26,7 @@ See: .planning/PROJECT.md (updated 2026-04-06)
 ## Current Position
 
 Phase: 033.1 (audit-gate-closure) — EXECUTING
-Plan: 3 of 4
+Plan: 4 of 4
 Status: Ready to execute
 Last activity: 2026-04-23
 
@@ -63,6 +63,7 @@ Progress: [░░░░░░░░░░] 0%
 | Phase 033.1 P04 | 9 min | 3 tasks | 6 files |
 | Phase 033.1 P01 | 10min | 3 tasks | 11 files |
 | Phase 033.1 P02 | 36min | 1 tasks | 20 files |
+| Phase 033.1 P03 | 80min | 4 tasks | 6 files |
 
 ## Accumulated Context
 
@@ -84,6 +85,8 @@ Recent decisions affecting current work:
 - [Phase 033.1]: Pitfall #11 root cause was missing public.vault_create_secret PostgREST wrapper (Hypothesis C); migration 20260424000000_enable_vault_extension.sql adds wrapper + idempotent grants; Option B chosen for plaintext rows (delete + force re-auth); callback route's outer catch hardened to surface Vault failures as HTTP 500 instead of log-and-redirect-to-success
 - [Phase 033.1]: Lint cleanup (033.1-02): converted button-groups to fieldset/legend, refactored modal backdrop to sibling button overlay, established SVG icon a11y pattern (role=img + aria-label + title)
 - [Phase 033.1]: Lint cleanup (033.1-02): typed upstash Ratelimit limiter via ReturnType<typeof Ratelimit.slidingWindow> (Algorithm<RegionContext> is internal)
+- [Phase 033.1]: Plan 033.1-03 closed Phase 33 carry-over gaps 4+5 AND fixed REQUIREMENTS.md audit-drift — all 8 DEP-AUD-NN entries are now [x] truth-consistent
+- [Phase 033.1]: Established Historical Note ADR pattern: when an ADR's claim is historically false at acceptance, add a section dating the day the claim became true (cite commit hash)
 
 ### Roadmap Evolution
 
@@ -112,6 +115,6 @@ None yet (roadmap just created).
 
 ## Session Continuity
 
-Last session: 2026-04-23T18:49:18.533Z
-Stopped at: Completed 033.1-02-lint-debt-cleanup-PLAN.md — pnpm lint exits 0, DEP-AUD-01 closes
+Last session: 2026-04-23T19:16:26.474Z
+Stopped at: Completed 033.1-03-docs-carry-over-PLAN.md — all 8 DEP-AUD-NN [x], ADR-003 has Historical Note, RUNBOOK.md exists
 Resume file: None
