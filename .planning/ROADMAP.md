@@ -582,9 +582,29 @@ Plans:
 **P0 pitfalls to flag during plan-phase**: Pitfall 1 (service-role NEXT_PUBLIC_ misprefix, grep `.next/static`), Pitfall 2 (`.env.local` committed, gitleaks history scan), Pitfall 3 (migration drift, `supabase db reset` on empty), Pitfall 8 (cold-start 500s, curl verification), Pitfall 10 (session revocation, E2E), Pitfall 11 (Discogs plaintext fallback, Vault check)
 **UI hint**: no
 
+### Phase 33.1: Audit Gate Closure (INSERTED)
+**Goal**: Close the 3 gate-blocking gaps + 2 carry-over housekeeping items surfaced by Phase 33 audit (AMBER verdict per AUDIT-REPORT.md). Specifically: (a) install Supabase Vault on dev + harden `apps/web/src/lib/discogs/oauth.ts` to abort on Vault failure (DEP-AUD-05 FAIL → PASS); (b) close 20 residual lint errors so `pnpm --filter @digswap/web lint` exits 0 (DEP-AUD-01 PARTIAL → PASS); (c) execute the wired-but-never-run session-revocation Playwright spec end-to-end (DEP-AUD-04 PARTIAL → PASS); (d) add ADR-003 historical-correctness timeline note documenting when `supabase/migrations/` actually became authoritative (2026-04-23 via commit 090bdcc); (e) document the user's local `.env.local` `NEXT_PUBLIC_APP_URL` requirement in a Phase 33.1 RUNBOOK.md.
+**Depends on**: Phase 33
+**Why now**: Phase 33 was an audit gate designed to surface "claimed fixed" items that weren't. AMBER (5 PASS / 2 PARTIAL / 1 FAIL) is the designed gap-found outcome, not a phase failure. Phase 34 promotes the same codebase to prod — the FAIL on DEP-AUD-05 means plaintext Discogs OAuth tokens would ship to prod. Phase 33.1 closes the gaps before the promotion gate opens.
+**Requirements**: DEP-AUD-01, DEP-AUD-04, DEP-AUD-05, DEP-AUD-08 (re-flips PARTIAL/FAIL → PASS; DEP-AUD-02, -03, -06, -07 already PASS in Phase 33)
+**Success Criteria** (what must be TRUE):
+  1. `pnpm --filter @digswap/web lint` exits 0 with `Found 0 errors` on Phase 33.1 HEAD (DEP-AUD-01 PASS)
+  2. Vault extension installed on dev project mrkgoucqcbqjhrdjcnpw + service_role grants in place + `apps/web/src/lib/discogs/oauth.ts storeTokens()` aborts on Vault failure (no silent plaintext fallback) + dev shows `plaintext_count=0` on the SC#5 probe (DEP-AUD-05 PASS)
+  3. Playwright spec `audit/session-revocation.audit.spec.ts` runs end-to-end with audit+33@digswap.test created on dev; pre-logout=200, post-logout=401 within 60s (DEP-AUD-04 PASS, Pitfall #10 verified live)
+  4. ADR-003 includes a Historical Note section documenting when supabase/migrations/ became authoritative (2026-04-23 via commit 090bdcc) + Phase 33.1 RUNBOOK.md captures the .env.local NEXT_PUBLIC_APP_URL gotcha
+  5. Migration `supabase/migrations/20260424000000_enable_vault_extension.sql` is committed and idempotent — Phase 34 can safely apply it to prod via `supabase db push --linked`
+**Plans**: 4 plans
+Plans:
+- [ ] 033.1-01-vault-remediation-PLAN.md — DEP-AUD-05: install Vault extension + grants + PostgREST wrappers, harden oauth.ts to abort on Vault failure, migrate or invalidate 2 plaintext rows, regression test
+- [ ] 033.1-02-lint-debt-cleanup-PLAN.md — DEP-AUD-01: close 20 residual lint errors across 11 files (noUnusedFunctionParameters, noNonNullAssertion, noExplicitAny, useExhaustiveDependencies, a11y rules)
+- [ ] 033.1-03-docs-carry-over-PLAN.md — DEP-AUD-01/02/08 carry-overs: ADR-003 historical-note section, new Phase 33.1 RUNBOOK.md, user-checkpoint for local .env.local update
+- [ ] 033.1-04-session-revocation-e2e-PLAN.md — DEP-AUD-04: create audit user on dev, install Playwright chromium, run pnpm start, execute spec end-to-end with env vars, capture pre=200/post=401 evidence
+**P0 pitfalls to flag during plan-phase**: Pitfall 10 (session revocation E2E — Plan 04 verifies live), Pitfall 11 (Discogs plaintext fallback — Plan 01 closes the LIVE bug)
+**UI hint**: no
+
 ### Phase 34: Supabase Production Setup
 **Goal**: Stand up a fully isolated `digswap-prod` Supabase project — all 28+ migrations applied via `supabase db push` (never drizzle-kit), RLS Security Advisor green, Edge Functions deployed, pg_cron jobs active, Vault populated with secrets required by scheduled jobs, trade-previews Storage bucket configured with CORS and 48h TTL, Pro tier enabled to disable the 7-day free-tier auto-pause, PITR active with a rehearsed restore on a throwaway project, and the DATABASE_URL connection pinned to PgBouncer transaction pooler on port 6543 with `prepare: false`. This phase creates the root dependency every subsequent phase needs.
-**Depends on**: Phase 33
+**Depends on**: Phase 33.1
 **Requirements**: DEP-SB-01, DEP-SB-02, DEP-SB-03, DEP-SB-04, DEP-SB-05, DEP-SB-06, DEP-SB-07, DEP-SB-08, DEP-SB-09, DEP-SB-10
 **Success Criteria** (what must be TRUE):
   1. `digswap-prod` Supabase project exists as a separate project from dev (different project ref, different URL, different keys) — confirmed by `supabase projects list`
