@@ -201,7 +201,7 @@ Feed and Profile have equal weight — both are primary entry points. Feed-first
 
 This document evolves at phase transitions and milestone boundaries.
 
-*Last updated: 2026-04-20 — v1.4 Production Launch milestone started*
+*Last updated: 2026-04-23 — Phase 33.1 (Audit Gate Closure) complete; Phase 33 audit gate flips AMBER → GREEN; Phase 34 (Supabase Production Setup) unblocked*
 
 **After each phase transition** (via `/gsd:transition`):
 1. Requirements invalidated? → Move to Out of Scope with reason
