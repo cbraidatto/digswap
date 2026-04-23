@@ -143,7 +143,10 @@ export function TransferSection({ tradeId }: Props) {
 						fill="none"
 						stroke="currentColor"
 						strokeWidth="1.5"
+						role="img"
+						aria-label="Download"
 					>
+						<title>Download</title>
 						<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
 						<polyline points="7 10 12 15 17 10" />
 						<line x1="12" y1="15" x2="12" y2="3" />
@@ -174,7 +177,10 @@ export function TransferSection({ tradeId }: Props) {
 						strokeLinecap="round"
 						strokeLinejoin="round"
 						className="text-primary"
+						role="img"
+						aria-label="Complete"
 					>
+						<title>Complete</title>
 						<polyline points="20 6 9 17 4 12" />
 					</svg>
 					<span className="text-xs font-mono font-bold uppercase tracking-widest text-primary">

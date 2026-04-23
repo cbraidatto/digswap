@@ -33,7 +33,7 @@ export const test = base.extend<{ authedPage: Page }>({
 		// Wait for redirect away from signin
 		await expect(page).not.toHaveURL(/\/signin/);
 
-		await use(page as any);
+		await use(page);
 	},
 });
 

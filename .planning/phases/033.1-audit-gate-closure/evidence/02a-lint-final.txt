@@ -1,0 +1,1697 @@
+
+> @digswap/web@0.1.0 lint C:\Users\INTEL\Desktop\Get Shit DOne\.claude\worktrees\nice-franklin-2075c5\apps\web
+> biome check src/ tests/ "--max-diagnostics=300"
+
+tests\unit\lib\collection-queries.test.ts:100:13 lint/correctness/useParseIntRadix  FIXABLE  ━━━━━━━━━━
+
+  i Missing radix parameter
+  
+     98 │ vi.mock("@/lib/collection/filters", () => ({
+     99 │ 	getDecadeRange: vi.fn((decade: string) => {
+  > 100 │ 		const d = parseInt(decade);
+        │ 		          ^^^^^^^^^^^^^^^^
+    101 │ 		return d ? { start: d, end: d + 10 } : null;
+    102 │ 	}),
+  
+  i Add a non-fractional number between 2 and 36
+  
+  i Unsafe fix: Add a radix of 10
+  
+    100 │ → → const·d·=·parseInt(decade,·10);
+        │                              ++++  
+
+tests\unit\lib\discovery-queries.test.ts:52:13 lint/correctness/useParseIntRadix  FIXABLE  ━━━━━━━━━━
+
+  i Missing radix parameter
+  
+    50 │ vi.mock("@/lib/collection/filters", () => ({
+    51 │ 	getDecadeRange: vi.fn((decade: string) => {
+  > 52 │ 		const d = parseInt(decade);
+       │ 		          ^^^^^^^^^^^^^^^^
+    53 │ 		return d ? { start: d, end: d + 10 } : null;
+    54 │ 	}),
+  
+  i Add a non-fractional number between 2 and 36
+  
+  i Unsafe fix: Add a radix of 10
+  
+    52 │ → → const·d·=·parseInt(decade,·10);
+       │                              ++++  
+
+src\app\api\og\rarity\[username]\route.tsx:101:23 lint/suspicious/noGlobalIsNan  FIXABLE  ━━━━━━━━━━
+
+  ! isNaN is unsafe. It attempts a type coercion. Use Number.isNaN instead.
+  
+     99 │ 	const rawGems = parseInt(searchParams.get("gems") ?? "0", 10);
+    100 │ 	const rawAvg = parseFloat(searchParams.get("avg") ?? "0");
+  > 101 │ 	const totalRecords = isNaN(rawTotal) || rawTotal < 0 ? 0 : Math.min(rawTotal, 999999);
+        │ 	                     ^^^^^
+    102 │ 	const gemScore = isNaN(rawGems) || rawGems < 0 ? 0 : Math.min(rawGems, 999999);
+    103 │ 	const avgRarity = isNaN(rawAvg) || rawAvg < 0 ? 0 : Math.min(rawAvg, 100);
+  
+  i See the MDN documentation for more details.
+  
+  i Unsafe fix: Use Number.isNaN instead.
+  
+     99  99 │     const rawGems = parseInt(searchParams.get("gems") ?? "0", 10);
+    100 100 │     const rawAvg = parseFloat(searchParams.get("avg") ?? "0");
+    101     │ - → const·totalRecords·=·isNaN(rawTotal)·||·rawTotal·<·0·?·0·:·Math.min(rawTotal,·999999);
+        101 │ + → const·totalRecords·=·Number.isNaN(rawTotal)·||·rawTotal·<·0·?·0·:·Math.min(rawTotal,·999999);
+    102 102 │     const gemScore = isNaN(rawGems) || rawGems < 0 ? 0 : Math.min(rawGems, 999999);
+    103 103 │     const avgRarity = isNaN(rawAvg) || rawAvg < 0 ? 0 : Math.min(rawAvg, 100);
+  
+
+src\app\api\og\rarity\[username]\route.tsx:102:19 lint/suspicious/noGlobalIsNan  FIXABLE  ━━━━━━━━━━
+
+  ! isNaN is unsafe. It attempts a type coercion. Use Number.isNaN instead.
+  
+    100 │ 	const rawAvg = parseFloat(searchParams.get("avg") ?? "0");
+    101 │ 	const totalRecords = isNaN(rawTotal) || rawTotal < 0 ? 0 : Math.min(rawTotal, 999999);
+  > 102 │ 	const gemScore = isNaN(rawGems) || rawGems < 0 ? 0 : Math.min(rawGems, 999999);
+        │ 	                 ^^^^^
+    103 │ 	const avgRarity = isNaN(rawAvg) || rawAvg < 0 ? 0 : Math.min(rawAvg, 100);
+    104 │ 	const obscurityPercentile = Math.min(99, Math.round(avgRarity));
+  
+  i See the MDN documentation for more details.
+  
+  i Unsafe fix: Use Number.isNaN instead.
+  
+    100 100 │     const rawAvg = parseFloat(searchParams.get("avg") ?? "0");
+    101 101 │     const totalRecords = isNaN(rawTotal) || rawTotal < 0 ? 0 : Math.min(rawTotal, 999999);
+    102     │ - → const·gemScore·=·isNaN(rawGems)·||·rawGems·<·0·?·0·:·Math.min(rawGems,·999999);
+        102 │ + → const·gemScore·=·Number.isNaN(rawGems)·||·rawGems·<·0·?·0·:·Math.min(rawGems,·999999);
+    103 103 │     const avgRarity = isNaN(rawAvg) || rawAvg < 0 ? 0 : Math.min(rawAvg, 100);
+    104 104 │     const obscurityPercentile = Math.min(99, Math.round(avgRarity));
+  
+
+src\app\api\og\rarity\[username]\route.tsx:103:20 lint/suspicious/noGlobalIsNan  FIXABLE  ━━━━━━━━━━
+
+  ! isNaN is unsafe. It attempts a type coercion. Use Number.isNaN instead.
+  
+    101 │ 	const totalRecords = isNaN(rawTotal) || rawTotal < 0 ? 0 : Math.min(rawTotal, 999999);
+    102 │ 	const gemScore = isNaN(rawGems) || rawGems < 0 ? 0 : Math.min(rawGems, 999999);
+  > 103 │ 	const avgRarity = isNaN(rawAvg) || rawAvg < 0 ? 0 : Math.min(rawAvg, 100);
+        │ 	                  ^^^^^
+    104 │ 	const obscurityPercentile = Math.min(99, Math.round(avgRarity));
+    105 │ 	const avgDisplay = avgRarity > 0 ? avgRarity.toFixed(1) : "-";
+  
+  i See the MDN documentation for more details.
+  
+  i Unsafe fix: Use Number.isNaN instead.
+  
+    101 101 │     const totalRecords = isNaN(rawTotal) || rawTotal < 0 ? 0 : Math.min(rawTotal, 999999);
+    102 102 │     const gemScore = isNaN(rawGems) || rawGems < 0 ? 0 : Math.min(rawGems, 999999);
+    103     │ - → const·avgRarity·=·isNaN(rawAvg)·||·rawAvg·<·0·?·0·:·Math.min(rawAvg,·100);
+        103 │ + → const·avgRarity·=·Number.isNaN(rawAvg)·||·rawAvg·<·0·?·0·:·Math.min(rawAvg,·100);
+    104 104 │     const obscurityPercentile = Math.min(99, Math.round(avgRarity));
+    105 105 │     const avgDisplay = avgRarity > 0 ? avgRarity.toFixed(1) : "-";
+  
+
+src\app\api\trade-preview\audio\route.ts:5:8 lint/correctness/noUnusedImports  FIXABLE  ━━━━━━━━━━━━
+
+  ! This import is unused.
+  
+    3 │ import { type NextRequest, NextResponse } from "next/server";
+    4 │ import { db } from "@/lib/db";
+  > 5 │ import { collectionItems } from "@/lib/db/schema/collections";
+      │        ^^^^^^^^^^^^^^^^^^^
+    6 │ import { tradeProposalItems, tradeProposals, tradeRequests } from "@/lib/db/schema/trades";
+    7 │ import { env, publicEnv } from "@/lib/env";
+  
+  i Unused imports might be the result of an incomplete refactoring.
+  
+  i Unsafe fix: Remove the unused imports.
+  
+      3   3 │   import { type NextRequest, NextResponse } from "next/server";
+      4   4 │   import { db } from "@/lib/db";
+      5     │ - import·{·collectionItems·}·from·"@/lib/db/schema/collections";
+      6   5 │   import { tradeProposalItems, tradeProposals, tradeRequests } from "@/lib/db/schema/trades";
+      7   6 │   import { env, publicEnv } from "@/lib/env";
+  
+
+src\app\api\user\me\route.ts:39:5 lint/style/noNonNullAssertion ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  ! Forbidden non-null assertion.
+  
+    37 │ 			const stateless = createSbClient(
+    38 │ 				process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  > 39 │ 				process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY! ||
+       │ 				^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    40 │ 					process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY!,
+    41 │ 				{ auth: { persistSession: false, autoRefreshToken: false } },
+  
+
+src\app\api\user\me\route.ts:40:6 lint/style/noNonNullAssertion ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  ! Forbidden non-null assertion.
+  
+    38 │ 				process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    39 │ 				process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY! ||
+  > 40 │ 					process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY!,
+       │ 					^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    41 │ 				{ auth: { persistSession: false, autoRefreshToken: false } },
+    42 │ 			);
+  
+
+src\app\api\user\me\route.ts:38:5 lint/style/noNonNullAssertion ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  ! Forbidden non-null assertion.
+  
+    36 │ 			// (server-side checks the session table — exactly what Pitfall #10 verifies).
+    37 │ 			const stateless = createSbClient(
+  > 38 │ 				process.env.NEXT_PUBLIC_SUPABASE_URL!,
+       │ 				^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    39 │ 				process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY! ||
+    40 │ 					process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY!,
+  
+
+src\app\layout.tsx:57:11 lint/suspicious/useGoogleFontDisplay ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  ! The Google Font link is missing the display parameter.
+  
+    55 │ 				<link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="" />
+    56 │ 				<link
+  > 57 │ 					href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0"
+       │ 					     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    58 │ 					rel="stylesheet"
+    59 │ 				/>
+  
+  i Use &display=optional to prevent invisible text and layout shifts. If font swapping is important, use &display=swap.
+  
+
+src\app\perfil\[username]\_components\profile-header.tsx:31:2 lint/correctness/noUnusedFunctionParameters ━━━━━━━━━━
+
+  ! This parameter is unused.
+  
+    29 │ 	followCounts,
+    30 │ 	isFollowing,
+  > 31 │ 	collectionCount,
+       │ 	^^^^^^^^^^^^^^^
+    32 │ 	ranking,
+    33 │ 	badges,
+  
+  i Unused parameters might be the result of an incomplete refactoring.
+  
+
+src\components\auth\totp-setup.tsx:142:7 lint/performance/noImgElement ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  ! Don't use <img> element.
+  
+    140 │ 						{/* Render QR as <img> with data URI to prevent SVG script execution (M-08) */}
+    141 │ 						{/* eslint-disable-next-line @next/next/no-img-element */}
+  > 142 │ 						<img
+        │ 						^^^^
+  > 143 │ 							src={
+         ...
+  > 151 │ 							style={{ imageRendering: "pixelated" }}
+  > 152 │ 						/>
+        │ 						^^
+    153 │ 					</div>
+    154 │ 					<p className="text-center text-sm text-muted-foreground">
+  
+  i Using the <img> can lead to slower LCP and higher bandwidth. Consider using <Image /> from next/image to automatically optimize images.
+  
+
+src\components\chat\chat-thread.tsx:34:41 lint/style/noNonNullAssertion ━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  ! Forbidden non-null assertion.
+  
+    32 │ 		async function load() {
+    33 │ 			setLoading(true);
+  > 34 │ 			const msgs = await getMessagesAction(activeFriendId!);
+       │ 			                                     ^^^^^^^^^^^^^^^
+    35 │ 			if (!cancelled) {
+    36 │ 				setMessages(msgs);
+  
+
+src\components\chat\chat-thread.tsx:139:42 lint/style/noNonNullAssertion ━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  ! Forbidden non-null assertion.
+  
+    137 │ 			setMessages((prev) =>
+    138 │ 				prev.map((m) =>
+  > 139 │ 					m.id === optimisticId ? { ...m, id: result.messageId!, senderId: "" } : m,
+        │ 					                                    ^^^^^^^^^^^^^^^^^
+    140 │ 				),
+    141 │ 			);
+  
+
+src\components\ui\record-context-menu.tsx:32:2 lint/correctness/noUnusedFunctionParameters ━━━━━━━━━━
+
+  ! This parameter is unused.
+  
+    30 │ export function RecordContextMenu({
+    31 │ 	discogsId,
+  > 32 │ 	releaseId,
+       │ 	^^^^^^^^^
+    33 │ 	title,
+    34 │ 	artist,
+  
+  i Unused parameters might be the result of an incomplete refactoring.
+  
+
+src\lib\chat\queries.ts:186:3 lint/style/noNonNullAssertion ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  ! Forbidden non-null assertion.
+  
+    184 │ ): Promise<ChatMessage[]> {
+    185 │ 	const conditions = [
+  > 186 │ 		or(
+        │ 		^^^
+  > 187 │ 			and(eq(directMessages.senderId, userId), eq(directMessages.receiverId, friendId)),
+  > 188 │ 			and(eq(directMessages.senderId, friendId), eq(directMessages.receiverId, userId)),
+  > 189 │ 		)!,
+        │ 		^^
+    190 │ 	];
+    191 │ 
+  
+
+src\lib\collection\queries.ts:70:19 lint/style/noNonNullAssertion ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  ! Forbidden non-null assertion.
+  
+    68 │ 		const sanitized = filters.search.replace(/[%_\\]/g, "\\$&");
+    69 │ 		const pattern = `%${sanitized}%`;
+  > 70 │ 		conditions.push(or(ilike(releases.title, pattern), ilike(releases.artist, pattern))!);
+       │ 		                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    71 │ 	}
+    72 │ 
+  
+
+src\lib\discovery\queries.ts:132:15 lint/style/noNonNullAssertion ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  ! Forbidden non-null assertion.
+  
+    130 │ 	const ownersByRelease = new Map<string, RecordOwner[]>();
+    131 │ 	for (const row of ownerRows) {
+  > 132 │ 		const rid = row.releaseId!;
+        │ 		            ^^^^^^^^^^^^^^
+    133 │ 		if (!ownersByRelease.has(rid)) {
+    134 │ 			ownersByRelease.set(rid, []);
+  
+
+src\lib\discovery\queries.ts:196:5 lint/style/noNonNullAssertion ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  ! Forbidden non-null assertion.
+  
+    194 │ 		if (range) {
+    195 │ 			conditions.push(
+  > 196 │ 				and(sql`${releases.year} >= ${range.start}`, sql`${releases.year} < ${range.end}`)!,
+        │ 				^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    197 │ 			);
+    198 │ 		}
+  
+
+src\lib\discovery\queries.ts:204:19 lint/style/noNonNullAssertion ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  ! Forbidden non-null assertion.
+  
+    202 │ 	if (styles.length > 0) {
+    203 │ 		const styleConditions = styles.map((s) => sql`${releases.style} @> ARRAY[${s}]::text[]`);
+  > 204 │ 		conditions.push(or(...styleConditions)!);
+        │ 		                ^^^^^^^^^^^^^^^^^^^^^^^
+    205 │ 	}
+    206 │ 
+  
+
+src\lib\discovery\queries.ts:189:19 lint/style/noNonNullAssertion ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  ! Forbidden non-null assertion.
+  
+    187 │ 	if (genres.length > 0) {
+    188 │ 		const genreConditions = genres.map((g) => sql`${releases.genre} @> ARRAY[${g}]::text[]`);
+  > 189 │ 		conditions.push(or(...genreConditions)!);
+        │ 		                ^^^^^^^^^^^^^^^^^^^^^^^
+    190 │ 	}
+    191 │ 
+  
+
+src\lib\gems\constants.ts:92:9 lint/style/noNonNullAssertion ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  ! Forbidden non-null assertion.
+  
+    90 │  */
+    91 │ export function getGemInfo(tier: GemTier) {
+  > 92 │ 	return GEM_TIERS.find((g) => g.key === tier)!;
+       │ 	       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    93 │ }
+    94 │ 
+  
+
+src\lib\social\comparison.ts:1:14 lint/correctness/noUnusedImports  FIXABLE  ━━━━━━━━━━━━━━━━━━━━━━━
+
+  ! Several of these imports are unused.
+  
+  > 1 │ import { eq, isNull, sql } from "drizzle-orm";
+      │              ^^^^^^
+    2 │ import { db } from "@/lib/db";
+    3 │ import { collectionItems } from "@/lib/db/schema/collections";
+  
+  i Unused imports might be the result of an incomplete refactoring.
+  
+  i Unsafe fix: Remove the unused imports.
+  
+    1 │ import·{·eq,·isNull,·sql·}·from·"drizzle-orm";
+      │              --------                         
+
+src\lib\supabase\client.ts:5:3 lint/style/noNonNullAssertion ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  ! Forbidden non-null assertion.
+  
+    3 │ export function createClient() {
+    4 │ 	return createBrowserClient(
+  > 5 │ 		process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      │ 		^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    6 │ 		process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY! || process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY!,
+    7 │ 	);
+  
+
+src\lib\supabase\client.ts:6:3 lint/style/noNonNullAssertion ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  ! Forbidden non-null assertion.
+  
+    4 │ 	return createBrowserClient(
+    5 │ 		process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  > 6 │ 		process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY! || process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY!,
+      │ 		^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    7 │ 	);
+    8 │ }
+  
+
+src\lib\supabase\client.ts:6:49 lint/style/noNonNullAssertion ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  ! Forbidden non-null assertion.
+  
+    4 │ 	return createBrowserClient(
+    5 │ 		process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  > 6 │ 		process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY! || process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY!,
+      │ 		                                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    7 │ 	);
+    8 │ }
+  
+
+src\lib\supabase\middleware.ts:20:3 lint/style/noNonNullAssertion ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  ! Forbidden non-null assertion.
+  
+    19 │ 	const supabase = createServerClient(
+  > 20 │ 		process.env.NEXT_PUBLIC_SUPABASE_URL!,
+       │ 		^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    21 │ 		process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY! || process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY!,
+    22 │ 		{
+  
+
+src\lib\supabase\middleware.ts:21:3 lint/style/noNonNullAssertion ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  ! Forbidden non-null assertion.
+  
+    19 │ 	const supabase = createServerClient(
+    20 │ 		process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  > 21 │ 		process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY! || process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY!,
+       │ 		^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    22 │ 		{
+    23 │ 			cookies: {
+  
+
+src\lib\supabase\middleware.ts:21:49 lint/style/noNonNullAssertion ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  ! Forbidden non-null assertion.
+  
+    19 │ 	const supabase = createServerClient(
+    20 │ 		process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  > 21 │ 		process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY! || process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY!,
+       │ 		                                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    22 │ 		{
+    23 │ 			cookies: {
+  
+
+src\lib\supabase\server.ts:8:3 lint/style/noNonNullAssertion ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  ! Forbidden non-null assertion.
+  
+     7 │ 	return createServerClient(
+   > 8 │ 		process.env.NEXT_PUBLIC_SUPABASE_URL!,
+       │ 		^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+     9 │ 		process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY! || process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY!,
+    10 │ 		{
+  
+
+src\lib\supabase\server.ts:9:3 lint/style/noNonNullAssertion ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  ! Forbidden non-null assertion.
+  
+     7 │ 	return createServerClient(
+     8 │ 		process.env.NEXT_PUBLIC_SUPABASE_URL!,
+   > 9 │ 		process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY! || process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY!,
+       │ 		^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    10 │ 		{
+    11 │ 			cookies: {
+  
+
+src\lib\supabase\server.ts:9:49 lint/style/noNonNullAssertion ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  ! Forbidden non-null assertion.
+  
+     7 │ 	return createServerClient(
+     8 │ 		process.env.NEXT_PUBLIC_SUPABASE_URL!,
+   > 9 │ 		process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY! || process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY!,
+       │ 		                                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    10 │ 		{
+    11 │ 			cookies: {
+  
+
+src\lib\sync\process-sync-batch.test.ts:188:7 lint/correctness/noUnusedVariables  FIXABLE  ━━━━━━━━━━
+
+  ! This variable insertCallCount is unused.
+  
+    186 │ 		});
+    187 │ 
+  > 188 │ 		let insertCallCount = 0;
+        │ 		    ^^^^^^^^^^^^^^^
+    189 │ 		mDb.insert.mockReturnValue({
+    190 │ 			values: vi.fn().mockReturnValue({
+  
+  i Unused variables are often the result of typos, incomplete refactors, or other sources of bugs.
+  
+  i Unsafe fix: If this is intentional, prepend insertCallCount with an underscore.
+  
+    186 186 │       });
+    187 187 │   
+    188     │ - → → let·insertCallCount·=·0;
+        188 │ + → → let·_insertCallCount·=·0;
+    189 189 │       mDb.insert.mockReturnValue({
+    190 190 │         values: vi.fn().mockReturnValue({
+    191 191 │           returning: vi.fn().mockImplementation(() => {
+    192     │ - → → → → → insertCallCount++;
+        192 │ + → → → → → _insertCallCount++;
+    193 193 │             return Promise.resolve([{ id: "shared-release" }]);
+    194 194 │           }),
+  
+
+src\lib\wantlist\radar-queries.ts:81:16 lint/style/noNonNullAssertion ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  ! Forbidden non-null assertion.
+  
+    79 │ 				matchUsername: m.matchUsername,
+    80 │ 				matchAvatarUrl: m.matchAvatarUrl,
+  > 81 │ 				releaseId: m.releaseId!,
+       │ 				           ^^^^^^^^^^^^
+    82 │ 				discogsId: m.discogsId ?? null,
+    83 │ 				releaseTitle: m.releaseTitle ?? "Unknown Title",
+  
+
+src\tests\collection\collection-types.test.ts:2:13 lint/correctness/noUnusedImports  FIXABLE  ━━━━━━━━━━
+
+  ! This import is unused.
+  
+    1 │ import { describe, expect, it } from "vitest";
+  > 2 │ import type { CollectionFilters } from "@/lib/collection/filters";
+      │             ^^^^^^^^^^^^^^^^^^^^^
+    3 │ import { collectionFilterSchema, VISIBILITY_OPTIONS } from "@/lib/collection/filters";
+    4 │ import type { CollectionItem } from "@/lib/collection/queries";
+  
+  i Unused imports might be the result of an incomplete refactoring.
+  
+  i Unsafe fix: Remove the unused imports.
+  
+     1  1 │   import { describe, expect, it } from "vitest";
+     2    │ - import·type·{·CollectionFilters·}·from·"@/lib/collection/filters";
+     3  2 │   import { collectionFilterSchema, VISIBILITY_OPTIONS } from "@/lib/collection/filters";
+     4  3 │   import type { CollectionItem } from "@/lib/collection/queries";
+  
+
+src\tests\trades\proposal-actions.test.ts:21:2 lint/correctness/noUnusedVariables ━━━━━━━━━━━━━━━━━━
+
+  ! This variable mockDbReturning is unused.
+  
+    19 │ 	mockState,
+    20 │ 	mockDbInsertValues,
+  > 21 │ 	mockDbReturning,
+       │ 	^^^^^^^^^^^^^^^
+    22 │ 	mockDbInsertValuesMethod,
+    23 │ 	mockDbInsert,
+  
+  i Unused variables are often the result of typos, incomplete refactors, or other sources of bugs.
+  
+
+src\tests\trades\proposal-actions.test.ts:22:2 lint/correctness/noUnusedVariables ━━━━━━━━━━━━━━━━━━
+
+  ! This variable mockDbInsertValuesMethod is unused.
+  
+    20 │ 	mockDbInsertValues,
+    21 │ 	mockDbReturning,
+  > 22 │ 	mockDbInsertValuesMethod,
+       │ 	^^^^^^^^^^^^^^^^^^^^^^^^
+    23 │ 	mockDbInsert,
+    24 │ 	mockDbUpdateWhere,
+  
+  i Unused variables are often the result of typos, incomplete refactors, or other sources of bugs.
+  
+
+src\tests\trades\proposal-actions.test.ts:24:2 lint/correctness/noUnusedVariables ━━━━━━━━━━━━━━━━━━
+
+  ! This variable mockDbUpdateWhere is unused.
+  
+    22 │ 	mockDbInsertValuesMethod,
+    23 │ 	mockDbInsert,
+  > 24 │ 	mockDbUpdateWhere,
+       │ 	^^^^^^^^^^^^^^^^^
+    25 │ 	mockDbUpdateSet,
+    26 │ 	mockDbUpdate,
+  
+  i Unused variables are often the result of typos, incomplete refactors, or other sources of bugs.
+  
+
+src\tests\trades\proposal-actions.test.ts:25:2 lint/correctness/noUnusedVariables ━━━━━━━━━━━━━━━━━━
+
+  ! This variable mockDbUpdateSet is unused.
+  
+    23 │ 	mockDbInsert,
+    24 │ 	mockDbUpdateWhere,
+  > 25 │ 	mockDbUpdateSet,
+       │ 	^^^^^^^^^^^^^^^
+    26 │ 	mockDbUpdate,
+    27 │ 	mockAdminInsert,
+  
+  i Unused variables are often the result of typos, incomplete refactors, or other sources of bugs.
+  
+
+tests\e2e\audit\session-revocation.audit.spec.ts:41:44 lint/style/noNonNullAssertion ━━━━━━━━━━━━━━━
+
+  ! Forbidden non-null assertion.
+  
+    39 │ 	await page.goto("http://localhost:3000/signin");
+    40 │ 	await page.fill('input[name="email"]', AUDIT_EMAIL!);
+  > 41 │ 	await page.fill('input[name="password"]', AUDIT_PASSWORD!);
+       │ 	                                          ^^^^^^^^^^^^^^^
+    42 │ 	await page.click('button[type="submit"]');
+    43 │ 	await page.waitForURL(/\/feed|\/onboarding/, { timeout: 15_000 });
+  
+
+tests\e2e\audit\session-revocation.audit.spec.ts:47:29 lint/style/noNonNullAssertion ━━━━━━━━━━━━━━━
+
+  ! Forbidden non-null assertion.
+  
+    45 │ 	// 2. Extract the access token from the Supabase auth cookie
+    46 │ 	const cookies = await page.context().cookies();
+  > 47 │ 	const projectRef = new URL(SUPABASE_URL!).hostname.split(".")[0];
+       │ 	                           ^^^^^^^^^^^^^
+    48 │ 	const authCookieName = `sb-${projectRef}-auth-token`;
+    49 │ 	// Supabase chunks large cookies as `<name>.0`, `<name>.1` — concatenate before parsing
+  
+
+tests\e2e\audit\session-revocation.audit.spec.ts:79:12 lint/style/noNonNullAssertion ━━━━━━━━━━━━━━━
+
+  ! Forbidden non-null assertion.
+  
+    77 │ 	const logoutResp = await apiClient.post(`${SUPABASE_URL}/auth/v1/logout?scope=global`, {
+    78 │ 		headers: {
+  > 79 │ 			apikey: SUPABASE_ANON!,
+       │ 			        ^^^^^^^^^^^^^^
+    80 │ 			Authorization: `Bearer ${accessToken}`,
+    81 │ 		},
+  
+
+tests\e2e\audit\session-revocation.audit.spec.ts:40:41 lint/style/noNonNullAssertion ━━━━━━━━━━━━━━━
+
+  ! Forbidden non-null assertion.
+  
+    38 │ 	// 1. Sign in with the audit user
+    39 │ 	await page.goto("http://localhost:3000/signin");
+  > 40 │ 	await page.fill('input[name="email"]', AUDIT_EMAIL!);
+       │ 	                                       ^^^^^^^^^^^^
+    41 │ 	await page.fill('input[name="password"]', AUDIT_PASSWORD!);
+    42 │ 	await page.click('button[type="submit"]');
+  
+
+tests\unit\actions\collection.test.ts:7:7 lint/correctness/noUnusedVariables  FIXABLE  ━━━━━━━━━━━━━
+
+  ! This variable OTHER_USER_ID is unused.
+  
+    5 │ // ---------------------------------------------------------------------------
+    6 │ const USER_ID = "user-1111-1111-1111-111111111111";
+  > 7 │ const OTHER_USER_ID = "user-2222-2222-2222-222222222222";
+      │       ^^^^^^^^^^^^^
+    8 │ const COLLECTION_ITEM_ID = "cccccccc-cccc-4ccc-8ccc-cccccccccccc";
+    9 │ const RELEASE_ID = "rrrrrrrr-rrrr-4rrr-8rrr-rrrrrrrrrrrr";
+  
+  i Unused variables are often the result of typos, incomplete refactors, or other sources of bugs.
+  
+  i Unsafe fix: If this is intentional, prepend OTHER_USER_ID with an underscore.
+  
+      5   5 │   // ---------------------------------------------------------------------------
+      6   6 │   const USER_ID = "user-1111-1111-1111-111111111111";
+      7     │ - const·OTHER_USER_ID·=·"user-2222-2222-2222-222222222222";
+          7 │ + const·_OTHER_USER_ID·=·"user-2222-2222-2222-222222222222";
+      8   8 │   const COLLECTION_ITEM_ID = "cccccccc-cccc-4ccc-8ccc-cccccccccccc";
+      9   9 │   const RELEASE_ID = "rrrrrrrr-rrrr-4rrr-8rrr-rrrrrrrrrrrr";
+  
+
+tests\unit\actions\crates.test.ts:11:7 lint/correctness/noUnusedVariables  FIXABLE  ━━━━━━━━━━━━━━━━
+
+  ! This variable OTHER_USER_ID is unused.
+  
+     9 │ const RELEASE_ID = "dddddddd-dddd-4ddd-8ddd-dddddddddddd";
+    10 │ const USER_ID = "user-1111-1111-1111-1111";
+  > 11 │ const OTHER_USER_ID = "user-2222-2222-2222-2222";
+       │       ^^^^^^^^^^^^^
+    12 │ 
+    13 │ let mockAuthUser: { id: string; email?: string } | null = { id: USER_ID };
+  
+  i Unused variables are often the result of typos, incomplete refactors, or other sources of bugs.
+  
+  i Unsafe fix: If this is intentional, prepend OTHER_USER_ID with an underscore.
+  
+      9   9 │   const RELEASE_ID = "dddddddd-dddd-4ddd-8ddd-dddddddddddd";
+     10  10 │   const USER_ID = "user-1111-1111-1111-1111";
+     11     │ - const·OTHER_USER_ID·=·"user-2222-2222-2222-2222";
+         11 │ + const·_OTHER_USER_ID·=·"user-2222-2222-2222-2222";
+     12  12 │   
+     13  13 │   let mockAuthUser: { id: string; email?: string } | null = { id: USER_ID };
+  
+
+tests\unit\actions\discogs.test.ts:12:7 lint/correctness/noUnusedVariables  FIXABLE  ━━━━━━━━━━━━━━━
+
+  ! This variable mockAdminFrom is unused.
+  
+    11 │ // Supabase admin chain mock for from().select/insert/update/delete
+  > 12 │ const mockAdminFrom = vi.fn();
+       │       ^^^^^^^^^^^^^
+    13 │ 
+    14 │ function createAdminChain(returnData: unknown = null, returnError: unknown = null) {
+  
+  i Unused variables are often the result of typos, incomplete refactors, or other sources of bugs.
+  
+  i Unsafe fix: If this is intentional, prepend mockAdminFrom with an underscore.
+  
+     10  10 │   
+     11  11 │   // Supabase admin chain mock for from().select/insert/update/delete
+     12     │ - const·mockAdminFrom·=·vi.fn();
+         12 │ + const·_mockAdminFrom·=·vi.fn();
+     13  13 │   
+     14  14 │   function createAdminChain(returnData: unknown = null, returnError: unknown = null) {
+  
+
+tests\unit\actions\discogs.test.ts:14:10 lint/correctness/noUnusedVariables  FIXABLE  ━━━━━━━━━━━━━━
+
+  ! This function createAdminChain is unused.
+  
+    12 │ const mockAdminFrom = vi.fn();
+    13 │ 
+  > 14 │ function createAdminChain(returnData: unknown = null, returnError: unknown = null) {
+       │          ^^^^^^^^^^^^^^^^
+    15 │ 	const chain: Record<string, unknown> = {};
+    16 │ 	const methods = ["select", "eq", "in", "limit", "delete", "single", "update"];
+  
+  i Unused variables are often the result of typos, incomplete refactors, or other sources of bugs.
+  
+  i Unsafe fix: If this is intentional, prepend createAdminChain with an underscore.
+  
+     12  12 │   const mockAdminFrom = vi.fn();
+     13  13 │   
+     14     │ - function·createAdminChain(returnData:·unknown·=·null,·returnError:·unknown·=·null)·{
+         14 │ + function·_createAdminChain(returnData:·unknown·=·null,·returnError:·unknown·=·null)·{
+     15  15 │   	const chain: Record<string, unknown> = {};
+     16  16 │   	const methods = ["select", "eq", "in", "limit", "delete", "single", "update"];
+  
+
+tests\unit\actions\export.test.ts:119:10 lint/style/noNonNullAssertion  FIXABLE  ━━━━━━━━━━━━━━━━━━━
+
+  ! Forbidden non-null assertion.
+  
+    117 │ 		expect(result.csv).toContain("Title,Artist");
+    118 │ 		// Only the header line
+  > 119 │ 		expect(result.csv!.split("\n")).toHaveLength(1);
+        │ 		       ^^^^^^^^^^^
+    120 │ 	});
+    121 │ 
+  
+  i Unsafe fix: Replace with optional chain operator ?. This operator includes runtime checks, so it is safer than the compile-only non-null assertion operator
+  
+    117 117 │       expect(result.csv).toContain("Title,Artist");
+    118 118 │       // Only the header line
+    119     │ - → → expect(result.csv!.split("\n")).toHaveLength(1);
+        119 │ + → → expect(result.csv?.split("\n")).toHaveLength(1);
+    120 120 │     });
+    121 121 │   
+  
+
+tests\unit\actions\notifications.test.ts:18:5 lint/correctness/noUnusedVariables  FIXABLE  ━━━━━━━━━━
+
+  ! This variable adminSelectResult is unused.
+  
+    17 │ /* ---------- Supabase admin mock (mutations) ---------- */
+  > 18 │ let adminSelectResult: { data: unknown; error: unknown } = { data: null, error: null };
+       │     ^^^^^^^^^^^^^^^^^
+    19 │ let adminUpdateResult: { data: unknown; error: unknown } = { data: null, error: null };
+    20 │ let adminInsertResult: { data: unknown; error: unknown } = { data: null, error: null };
+  
+  i Unused variables are often the result of typos, incomplete refactors, or other sources of bugs.
+  
+  i Unsafe fix: If this is intentional, prepend adminSelectResult with an underscore.
+  
+     16  16 │   
+     17  17 │   /* ---------- Supabase admin mock (mutations) ---------- */
+     18     │ - let·adminSelectResult:·{·data:·unknown;·error:·unknown·}·=·{·data:·null,·error:·null·};
+         18 │ + let·_adminSelectResult:·{·data:·unknown;·error:·unknown·}·=·{·data:·null,·error:·null·};
+     19  19 │   let adminUpdateResult: { data: unknown; error: unknown } = { data: null, error: null };
+     20  20 │   let adminInsertResult: { data: unknown; error: unknown } = { data: null, error: null };
+    ······· │ 
+     92  92 │   beforeEach(() => {
+     93  93 │     mockUser = { id: USER_ID };
+     94     │ - → adminSelectResult·=·{·data:·null,·error:·null·};
+         94 │ + → _adminSelectResult·=·{·data:·null,·error:·null·};
+     95  95 │     adminUpdateResult = { data: null, error: null };
+     96  96 │     adminInsertResult = { data: null, error: null };
+  
+
+tests\unit\actions\search-signals.test.ts:9:5 lint/correctness/noUnusedVariables  FIXABLE  ━━━━━━━━━━
+
+  ! This variable queryCallCount is unused.
+  
+     8 │ let mockAuthUser: { id: string } | null = { id: USER_ID };
+   > 9 │ let queryCallCount = 0;
+       │     ^^^^^^^^^^^^^^
+    10 │ const mockInsertValues = vi.fn();
+    11 │ 
+  
+  i Unused variables are often the result of typos, incomplete refactors, or other sources of bugs.
+  
+  i Unsafe fix: If this is intentional, prepend queryCallCount with an underscore.
+  
+     7  7 │   
+     8  8 │   let mockAuthUser: { id: string } | null = { id: USER_ID };
+     9    │ - let·queryCallCount·=·0;
+        9 │ + let·_queryCallCount·=·0;
+    10 10 │   const mockInsertValues = vi.fn();
+    11 11 │   
+    ····· │ 
+    28 28 │     }
+    29 29 │     chain.then = (resolve: (v: unknown) => void) => {
+    30    │ - → → queryCallCount++;
+       30 │ + → → _queryCallCount++;
+    31 31 │       return resolve([]);
+    32 32 │     };
+    ····· │ 
+    35 35 │         onConflictDoUpdate: vi.fn().mockImplementation(() => ({
+    36 36 │           then: (resolve: (v: unknown) => void) => {
+    37    │ - → → → → → queryCallCount++;
+       37 │ + → → → → → _queryCallCount++;
+    38 38 │             return resolve([]);
+    39 39 │           },
+    40 40 │         })),
+    41 41 │         then: (resolve: (v: unknown) => void) => {
+    42    │ - → → → → queryCallCount++;
+       42 │ + → → → → _queryCallCount++;
+    43 43 │           return resolve([]);
+    44 44 │         },
+    ····· │ 
+    66 66 │   beforeEach(() => {
+    67 67 │     mockAuthUser = { id: USER_ID };
+    68    │ - → queryCallCount·=·0;
+       68 │ + → _queryCallCount·=·0;
+    69 69 │     vi.clearAllMocks();
+    70 70 │   });
+  
+
+tests\unit\actions\wantlist.test.ts:162:9 lint/correctness/noUnusedVariables  FIXABLE  ━━━━━━━━━━━━━
+
+  ! This variable result is unused.
+  
+    160 │ 		// existingRelease returns something so we skip Discogs fetch
+    161 │ 		mockAdminClient = createMockAdminChain({ selectData: { id: RELEASE_ID } });
+  > 162 │ 		const result = await addToWantlist(12345);
+        │ 		      ^^^^^^
+    163 │ 		// Should reach admin client calls
+    164 │ 		expect(adminFromCalls.length).toBeGreaterThan(0);
+  
+  i Unused variables are often the result of typos, incomplete refactors, or other sources of bugs.
+  
+  i Unsafe fix: If this is intentional, prepend result with an underscore.
+  
+    160 160 │       // existingRelease returns something so we skip Discogs fetch
+    161 161 │       mockAdminClient = createMockAdminChain({ selectData: { id: RELEASE_ID } });
+    162     │ - → → const·result·=·await·addToWantlist(12345);
+        162 │ + → → const·_result·=·await·addToWantlist(12345);
+    163 163 │       // Should reach admin client calls
+    164 164 │       expect(adminFromCalls.length).toBeGreaterThan(0);
+  
+
+tests\unit\actions\wantlist.test.ts:182:9 lint/correctness/noUnusedVariables  FIXABLE  ━━━━━━━━━━━━━
+
+  ! This variable result is unused.
+  
+    181 │ 	it("calls delete on admin client for valid request", async () => {
+  > 182 │ 		const result = await removeFromWantlist(WANTLIST_ITEM_ID);
+        │ 		      ^^^^^^
+    183 │ 		expect(adminFromCalls.some((c) => c.args[0] === "wantlist_items")).toBe(true);
+    184 │ 	});
+  
+  i Unused variables are often the result of typos, incomplete refactors, or other sources of bugs.
+  
+  i Unsafe fix: If this is intentional, prepend result with an underscore.
+  
+    180 180 │   
+    181 181 │     it("calls delete on admin client for valid request", async () => {
+    182     │ - → → const·result·=·await·removeFromWantlist(WANTLIST_ITEM_ID);
+        182 │ + → → const·_result·=·await·removeFromWantlist(WANTLIST_ITEM_ID);
+    183 183 │       expect(adminFromCalls.some((c) => c.args[0] === "wantlist_items")).toBe(true);
+    184 184 │     });
+  
+
+tests\unit\actions\wrapped.test.ts:125:10 lint/style/noNonNullAssertion  FIXABLE  ━━━━━━━━━━━━━━━━━━
+
+  ! Forbidden non-null assertion.
+  
+    123 │ 		expect(result!.recordsAdded).toBe(3);
+    124 │ 		expect(result!.reviewsWritten).toBe(5);
+  > 125 │ 		expect(result!.followersGained).toBe(10);
+        │ 		       ^^^^^^^
+    126 │ 		expect(result!.topGenres[0].name).toBe("Jazz");
+    127 │ 		expect(result!.topArtists[0].name).toBe("Coltrane");
+  
+  i Unsafe fix: Replace with optional chain operator ?. This operator includes runtime checks, so it is safer than the compile-only non-null assertion operator
+  
+    123 123 │       expect(result!.recordsAdded).toBe(3);
+    124 124 │       expect(result!.reviewsWritten).toBe(5);
+    125     │ - → → expect(result!.followersGained).toBe(10);
+        125 │ + → → expect(result?.followersGained).toBe(10);
+    126 126 │       expect(result!.topGenres[0].name).toBe("Jazz");
+    127 127 │       expect(result!.topArtists[0].name).toBe("Coltrane");
+  
+
+tests\unit\actions\wrapped.test.ts:126:10 lint/style/noNonNullAssertion  FIXABLE  ━━━━━━━━━━━━━━━━━━
+
+  ! Forbidden non-null assertion.
+  
+    124 │ 		expect(result!.reviewsWritten).toBe(5);
+    125 │ 		expect(result!.followersGained).toBe(10);
+  > 126 │ 		expect(result!.topGenres[0].name).toBe("Jazz");
+        │ 		       ^^^^^^^
+    127 │ 		expect(result!.topArtists[0].name).toBe("Coltrane");
+    128 │ 		expect(result!.rarestFind?.title).toBe("A Love Supreme");
+  
+  i Unsafe fix: Replace with optional chain operator ?. This operator includes runtime checks, so it is safer than the compile-only non-null assertion operator
+  
+    124 124 │       expect(result!.reviewsWritten).toBe(5);
+    125 125 │       expect(result!.followersGained).toBe(10);
+    126     │ - → → expect(result!.topGenres[0].name).toBe("Jazz");
+        126 │ + → → expect(result?.topGenres[0].name).toBe("Jazz");
+    127 127 │       expect(result!.topArtists[0].name).toBe("Coltrane");
+    128 128 │       expect(result!.rarestFind?.title).toBe("A Love Supreme");
+  
+
+tests\unit\actions\wrapped.test.ts:127:10 lint/style/noNonNullAssertion  FIXABLE  ━━━━━━━━━━━━━━━━━━
+
+  ! Forbidden non-null assertion.
+  
+    125 │ 		expect(result!.followersGained).toBe(10);
+    126 │ 		expect(result!.topGenres[0].name).toBe("Jazz");
+  > 127 │ 		expect(result!.topArtists[0].name).toBe("Coltrane");
+        │ 		       ^^^^^^^
+    128 │ 		expect(result!.rarestFind?.title).toBe("A Love Supreme");
+    129 │ 		expect(result!.totalValue).toBe("Getting started");
+  
+  i Unsafe fix: Replace with optional chain operator ?. This operator includes runtime checks, so it is safer than the compile-only non-null assertion operator
+  
+    125 125 │       expect(result!.followersGained).toBe(10);
+    126 126 │       expect(result!.topGenres[0].name).toBe("Jazz");
+    127     │ - → → expect(result!.topArtists[0].name).toBe("Coltrane");
+        127 │ + → → expect(result?.topArtists[0].name).toBe("Coltrane");
+    128 128 │       expect(result!.rarestFind?.title).toBe("A Love Supreme");
+    129 129 │       expect(result!.totalValue).toBe("Getting started");
+  
+
+tests\unit\actions\wrapped.test.ts:128:10 lint/style/noNonNullAssertion  FIXABLE  ━━━━━━━━━━━━━━━━━━
+
+  ! Forbidden non-null assertion.
+  
+    126 │ 		expect(result!.topGenres[0].name).toBe("Jazz");
+    127 │ 		expect(result!.topArtists[0].name).toBe("Coltrane");
+  > 128 │ 		expect(result!.rarestFind?.title).toBe("A Love Supreme");
+        │ 		       ^^^^^^^
+    129 │ 		expect(result!.totalValue).toBe("Getting started");
+    130 │ 		expect(result!.year).toBe(2025);
+  
+  i Unsafe fix: Replace with optional chain operator ?. This operator includes runtime checks, so it is safer than the compile-only non-null assertion operator
+  
+    126 126 │       expect(result!.topGenres[0].name).toBe("Jazz");
+    127 127 │       expect(result!.topArtists[0].name).toBe("Coltrane");
+    128     │ - → → expect(result!.rarestFind?.title).toBe("A·Love·Supreme");
+        128 │ + → → expect(result?.rarestFind?.title).toBe("A·Love·Supreme");
+    129 129 │       expect(result!.totalValue).toBe("Getting started");
+    130 130 │       expect(result!.year).toBe(2025);
+  
+
+tests\unit\actions\wrapped.test.ts:129:10 lint/style/noNonNullAssertion  FIXABLE  ━━━━━━━━━━━━━━━━━━
+
+  ! Forbidden non-null assertion.
+  
+    127 │ 		expect(result!.topArtists[0].name).toBe("Coltrane");
+    128 │ 		expect(result!.rarestFind?.title).toBe("A Love Supreme");
+  > 129 │ 		expect(result!.totalValue).toBe("Getting started");
+        │ 		       ^^^^^^^
+    130 │ 		expect(result!.year).toBe(2025);
+    131 │ 	});
+  
+  i Unsafe fix: Replace with optional chain operator ?. This operator includes runtime checks, so it is safer than the compile-only non-null assertion operator
+  
+    127 127 │       expect(result!.topArtists[0].name).toBe("Coltrane");
+    128 128 │       expect(result!.rarestFind?.title).toBe("A Love Supreme");
+    129     │ - → → expect(result!.totalValue).toBe("Getting·started");
+        129 │ + → → expect(result?.totalValue).toBe("Getting·started");
+    130 130 │       expect(result!.year).toBe(2025);
+    131 131 │     });
+  
+
+tests\unit\actions\wrapped.test.ts:130:10 lint/style/noNonNullAssertion  FIXABLE  ━━━━━━━━━━━━━━━━━━
+
+  ! Forbidden non-null assertion.
+  
+    128 │ 		expect(result!.rarestFind?.title).toBe("A Love Supreme");
+    129 │ 		expect(result!.totalValue).toBe("Getting started");
+  > 130 │ 		expect(result!.year).toBe(2025);
+        │ 		       ^^^^^^^
+    131 │ 	});
+    132 │ 
+  
+  i Unsafe fix: Replace with optional chain operator ?. This operator includes runtime checks, so it is safer than the compile-only non-null assertion operator
+  
+    128 128 │       expect(result!.rarestFind?.title).toBe("A Love Supreme");
+    129 129 │       expect(result!.totalValue).toBe("Getting started");
+    130     │ - → → expect(result!.year).toBe(2025);
+        130 │ + → → expect(result?.year).toBe(2025);
+    131 131 │     });
+    132 132 │   
+  
+
+tests\unit\actions\wrapped.test.ts:150:10 lint/style/noNonNullAssertion  FIXABLE  ━━━━━━━━━━━━━━━━━━
+
+  ! Forbidden non-null assertion.
+  
+    148 │ 		selectResults = [items, [{ count: 0 }], [{ count: 0 }]];
+    149 │ 		const result = await generateWrapped(USER_ID, 2025);
+  > 150 │ 		expect(result!.totalValue).toBe("Growing");
+        │ 		       ^^^^^^^
+    151 │ 	});
+    152 │ });
+  
+  i Unsafe fix: Replace with optional chain operator ?. This operator includes runtime checks, so it is safer than the compile-only non-null assertion operator
+  
+    148 148 │       selectResults = [items, [{ count: 0 }], [{ count: 0 }]];
+    149 149 │       const result = await generateWrapped(USER_ID, 2025);
+    150     │ - → → expect(result!.totalValue).toBe("Growing");
+        150 │ + → → expect(result?.totalValue).toBe("Growing");
+    151 151 │     });
+    152 152 │   });
+  
+
+tests\unit\actions\wrapped.test.ts:124:10 lint/style/noNonNullAssertion  FIXABLE  ━━━━━━━━━━━━━━━━━━
+
+  ! Forbidden non-null assertion.
+  
+    122 │ 		expect(result).not.toBeNull();
+    123 │ 		expect(result!.recordsAdded).toBe(3);
+  > 124 │ 		expect(result!.reviewsWritten).toBe(5);
+        │ 		       ^^^^^^^
+    125 │ 		expect(result!.followersGained).toBe(10);
+    126 │ 		expect(result!.topGenres[0].name).toBe("Jazz");
+  
+  i Unsafe fix: Replace with optional chain operator ?. This operator includes runtime checks, so it is safer than the compile-only non-null assertion operator
+  
+    122 122 │       expect(result).not.toBeNull();
+    123 123 │       expect(result!.recordsAdded).toBe(3);
+    124     │ - → → expect(result!.reviewsWritten).toBe(5);
+        124 │ + → → expect(result?.reviewsWritten).toBe(5);
+    125 125 │       expect(result!.followersGained).toBe(10);
+    126 126 │       expect(result!.topGenres[0].name).toBe("Jazz");
+  
+
+tests\unit\actions\wrapped.test.ts:123:10 lint/style/noNonNullAssertion  FIXABLE  ━━━━━━━━━━━━━━━━━━
+
+  ! Forbidden non-null assertion.
+  
+    121 │ 		const result = await generateWrapped(USER_ID, 2025);
+    122 │ 		expect(result).not.toBeNull();
+  > 123 │ 		expect(result!.recordsAdded).toBe(3);
+        │ 		       ^^^^^^^
+    124 │ 		expect(result!.reviewsWritten).toBe(5);
+    125 │ 		expect(result!.followersGained).toBe(10);
+  
+  i Unsafe fix: Replace with optional chain operator ?. This operator includes runtime checks, so it is safer than the compile-only non-null assertion operator
+  
+    121 121 │       const result = await generateWrapped(USER_ID, 2025);
+    122 122 │       expect(result).not.toBeNull();
+    123     │ - → → expect(result!.recordsAdded).toBe(3);
+        123 │ + → → expect(result?.recordsAdded).toBe(3);
+    124 124 │       expect(result!.reviewsWritten).toBe(5);
+    125 125 │       expect(result!.followersGained).toBe(10);
+  
+
+tests\unit\api\discogs-callback.test.ts:177:9 lint/correctness/noUnusedVariables  FIXABLE  ━━━━━━━━━━
+
+  ! This variable mockInsertSelect is unused.
+  
+    175 │ 		const mockSelect = vi.fn().mockReturnValue({ eq: mockSelectEq });
+    176 │ 		const mockInsertSingle = vi.fn().mockResolvedValue({ data: { id: "job-1" } });
+  > 177 │ 		const mockInsertSelect = vi.fn().mockReturnValue({ single: mockInsertSingle });
+        │ 		      ^^^^^^^^^^^^^^^^
+    178 │ 		const mockInsert = vi
+    179 │ 			.fn()
+  
+  i Unused variables are often the result of typos, incomplete refactors, or other sources of bugs.
+  
+  i Unsafe fix: If this is intentional, prepend mockInsertSelect with an underscore.
+  
+    175 175 │       const mockSelect = vi.fn().mockReturnValue({ eq: mockSelectEq });
+    176 176 │       const mockInsertSingle = vi.fn().mockResolvedValue({ data: { id: "job-1" } });
+    177     │ - → → const·mockInsertSelect·=·vi.fn().mockReturnValue({·single:·mockInsertSingle·});
+        177 │ + → → const·_mockInsertSelect·=·vi.fn().mockReturnValue({·single:·mockInsertSingle·});
+    178 178 │       const mockInsert = vi
+    179 179 │         .fn()
+  
+
+tests\unit\api\trade-preview-audio.test.ts:31:57 lint/correctness/noUnusedVariables ━━━━━━━━━━━━━━━━
+
+  ! This variable mockGlobalFetch is unused.
+  
+    29 │ }));
+    30 │ 
+  > 31 │ const { mockGetUser, mockDbSelect, mockCreateSignedUrl, mockGlobalFetch } = vi.hoisted(() => ({
+       │                                                         ^^^^^^^^^^^^^^^
+    32 │ 	mockGetUser: vi.fn(),
+    33 │ 	mockDbSelect: vi.fn(),
+  
+  i Unused variables are often the result of typos, incomplete refactors, or other sources of bugs.
+  
+
+tests\unit\components\collection\add-record-dialog.test.tsx:30:10 lint/performance/noImgElement ━━━━━━━━━━
+
+  ! Don't use <img> element.
+  
+    28 │ 	default: (props: Record<string, unknown>) => {
+    29 │ 		const { fill, ...rest } = props;
+  > 30 │ 		return <img alt="" {...rest} />;
+       │ 		       ^^^^^^^^^^^^^^^^^^^^^^^^
+    31 │ 	},
+    32 │ }));
+  
+  i Using the <img> can lead to slower LCP and higher bandwidth. Consider using <Image /> from next/image to automatically optimize images.
+  
+
+tests\unit\components\shell\notification-bell.test.tsx:211:19 lint/style/noNonNullAssertion ━━━━━━━━━━
+
+  ! Forbidden non-null assertion.
+  
+    209 │ 			btn.textContent?.includes("Wantlist match found!"),
+    210 │ 		);
+  > 211 │ 		fireEvent.click(notifButton!);
+        │ 		                ^^^^^^^^^^^^
+    212 │ 
+    213 │ 		// Wait for the async markNotificationRead to resolve
+  
+
+tests\unit\gamification\profile-ranking.test.ts:119:10 lint/style/noNonNullAssertion  FIXABLE  ━━━━━━━━━━
+
+  ! Forbidden non-null assertion.
+  
+    118 │ 		expect(result).not.toBeNull();
+  > 119 │ 		expect(result!.gemScore).toBe(127.3); // mapped from DB rarity_score to gemScore
+        │ 		       ^^^^^^^
+    120 │ 		expect(result!.contributionScore).toBe(38.5);
+    121 │ 		expect(result!.globalRank).toBe(42);
+  
+  i Unsafe fix: Replace with optional chain operator ?. This operator includes runtime checks, so it is safer than the compile-only non-null assertion operator
+  
+    117 117 │   
+    118 118 │       expect(result).not.toBeNull();
+    119     │ - → → expect(result!.gemScore).toBe(127.3);·//·mapped·from·DB·rarity_score·to·gemScore
+        119 │ + → → expect(result?.gemScore).toBe(127.3);·//·mapped·from·DB·rarity_score·to·gemScore
+    120 120 │       expect(result!.contributionScore).toBe(38.5);
+    121 121 │       expect(result!.globalRank).toBe(42);
+  
+
+tests\unit\gamification\profile-ranking.test.ts:120:10 lint/style/noNonNullAssertion  FIXABLE  ━━━━━━━━━━
+
+  ! Forbidden non-null assertion.
+  
+    118 │ 		expect(result).not.toBeNull();
+    119 │ 		expect(result!.gemScore).toBe(127.3); // mapped from DB rarity_score to gemScore
+  > 120 │ 		expect(result!.contributionScore).toBe(38.5);
+        │ 		       ^^^^^^^
+    121 │ 		expect(result!.globalRank).toBe(42);
+    122 │ 		expect(result!.title).toBe("Wax Prophet");
+  
+  i Unsafe fix: Replace with optional chain operator ?. This operator includes runtime checks, so it is safer than the compile-only non-null assertion operator
+  
+    118 118 │       expect(result).not.toBeNull();
+    119 119 │       expect(result!.gemScore).toBe(127.3); // mapped from DB rarity_score to gemScore
+    120     │ - → → expect(result!.contributionScore).toBe(38.5);
+        120 │ + → → expect(result?.contributionScore).toBe(38.5);
+    121 121 │       expect(result!.globalRank).toBe(42);
+    122 122 │       expect(result!.title).toBe("Wax Prophet");
+  
+
+tests\unit\gamification\profile-ranking.test.ts:121:10 lint/style/noNonNullAssertion  FIXABLE  ━━━━━━━━━━
+
+  ! Forbidden non-null assertion.
+  
+    119 │ 		expect(result!.gemScore).toBe(127.3); // mapped from DB rarity_score to gemScore
+    120 │ 		expect(result!.contributionScore).toBe(38.5);
+  > 121 │ 		expect(result!.globalRank).toBe(42);
+        │ 		       ^^^^^^^
+    122 │ 		expect(result!.title).toBe("Wax Prophet");
+    123 │ 	});
+  
+  i Unsafe fix: Replace with optional chain operator ?. This operator includes runtime checks, so it is safer than the compile-only non-null assertion operator
+  
+    119 119 │       expect(result!.gemScore).toBe(127.3); // mapped from DB rarity_score to gemScore
+    120 120 │       expect(result!.contributionScore).toBe(38.5);
+    121     │ - → → expect(result!.globalRank).toBe(42);
+        121 │ + → → expect(result?.globalRank).toBe(42);
+    122 122 │       expect(result!.title).toBe("Wax Prophet");
+    123 123 │     });
+  
+
+tests\unit\gamification\profile-ranking.test.ts:122:10 lint/style/noNonNullAssertion  FIXABLE  ━━━━━━━━━━
+
+  ! Forbidden non-null assertion.
+  
+    120 │ 		expect(result!.contributionScore).toBe(38.5);
+    121 │ 		expect(result!.globalRank).toBe(42);
+  > 122 │ 		expect(result!.title).toBe("Wax Prophet");
+        │ 		       ^^^^^^^
+    123 │ 	});
+    124 │ 
+  
+  i Unsafe fix: Replace with optional chain operator ?. This operator includes runtime checks, so it is safer than the compile-only non-null assertion operator
+  
+    120 120 │       expect(result!.contributionScore).toBe(38.5);
+    121 121 │       expect(result!.globalRank).toBe(42);
+    122     │ - → → expect(result!.title).toBe("Wax·Prophet");
+        122 │ + → → expect(result?.title).toBe("Wax·Prophet");
+    123 123 │     });
+    124 124 │   
+  
+
+tests\unit\gamification\ranking-computation.test.ts:160:10 lint/style/noNonNullAssertion  FIXABLE  ━━━━━━━━━━
+
+  ! Forbidden non-null assertion.
+  
+    158 │ 		const rareFindBadge = BADGE_DEFINITIONS.find((b) => b.slug === "rare_find");
+    159 │ 		expect(rareFindBadge).toBeDefined();
+  > 160 │ 		expect(rareFindBadge!.description).toContain("Safira or Diamante");
+        │ 		       ^^^^^^^^^^^^^^
+    161 │ 	});
+    162 │ });
+  
+  i Unsafe fix: Replace with optional chain operator ?. This operator includes runtime checks, so it is safer than the compile-only non-null assertion operator
+  
+    158 158 │       const rareFindBadge = BADGE_DEFINITIONS.find((b) => b.slug === "rare_find");
+    159 159 │       expect(rareFindBadge).toBeDefined();
+    160     │ - → → expect(rareFindBadge!.description).toContain("Safira·or·Diamante");
+        160 │ + → → expect(rareFindBadge?.description).toContain("Safira·or·Diamante");
+    161 161 │     });
+    162 162 │   });
+  
+
+tests\unit\gems\gem-notifications.test.ts:100:10 lint/style/noNonNullAssertion  FIXABLE  ━━━━━━━━━━━
+
+  ! Forbidden non-null assertion.
+  
+     98 │ 		const r1Change = changes.find((c) => c.releaseId === "r-1");
+     99 │ 		expect(r1Change).toBeDefined();
+  > 100 │ 		expect(r1Change!.oldTier).toBe("quartz");
+        │ 		       ^^^^^^^^^
+    101 │ 		expect(r1Change!.newTier).toBe("emerald");
+    102 │ 
+  
+  i Unsafe fix: Replace with optional chain operator ?. This operator includes runtime checks, so it is safer than the compile-only non-null assertion operator
+  
+     98  98 │       const r1Change = changes.find((c) => c.releaseId === "r-1");
+     99  99 │       expect(r1Change).toBeDefined();
+    100     │ - → → expect(r1Change!.oldTier).toBe("quartz");
+        100 │ + → → expect(r1Change?.oldTier).toBe("quartz");
+    101 101 │       expect(r1Change!.newTier).toBe("emerald");
+    102 102 │   
+  
+
+tests\unit\gems\gem-notifications.test.ts:101:10 lint/style/noNonNullAssertion  FIXABLE  ━━━━━━━━━━━
+
+  ! Forbidden non-null assertion.
+  
+     99 │ 		expect(r1Change).toBeDefined();
+    100 │ 		expect(r1Change!.oldTier).toBe("quartz");
+  > 101 │ 		expect(r1Change!.newTier).toBe("emerald");
+        │ 		       ^^^^^^^^^
+    102 │ 
+    103 │ 		const r2Change = changes.find((c) => c.releaseId === "r-2");
+  
+  i Unsafe fix: Replace with optional chain operator ?. This operator includes runtime checks, so it is safer than the compile-only non-null assertion operator
+  
+     99  99 │       expect(r1Change).toBeDefined();
+    100 100 │       expect(r1Change!.oldTier).toBe("quartz");
+    101     │ - → → expect(r1Change!.newTier).toBe("emerald");
+        101 │ + → → expect(r1Change?.newTier).toBe("emerald");
+    102 102 │   
+    103 103 │       const r2Change = changes.find((c) => c.releaseId === "r-2");
+  
+
+tests\unit\gems\gem-notifications.test.ts:105:10 lint/style/noNonNullAssertion  FIXABLE  ━━━━━━━━━━━
+
+  ! Forbidden non-null assertion.
+  
+    103 │ 		const r2Change = changes.find((c) => c.releaseId === "r-2");
+    104 │ 		expect(r2Change).toBeDefined();
+  > 105 │ 		expect(r2Change!.oldTier).toBe("sapphire");
+        │ 		       ^^^^^^^^^
+    106 │ 		expect(r2Change!.newTier).toBe("diamond");
+    107 │ 	});
+  
+  i Unsafe fix: Replace with optional chain operator ?. This operator includes runtime checks, so it is safer than the compile-only non-null assertion operator
+  
+    103 103 │       const r2Change = changes.find((c) => c.releaseId === "r-2");
+    104 104 │       expect(r2Change).toBeDefined();
+    105     │ - → → expect(r2Change!.oldTier).toBe("sapphire");
+        105 │ + → → expect(r2Change?.oldTier).toBe("sapphire");
+    106 106 │       expect(r2Change!.newTier).toBe("diamond");
+    107 107 │     });
+  
+
+tests\unit\gems\gem-notifications.test.ts:106:10 lint/style/noNonNullAssertion  FIXABLE  ━━━━━━━━━━━
+
+  ! Forbidden non-null assertion.
+  
+    104 │ 		expect(r2Change).toBeDefined();
+    105 │ 		expect(r2Change!.oldTier).toBe("sapphire");
+  > 106 │ 		expect(r2Change!.newTier).toBe("diamond");
+        │ 		       ^^^^^^^^^
+    107 │ 	});
+    108 │ });
+  
+  i Unsafe fix: Replace with optional chain operator ?. This operator includes runtime checks, so it is safer than the compile-only non-null assertion operator
+  
+    104 104 │       expect(r2Change).toBeDefined();
+    105 105 │       expect(r2Change!.oldTier).toBe("sapphire");
+    106     │ - → → expect(r2Change!.newTier).toBe("diamond");
+        106 │ + → → expect(r2Change?.newTier).toBe("diamond");
+    107 107 │     });
+    108 108 │   });
+  
+
+tests\unit\gems\gem-tiers.test.ts:5:2 lint/correctness/noUnusedImports  FIXABLE  ━━━━━━━━━━━━━━━━━━━
+
+  ! Several of these imports are unused.
+  
+    3 │ 	computeGemScore,
+    4 │ 	GEM_TIERS,
+  > 5 │ 	type GemTier,
+      │ 	^^^^^^^^^^^^
+    6 │ 	getGemInfo,
+    7 │ 	getGemTier,
+  
+  i Unused imports might be the result of an incomplete refactoring.
+  
+  i Unsafe fix: Remove the unused imports.
+  
+      3   3 │     computeGemScore,
+      4   4 │     GEM_TIERS,
+      5     │ - → type·GemTier,
+      6   5 │     getGemInfo,
+      7   6 │     getGemTier,
+  
+
+tests\unit\lib\gamification-badges.test.ts:38:5 lint/correctness/noUnusedVariables  FIXABLE  ━━━━━━━━━━
+
+  ! This variable callIndex is unused.
+  
+    36 │ };
+    37 │ 
+  > 38 │ let callIndex = 0;
+       │     ^^^^^^^^^
+    39 │ 
+    40 │ vi.mock("@/lib/supabase/admin", () => ({
+  
+  i Unused variables are often the result of typos, incomplete refactors, or other sources of bugs.
+  
+  i Unsafe fix: If this is intentional, prepend callIndex with an underscore.
+  
+     36  36 │   };
+     37  37 │   
+     38     │ - let·callIndex·=·0;
+         38 │ + let·_callIndex·=·0;
+     39  39 │   
+     40  40 │   vi.mock("@/lib/supabase/admin", () => ({
+    ······· │ 
+     78  78 │   
+     79  79 │   beforeEach(() => {
+     80     │ - → callIndex·=·0;
+         80 │ + → _callIndex·=·0;
+     81  81 │     badgeLookupResult = {
+     82  82 │       data: { id: "badge-001", name: "First Dig" },
+  
+
+tests\unit\lib\gamification-badges.test.ts:24:7 lint/correctness/noUnusedVariables  FIXABLE  ━━━━━━━━━━
+
+  ! This variable adminChain is unused.
+  
+    22 │ }
+    23 │ 
+  > 24 │ const adminChain = buildAdminChain();
+       │       ^^^^^^^^^^
+    25 │ let badgeLookupResult: { data: unknown; error: unknown } = {
+    26 │ 	data: { id: "badge-001", name: "First Dig" },
+  
+  i Unused variables are often the result of typos, incomplete refactors, or other sources of bugs.
+  
+  i Unsafe fix: If this is intentional, prepend adminChain with an underscore.
+  
+     22  22 │   }
+     23  23 │   
+     24     │ - const·adminChain·=·buildAdminChain();
+         24 │ + const·_adminChain·=·buildAdminChain();
+     25  25 │   let badgeLookupResult: { data: unknown; error: unknown } = {
+     26  26 │   	data: { id: "badge-001", name: "First Dig" },
+  
+
+tests\unit\lib\gamification-leaderboard.test.ts:189:10 lint/style/noNonNullAssertion  FIXABLE  ━━━━━━━━━━
+
+  ! Forbidden non-null assertion.
+  
+    187 │ 		expect(result!.gemScore).toBe(120);
+    188 │ 		expect(result!.contributionScore).toBe(45);
+  > 189 │ 		expect(result!.globalRank).toBe(5);
+        │ 		       ^^^^^^^
+    190 │ 		expect(result!.title).toBe("Crate Digger");
+    191 │ 	});
+  
+  i Unsafe fix: Replace with optional chain operator ?. This operator includes runtime checks, so it is safer than the compile-only non-null assertion operator
+  
+    187 187 │       expect(result!.gemScore).toBe(120);
+    188 188 │       expect(result!.contributionScore).toBe(45);
+    189     │ - → → expect(result!.globalRank).toBe(5);
+        189 │ + → → expect(result?.globalRank).toBe(5);
+    190 190 │       expect(result!.title).toBe("Crate Digger");
+    191 191 │     });
+  
+
+tests\unit\lib\gamification-leaderboard.test.ts:187:10 lint/style/noNonNullAssertion  FIXABLE  ━━━━━━━━━━
+
+  ! Forbidden non-null assertion.
+  
+    185 │ 		const result = await getUserRanking(USER_ID);
+    186 │ 		expect(result).not.toBeNull();
+  > 187 │ 		expect(result!.gemScore).toBe(120);
+        │ 		       ^^^^^^^
+    188 │ 		expect(result!.contributionScore).toBe(45);
+    189 │ 		expect(result!.globalRank).toBe(5);
+  
+  i Unsafe fix: Replace with optional chain operator ?. This operator includes runtime checks, so it is safer than the compile-only non-null assertion operator
+  
+    185 185 │       const result = await getUserRanking(USER_ID);
+    186 186 │       expect(result).not.toBeNull();
+    187     │ - → → expect(result!.gemScore).toBe(120);
+        187 │ + → → expect(result?.gemScore).toBe(120);
+    188 188 │       expect(result!.contributionScore).toBe(45);
+    189 189 │       expect(result!.globalRank).toBe(5);
+  
+
+tests\unit\lib\gamification-leaderboard.test.ts:188:10 lint/style/noNonNullAssertion  FIXABLE  ━━━━━━━━━━
+
+  ! Forbidden non-null assertion.
+  
+    186 │ 		expect(result).not.toBeNull();
+    187 │ 		expect(result!.gemScore).toBe(120);
+  > 188 │ 		expect(result!.contributionScore).toBe(45);
+        │ 		       ^^^^^^^
+    189 │ 		expect(result!.globalRank).toBe(5);
+    190 │ 		expect(result!.title).toBe("Crate Digger");
+  
+  i Unsafe fix: Replace with optional chain operator ?. This operator includes runtime checks, so it is safer than the compile-only non-null assertion operator
+  
+    186 186 │       expect(result).not.toBeNull();
+    187 187 │       expect(result!.gemScore).toBe(120);
+    188     │ - → → expect(result!.contributionScore).toBe(45);
+        188 │ + → → expect(result?.contributionScore).toBe(45);
+    189 189 │       expect(result!.globalRank).toBe(5);
+    190 190 │       expect(result!.title).toBe("Crate Digger");
+  
+
+tests\unit\lib\gamification-leaderboard.test.ts:190:10 lint/style/noNonNullAssertion  FIXABLE  ━━━━━━━━━━
+
+  ! Forbidden non-null assertion.
+  
+    188 │ 		expect(result!.contributionScore).toBe(45);
+    189 │ 		expect(result!.globalRank).toBe(5);
+  > 190 │ 		expect(result!.title).toBe("Crate Digger");
+        │ 		       ^^^^^^^
+    191 │ 	});
+    192 │ 
+  
+  i Unsafe fix: Replace with optional chain operator ?. This operator includes runtime checks, so it is safer than the compile-only non-null assertion operator
+  
+    188 188 │       expect(result!.contributionScore).toBe(45);
+    189 189 │       expect(result!.globalRank).toBe(5);
+    190     │ - → → expect(result!.title).toBe("Crate·Digger");
+        190 │ + → → expect(result?.title).toBe("Crate·Digger");
+    191 191 │     });
+    192 192 │   
+  
+
+tests\unit\lib\gems-badge-notifications.test.ts:2:13 lint/correctness/noUnusedImports  FIXABLE  ━━━━━━━━━━
+
+  ! This import is unused.
+  
+    1 │ import { describe, expect, it } from "vitest";
+  > 2 │ import type { GemTierChange } from "@/lib/gems/notifications";
+      │             ^^^^^^^^^^^^^^^^^
+    3 │ import { detectGemTierChanges } from "@/lib/gems/notifications";
+    4 │ 
+  
+  i Unused imports might be the result of an incomplete refactoring.
+  
+  i Unsafe fix: Remove the unused imports.
+  
+      1   1 │   import { describe, expect, it } from "vitest";
+      2     │ - import·type·{·GemTierChange·}·from·"@/lib/gems/notifications";
+      3   2 │   import { detectGemTierChanges } from "@/lib/gems/notifications";
+      4   3 │   
+  
+
+tests\unit\lib\notifications-wantlist-match.test.ts:31:10 lint/correctness/noUnusedVariables  FIXABLE  ━━━━━━━━━━
+
+  ! This variable self is unused.
+  
+    29 │ 		from: vi.fn((table: string) => {
+    30 │ 			const chain: Record<string, ReturnType<typeof vi.fn>> = {};
+  > 31 │ 			const self = () => chain;
+       │ 			      ^^^^
+    32 │ 
+    33 │ 			chain.select = vi.fn().mockReturnValue(chain);
+  
+  i Unused variables are often the result of typos, incomplete refactors, or other sources of bugs.
+  
+  i Unsafe fix: If this is intentional, prepend self with an underscore.
+  
+     29  29 │       from: vi.fn((table: string) => {
+     30  30 │         const chain: Record<string, ReturnType<typeof vi.fn>> = {};
+     31     │ - → → → const·self·=·()·=>·chain;
+         31 │ + → → → const·_self·=·()·=>·chain;
+     32  32 │   
+     33  33 │         chain.select = vi.fn().mockReturnValue(chain);
+  
+
+tests\unit\lib\security-csp.test.ts:1:55 lint/correctness/noUnusedImports  FIXABLE  ━━━━━━━━━━━━━━━━
+
+  ! Several of these imports are unused.
+  
+  > 1 │ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+      │                                                       ^^
+    2 │ import { generateCspHeader } from "@/lib/security/csp";
+    3 │ 
+  
+  i Unused imports might be the result of an incomplete refactoring.
+  
+  i Unsafe fix: Remove the unused imports.
+  
+    1 │ import·{·afterEach,·beforeEach,·describe,·expect,·it,·vi·}·from·"vitest";
+      │                                                       ---                
+
+tests\unit\lib\trades-messages.test.ts:157:10 lint/style/noNonNullAssertion  FIXABLE  ━━━━━━━━━━━━━━
+
+  ! Forbidden non-null assertion.
+  
+    156 │ 		const ctx = await getTradeParticipantContext(TRADE_ID, USER_A);
+  > 157 │ 		expect(ctx!.lastReadAt).toBe(readAt.toISOString());
+        │ 		       ^^^^
+    158 │ 	});
+    159 │ 
+  
+  i Unsafe fix: Replace with optional chain operator ?. This operator includes runtime checks, so it is safer than the compile-only non-null assertion operator
+  
+    155 155 │   
+    156 156 │       const ctx = await getTradeParticipantContext(TRADE_ID, USER_A);
+    157     │ - → → expect(ctx!.lastReadAt).toBe(readAt.toISOString());
+        157 │ + → → expect(ctx?.lastReadAt).toBe(readAt.toISOString());
+    158 158 │     });
+    159 159 │   
+  
+
+tests\unit\lib\trades-messages.test.ts:165:10 lint/style/noNonNullAssertion  FIXABLE  ━━━━━━━━━━━━━━
+
+  ! Forbidden non-null assertion.
+  
+    164 │ 		const ctx = await getTradeParticipantContext(TRADE_ID, USER_B);
+  > 165 │ 		expect(ctx!.lastReadAt).toBe(readAt.toISOString());
+        │ 		       ^^^^
+    166 │ 	});
+    167 │ });
+  
+  i Unsafe fix: Replace with optional chain operator ?. This operator includes runtime checks, so it is safer than the compile-only non-null assertion operator
+  
+    163 163 │   
+    164 164 │       const ctx = await getTradeParticipantContext(TRADE_ID, USER_B);
+    165     │ - → → expect(ctx!.lastReadAt).toBe(readAt.toISOString());
+        165 │ + → → expect(ctx?.lastReadAt).toBe(readAt.toISOString());
+    166 166 │     });
+    167 167 │   });
+  
+
+tests\unit\lib\trades-messages.test.ts:142:10 lint/style/noNonNullAssertion  FIXABLE  ━━━━━━━━━━━━━━
+
+  ! Forbidden non-null assertion.
+  
+    140 │ 		expect(ctx).not.toBeNull();
+    141 │ 		expect(ctx!.isRequester).toBe(false);
+  > 142 │ 		expect(ctx!.counterpartyId).toBe(USER_A);
+        │ 		       ^^^^
+    143 │ 	});
+    144 │ 
+  
+  i Unsafe fix: Replace with optional chain operator ?. This operator includes runtime checks, so it is safer than the compile-only non-null assertion operator
+  
+    140 140 │       expect(ctx).not.toBeNull();
+    141 141 │       expect(ctx!.isRequester).toBe(false);
+    142     │ - → → expect(ctx!.counterpartyId).toBe(USER_A);
+        142 │ + → → expect(ctx?.counterpartyId).toBe(USER_A);
+    143 143 │     });
+    144 144 │   
+  
+
+tests\unit\lib\trades-messages.test.ts:133:10 lint/style/noNonNullAssertion  FIXABLE  ━━━━━━━━━━━━━━
+
+  ! Forbidden non-null assertion.
+  
+    131 │ 		expect(ctx!.counterpartyId).toBe(USER_B);
+    132 │ 		expect(ctx!.tradeId).toBe(TRADE_ID);
+  > 133 │ 		expect(ctx!.status).toBe("pending");
+        │ 		       ^^^^
+    134 │ 	});
+    135 │ 
+  
+  i Unsafe fix: Replace with optional chain operator ?. This operator includes runtime checks, so it is safer than the compile-only non-null assertion operator
+  
+    131 131 │       expect(ctx!.counterpartyId).toBe(USER_B);
+    132 132 │       expect(ctx!.tradeId).toBe(TRADE_ID);
+    133     │ - → → expect(ctx!.status).toBe("pending");
+        133 │ + → → expect(ctx?.status).toBe("pending");
+    134 134 │     });
+    135 135 │   
+  
+
+tests\unit\lib\trades-messages.test.ts:130:10 lint/style/noNonNullAssertion  FIXABLE  ━━━━━━━━━━━━━━
+
+  ! Forbidden non-null assertion.
+  
+    128 │ 		const ctx = await getTradeParticipantContext(TRADE_ID, USER_A);
+    129 │ 		expect(ctx).not.toBeNull();
+  > 130 │ 		expect(ctx!.isRequester).toBe(true);
+        │ 		       ^^^^
+    131 │ 		expect(ctx!.counterpartyId).toBe(USER_B);
+    132 │ 		expect(ctx!.tradeId).toBe(TRADE_ID);
+  
+  i Unsafe fix: Replace with optional chain operator ?. This operator includes runtime checks, so it is safer than the compile-only non-null assertion operator
+  
+    128 128 │       const ctx = await getTradeParticipantContext(TRADE_ID, USER_A);
+    129 129 │       expect(ctx).not.toBeNull();
+    130     │ - → → expect(ctx!.isRequester).toBe(true);
+        130 │ + → → expect(ctx?.isRequester).toBe(true);
+    131 131 │       expect(ctx!.counterpartyId).toBe(USER_B);
+    132 132 │       expect(ctx!.tradeId).toBe(TRADE_ID);
+  
+
+tests\unit\lib\trades-messages.test.ts:131:10 lint/style/noNonNullAssertion  FIXABLE  ━━━━━━━━━━━━━━
+
+  ! Forbidden non-null assertion.
+  
+    129 │ 		expect(ctx).not.toBeNull();
+    130 │ 		expect(ctx!.isRequester).toBe(true);
+  > 131 │ 		expect(ctx!.counterpartyId).toBe(USER_B);
+        │ 		       ^^^^
+    132 │ 		expect(ctx!.tradeId).toBe(TRADE_ID);
+    133 │ 		expect(ctx!.status).toBe("pending");
+  
+  i Unsafe fix: Replace with optional chain operator ?. This operator includes runtime checks, so it is safer than the compile-only non-null assertion operator
+  
+    129 129 │       expect(ctx).not.toBeNull();
+    130 130 │       expect(ctx!.isRequester).toBe(true);
+    131     │ - → → expect(ctx!.counterpartyId).toBe(USER_B);
+        131 │ + → → expect(ctx?.counterpartyId).toBe(USER_B);
+    132 132 │       expect(ctx!.tradeId).toBe(TRADE_ID);
+    133 133 │       expect(ctx!.status).toBe("pending");
+  
+
+tests\unit\lib\trades-messages.test.ts:132:10 lint/style/noNonNullAssertion  FIXABLE  ━━━━━━━━━━━━━━
+
+  ! Forbidden non-null assertion.
+  
+    130 │ 		expect(ctx!.isRequester).toBe(true);
+    131 │ 		expect(ctx!.counterpartyId).toBe(USER_B);
+  > 132 │ 		expect(ctx!.tradeId).toBe(TRADE_ID);
+        │ 		       ^^^^
+    133 │ 		expect(ctx!.status).toBe("pending");
+    134 │ 	});
+  
+  i Unsafe fix: Replace with optional chain operator ?. This operator includes runtime checks, so it is safer than the compile-only non-null assertion operator
+  
+    130 130 │       expect(ctx!.isRequester).toBe(true);
+    131 131 │       expect(ctx!.counterpartyId).toBe(USER_B);
+    132     │ - → → expect(ctx!.tradeId).toBe(TRADE_ID);
+        132 │ + → → expect(ctx?.tradeId).toBe(TRADE_ID);
+    133 133 │       expect(ctx!.status).toBe("pending");
+    134 134 │     });
+  
+
+tests\unit\lib\trades-messages.test.ts:141:10 lint/style/noNonNullAssertion  FIXABLE  ━━━━━━━━━━━━━━
+
+  ! Forbidden non-null assertion.
+  
+    139 │ 		const ctx = await getTradeParticipantContext(TRADE_ID, USER_B);
+    140 │ 		expect(ctx).not.toBeNull();
+  > 141 │ 		expect(ctx!.isRequester).toBe(false);
+        │ 		       ^^^^
+    142 │ 		expect(ctx!.counterpartyId).toBe(USER_A);
+    143 │ 	});
+  
+  i Unsafe fix: Replace with optional chain operator ?. This operator includes runtime checks, so it is safer than the compile-only non-null assertion operator
+  
+    139 139 │       const ctx = await getTradeParticipantContext(TRADE_ID, USER_B);
+    140 140 │       expect(ctx).not.toBeNull();
+    141     │ - → → expect(ctx!.isRequester).toBe(false);
+        141 │ + → → expect(ctx?.isRequester).toBe(false);
+    142 142 │       expect(ctx!.counterpartyId).toBe(USER_A);
+    143 143 │     });
+  
+
+Checked 616 files in 861ms. No fixes applied.
+Found 90 warnings.
+Found 2 infos.
+
+---
+EXIT STATUS: 0
+errors: 0 (none reported)
+warnings: 90
+infos: 2
+noExplicitAny count: 0
+typecheck exit: 0
+test exit: 0 (1570 passed, 4 skipped, 7 todo)

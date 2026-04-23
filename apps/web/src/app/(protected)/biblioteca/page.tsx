@@ -113,16 +113,7 @@ export default function BibliotecaPage() {
 			});
 	}, []);
 
-	const handleSelectFolder = useCallback(async () => {
-		const bridge = bridgeRef.current;
-		if (!bridge) return;
-		const folder = await bridge.selectLibraryFolder();
-		if (!folder) return;
-		setLibraryRoot(folder);
-		startScan(folder, "full");
-	}, []);
-
-	const startScan = useCallback(async (folder: string, mode: "incremental" | "full") => {
+	const startScan = useCallback(async (_folder: string, mode: "incremental" | "full") => {
 		const bridge = bridgeRef.current;
 		if (!bridge) return;
 
@@ -152,6 +143,15 @@ export default function BibliotecaPage() {
 			setState("library");
 		}
 	}, []);
+
+	const handleSelectFolder = useCallback(async () => {
+		const bridge = bridgeRef.current;
+		if (!bridge) return;
+		const folder = await bridge.selectLibraryFolder();
+		if (!folder) return;
+		setLibraryRoot(folder);
+		startScan(folder, "full");
+	}, [startScan]);
 
 	if (state === "loading") {
 		return (

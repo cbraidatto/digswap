@@ -45,7 +45,10 @@ function MusicIcon() {
 			strokeWidth="1.5"
 			strokeLinecap="round"
 			strokeLinejoin="round"
+			role="img"
+			aria-label="Music"
 		>
+			<title>Music</title>
 			<path d="M9 18V5l12-2v13" />
 			<circle cx="6" cy="18" r="3" />
 			<circle cx="18" cy="16" r="3" />
@@ -64,7 +67,10 @@ function CheckIcon() {
 			strokeWidth="2.5"
 			strokeLinecap="round"
 			strokeLinejoin="round"
+			role="img"
+			aria-label="Check"
 		>
+			<title>Check</title>
 			<polyline points="20 6 9 17 4 12" />
 		</svg>
 	);
@@ -81,7 +87,10 @@ function UploadIcon() {
 			strokeWidth="2"
 			strokeLinecap="round"
 			strokeLinejoin="round"
+			role="img"
+			aria-label="Upload"
 		>
+			<title>Upload</title>
 			<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
 			<polyline points="17 8 12 3 7 8" />
 			<line x1="12" y1="3" x2="12" y2="15" />
@@ -122,7 +131,8 @@ export function AudioUploadSection({ tradeId, items }: Props) {
 		setErrors((e) => ({ ...e, [item.proposalItemId]: "" }));
 
 		try {
-			const result = await bridge!.selectAndPrepareAudio(tradeId, item.proposalItemId);
+			if (!bridge) throw new Error("Desktop bridge unavailable");
+			const result = await bridge.selectAndPrepareAudio(tradeId, item.proposalItemId);
 			setSpecs((s) => ({
 				...s,
 				[item.proposalItemId]: { ...result.specs, sha256: result.sha256 },

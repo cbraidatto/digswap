@@ -271,10 +271,14 @@ export function ProposalBuilder({
 
 				{/* Optional message */}
 				<div className="space-y-2">
-					<label className="text-xs font-mono text-muted-foreground uppercase tracking-wider">
+					<label
+						htmlFor="proposal-message"
+						className="text-xs font-mono text-muted-foreground uppercase tracking-wider"
+					>
 						Message <span className="text-muted-foreground/40">(optional)</span>
 					</label>
 					<textarea
+						id="proposal-message"
 						value={message}
 						onChange={(e) => setMessage(e.target.value.slice(0, 1000))}
 						placeholder={

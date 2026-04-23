@@ -1,4 +1,4 @@
-import { and, count, eq, gte, inArray, isNotNull, isNull, or } from "drizzle-orm";
+import { and, count, eq, inArray, or } from "drizzle-orm";
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 
@@ -17,11 +17,9 @@ import {
 	PAGE_SIZE,
 } from "@/lib/collection/queries";
 import { db } from "@/lib/db";
-import { collectionItems } from "@/lib/db/schema/collections";
 import { releases } from "@/lib/db/schema/releases";
 import { tradeRequests } from "@/lib/db/schema/trades";
 import { profiles } from "@/lib/db/schema/users";
-import { wantlistItems } from "@/lib/db/schema/wantlist";
 import { getUserBadges, getUserRanking } from "@/lib/gamification/queries";
 import { getGemDistribution, getGemScoreForUser } from "@/lib/gems/queries";
 import { getFollowCounts } from "@/lib/social/queries";
@@ -62,8 +60,6 @@ export default async function PerfilPage({ searchParams }: PerfilPageProps) {
 
 	if (!profile) redirect("/onboarding");
 
-	const weekAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
-
 	// Showcase release IDs
 	const showcaseIds = [
 		profile.showcaseSearchingId,
@@ -88,9 +84,6 @@ export default async function PerfilPage({ searchParams }: PerfilPageProps) {
 		[{ activeTradeCount }],
 		gemDistribution,
 		gemScore,
-		[{ weeklyAdds }],
-		[{ tradesThisWeek }],
-		[{ wantlistFound }],
 	] = await Promise.all([
 		getCollectionPage(user.id, filters),
 		getCollectionCount(user.id, filters),
@@ -130,29 +123,6 @@ export default async function PerfilPage({ searchParams }: PerfilPageProps) {
 			),
 		getGemDistribution(user.id),
 		getGemScoreForUser(user.id),
-		db
-			.select({ weeklyAdds: count() })
-			.from(collectionItems)
-			.where(
-				and(
-					eq(collectionItems.userId, user.id),
-					isNull(collectionItems.deletedAt),
-					gte(collectionItems.createdAt, weekAgo),
-				),
-			),
-		db
-			.select({ tradesThisWeek: count() })
-			.from(tradeRequests)
-			.where(
-				and(
-					or(eq(tradeRequests.requesterId, user.id), eq(tradeRequests.providerId, user.id)),
-					gte(tradeRequests.createdAt, weekAgo),
-				),
-			),
-		db
-			.select({ wantlistFound: count() })
-			.from(wantlistItems)
-			.where(and(eq(wantlistItems.userId, user.id), isNotNull(wantlistItems.foundAt))),
 	]);
 
 	const totalPages = Math.ceil(totalCount / PAGE_SIZE);

@@ -113,7 +113,9 @@ describe("Middleware helper", () => {
 			},
 		};
 
-		const response = await updateSession(mockRequest as any);
+		const response = await updateSession(
+			mockRequest as unknown as Parameters<typeof updateSession>[0],
+		);
 		expect(response).toBeDefined();
 		// Verify createServerClient was called (which sets up cookie handling)
 		expect(createServerClient).toHaveBeenCalled();

@@ -47,7 +47,7 @@ function SpectrogramCanvas({ audioRef }: { audioRef: React.RefObject<HTMLAudioEl
 
 		function start() {
 			if (analyserRef.current) return; // already set up
-			if (!canvas) return;
+			if (!canvas || !audio) return;
 
 			const audioCtx = new AudioContext();
 			ctxRef.current = audioCtx;
@@ -57,7 +57,7 @@ function SpectrogramCanvas({ audioRef }: { audioRef: React.RefObject<HTMLAudioEl
 			analyser.smoothingTimeConstant = 0.75;
 			analyserRef.current = analyser;
 
-			const source = audioCtx.createMediaElementSource(audio!);
+			const source = audioCtx.createMediaElementSource(audio);
 			sourceRef.current = source;
 			source.connect(analyser);
 			analyser.connect(audioCtx.destination);
@@ -76,15 +76,15 @@ function SpectrogramCanvas({ audioRef }: { audioRef: React.RefObject<HTMLAudioEl
 			const dataArray = new Uint8Array(bufferLength);
 
 			function frame() {
-				if (!analyser || !canvas) return;
+				if (!analyser || !canvas || !ctx2d) return;
 				rafRef.current = requestAnimationFrame(frame);
 				analyser.getByteFrequencyData(dataArray);
 
 				const w = canvas.width;
 				const h = canvas.height;
 
-				ctx2d!.fillStyle = "rgba(13, 10, 7, 0.3)";
-				ctx2d!.fillRect(0, 0, w, h);
+				ctx2d.fillStyle = "rgba(13, 10, 7, 0.3)";
+				ctx2d.fillRect(0, 0, w, h);
 
 				const barWidth = (w / bufferLength) * 2.5;
 				let x = 0;
@@ -97,8 +97,8 @@ function SpectrogramCanvas({ audioRef }: { audioRef: React.RefObject<HTMLAudioEl
 					const r = Math.floor(200 + intensity * 55);
 					const g = Math.floor(145 + intensity * 60);
 					const b = Math.floor(74 - intensity * 50);
-					ctx2d!.fillStyle = `rgb(${r},${g},${b})`;
-					ctx2d!.fillRect(x, h - barHeight, barWidth, barHeight);
+					ctx2d.fillStyle = `rgb(${r},${g},${b})`;
+					ctx2d.fillRect(x, h - barHeight, barWidth, barHeight);
 					x += barWidth + 1;
 				}
 			}
@@ -165,7 +165,7 @@ function AudioPlayer({
 	}
 
 	function formatTime(s: number) {
-		if (!s || !isFinite(s)) return "0:00";
+		if (!s || !Number.isFinite(s)) return "0:00";
 		return `${Math.floor(s / 60)}:${String(Math.floor(s % 60)).padStart(2, "0")}`;
 	}
 
@@ -180,12 +180,28 @@ function AudioPlayer({
 					aria-label={playing ? "Pause" : "Play"}
 				>
 					{playing ? (
-						<svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+						<svg
+							width="14"
+							height="14"
+							viewBox="0 0 24 24"
+							fill="currentColor"
+							role="img"
+							aria-label="Pause"
+						>
+							<title>Pause</title>
 							<rect x="6" y="4" width="4" height="16" />
 							<rect x="14" y="4" width="4" height="16" />
 						</svg>
 					) : (
-						<svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+						<svg
+							width="14"
+							height="14"
+							viewBox="0 0 24 24"
+							fill="currentColor"
+							role="img"
+							aria-label="Play"
+						>
+							<title>Play</title>
 							<polygon points="5 3 19 12 5 21 5 3" />
 						</svg>
 					)}
@@ -205,8 +221,10 @@ function AudioPlayer({
 			<SpectrogramCanvas audioRef={audioRef} />
 
 			{/* Progress bar */}
-			<div
-				className="w-full h-1 bg-surface-container rounded-full overflow-hidden cursor-pointer"
+			<button
+				type="button"
+				aria-label="Seek audio"
+				className="w-full h-1 bg-surface-container rounded-full overflow-hidden cursor-pointer p-0 border-0"
 				onClick={(e) => {
 					const a = audioRef.current;
 					if (!a || !duration) return;
@@ -218,7 +236,7 @@ function AudioPlayer({
 					className="h-full bg-primary/70 rounded-full"
 					style={{ width: `${duration ? (currentTime / duration) * 100 : 0}%` }}
 				/>
-			</div>
+			</button>
 
 			{error && <p className="text-xs text-destructive font-mono">{error}</p>}
 

@@ -151,7 +151,7 @@ function ProposalCard({
 		.join(" ");
 
 	return (
-		<div
+		<article
 			className={cardClasses}
 			aria-label={`Proposal round ${proposal.sequenceNumber}, status: ${proposal.status}`}
 		>
@@ -214,7 +214,7 @@ function ProposalCard({
 					<p className="font-mono text-sm text-muted-foreground italic">{proposal.message}</p>
 				</div>
 			)}
-		</div>
+		</article>
 	);
 }
 

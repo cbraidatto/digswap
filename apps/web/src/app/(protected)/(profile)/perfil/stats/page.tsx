@@ -201,7 +201,7 @@ export default async function StatsPage() {
 				<StatSection title="Top Labels" icon="label" color="text-tertiary">
 					{topLabels.length > 0 ? (
 						topLabels.map((l) => (
-							<StatRow key={l.label} label={l.label!} count={l.count} max={maxLabelCount} />
+							<StatRow key={l.label} label={l.label ?? ""} count={l.count} max={maxLabelCount} />
 						))
 					) : (
 						<Empty />

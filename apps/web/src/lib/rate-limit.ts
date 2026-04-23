@@ -45,8 +45,9 @@ export async function safeLimit(
 	}
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-function makeRatelimit(limiter: any, prefix: string): Ratelimit | null {
+type RatelimitAlgorithm = ReturnType<typeof Ratelimit.slidingWindow>;
+
+function makeRatelimit(limiter: RatelimitAlgorithm, prefix: string): Ratelimit | null {
 	if (!redis) return null;
 	return new Ratelimit({
 		redis,

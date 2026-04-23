@@ -87,10 +87,10 @@ export function QualityDeclarationModal({
 
 				<div className="space-y-5">
 					{/* Vinyl condition */}
-					<div className="space-y-2">
-						<label className="text-xs font-mono text-muted-foreground uppercase tracking-wider">
+					<fieldset className="space-y-2 border-0 p-0 m-0">
+						<legend className="text-xs font-mono text-muted-foreground uppercase tracking-wider">
 							Vinyl Condition
-						</label>
+						</legend>
 						<div className="flex flex-wrap gap-1.5">
 							{QUALITY_GRADES.map((g) => (
 								<button
@@ -107,16 +107,16 @@ export function QualityDeclarationModal({
 								</button>
 							))}
 						</div>
-					</div>
+					</fieldset>
 
 					{/* Divider */}
 					<div className="border-t border-outline-variant" />
 
 					{/* Audio format */}
-					<div className="space-y-2">
-						<label className="text-xs font-mono text-muted-foreground uppercase tracking-wider">
+					<fieldset className="space-y-2 border-0 p-0 m-0">
+						<legend className="text-xs font-mono text-muted-foreground uppercase tracking-wider">
 							Audio Format <span className="text-muted-foreground/40">(optional)</span>
-						</label>
+						</legend>
 						<div className="flex flex-wrap gap-1.5">
 							{AUDIO_FORMATS.map((fmt) => (
 								<button
@@ -133,14 +133,14 @@ export function QualityDeclarationModal({
 								</button>
 							))}
 						</div>
-					</div>
+					</fieldset>
 
 					{/* Bit depth — only for lossless */}
 					{showBitDepth && (
-						<div className="space-y-2">
-							<label className="text-xs font-mono text-muted-foreground uppercase tracking-wider">
+						<fieldset className="space-y-2 border-0 p-0 m-0">
+							<legend className="text-xs font-mono text-muted-foreground uppercase tracking-wider">
 								Bit Depth <span className="text-muted-foreground/40">(optional)</span>
-							</label>
+							</legend>
 							<div className="flex flex-wrap gap-1.5">
 								{BIT_DEPTHS.map((d) => (
 									<button
@@ -157,7 +157,7 @@ export function QualityDeclarationModal({
 									</button>
 								))}
 							</div>
-						</div>
+						</fieldset>
 					)}
 
 					{/* Preview badge */}
@@ -172,10 +172,14 @@ export function QualityDeclarationModal({
 
 					{/* Condition notes */}
 					<div className="space-y-2">
-						<label className="text-xs font-mono text-muted-foreground uppercase tracking-wider">
+						<label
+							htmlFor="quality-condition-notes"
+							className="text-xs font-mono text-muted-foreground uppercase tracking-wider"
+						>
 							Notes <span className="text-muted-foreground/40">(optional)</span>
 						</label>
 						<textarea
+							id="quality-condition-notes"
 							value={conditionNotes}
 							onChange={(e) => setConditionNotes(e.target.value.slice(0, 500))}
 							placeholder="Any notes about the condition or rip..."

@@ -11,7 +11,11 @@ interface InviteAcceptButtonProps {
 	groupSlug: string;
 }
 
-export function InviteAcceptButton({ token, groupName, groupSlug: _groupSlug }: InviteAcceptButtonProps) {
+export function InviteAcceptButton({
+	token,
+	groupName,
+	groupSlug: _groupSlug,
+}: InviteAcceptButtonProps) {
 	const router = useRouter();
 	const [isPending, startTransition] = useTransition();
 

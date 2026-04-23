@@ -115,18 +115,21 @@ export function EditProfileModal({ initial }: EditProfileModalProps) {
 
 			{open && (
 				<div
-					className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4"
-					onClick={(e) => {
-						if (e.target === e.currentTarget) setOpen(false);
-					}}
+					className="fixed inset-0 z-50 flex items-center justify-center p-4"
 					onKeyDown={(e) => {
 						if (e.key === "Escape") setOpen(false);
 					}}
-					role="button"
-					tabIndex={-1}
-					aria-label="Close modal"
+					role="dialog"
+					aria-modal="true"
+					aria-label="Edit profile"
 				>
-					<div className="w-full max-w-md bg-surface-container-low border border-outline/20 rounded-lg overflow-hidden">
+					<button
+						type="button"
+						aria-label="Close modal"
+						onClick={() => setOpen(false)}
+						className="absolute inset-0 w-full h-full bg-black/70 backdrop-blur-sm cursor-default"
+					/>
+					<div className="relative w-full max-w-md bg-surface-container-low border border-outline/20 rounded-lg overflow-hidden">
 						{/* Header */}
 						<div className="flex items-center justify-between px-6 py-4 border-b border-outline/10">
 							<span className="font-mono text-xs uppercase tracking-[0.2em] text-on-surface-variant">

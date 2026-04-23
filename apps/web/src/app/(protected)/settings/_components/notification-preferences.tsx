@@ -187,24 +187,28 @@ export function NotificationPreferences() {
 								/>
 								<span className="font-mono text-xs text-on-surface-variant">In-app</span>
 							</label>
-							{group.emailField && (
-								<label
-									className={cn(
-										"flex items-center gap-2 cursor-pointer",
-										!group.enabled && "opacity-50 cursor-not-allowed",
-									)}
-								>
-									<input
-										type="checkbox"
-										className="accent-primary"
-										checked={preferences[group.emailField]}
-										disabled={!group.enabled}
-										aria-disabled={!group.enabled}
-										onChange={(e) => handleToggle(group.emailField!, e.target.checked)}
-									/>
-									<span className="font-mono text-xs text-on-surface-variant">Email</span>
-								</label>
-							)}
+							{group.emailField &&
+								(() => {
+									const emailField = group.emailField;
+									return (
+										<label
+											className={cn(
+												"flex items-center gap-2 cursor-pointer",
+												!group.enabled && "opacity-50 cursor-not-allowed",
+											)}
+										>
+											<input
+												type="checkbox"
+												className="accent-primary"
+												checked={preferences[emailField]}
+												disabled={!group.enabled}
+												aria-disabled={!group.enabled}
+												onChange={(e) => handleToggle(emailField, e.target.checked)}
+											/>
+											<span className="font-mono text-xs text-on-surface-variant">Email</span>
+										</label>
+									);
+								})()}
 						</div>
 					</div>
 					{index < PREFERENCE_GROUPS.length - 1 && (

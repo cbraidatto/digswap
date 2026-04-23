@@ -4,15 +4,6 @@ import { useRouter } from "next/navigation";
 import { useEffect, useRef } from "react";
 import { createClient } from "@/lib/supabase/client";
 
-interface DesktopShell {
-	isDesktop(): boolean;
-	openTradeInShell(tradeId: string): Promise<void>;
-}
-
-function getDesktopShell(): DesktopShell | undefined {
-	return (window as Window & { desktopShell?: DesktopShell }).desktopShell;
-}
-
 interface Props {
 	tradeId: string;
 	currentStatus: string;

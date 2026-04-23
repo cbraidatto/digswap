@@ -119,11 +119,11 @@ export function CoverBanner({ initialCoverUrl, initialPositionY, isOwner }: Cove
 		router.refresh();
 	}
 
-	function handleCancel() {
+	const handleCancel = useCallback(() => {
 		setPendingFile(null);
 		setPendingPreview(null);
 		setIsRepositioning(false);
-	}
+	}, []);
 
 	// Escape key to cancel repositioning
 	useEffect(() => {

@@ -2,7 +2,6 @@ import Image from "next/image";
 import type { TradeThreadDetail } from "@/lib/trades/messages";
 import { OpenInDesktopButton } from "./OpenInDesktopButton";
 
-const TERMINAL_STATUSES = new Set(["completed", "declined", "cancelled", "expired"]);
 // "Open in Desktop" appears once proposal is accepted (lobby) — upload and transfer are desktop-only
 const DESKTOP_TRANSFER_STATUSES = new Set(["lobby"]);
 
@@ -24,7 +23,6 @@ interface Props {
 
 export function TradeDetailHeader({ thread }: Props) {
 	const status = STATUS_CONFIG[thread.status] ?? STATUS_CONFIG.pending;
-	const isTerminal = TERMINAL_STATUSES.has(thread.status);
 
 	return (
 		<div className="border-b border-outline-variant pb-5 mb-6">
