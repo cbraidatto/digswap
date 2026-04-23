@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.1
 milestone_name: Deploy Readiness
 status: executing
-stopped_at: "v1.4 roadmap created — phases 33-39 defined, 61 requirements mapped 100%, ready for `/gsd:discuss-phase 33`"
-last_updated: "2026-04-23T01:27:33.506Z"
-last_activity: 2026-04-23
+stopped_at: Completed 033.1-04-session-revocation-e2e-PLAN.md (DEP-AUD-04 PARTIAL → PASS, JWT revoked in 344ms)
+last_updated: "2026-04-23T18:46:49.281Z"
+last_activity: 2026-04-23 -- Phase 033.1 execution started
 progress:
-  total_phases: 33
-  completed_phases: 30
-  total_plans: 129
-  completed_plans: 122
+  total_phases: 34
+  completed_phases: 31
+  total_plans: 133
+  completed_plans: 128
   percent: 0
 ---
 
@@ -21,14 +21,14 @@ progress:
 See: .planning/PROJECT.md (updated 2026-04-06)
 
 **Core value:** A digger opens the app and immediately finds who has the record they've been hunting -- and sees where they stand in the community.
-**Current focus:** Phase 033 — Pre-Deploy Audit Gate
+**Current focus:** Phase 033.1 — audit-gate-closure
 
 ## Current Position
 
-Phase: 033 (Pre-Deploy Audit Gate) — EXECUTING
-Plan: 4 of 8
-Status: Ready to execute
-Last activity: 2026-04-23
+Phase: 033.1 (audit-gate-closure) — EXECUTING
+Plan: 1 of 4
+Status: Executing Phase 033.1
+Last activity: 2026-04-23 -- Phase 033.1 execution started
 
 Progress: [░░░░░░░░░░] 0%
 
@@ -60,6 +60,7 @@ Progress: [░░░░░░░░░░] 0%
 *Updated after each plan completion*
 | Phase 033 P01 | 15 min | 3 tasks | 9 files |
 | Phase 033 P02 | ~2h | 2 tasks | 118 files |
+| Phase 033.1 P04 | 9 min | 3 tasks | 6 files |
 
 ## Accumulated Context
 
@@ -75,6 +76,9 @@ Recent decisions affecting current work:
 - [Roadmap v1.4]: Phase 33 verifies commit 35ed595's claims independently — "claimed fixed" is not "verified fixed"
 - [Roadmap v1.4]: Infrastructure milestone — UI hint is "no" across all 7 phases; no frontend work
 - [Roadmap v1.4]: Each phase identifies specific P0 pitfalls from PITFALLS.md to surface during `/gsd:plan-phase`
+- [Phase 033.1]: DEP-AUD-04 closed: Pitfall #10 (Supabase JWT survives logout) verified non-LIVE on dev — JWT rejected 344ms after /auth/v1/logout?scope=global, vs 60s SLO
+- [Phase 033.1]: /api/user/me now supports dual auth (cookie + Authorization Bearer) — pattern available for any future audit/integration test that needs to validate a JWT against the running app
+- [Phase 033.1]: Audit users provisioned via Supabase Auth Admin API (POST /auth/v1/admin/users with email_confirm=true) instead of dashboard checkpoints — documented pattern for Phase 34 prod-side audit user creation
 
 ### Roadmap Evolution
 
@@ -103,6 +107,6 @@ None yet (roadmap just created).
 
 ## Session Continuity
 
-Last session: 2026-04-20T00:00:00.000Z
-Stopped at: v1.4 roadmap created — phases 33-39 defined, 61 requirements mapped 100%, ready for `/gsd:discuss-phase 33`
+Last session: 2026-04-23T18:46:37.176Z
+Stopped at: Completed 033.1-04-session-revocation-e2e-PLAN.md (DEP-AUD-04 PARTIAL → PASS, JWT revoked in 344ms)
 Resume file: None
