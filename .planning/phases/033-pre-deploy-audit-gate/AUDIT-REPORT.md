@@ -7,7 +7,7 @@
 ## Checklist
 
 - [~] DEP-AUD-01: CI gates — typecheck/test/build/audit PASS, lint DEBT (20 residual errors, deferred to 33.1)  — evidence/01*-*.txt
-- [ ] DEP-AUD-02: `supabase db reset` clean on local Docker + throwaway cloud      — evidence/02a-*.txt, evidence/02b-*.txt
+- [F] DEP-AUD-02: `supabase db reset` FAILS — migration trail incomplete (leads table + more missing); deferred to 33.1 reconstruction — evidence/02a-start.txt
 - [ ] DEP-AUD-03: Cold-start curl — all 4 public routes 200 in <3s after idle      — evidence/03-*.txt
 - [ ] DEP-AUD-04: Session revocation — logged-out JWT returns 401 within 60s       — evidence/04-*.txt
 - [ ] DEP-AUD-05: Discogs tokens Vault-wrapped — zero plaintext rows               — evidence/05a-*.txt, evidence/05b-*.txt
@@ -81,11 +81,69 @@ audit exit=0
 
 ## §2 DEP-AUD-02 Supabase Migration Reset
 
-**Status:** pending
-**Local reset command:** (populated in Plan 03)
-**Cloud reset command:** (populated in Plan 03)
-**Teardown proof:** evidence/02b-teardown.png
-**Verdict:** —
+**Status:** FAIL — migration trail fundamentally incomplete; reconstruction deferred to Phase 33.1
+
+**Local reset command:** `pnpm dlx supabase start` + `supabase db reset`
+**Cloud reset command:** NOT ATTEMPTED (local failed first; D-07 gate blocked)
+**Teardown proof:** N/A
+**Verdict:** FAIL
+
+### Findings (layered — each fix revealed a deeper issue)
+
+**Layer 1 — migration ordering bug (FIRST ATTEMPT):**
+`supabase/migrations/030_purge_soft_deleted.sql` sorts lexicographically BEFORE the `20260327_*` files. Per the D-03 decision, drizzle is supposed to create base tables — but `supabase db reset` only replays files in `supabase/migrations/`, never touching `drizzle/`. So `030_*` tried to `ALTER TABLE collection_items ADD COLUMN deleted_at` on an empty database. First failure:
+```
+Applying migration 030_purge_soft_deleted.sql...
+ERROR: relation "collection_items" does not exist (SQLSTATE 42P01)
+```
+
+**Layer 2 — architectural misread of ADR-003 (CONSOLIDATION ATTEMPT):**
+Copied drizzle/0000–0005 into `supabase/migrations/` with pre-dated prefixes (`20260101_drizzle_0000_*.sql` … `20260106_drizzle_0005_*.sql`) and renamed `030_purge_soft_deleted.sql` → `20260419_purge_soft_deleted.sql`. This closed Layer 1 — migrations 20260101–20260105 applied OK — but the next migration (0004 GIN indexes) failed:
+```
+Applying migration 20260105_drizzle_0004_gin_indexes.sql...
+ERROR: CREATE INDEX CONCURRENTLY cannot be executed within a pipeline (SQLSTATE 25001)
+CREATE INDEX CONCURRENTLY IF NOT EXISTS releases_style_gin_idx
+```
+Supabase CLI wraps migrations in a transaction; `CREATE INDEX CONCURRENTLY` cannot run in transactions. **Fixed inline** — removed `CONCURRENTLY` keyword (moot on empty DB).
+
+**Layer 3 — schema drift beyond drizzle (OPEN, escalated to 33.1):**
+After the index fix, next failure was:
+```
+Applying migration 20260328_leads_rls.sql...
+ERROR: relation "leads" does not exist (SQLSTATE 42P01)
+ALTER TABLE leads ENABLE ROW LEVEL SECURITY
+```
+The `leads` table is defined in `apps/web/src/lib/db/schema/leads.ts` (TypeScript Drizzle schema) but **does not appear in any drizzle/*.sql or supabase/migrations/*.sql file**. It was clearly created on the dev Supabase project via direct `drizzle-kit push` without generating a migration. **Dev and prod schema have diverged silently from the committed SQL trail.**
+
+This is almost certainly not isolated to `leads`. Each subsequent `db reset` attempt would reveal the next missing table/column via `ERROR: relation X does not exist`. Repeating this whack-a-mole inside Plan 03 exceeds D-16's 2h threshold.
+
+### Impact on ADR-003
+
+ADR-003 claims `supabase/migrations/` is the "sole authoritative trail for production" — this claim is **false as of 2026-04-22**. `drizzle-kit push` has been used against the dev Supabase project to materialize schemas (notably `leads`) that were never reconciled back into either trail. ADR-003 describes the *intended* state, not the *actual* state.
+
+### Migration fixes landed in this plan (partial progress)
+
+- `supabase/migrations/20260101_drizzle_0000_initial.sql` (new — copy of drizzle/0000)
+- `supabase/migrations/20260102_drizzle_0001_groups_slug.sql` (new)
+- `supabase/migrations/20260103_drizzle_0002_profile_showcase.sql` (new)
+- `supabase/migrations/20260104_drizzle_0003_trade_tos.sql` (new)
+- `supabase/migrations/20260105_drizzle_0004_gin_indexes.sql` (new — CONCURRENTLY stripped)
+- `supabase/migrations/20260106_drizzle_0005_stripe_event_log.sql` (new)
+- `supabase/migrations/20260419_purge_soft_deleted.sql` (renamed from `030_purge_soft_deleted.sql`)
+
+These close Layers 1 and 2 but NOT Layer 3. Reset still fails on the first dev-only table (`leads`).
+
+### Deferred to Phase 33.1
+
+1. Regenerate Drizzle migrations: `drizzle-kit generate` against current schema to capture `leads` and any other tables/columns missing from the SQL trail
+2. Merge those newly-generated Drizzle migrations into `supabase/migrations/` with appropriate timestamps
+3. Walk all `supabase/migrations/*.sql` files that reference tables NOT in the current SQL trail — document, add or drop each
+4. Re-run `supabase db reset` until it completes with zero ERROR/FATAL
+5. Then repeat on the throwaway Supabase Cloud project (D-07 gate)
+6. Revise ADR-003 to either (a) document drizzle-first deploy sequence or (b) commit to the consolidation post-33.1
+7. Close DEP-AUD-02 as PASS
+
+**Estimated effort for 33.1 DEP-AUD-02 portion:** 4–8 hours depending on how many hidden tables/columns exist.
 
 ## §3 DEP-AUD-03 Cold-Start Public Routes (LOCAL ONLY per D-08)
 
