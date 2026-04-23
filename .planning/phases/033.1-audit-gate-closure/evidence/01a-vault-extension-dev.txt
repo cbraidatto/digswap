@@ -1,0 +1,17 @@
+Phase 33.1 / DEP-AUD-05 — Hypothesis A probe (extension installed?)
+========================================================================
+
+Project ref: mrkgoucqcbqjhrdjcnpw  (must be 'mrkgoucqcbqjhrdjcnpw' = dev)
+Executed:    2026-04-23T18:35:43.618Z
+
+Query: SELECT extname, extversion FROM pg_extension WHERE extname = 'supabase_vault';
+
+Result rows: 1
+[
+  {
+    "extname": "supabase_vault",
+    "extversion": "0.3.1"
+  }
+]
+
+Hypothesis A confirmed: NO — extension IS installed

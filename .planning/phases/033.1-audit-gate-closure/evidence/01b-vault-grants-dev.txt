@@ -1,0 +1,20 @@
+Phase 33.1 / DEP-AUD-05 — Hypothesis B probe (grants present?)
+================================================================
+
+Project ref: mrkgoucqcbqjhrdjcnpw
+Executed:    2026-04-23T18:35:45.364Z
+
+Query 1: schema USAGE on vault for service_role
+SELECT has_schema_privilege('service_role', 'vault', 'USAGE');
+Result: {"usage_ok":true}
+
+Query 2: EXECUTE privilege on vault.create_secret
+SELECT has_function_privilege('service_role', 'vault.create_secret(text, text, text)', 'EXECUTE');
+ERROR: function "vault.create_secret(text, text, text)" does not exist
+
+Query 3: EXECUTE privilege on vault.update_secret
+SELECT has_function_privilege('service_role', 'vault.update_secret(uuid, text, text, text)', 'EXECUTE');
+ERROR: function "vault.update_secret(uuid, text, text, text)" does not exist
+
+Query 4: does vault schema exist at all?
+Result rows: 1  [{"nspname":"vault"}]

@@ -1,0 +1,100 @@
+Phase 33.1 / DEP-AUD-05 — Hypothesis C probe (RPC wrapper exists?)
+====================================================================
+
+Project ref: mrkgoucqcbqjhrdjcnpw
+Executed:    2026-04-23T18:35:46.226Z
+
+Background: app calls admin.rpc('vault_create_secret', ...). PostgREST
+maps rpc names to public schema. Supabase ships vault.create_secret in
+the vault schema, NOT public. We need to verify whether public.vault_create_secret
+exists as a wrapper.
+
+Query 1: search for any vault_create_secret / create_secret functions across schemas
+SELECT n.nspname, p.proname, pg_get_function_identity_arguments(p.oid) AS args
+FROM pg_proc p JOIN pg_namespace n ON n.oid = p.pronamespace
+WHERE p.proname IN ('vault_create_secret', 'create_secret', 'vault_delete_secret', 'vault_update_secret')
+ORDER BY n.nspname, p.proname;
+
+Result rows: 1
+[
+  {
+    "nspname": "vault",
+    "proname": "create_secret",
+    "args": "new_secret text, new_name text, new_description text, new_key_id uuid"
+  }
+]
+
+hasPublicWrapper (public.vault_create_secret):  false
+hasVaultNative   (vault.create_secret):         true
+
+Hypothesis C CONFIRMED: app's admin.rpc('vault_create_secret', ...) call
+fails because no public.vault_create_secret wrapper exists. PostgREST returns
+a 404-style error object that the silent try/catch in oauth.ts swallows.
+
+---
+
+POST-MIGRATION VERIFICATION (after applying supabase/migrations/20260424000000_enable_vault_extension.sql)
+Executed: 2026-04-23T18:37:15.950Z
+Project ref: mrkgoucqcbqjhrdjcnpw
+
+Public wrappers after migration:
+[
+  {
+    "nspname": "public",
+    "proname": "vault_create_secret",
+    "args": "secret text, name text, description text"
+  },
+  {
+    "nspname": "public",
+    "proname": "vault_delete_secret",
+    "args": "name text"
+  }
+]
+
+Smoke test 1: SELECT public.vault_create_secret('smoke-test-value', 'smoke:test:033-1', 'phase 33.1 smoke');
+Result: new_id = 6a302dd9-f813-4b7e-bfdf-d0e6de91b59a
+
+Smoke test 2: SELECT decrypted_secret FROM vault.decrypted_secrets WHERE name = 'smoke:test:033-1';
+Result rows: 1
+decrypted_secret matches written value: true
+
+Smoke test 3: SELECT public.vault_delete_secret('smoke:test:033-1');
+Result: rows remaining = 0
+
+Service role EXECUTE privileges: {"exec_create_ok":true,"exec_delete_ok":true}
+
+SMOKE TEST RESULT: PASS — Vault is now functional via PostgREST wrapper.
+
+---
+
+POST-MIGRATION VERIFICATION (after applying supabase/migrations/20260424000000_enable_vault_extension.sql)
+Executed: 2026-04-23T18:37:31.268Z
+Project ref: mrkgoucqcbqjhrdjcnpw
+
+Public wrappers after migration:
+[
+  {
+    "nspname": "public",
+    "proname": "vault_create_secret",
+    "args": "secret text, name text, description text"
+  },
+  {
+    "nspname": "public",
+    "proname": "vault_delete_secret",
+    "args": "name text"
+  }
+]
+
+Smoke test 1: SELECT public.vault_create_secret('smoke-test-value', 'smoke:test:033-1', 'phase 33.1 smoke');
+Result: new_id = b0a75e09-eb8f-41fa-a8d0-03e438e119b1
+
+Smoke test 2: SELECT decrypted_secret FROM vault.decrypted_secrets WHERE name = 'smoke:test:033-1';
+Result rows: 1
+decrypted_secret matches written value: true
+
+Smoke test 3: SELECT public.vault_delete_secret('smoke:test:033-1');
+Result: rows remaining = 0
+
+Service role EXECUTE privileges: {"exec_create_ok":true,"exec_delete_ok":true}
+
+SMOKE TEST RESULT: PASS — Vault is now functional via PostgREST wrapper.
