@@ -1,0 +1,33 @@
+# Task 3 (checkpoint:human-verify) — User attestation
+
+Plan:        033.1-03 (docs-carry-over)
+Task:        Task 3 — Confirm user has updated their local .env.local
+Date:        2026-04-23
+User:        thiagobraidatto@gmail.com
+Response:    "done"
+
+## What was verified
+
+The user ran the verification command on their machine:
+
+    grep -c '^NEXT_PUBLIC_APP_URL=' apps/web/.env.local
+
+Reported result: 1 (the NEXT_PUBLIC_APP_URL line is present in
+their local apps/web/.env.local).
+
+## Why this is self-attestation
+
+apps/web/.env.local is gitignored (security/operator boundary).
+Claude cannot read or write that file from this worktree, so the
+verification of "fix landed locally" is necessarily a user
+self-attestation. The acceptance is recorded here and in the
+033.1-03 SUMMARY.md so the audit trail is complete.
+
+## Coverage
+
+- RUNBOOK.md Section 1 documents the requirement permanently for
+  any future operator (re-clone, new dev box, Phase 34 setup).
+- Phase 34 entry criteria can re-verify with the same one-line
+  grep on the prod operator's machine.
+
+Resolution: Task 3 closed — `done` recorded.
