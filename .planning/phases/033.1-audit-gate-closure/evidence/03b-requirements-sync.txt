@@ -1,0 +1,17 @@
+15:- [x] **DEP-AUD-01**: All 4 CI gates green against main (typecheck, build, test, lint) <!-- Phase 33.1: lint debt closed in 033.1-02 -->
+16:- [x] **DEP-AUD-02**: Migration trail applies cleanly on empty Supabase (`supabase db reset` succeeds end-to-end)
+17:- [x] **DEP-AUD-03**: Cold-start 500 fix from 35ed595 independently verified via curl on public routes (`/`, `/signin`, `/signup`, `/pricing`) <!-- PASS in Phase 33 (audit drift fix 2026-04-24, Phase 33.1) -->
+18:- [x] **DEP-AUD-04**: Session revocation E2E passes (logged-out token returns 401 on protected routes within 60s) <!-- Phase 33.1: re-verified end-to-end in 033.1-04 -->
+19:- [x] **DEP-AUD-05**: Discogs OAuth tokens encrypted via Supabase Vault (no plaintext fallback in `discogs_tokens`) <!-- Phase 33.1: Vault remediation + silent-fallback fix landed in 033.1-01 -->
+20:- [x] **DEP-AUD-06**: Outstanding CSP issue from 2026-03-28 security audit confirmed resolved or documented as accepted risk <!-- PASS in Phase 33 (audit drift fix 2026-04-24, Phase 33.1) -->
+21:- [x] **DEP-AUD-07**: Git history scanned — no historical secret commits (service_role, Stripe, handoff)
+22:- [x] **DEP-AUD-08**: Environment variable inventory complete — every var in `.env.local.example` has a planned prod value <!-- PASS in Phase 33 (audit drift fix 2026-04-24, Phase 33.1) -->
+148:| DEP-AUD-01 | Phase 33 | Complete |
+149:| DEP-AUD-02 | Phase 33 | Complete |
+150:| DEP-AUD-03 | Phase 33 | Complete |
+151:| DEP-AUD-04 | Phase 33 | Complete |
+152:| DEP-AUD-05 | Phase 33 | Complete |
+153:| DEP-AUD-06 | Phase 33 | Complete |
+154:| DEP-AUD-07 | Phase 33 | Complete |
+155:| DEP-AUD-08 | Phase 33 | Complete |
+216:- Phase 33 (Pre-Deploy Audit Gate): 8 requirements (DEP-AUD-01 → DEP-AUD-08)

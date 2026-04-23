@@ -12,14 +12,14 @@ Requirements for milestone v1.4 (Production Launch). Each maps to exactly one ro
 
 Independent verification of the baseline before touching any prod infrastructure. Commit `35ed595` claims pre-deploy blockers fixed — this gate verifies that claim.
 
-- [x] **DEP-AUD-01**: All 4 CI gates green against main (typecheck, build, test, lint)
+- [x] **DEP-AUD-01**: All 4 CI gates green against main (typecheck, build, test, lint) <!-- Phase 33.1: lint debt closed in 033.1-02 -->
 - [x] **DEP-AUD-02**: Migration trail applies cleanly on empty Supabase (`supabase db reset` succeeds end-to-end)
-- [ ] **DEP-AUD-03**: Cold-start 500 fix from 35ed595 independently verified via curl on public routes (`/`, `/signin`, `/signup`, `/pricing`)
-- [x] **DEP-AUD-04**: Session revocation E2E passes (logged-out token returns 401 on protected routes within 60s)
-- [x] **DEP-AUD-05**: Discogs OAuth tokens encrypted via Supabase Vault (no plaintext fallback in `discogs_tokens`)
-- [ ] **DEP-AUD-06**: Outstanding CSP issue from 2026-03-28 security audit confirmed resolved or documented as accepted risk
+- [x] **DEP-AUD-03**: Cold-start 500 fix from 35ed595 independently verified via curl on public routes (`/`, `/signin`, `/signup`, `/pricing`) <!-- PASS in Phase 33 (audit drift fix 2026-04-24, Phase 33.1) -->
+- [x] **DEP-AUD-04**: Session revocation E2E passes (logged-out token returns 401 on protected routes within 60s) <!-- Phase 33.1: re-verified end-to-end in 033.1-04 -->
+- [x] **DEP-AUD-05**: Discogs OAuth tokens encrypted via Supabase Vault (no plaintext fallback in `discogs_tokens`) <!-- Phase 33.1: Vault remediation + silent-fallback fix landed in 033.1-01 -->
+- [x] **DEP-AUD-06**: Outstanding CSP issue from 2026-03-28 security audit confirmed resolved or documented as accepted risk <!-- PASS in Phase 33 (audit drift fix 2026-04-24, Phase 33.1) -->
 - [x] **DEP-AUD-07**: Git history scanned — no historical secret commits (service_role, Stripe, handoff)
-- [ ] **DEP-AUD-08**: Environment variable inventory complete — every var in `.env.local.example` has a planned prod value
+- [x] **DEP-AUD-08**: Environment variable inventory complete — every var in `.env.local.example` has a planned prod value <!-- PASS in Phase 33 (audit drift fix 2026-04-24, Phase 33.1) -->
 
 ### Supabase Production Setup
 
@@ -147,12 +147,12 @@ Empty initially. Populated during roadmap creation.
 |-------------|-------|--------|
 | DEP-AUD-01 | Phase 33 | Complete |
 | DEP-AUD-02 | Phase 33 | Complete |
-| DEP-AUD-03 | Phase 33 | Pending |
+| DEP-AUD-03 | Phase 33 | Complete |
 | DEP-AUD-04 | Phase 33 | Complete |
 | DEP-AUD-05 | Phase 33 | Complete |
-| DEP-AUD-06 | Phase 33 | Pending |
+| DEP-AUD-06 | Phase 33 | Complete |
 | DEP-AUD-07 | Phase 33 | Complete |
-| DEP-AUD-08 | Phase 33 | Pending |
+| DEP-AUD-08 | Phase 33 | Complete |
 | DEP-SB-01 | Phase 34 | Pending |
 | DEP-SB-02 | Phase 34 | Pending |
 | DEP-SB-03 | Phase 34 | Pending |
