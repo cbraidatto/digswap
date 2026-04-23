@@ -12,7 +12,7 @@ Requirements for milestone v1.4 (Production Launch). Each maps to exactly one ro
 
 Independent verification of the baseline before touching any prod infrastructure. Commit `35ed595` claims pre-deploy blockers fixed — this gate verifies that claim.
 
-- [ ] **DEP-AUD-01**: All 4 CI gates green against main (typecheck, build, test, lint)
+- [x] **DEP-AUD-01**: All 4 CI gates green against main (typecheck, build, test, lint)
 - [x] **DEP-AUD-02**: Migration trail applies cleanly on empty Supabase (`supabase db reset` succeeds end-to-end)
 - [ ] **DEP-AUD-03**: Cold-start 500 fix from 35ed595 independently verified via curl on public routes (`/`, `/signin`, `/signup`, `/pricing`)
 - [x] **DEP-AUD-04**: Session revocation E2E passes (logged-out token returns 401 on protected routes within 60s)
@@ -145,7 +145,7 @@ Empty initially. Populated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| DEP-AUD-01 | Phase 33 | Pending |
+| DEP-AUD-01 | Phase 33 | Complete |
 | DEP-AUD-02 | Phase 33 | Complete |
 | DEP-AUD-03 | Phase 33 | Pending |
 | DEP-AUD-04 | Phase 33 | Complete |

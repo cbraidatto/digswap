@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.1
 milestone_name: Deploy Readiness
 status: executing
-stopped_at: Completed 033.1-01-vault-remediation-PLAN.md (DEP-AUD-05 closed)
-last_updated: "2026-04-23T18:48:17.890Z"
+stopped_at: Completed 033.1-02-lint-debt-cleanup-PLAN.md — pnpm lint exits 0, DEP-AUD-01 closes
+last_updated: "2026-04-23T18:49:26.191Z"
 last_activity: 2026-04-23
 progress:
   total_phases: 34
   completed_phases: 31
   total_plans: 133
-  completed_plans: 129
+  completed_plans: 130
   percent: 0
 ---
 
@@ -26,7 +26,7 @@ See: .planning/PROJECT.md (updated 2026-04-06)
 ## Current Position
 
 Phase: 033.1 (audit-gate-closure) — EXECUTING
-Plan: 2 of 4
+Plan: 3 of 4
 Status: Ready to execute
 Last activity: 2026-04-23
 
@@ -62,6 +62,7 @@ Progress: [░░░░░░░░░░] 0%
 | Phase 033 P02 | ~2h | 2 tasks | 118 files |
 | Phase 033.1 P04 | 9 min | 3 tasks | 6 files |
 | Phase 033.1 P01 | 10min | 3 tasks | 11 files |
+| Phase 033.1 P02 | 36min | 1 tasks | 20 files |
 
 ## Accumulated Context
 
@@ -81,6 +82,8 @@ Recent decisions affecting current work:
 - [Phase 033.1]: /api/user/me now supports dual auth (cookie + Authorization Bearer) — pattern available for any future audit/integration test that needs to validate a JWT against the running app
 - [Phase 033.1]: Audit users provisioned via Supabase Auth Admin API (POST /auth/v1/admin/users with email_confirm=true) instead of dashboard checkpoints — documented pattern for Phase 34 prod-side audit user creation
 - [Phase 033.1]: Pitfall #11 root cause was missing public.vault_create_secret PostgREST wrapper (Hypothesis C); migration 20260424000000_enable_vault_extension.sql adds wrapper + idempotent grants; Option B chosen for plaintext rows (delete + force re-auth); callback route's outer catch hardened to surface Vault failures as HTTP 500 instead of log-and-redirect-to-success
+- [Phase 033.1]: Lint cleanup (033.1-02): converted button-groups to fieldset/legend, refactored modal backdrop to sibling button overlay, established SVG icon a11y pattern (role=img + aria-label + title)
+- [Phase 033.1]: Lint cleanup (033.1-02): typed upstash Ratelimit limiter via ReturnType<typeof Ratelimit.slidingWindow> (Algorithm<RegionContext> is internal)
 
 ### Roadmap Evolution
 
@@ -109,6 +112,6 @@ None yet (roadmap just created).
 
 ## Session Continuity
 
-Last session: 2026-04-23T18:48:06.516Z
-Stopped at: Completed 033.1-01-vault-remediation-PLAN.md (DEP-AUD-05 closed)
+Last session: 2026-04-23T18:49:18.533Z
+Stopped at: Completed 033.1-02-lint-debt-cleanup-PLAN.md — pnpm lint exits 0, DEP-AUD-01 closes
 Resume file: None

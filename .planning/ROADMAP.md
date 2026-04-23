@@ -596,7 +596,7 @@ Plans:
 **Plans**: 4 plans
 Plans:
 - [x] 033.1-01-vault-remediation-PLAN.md — DEP-AUD-05: install Vault extension + grants + PostgREST wrappers, harden oauth.ts to abort on Vault failure, migrate or invalidate 2 plaintext rows, regression test
-- [ ] 033.1-02-lint-debt-cleanup-PLAN.md — DEP-AUD-01: close 20 residual lint errors across 11 files (noUnusedFunctionParameters, noNonNullAssertion, noExplicitAny, useExhaustiveDependencies, a11y rules)
+- [x] 033.1-02-lint-debt-cleanup-PLAN.md — DEP-AUD-01: close 20 residual lint errors across 11 files (noUnusedFunctionParameters, noNonNullAssertion, noExplicitAny, useExhaustiveDependencies, a11y rules)
 - [ ] 033.1-03-docs-carry-over-PLAN.md — DEP-AUD-01/02/08 carry-overs: ADR-003 historical-note section, new Phase 33.1 RUNBOOK.md, user-checkpoint for local .env.local update
 - [x] 033.1-04-session-revocation-e2e-PLAN.md — DEP-AUD-04: create audit user on dev, install Playwright chromium, run pnpm start, execute spec end-to-end with env vars, capture pre=200/post=401 evidence
 **P0 pitfalls to flag during plan-phase**: Pitfall 10 (session revocation E2E — Plan 04 verifies live), Pitfall 11 (Discogs plaintext fallback — Plan 01 closes the LIVE bug)
