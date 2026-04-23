@@ -1,0 +1,89 @@
+Phase 33.1 / DEP-AUD-05 — call-site audit of storeTokens caller
+=================================================================
+
+Captured: 2026-04-23T18:42:11Z
+File: apps/web/src/app/api/discogs/callback/route.ts
+
+--- storeTokens() invocation (with -B2 -A5 context) ---
+2-import { cookies } from "next/headers";
+3-import { type NextRequest, NextResponse } from "next/server";
+4:import { getAccessToken, storeTokens } from "@/lib/discogs/oauth";
+5-import { env, publicEnv } from "@/lib/env";
+6-import { authRateLimit, safeLimit } from "@/lib/rate-limit";
+7-import { createAdminClient } from "@/lib/supabase/admin";
+8-import { createClient } from "@/lib/supabase/server";
+9-
+--
+110-
+111-		// 5. Store tokens securely
+112:		await storeTokens(user.id, accessToken, accessTokenSecret);
+113-
+114-		// 6. Update profile (admin client bypasses RLS -- needed for service-level update)
+115-		const admin = createAdminClient();
+116-		await admin
+117-			.from("profiles")
+--
+171-
+172-		// Phase 33.1 / DEP-AUD-05 hardening (Pitfall #11):
+173:		// storeTokens() now throws when Vault is unavailable. We MUST NOT
+174-		// swallow that error by redirecting back to /settings with a generic
+175-		// success-shaped page (HTTP 307 to a 200 route), because that masks
+176-		// what is effectively a security-critical infrastructure failure
+177-		// (we cannot encrypt the user's Discogs OAuth credentials at rest).
+178-		//
+
+--- Outer catch handler (lines 165-end, after Phase 33.1 fix) ---
+		}
+
+		// 10. Redirect to import progress (per D-03)
+		return NextResponse.redirect(`${siteUrl}/import-progress`);
+	} catch (error) {
+		console.error("Discogs OAuth callback error:", error);
+
+		// Phase 33.1 / DEP-AUD-05 hardening (Pitfall #11):
+		// storeTokens() now throws when Vault is unavailable. We MUST NOT
+		// swallow that error by redirecting back to /settings with a generic
+		// success-shaped page (HTTP 307 to a 200 route), because that masks
+		// what is effectively a security-critical infrastructure failure
+		// (we cannot encrypt the user's Discogs OAuth credentials at rest).
+		//
+		// Detect Vault failures by message marker and return an explicit
+		// HTTP 500 so operators see it in error monitoring and the user gets
+		// a clear "something is wrong on our side" signal rather than a
+		// silently-broken Discogs connection.
+		const message = error instanceof Error ? error.message : String(error);
+		if (message.includes("Vault unavailable")) {
+			return NextResponse.json(
+				{
+					ok: false,
+					error: "discogs_vault_unavailable",
+					message:
+						"We could not securely store your Discogs credentials. Please contact support — this is an infrastructure issue on our side.",
+				},
+				{ status: 500 },
+			);
+		}
+
+		// All other errors (Discogs API down, rate limit, network blip)
+		// remain user-facing redirects with the existing UX.
+		return NextResponse.redirect(
+			`${siteUrl}/settings?error=${encodeURIComponent("Could not connect to Discogs. Please try again.")}`,
+		);
+	}
+}
+
+--- VERDICT ---
+BEFORE Phase 33.1: outer catch logged the error and returned NextResponse.redirect
+to /settings?error=... (an HTTP 307 to a 200-eligible route). This was the
+FORBIDDEN log-and-redirect-to-success pattern — Vault-storage failures would
+have been silently masked by the same UX as 'Discogs API down'.
+
+AFTER Phase 33.1 fix: catch handler INSPECTS error.message for the 'Vault
+unavailable' marker that storeTokens() now throws on Vault failure. If matched,
+returns NextResponse.json(..., { status: 500 }) — explicit non-2xx response.
+Other errors (Discogs API down, network blips) preserve the prior /settings
+redirect UX since they are not security-critical infrastructure failures.
+
+VERDICT: outer catch returns NextResponse.json({...}, { status: 500 }) for
+Vault failures (>= 400 — satisfies plan rule (b)), preserves redirect UX for
+non-security errors. PROPAGATES Vault failures correctly — no silent swallow.

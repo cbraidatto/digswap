@@ -88,10 +88,18 @@ describe("Discogs OAuth helpers", () => {
 		);
 	});
 
-	test("storeTokens stores in Vault via admin client RPC", async () => {
-		mockRpc.mockResolvedValue({ error: null });
+	// ---- Phase 33.1 / DEP-AUD-05 hardening contract ----
+	// storeTokens() MUST NOT have a silent plaintext fallback. If Vault fails
+	// for any reason, the function aborts (throws). The plaintext discogs_tokens
+	// table is treated as an emergency-only migration target, never as a runtime
+	// fallback. This pins the contract so Pitfall #11 cannot regress.
 
-		await storeTokens("user-123", "access_tok", "access_sec");
+	test("storeTokens (vault success path): writes both secrets to Vault, never touches discogs_tokens", async () => {
+		mockRpc.mockResolvedValue({ error: null });
+		const mockUpsert = vi.fn().mockResolvedValue({ error: null });
+		mockFrom.mockReturnValue({ upsert: mockUpsert });
+
+		await expect(storeTokens("user-123", "access_tok", "access_sec")).resolves.toBeUndefined();
 
 		expect(mockRpc).toHaveBeenCalledWith("vault_create_secret", {
 			secret: "access_tok",
@@ -101,24 +109,60 @@ describe("Discogs OAuth helpers", () => {
 			secret: "access_sec",
 			name: "discogs_secret:user-123",
 		});
+		// Critical assertion: no plaintext write side-effect on success path
+		expect(mockFrom).not.toHaveBeenCalledWith("discogs_tokens");
+		expect(mockUpsert).not.toHaveBeenCalled();
 	});
 
-	test("storeTokens falls back to table when Vault fails", async () => {
-		mockRpc.mockResolvedValue({ error: { message: "Vault not available" } });
+	test("storeTokens (vault PRIMARY-token failure): rejects with Vault error and does NOT write plaintext", async () => {
+		// First (and only) rpc call returns an error -> primary token write failed
+		mockRpc.mockResolvedValueOnce({
+			error: { message: "vault extension not installed", code: "42P01" },
+		});
+		const mockUpsert = vi.fn().mockResolvedValue({ error: null });
+		mockFrom.mockReturnValue({ upsert: mockUpsert });
+
+		await expect(storeTokens("user-123", "access_tok", "access_sec")).rejects.toThrow(
+			/Vault unavailable/,
+		);
+
+		// CRITICAL: no fallback into the plaintext discogs_tokens table
+		expect(mockFrom).not.toHaveBeenCalledWith("discogs_tokens");
+		expect(mockUpsert).not.toHaveBeenCalled();
+	});
+
+	test("storeTokens (vault SECONDARY-secret failure): rejects + cleans up first secret + does NOT write plaintext", async () => {
+		// First rpc resolves OK (primary token written), second rpc fails (secret write fails)
+		mockRpc
+			.mockResolvedValueOnce({ error: null })
+			.mockResolvedValueOnce({ error: { message: "secret write failed" } })
+			// Third rpc is the cleanup vault_delete_secret -> resolve to no-op
+			.mockResolvedValueOnce({ error: null });
 
 		const mockUpsert = vi.fn().mockResolvedValue({ error: null });
 		mockFrom.mockReturnValue({ upsert: mockUpsert });
 
-		await storeTokens("user-123", "access_tok", "access_sec");
+		await expect(storeTokens("user-456", "access_tok", "access_sec")).rejects.toThrow(
+			/Vault unavailable/,
+		);
 
-		expect(mockFrom).toHaveBeenCalledWith("discogs_tokens");
-		expect(mockUpsert).toHaveBeenCalledWith(
-			expect.objectContaining({
-				user_id: "user-123",
-				access_token: "access_tok",
-				access_token_secret: "access_sec",
-			}),
-			{ onConflict: "user_id" },
+		// Cleanup: must have attempted vault_delete_secret on the first secret
+		expect(mockRpc).toHaveBeenCalledWith("vault_delete_secret", {
+			name: "discogs_token:user-456",
+		});
+
+		// CRITICAL: no fallback into the plaintext discogs_tokens table
+		expect(mockFrom).not.toHaveBeenCalledWith("discogs_tokens");
+		expect(mockUpsert).not.toHaveBeenCalled();
+	});
+
+	test("storeTokens (vault primary failure): error message surfaces underlying Vault failure cause", async () => {
+		mockRpc.mockResolvedValueOnce({
+			error: { message: "permission denied for function vault_create_secret", code: "42501" },
+		});
+
+		await expect(storeTokens("user-789", "access_tok", "access_sec")).rejects.toThrow(
+			/permission denied for function vault_create_secret/,
 		);
 	});
 

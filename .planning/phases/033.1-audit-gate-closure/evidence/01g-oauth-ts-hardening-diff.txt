@@ -1,0 +1,103 @@
+diff --git a/apps/web/src/lib/discogs/oauth.ts b/apps/web/src/lib/discogs/oauth.ts
+index 55b9e93..b46be73 100644
+--- a/apps/web/src/lib/discogs/oauth.ts
++++ b/apps/web/src/lib/discogs/oauth.ts
+@@ -73,13 +73,29 @@ export async function getAccessToken(
+ /**
+  * Store Discogs OAuth tokens securely for a user.
+  *
+- * Strategy: Try Supabase Vault first (encrypted at rest), fall back to
+- * a `discogs_tokens` table if Vault is not available (e.g., local dev
+- * without Vault extension enabled).
++ * Contract (Phase 33.1 / DEP-AUD-05 hardening — Pitfall #11):
++ * Tokens MUST be encrypted at rest in Supabase Vault. There is NO silent
++ * fallback to the legacy `public.discogs_tokens` plaintext table. If Vault
++ * is unavailable for any reason (extension missing, RPC wrapper missing,
++ * permission denied, transient network failure), this function throws and
++ * the caller is responsible for surfacing the error to the user.
++ *
++ * The legacy `public.discogs_tokens` table remains in the schema only as
++ * an emergency migration target for the deleteTokens() cleanup path; it
++ * MUST never be written to by storeTokens().
++ *
++ * History: previous versions had a try/catch that fell through to the
++ * plaintext upsert when Vault returned an error object (rather than
++ * throwing). This silently bypassed Vault on every OAuth flow because the
++ * `public.vault_create_secret` PostgREST wrapper had never been deployed.
++ * Migration 20260424000000_enable_vault_extension.sql adds the wrapper;
++ * this function aborts if it ever fails again.
+  *
+  * @param userId - The Supabase user ID
+  * @param accessToken - The Discogs OAuth access token
+  * @param accessTokenSecret - The Discogs OAuth access token secret
++ * @throws Error if Vault is unavailable — caller must propagate (do NOT
++ *   log-and-continue).
+  */
+ export async function storeTokens(
+ 	userId: string,
+@@ -88,45 +104,36 @@ export async function storeTokens(
+ ): Promise<void> {
+ 	const admin = createAdminClient();
+ 
+-	// Attempt Vault storage first (encrypted at rest)
++	// Step 1: write the primary access token to Vault
+ 	const { error: vaultTokenError } = await admin.rpc("vault_create_secret", {
+ 		secret: accessToken,
+ 		name: `discogs_token:${userId}`,
+ 	});
++	if (vaultTokenError) {
++		console.error("[Discogs OAuth] Vault primary-token write failed", vaultTokenError);
++		throw new Error(
++			`Vault unavailable: cannot store Discogs token (${vaultTokenError.message ?? "unknown"})`,
++		);
++	}
+ 
+-	if (!vaultTokenError) {
+-		const { error: vaultSecretError } = await admin.rpc("vault_create_secret", {
+-			secret: accessTokenSecret,
+-			name: `discogs_secret:${userId}`,
+-		});
+-
+-		if (!vaultSecretError) {
+-			console.info(`[Discogs OAuth] Tokens stored in Vault for user ${userId}`);
+-			return;
+-		}
+-
+-		// Second secret failed -- clean up the first and fall through
++	// Step 2: write the secondary token-secret to Vault
++	const { error: vaultSecretError } = await admin.rpc("vault_create_secret", {
++		secret: accessTokenSecret,
++		name: `discogs_secret:${userId}`,
++	});
++	if (vaultSecretError) {
++		// Best-effort cleanup of the first write so we don't leave a half-written
++		// pair behind (orphan secret without its pair confuses lookup later).
+ 		await admin.rpc("vault_delete_secret", {
+ 			name: `discogs_token:${userId}`,
+ 		});
++		console.error("[Discogs OAuth] Vault secondary-secret write failed", vaultSecretError);
++		throw new Error(
++			`Vault unavailable: cannot store Discogs token-secret (${vaultSecretError.message ?? "unknown"})`,
++		);
+ 	}
+ 
+-	// Fallback: store in discogs_tokens table
+-	const { error: tableError } = await admin.from("discogs_tokens").upsert(
+-		{
+-			user_id: userId,
+-			access_token: accessToken,
+-			access_token_secret: accessTokenSecret,
+-			updated_at: new Date().toISOString(),
+-		},
+-		{ onConflict: "user_id" },
+-	);
+-
+-	if (tableError) {
+-		throw new Error(`Failed to store Discogs tokens: ${tableError.message}`);
+-	}
+-
+-	console.info(`[Discogs OAuth] Tokens stored in fallback table for user ${userId}`);
++	console.info(`[Discogs OAuth] Tokens stored in Vault for user ${userId}`);
+ }
+ 
+ /**

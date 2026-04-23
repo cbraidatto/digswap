@@ -168,6 +168,33 @@ export async function GET(request: NextRequest) {
 		return NextResponse.redirect(`${siteUrl}/import-progress`);
 	} catch (error) {
 		console.error("Discogs OAuth callback error:", error);
+
+		// Phase 33.1 / DEP-AUD-05 hardening (Pitfall #11):
+		// storeTokens() now throws when Vault is unavailable. We MUST NOT
+		// swallow that error by redirecting back to /settings with a generic
+		// success-shaped page (HTTP 307 to a 200 route), because that masks
+		// what is effectively a security-critical infrastructure failure
+		// (we cannot encrypt the user's Discogs OAuth credentials at rest).
+		//
+		// Detect Vault failures by message marker and return an explicit
+		// HTTP 500 so operators see it in error monitoring and the user gets
+		// a clear "something is wrong on our side" signal rather than a
+		// silently-broken Discogs connection.
+		const message = error instanceof Error ? error.message : String(error);
+		if (message.includes("Vault unavailable")) {
+			return NextResponse.json(
+				{
+					ok: false,
+					error: "discogs_vault_unavailable",
+					message:
+						"We could not securely store your Discogs credentials. Please contact support — this is an infrastructure issue on our side.",
+				},
+				{ status: 500 },
+			);
+		}
+
+		// All other errors (Discogs API down, rate limit, network blip)
+		// remain user-facing redirects with the existing UX.
 		return NextResponse.redirect(
 			`${siteUrl}/settings?error=${encodeURIComponent("Could not connect to Discogs. Please try again.")}`,
 		);

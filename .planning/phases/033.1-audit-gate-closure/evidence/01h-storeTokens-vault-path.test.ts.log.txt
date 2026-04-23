@@ -1,0 +1,21 @@
+
+ RUN  v4.1.2 C:/Users/INTEL/Desktop/Get Shit DOne/.claude/worktrees/nice-franklin-2075c5/apps/web
+
+stdout | tests/unit/lib/discogs/oauth.test.ts > Discogs OAuth helpers > storeTokens (vault success path): writes both secrets to Vault, never touches discogs_tokens
+[Discogs OAuth] Tokens stored in Vault for user user-123
+
+ ✓ tests/unit/lib/discogs/oauth.test.ts > Discogs OAuth helpers > getRequestToken returns token and authorizeUrl 3ms
+ ✓ tests/unit/lib/discogs/oauth.test.ts > Discogs OAuth helpers > getRequestToken throws when token is missing 1ms
+ ✓ tests/unit/lib/discogs/oauth.test.ts > Discogs OAuth helpers > getAccessToken exchanges verifier for access token 0ms
+ ✓ tests/unit/lib/discogs/oauth.test.ts > Discogs OAuth helpers > getAccessToken throws when access token is missing 0ms
+ ✓ tests/unit/lib/discogs/oauth.test.ts > Discogs OAuth helpers > storeTokens (vault success path): writes both secrets to Vault, never touches discogs_tokens 2ms
+ ✓ tests/unit/lib/discogs/oauth.test.ts > Discogs OAuth helpers > storeTokens (vault PRIMARY-token failure): rejects with Vault error and does NOT write plaintext 1ms
+ ✓ tests/unit/lib/discogs/oauth.test.ts > Discogs OAuth helpers > storeTokens (vault SECONDARY-secret failure): rejects + cleans up first secret + does NOT write plaintext 1ms
+ ✓ tests/unit/lib/discogs/oauth.test.ts > Discogs OAuth helpers > storeTokens (vault primary failure): error message surfaces underlying Vault failure cause 0ms
+ ✓ tests/unit/lib/discogs/oauth.test.ts > Discogs OAuth helpers > deleteTokens cleans up Vault secrets and fallback table 1ms
+
+ Test Files  1 passed (1)
+      Tests  9 passed (9)
+   Start at  15:40:53
+   Duration  1.37s (transform 70ms, setup 129ms, import 103ms, tests 12ms, environment 906ms)
+
