@@ -1,0 +1,3 @@
+38:`supabase/migrations/` became authoritative on **2026-04-23 via commit `090bdcc`**, which landed in Phase 33 Plan 03. That commit:
+39:1. Added `supabase/migrations/20260107_drift_capture_missing_tables.sql` capturing the 6 drift tables (drift-capture migration);
+49:Future readers should treat this ADR as accurate from commit `090bdcc` forward. Audits or refactors looking at the repo state before that commit must be aware of the dev-vs-trail divergence.

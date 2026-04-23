@@ -31,6 +31,23 @@ Drizzle cannot express RLS policies, pg_cron schedules, or Vault calls in its ge
 - CI remains unchanged; `drizzle-kit` is not run in CI.
 - Future schema-drift audits compare: `apps/web/src/lib/db/schema/*.ts` ↔ the SQL that `supabase/migrations/*.sql` produces against a reset DB.
 
+## Historical Note (added 2026-04-24, Phase 33.1)
+
+The decision above describes the *intended* architectural state. As of 2026-04-21 (when this ADR was accepted) and 2026-04-22 (when Phase 33 audit began), the claim that `supabase/migrations/` was the "sole authoritative trail for production" was **historically false**. Several tables (notably `leads`, plus 5 others — `crew_members`, `crew_invites`, `feed_post_reactions`, `feed_post_comments`, and `discogs_tokens`) existed only on the dev Supabase project (`mrkgoucqcbqjhrdjcnpw`) via ad-hoc `drizzle-kit push` invocations and had never been reconciled into either the `drizzle/` journal or the `supabase/migrations/` SQL trail.
+
+`supabase/migrations/` became authoritative on **2026-04-23 via commit `090bdcc`**, which landed in Phase 33 Plan 03. That commit:
+1. Added `supabase/migrations/20260107_drift_capture_missing_tables.sql` capturing the 6 drift tables (drift-capture migration);
+2. Resolved 7 distinct drift categories documented in `.planning/phases/033-pre-deploy-audit-gate/AUDIT-REPORT.md §2 Findings`:
+   - Lexical migration ordering (renamed `030_purge_soft_deleted.sql` → `20260419_purge_soft_deleted.sql`; copied `drizzle/0000-0005` into `supabase/migrations/` as `20260101-20260106_drizzle_*.sql`);
+   - `CREATE INDEX CONCURRENTLY` in transaction (removed `CONCURRENTLY` keyword from `20260105_drizzle_0004_gin_indexes.sql`);
+   - Drift tables created (`20260107_drift_capture_missing_tables.sql`);
+   - Duplicate-policy creation in `20260405` (archived the file to `.planning/phases/033-pre-deploy-audit-gate/deprecated-migrations/`);
+   - Duplicate version-prefix collisions (renamed `20260401`, `20260406`, `20260409`, `20260416` duplicates to 14-digit `YYYYMMDDHHMMSS` timestamps);
+   - References to `invited_by` / `created_by` columns that never existed (archival of `20260405`);
+   - Out-of-order column dependency on `open_for_trade` (moved `20260415_open_for_trade_and_rating.sql` earlier to `20260405000000_*.sql`).
+
+Future readers should treat this ADR as accurate from commit `090bdcc` forward. Audits or refactors looking at the repo state before that commit must be aware of the dev-vs-trail divergence.
+
 ## Status
 
 Accepted 2026-04-21 as part of Phase 33 (Pre-Deploy Audit Gate).
