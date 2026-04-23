@@ -2,8 +2,15 @@
 phase: 33
 slug: pre-deploy-audit-gate
 status: draft
-nyquist_compliant: false
+nyquist_compliant: true
 wave_0_complete: false
+# Note on flags above:
+# - nyquist_compliant: true      → planning-time guarantee. Every non-checkpoint task has an
+#                                   <automated> verify, no task runs in watch mode, feedback
+#                                   latency < 180s. Verified by checker iteration 1 + revision.
+# - wave_0_complete: false       → execution-time flag. Flips to true only AFTER Plan 01 runs
+#                                   and Wave 0 artifacts land on disk. Don't flip at planning
+#                                   time — this is the signal that W1+ can begin.
 created: 2026-04-21
 ---
 
@@ -87,11 +94,19 @@ Files that MUST exist before later waves run:
 
 ## Validation Sign-Off
 
-- [ ] All tasks have `<automated>` verify command OR Wave 0 dependency listed above
-- [ ] Sampling continuity: no 3 consecutive tasks without automated verify
-- [ ] Wave 0 covers all MISSING references (8 Wave 0 files/deletes)
-- [ ] No watch-mode flags (Vitest `--run`, Playwright non-UI mode mandatory)
-- [ ] Feedback latency < 180s
-- [ ] `nyquist_compliant: true` set in frontmatter once planner confirms every task has a verify or W0 dep
+Planning-time guarantees (tick these when plans are written and checker-validated):
 
-**Approval:** pending
+- [x] All tasks have `<automated>` verify command OR Wave 0 dependency listed above
+- [x] Sampling continuity: no 3 consecutive tasks without automated verify
+- [x] Wave 0 covers all MISSING references (8 Wave 0 files/deletes)
+- [x] No watch-mode flags (Vitest `--run`, Playwright non-UI mode mandatory)
+- [x] Feedback latency < 180s
+- [x] `nyquist_compliant: true` set in frontmatter once planner confirms every task has a verify or W0 dep
+
+Execution-time guarantees (tick these when Plan 01 actually runs — NOT at planning time):
+
+- [ ] `wave_0_complete: true` flipped in frontmatter after Plan 01 artifacts land on disk (orphan deleted, guard wired, ADR committed, .gitleaks.toml present, AUDIT-REPORT.md skeleton, Playwright spec, evidence/.gitignore, evidence/00-docker.txt)
+
+**Approval:** approved 2026-04-21 (planning-time — plans are Nyquist-compliant in design). `wave_0_complete` remains an execution-time flag; it flips separately when Plan 01 runs.
+</content>
+</invoke>
