@@ -1,0 +1,50 @@
+# Phase 34 — Evidence 03: Migration trail "dry run" (MCP-mode equivalent)
+# Date: 2026-04-26
+# Path deviation: original plan called for `supabase db push --linked --dry-run`.
+# In MCP-only mode, dry-run is replaced by:
+#   1. mcp__supabase__list_migrations BEFORE apply  → expect [] (empty)
+#   2. enumerate the 35 files in supabase/migrations/ in lexical order
+#   3. mcp__supabase__list_tables BEFORE apply       → expect [] (empty)
+# Apply will proceed migration-by-migration with halt-on-fail per RESEARCH.md §10.
+
+PRE_APPLY_MIGRATIONS=[]
+PRE_APPLY_TABLES_PUBLIC=[]
+PRE_APPLY_BUCKETS=[]
+PRE_APPLY_ADVISOR_LINTS=0
+
+# Lexically-ordered trail to apply (35 files):
+01: 20260101_drizzle_0000_initial.sql
+02: 20260102_drizzle_0001_groups_slug.sql
+03: 20260103_drizzle_0002_profile_showcase.sql
+04: 20260104_drizzle_0003_trade_tos.sql
+05: 20260105_drizzle_0004_gin_indexes.sql
+06: 20260106_drizzle_0005_stripe_event_log.sql
+07: 20260107_drift_capture_missing_tables.sql
+08: 20260327_ranking_function.sql
+09: 20260328_leads_rls.sql
+10: 20260329_trade_v2_schema.sql
+11: 20260331_desktop_trade_runtime.sql
+12: 20260401000000_trade_messages.sql
+13: 20260401000001_trade_presence_rpc.sql
+14: 20260402_subscriptions_schema.sql
+15: 20260403_subscription_init_trigger.sql
+16: 20260404_fix_trade_requests_rls.sql
+17: 20260405000000_open_for_trade_and_rating.sql
+18: 20260406000000_gem_ranking_function.sql
+19: 20260406000001_missing_tables_and_columns.sql
+20: 20260407_trade_messages_and_challenges.sql
+21: 20260408_digs_table.sql
+22: 20260409000000_deploy_readiness_fixes.sql
+23: 20260409000001_perf_and_security.sql
+24: 20260409000002_visibility_and_trade_proposals.sql
+25: 20260410_trade_peer_id_coordination.sql
+26: 20260411_security_audit_fixes.sql
+27: 20260412_security_audit_phase2.sql
+28: 20260413_direct_messages.sql
+29: 20260414_tracklist.sql
+30: 20260416000000_dm_mutual_follow_rls.sql
+31: 20260416000001_trade_reviews_rls_upgrade.sql
+32: 20260417_trade_preview_infrastructure.sql
+33: 20260418_collection_deleted_at.sql
+34: 20260419_purge_soft_deleted.sql
+35: 20260424000000_enable_vault_extension.sql

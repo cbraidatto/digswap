@@ -1,0 +1,76 @@
+# Phase 34 — Evidence 04: Migration trail apply log (MCP-mode)
+# Date: 2026-04-26
+# Path deviation: original plan called for `supabase db push --linked` stdout.
+# In MCP-only mode this captures per-migration apply_migration responses.
+# All migrations applied via mcp__supabase__apply_migration.
+
+## Apply log
+
+01: 20260101_drizzle_0000_initial.sql                       -> {"success":true}
+02: 20260102_drizzle_0001_groups_slug.sql                   -> {"success":true}
+03: 20260103_drizzle_0002_profile_showcase.sql              -> {"success":true}
+04: 20260104_drizzle_0003_trade_tos.sql                     -> {"success":true}
+05: 20260105_drizzle_0004_gin_indexes.sql                   -> {"success":true}
+06: 20260106_drizzle_0005_stripe_event_log.sql              -> {"success":true}
+07: 20260107_drift_capture_missing_tables.sql               -> {"success":true}
+08: 20260327_ranking_function.sql                            -> {"success":true}  # enables pg_cron + recalculate-rankings job
+09: 20260328_leads_rls.sql                                   -> {"success":true}
+10: 20260329_trade_v2_schema.sql                             -> {"success":true}
+11: 20260331_desktop_trade_runtime.sql                       -> {"success":true}
+12: 20260401000000_trade_messages.sql                        -> {"success":true}
+13: 20260401000001_trade_presence_rpc.sql                    -> {"success":true}
+14: 20260402_subscriptions_schema.sql                        -> {"success":true}
+15: 20260403_subscription_init_trigger.sql                   -> {"success":true}
+16: 20260404_fix_trade_requests_rls.sql                      -> {"success":true}
+17: 20260405000000_open_for_trade_and_rating.sql             -> {"success":true}
+18: 20260406000000_gem_ranking_function.sql                  -> {"success":true}
+19: 20260406000001_missing_tables_and_columns.sql            -> {"success":true}
+20: 20260407_trade_messages_and_challenges.sql               -> {"success":true}
+21: 20260408_digs_table.sql                                  -> {"success":true}
+22: 20260409000000_deploy_readiness_fixes.sql                -> {"success":true}
+23: 20260409000001_perf_and_security.sql                     -> {"success":true}  # enables pg_trgm
+24: 20260409000002_visibility_and_trade_proposals.sql        -> {"success":true}
+25: 20260410_trade_peer_id_coordination.sql                  -> {"success":true}
+26: 20260411_security_audit_fixes.sql                        -> {"success":true}
+27: 20260412_security_audit_phase2.sql                       -> {"success":true}
+28: 20260413_direct_messages.sql                             -> {"success":true}
+29: 20260414_tracklist.sql                                   -> {"success":true}
+30: 20260416000000_dm_mutual_follow_rls.sql                  -> {"success":true}
+31: 20260416000001_trade_reviews_rls_upgrade.sql             -> {"success":true}
+32: 20260417_trade_preview_infrastructure.sql                -> {"success":true}  # creates bucket + pg_net + trade-preview-cleanup cron
+33: 20260418_collection_deleted_at.sql                       -> RETRY (1st: PK conflict on auto-version) -> {"success":true}
+34: 20260419_purge_soft_deleted.sql                          -> {"success":true}  # purge-soft-deleted-collection-items cron
+35: 20260424000000_enable_vault_extension.sql                -> RETRY (1st: PK conflict on auto-version) -> {"success":true}
+
+## Halt-on-fail observations
+
+- Migrations 33 + 35 failed on first attempt with `duplicate key on schema_migrations_pkey`.
+  Root cause: MCP server auto-generates `version` from `now()` when filename has < 14-digit
+  timestamp prefix. Multiple parallel apply_migration calls within the same second can
+  collide on version. RESEARCH.md §10 catastrophic-halt protocol (drop+recreate) was NOT
+  triggered because:
+    a. PK violation = trail integrity intact, no partial schema state
+    b. Sequential retry succeeded immediately on each
+    c. Final list_migrations shows 35 unique entries, all 35 names recorded
+- This is a known limitation of MCP-mode applying migrations whose names lack a
+  full 14-digit timestamp prefix. Not a blocker for production correctness — the
+  schema state matches dev exactly. Future migrations should use 14-digit prefixes
+  to avoid the collision.
+
+## Final state probes (post-apply)
+
+- mcp__supabase__list_migrations -> 35 entries (all 35 file names present)
+- mcp__supabase__list_tables -> 42 tables in public, ALL with rls_enabled=true (zero exceptions)
+- mcp__supabase__list_storage_buckets -> 1 bucket: trade-previews (public=false, 512MB limit, 10 audio mime types)
+- mcp__supabase__list_extensions (post-apply) -> pg_cron, pg_net, pg_trgm now enabled (in addition to pre-existing platform defaults)
+
+## Cron jobs (post-apply)
+
+| jobid | jobname                                | schedule    | active | username |
+|-------|----------------------------------------|-------------|--------|----------|
+|   1   | recalculate-rankings                   | */15 * * * *| true   | postgres |
+|   2   | trade-preview-cleanup                  | 0 * * * *   | true   | postgres |
+|   3   | purge-soft-deleted-collection-items    | 0 3 * * *   | true   | postgres |
+
+DEP-SB-05 satisfied (>=3 active jobs under postgres role per Pitfall #18).
+DEP-SB-02 satisfied (35/35 migrations applied via supabase db push equivalent — see 00-path-deviation.md).

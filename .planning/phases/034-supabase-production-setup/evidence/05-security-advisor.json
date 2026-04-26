@@ -1,0 +1,62 @@
+{
+  "phase": "034-supabase-production-setup",
+  "captured_via": "mcp__supabase__get_advisors(type='security')",
+  "captured_at": "2026-04-26",
+  "raw_dump": "evidence/05-security-advisor-raw.json",
+  "verdict": "PASS — zero ERROR-level findings; zero 'Tables without RLS enabled' findings; zero 'Policies referencing missing columns' findings",
+  "summary": {
+    "total_lints": 50,
+    "by_level": {
+      "ERROR": 0,
+      "WARN": 50,
+      "INFO": 0
+    },
+    "by_category": {
+      "function_search_path_mutable": 1,
+      "extension_in_public": 2,
+      "materialized_view_in_api": 1,
+      "pg_graphql_anon_table_exposed": 46
+    }
+  },
+  "must_haves_check": {
+    "tables_without_rls": 0,
+    "policies_with_missing_columns": 0,
+    "satisfies_DEP_SB_03": true,
+    "comment": "Plan 034-02 must_haves require zero 'Tables without RLS' AND zero 'Policies referencing missing columns'. Both are satisfied (0 + 0). The 50 WARN lints are advisory and inherent to the migration trail as written — they exist on dev too."
+  },
+  "warn_lints_categorized": {
+    "function_search_path_mutable": {
+      "count": 1,
+      "items": ["public.recalculate_rankings"],
+      "blocker": false,
+      "rationale": "Function works correctly. Mutable search_path is a hardening recommendation, not a correctness issue. Tracked as post-MVP tech debt.",
+      "remediation_link": "https://supabase.com/docs/guides/database/database-linter?lint=0011_function_search_path_mutable"
+    },
+    "extension_in_public": {
+      "count": 2,
+      "items": ["pg_trgm", "pg_net"],
+      "blocker": false,
+      "rationale": "Both extensions are installed in public schema by their CREATE EXTENSION statements (no SCHEMA clause specified). Supabase recommends moving to dedicated extensions schema, but this is a clean-up concern, not a security boundary. Tracked as post-MVP tech debt.",
+      "remediation_link": "https://supabase.com/docs/guides/database/database-linter?lint=0014_extension_in_public"
+    },
+    "materialized_view_in_api": {
+      "count": 1,
+      "items": ["public.genre_leaderboard_mv"],
+      "blocker": false,
+      "rationale": "Genre leaderboard is intentionally public (it's a leaderboard — visibility is the feature). Confirmed by the migration's own comment in 20260105_drizzle_0004_gin_indexes.sql line 51-57.",
+      "remediation_link": "https://supabase.com/docs/guides/database/database-linter?lint=0016_materialized_view_in_api"
+    },
+    "pg_graphql_anon_table_exposed": {
+      "count": 46,
+      "items_summary": "All 41 public tables + genre_leaderboard_mv + 4 others (visible to anon via /graphql/v1 introspection)",
+      "blocker": false,
+      "rationale": "RLS still enforces row-level access control on actual SELECT operations. Introspection only reveals SCHEMA (table names, column names) — no row data. This is intentional Supabase behavior when pg_graphql is enabled. RLS remains the security boundary; introspection is a discoverability convenience for client SDKs. Future hardening (post-MVP) could move sensitive tables to a non-graphql schema or revoke anon SELECT.",
+      "remediation_link": "https://supabase.com/docs/guides/database/database-linter?lint=0026_pg_graphql_anon_table_exposed"
+    }
+  },
+  "deferred_to_post_mvp": [
+    "Add SET search_path = public, pg_temp to recalculate_rankings (1 fn)",
+    "Move pg_trgm + pg_net to dedicated extensions schema",
+    "Decide whether to revoke anon SELECT on subset of tables (or accept introspection as documented)"
+  ]
+}

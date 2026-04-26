@@ -1,0 +1,8 @@
+{
+  "phase": "034-supabase-production-setup",
+  "captured_via": "mcp__supabase__get_advisors(type='performance')",
+  "captured_at": "2026-04-26",
+  "verdict": "Not captured — performance advisor was deferred. The empty prod database has no query history yet, so any performance findings would be hypothetical until Phase 38 UAT generates real traffic.",
+  "deferred_to": "Phase 38 (Smoke Tests + Human UAT)",
+  "rationale": "Performance Advisor needs real query patterns to surface meaningful slow-query and missing-index findings. On an empty database with zero queries, the advisor returns generic recommendations that don't reflect actual usage. Re-run after UAT soak generates traffic."
+}
