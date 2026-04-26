@@ -1,0 +1,29 @@
+# Phase 34 — Evidence 02: CLI link confirmation
+# Captured: 2026-04-26
+# Path deviation: original plan called for `supabase link --project-ref` + cat supabase/.temp/project-ref.
+# In MCP-only mode (chosen 2026-04-26), the supabase CLI is never invoked against prod —
+# all DDL/DML/Edge-Functions/Storage operations go through the project-scoped MCP at
+# https://mcp.supabase.com/mcp?project_ref=swyfhpgerzvvmoswkjyt&...
+#
+# This is a stronger guarantee than `supabase link` because:
+#   1. The MCP URL itself is pinned to project_ref=swyfhpgerzvvmoswkjyt (typo would fail OAuth)
+#   2. OAuth-scoped credentials cannot accidentally target dev (no env switching mistake possible)
+#   3. No DB password ever passes through any local file or env var
+#
+# Equivalent of `cat supabase/.temp/project-ref`:
+PROJECT_REF=swyfhpgerzvvmoswkjyt
+
+# Equivalent guardrail check (Plan 01 T3 acceptance criteria):
+# PROD_REF != DEV_REF (mrkgoucqcbqjhrdjcnpw) → ✓ confirmed
+# PROD_REF length == 20 → ✓ confirmed (s-w-y-f-h-p-g-e-r-z-v-v-m-o-s-w-k-j-y-t = 20)
+# PROD_REF is lowercase alphanumeric → ✓ confirmed
+
+# OAuth scopes granted (from MCP authorize URL):
+#   organizations:read
+#   projects:read, projects:write
+#   database:read, database:write    ← powers apply_migration + execute_sql
+#   analytics:read
+#   secrets:read                     ← Edge Function env vars (NOT Vault — Vault is read via SQL)
+#   edge_functions:read, edge_functions:write   ← powers deploy_edge_function for Plan 04
+#   environment:read, environment:write
+#   storage:read                     ← can list buckets but NOT modify CORS (Plan 04 T4 keeps Dashboard)
