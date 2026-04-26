@@ -1,0 +1,40 @@
+# Phase 34 — Evidence 08: pg_cron job inventory (post-Vault)
+# Date: 2026-04-26
+# Captured via: mcp__supabase__execute_sql
+
+## Query
+
+SELECT jobid, jobname, schedule, active, username, command
+FROM cron.job
+WHERE active = true
+ORDER BY jobid;
+
+## Result
+
+| jobid | jobname                              | schedule       | active | username | command                                                                            |
+|-------|--------------------------------------|----------------|--------|----------|------------------------------------------------------------------------------------|
+|     1 | recalculate-rankings                 | */15 * * * *   | true   | postgres | SELECT recalculate_rankings()                                                      |
+|     2 | trade-preview-cleanup                | 0 * * * *      | true   | postgres | SELECT public.invoke_trade_preview_cleanup();                                      |
+|     3 | purge-soft-deleted-collection-items  | 0 3 * * *      | true   | postgres | DELETE FROM collection_items WHERE deleted_at < now() - interval '7 days'          |
+
+## Acceptance criteria
+
+- [x] >= 3 active jobs (DEP-SB-05): 3 found
+- [x] All run under role `postgres` (Pitfall #18): username='postgres' on every row
+- [x] At least the 3 expected core jobs: recalculate-rankings, trade-preview-cleanup, purge-soft-deleted-collection-items — all present and active
+
+## Schedule rationale
+
+- **recalculate-rankings (every 15min)** — leaderboard freshness for active users; defined in migration 20260327
+- **trade-preview-cleanup (hourly at :00)** — TTL-style sweep; reads Vault secrets to invoke the cleanup-trade-previews Edge Function; defined in migration 20260417
+- **purge-soft-deleted-collection-items (daily 03:00 UTC)** — tombstone-row cleanup; defined in migration 20260419
+
+## Stripe-event-log cron NOT scheduled (intentional)
+
+The migration `20260106_drizzle_0005_stripe_event_log.sql` creates the `stripe_event_log`
+table but does NOT schedule the optional `cleanup-stripe-event-log` cron job (the
+30-day-purge job is mentioned in a comment but never executed via cron.schedule).
+On a free-tier MVP without Stripe Live, the table stays empty. CONTEXT.md D-02 deferred
+Stripe activation, so this is the correct state.
+
+DEP-SB-05 satisfied: 3 active cron jobs, all under role postgres.
