@@ -1,0 +1,76 @@
+# Phase 34 — Evidence 14: Production DATABASE_URL pooler template
+# Date: 2026-04-26
+# DEP-SB-10 — for Phase 35 to consume
+
+## Template (do NOT commit the real password — Phase 35 sets via Vercel env)
+
+DATABASE_URL = postgresql://postgres.swyfhpgerzvvmoswkjyt:<DB_PASSWORD>@aws-0-us-east-1.pooler.supabase.com:6543/postgres?pgbouncer=true
+
+## Required tokens (must all appear)
+
+1. **Pooler host:** `aws-0-us-east-1.pooler.supabase.com:6543`
+   - Region: us-east-1 (matches D-01 + matches Vercel iad1)
+   - Port: 6543 (PgBouncer transaction-mode pooler — Pitfall #17)
+   - NOT 5432 (direct connection — would exhaust serverless connection limits)
+
+2. **Query string:** `?pgbouncer=true`
+   - Tells the postgres driver this is a transaction-mode pooler
+   - Disables prepared statement caching at the driver level (defensive — pairs with `prepare: false`)
+
+3. **Drizzle config:** `prepare: false`
+   - In `drizzle.config.ts` or wherever the postgres-js client is created:
+     ```ts
+     import postgres from 'postgres';
+     import { drizzle } from 'drizzle-orm/postgres-js';
+
+     const client = postgres(process.env.DATABASE_URL!, {
+       prepare: false,  // <-- REQUIRED for PgBouncer transaction mode
+     });
+     export const db = drizzle(client);
+     ```
+   - Without `prepare: false`: queries silently fail with prepared statement errors after the first hot path
+
+## Username structure (Supabase pooler quirk)
+
+The pooler username has a TWO-PART structure: `postgres.<project_ref>`. So for digswap-prod:
+- Username: `postgres.swyfhpgerzvvmoswkjyt`
+- NOT just `postgres`
+
+This is the pooler's tenant-routing scheme — the project_ref in the username tells PgBouncer which Supabase project to route to.
+
+## Password placeholder
+
+`<DB_PASSWORD>` is the database password the user set when creating the project on the
+Dashboard (Plan 01 T2). The password is stored ONLY in the user's password manager —
+NOT in this file, NOT in any committed source, NOT in the AI/orchestrator context.
+
+Phase 35 will:
+1. Have the user paste the password into Vercel's env-var UI directly (Production scope only)
+2. Construct the full DATABASE_URL on Vercel by interpolating `<DB_PASSWORD>`
+3. Verify post-build that no `DATABASE_URL` value is leaked into client bundles via the
+   secret-grep step (`grep -r "DATABASE_URL" apps/web/.next/static/`)
+
+## Direct connection (alternate, non-default — for migrations only)
+
+If migrations were applied via `supabase db push --linked` instead of the MCP, the CLI
+would use a DIFFERENT connection string (port 5432 direct, not pooler):
+
+  postgresql://postgres:<DB_PASSWORD>@db.swyfhpgerzvvmoswkjyt.supabase.co:5432/postgres
+
+**This is not the application's DATABASE_URL.** The app must use the pooler. The
+direct URL is only mentioned here as a reference for any future migration push the
+user might want to do via CLI rather than MCP.
+
+## Verification grep (used by Plan 05's verify step)
+
+A successful verify run greps `evidence/14-database-url-template.txt` for all three
+required tokens:
+
+  $ grep -q 'aws-0-us-east-1.pooler.supabase.com:6543' evidence/14-database-url-template.txt && \
+    grep -q '?pgbouncer=true'                          evidence/14-database-url-template.txt && \
+    grep -q 'prepare: false'                           evidence/14-database-url-template.txt && \
+    echo "DEP-SB-10 evidence OK" || echo "DEP-SB-10 evidence MISSING tokens"
+
+Expected: `DEP-SB-10 evidence OK`.
+
+DEP-SB-10 satisfied: pooler-format DATABASE_URL template documented for Phase 35 consumption.

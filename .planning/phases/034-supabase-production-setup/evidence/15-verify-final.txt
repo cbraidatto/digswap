@@ -1,0 +1,46 @@
+# Phase 34 — Evidence 15: Final verify (all 8 in-scope DEP-SB-* checks)
+# Date: 2026-04-26
+# Captured via: mcp__supabase__execute_sql (single CTE returning every check)
+
+## Probe SQL
+
+WITH checks AS (
+  -- DEP-SB-01..07 + 10 in one query (8 in-scope; 08 + 09 deferred per CONTEXT.md D-03/D-05)
+  ...
+)
+SELECT req, status, detail FROM checks ORDER BY req;
+
+## Result
+
+| req                                                 | status            | detail                                                                |
+|------------------------------------------------------|-------------------|-----------------------------------------------------------------------|
+| DEP-SB-01: project ref                              | PASS              | postgres (database `postgres` on project ref `swyfhpgerzvvmoswkjyt`) |
+| DEP-SB-02: migrations applied (>=35)                | PASS              | 35 migrations recorded in supabase_migrations.schema_migrations       |
+| DEP-SB-03: RLS on all public tables                 | PASS              | 42 public tables w/ RLS, 0 without                                    |
+| DEP-SB-04: edge functions deployed                  | PASS-by-MCP-list  | cleanup-trade-previews + validate-preview both ACTIVE                |
+| DEP-SB-05: cron jobs >=3 active                     | PASS              | 3 active jobs under role postgres (recalculate-rankings, trade-preview-cleanup, purge-soft-deleted-collection-items) |
+| DEP-SB-06: vault secrets present                    | PASS              | 2 of 2 expected vault secrets present (project_url + publishable_key) |
+| DEP-SB-07: bucket trade-previews public=false       | PASS              | public=false, 10 MIME types whitelisted                              |
+| DEP-SB-10: pooler-template doc                      | PASS-by-file-grep | evidence/14 has all 3 required tokens                                |
+
+**Pass rate: 8/8 in-scope DEP-SB-* requirements satisfied.**
+
+## Deferred (per CONTEXT.md D-03 + D-05, not validated this phase)
+
+- DEP-SB-08: Supabase Pro tier + auto-pause off — deferred (Free-tier launch)
+- DEP-SB-09: PITR + rehearsed restore — deferred (Free-tier launch; daily backups suffice for MVP)
+
+## Path-deviation notes
+
+- All migrations applied via `mcp__supabase__apply_migration` instead of `supabase db push --linked` — see `evidence/00-path-deviation.md`
+- Per-bucket CORS task (D-07 part 2) marked N/A — feature does not exist in modern Supabase Storage; D-07's intent satisfied via Storage RLS policies — see `evidence/10-cors-investigation.md`
+- Vault publishable_key stored as legacy anon JWT (208 chars) instead of modern sb_publishable_* (46 chars) — see `evidence/06-vault-secrets.txt` correction note
+
+## verify.sh equivalent
+
+scripts/verify.sh was created in Plan 01 T1 to run psql + curl probes via local CLI.
+In MCP-only mode the equivalent of `bash scripts/verify.sh` is the CTE above.
+verify.sh remains useful for future Phase 38 UAT-time re-runs from a CI/CD harness
+that has direct DATABASE_URL access (which Phase 35 will provision).
+
+Phase 34 ready to mark COMPLETE in ROADMAP.md + STATE.md.
