@@ -613,7 +613,13 @@ Plans:
   4. `trade-previews` Storage bucket exists with Public = off, CORS configured to production origin only, and 48h object lifecycle
   5. Supabase Pro plan active on the prod project (verified via dashboard billing view) — auto-pause disabled, PITR enabled, and a PITR restore to a throwaway project has been rehearsed end-to-end at least once
   6. Prod `DATABASE_URL` uses the pooler host on port 6543 with `?pgbouncer=true` and the app connects with `prepare: false` (Drizzle config verified against prod URL)
-**Plans**: TBD
+**Plans**: 5 plans (in-scope free-tier scope; DEP-SB-08 and DEP-SB-09 deferred per CONTEXT.md D-03/D-05)
+Plans:
+- [x] 034-01-wave-0-scaffolding-and-project-create-PLAN.md — DEP-SB-01: scaffold verify.sh + rls-probe.sql + drop-and-recreate.md, create digswap-prod project (us-east-1, Free), supabase link + capture evidence/01-02
+- [x] 034-02-migration-push-and-rls-verify-PLAN.md — DEP-SB-02 + DEP-SB-03: dry-run + supabase db push --linked (35 migrations), Security Advisor green, JWT-bound RLS probe under role authenticated
+- [x] 034-03-vault-populate-and-cron-verify-PLAN.md — DEP-SB-05 + DEP-SB-06: populate Vault with trade_preview_project_url + trade_preview_publishable_key BEFORE first cron tick, verify 3+ active pg_cron jobs all running as postgres
+- [x] 034-04-edge-functions-bucket-and-cors-PLAN.md — DEP-SB-04 + DEP-SB-07: deploy cleanup-trade-previews + validate-preview, curl smoke 200/401, verify trade-previews bucket public=false, configure CORS hard-coded to digswap.com.br + www.digswap.com.br
+- [x] 034-05-database-url-doc-and-final-verify-PLAN.md — DEP-SB-10: document DATABASE_URL pooler template (aws-0-us-east-1.pooler.supabase.com:6543 + ?pgbouncer=true + prepare:false), run scripts/verify.sh end-to-end, write phase 034-SUMMARY.md
 **P0 pitfalls to flag during plan-phase**: Pitfall 3 (migration drift — `supabase db push` only), Pitfall 4 (wrong-DB migration — confirm `supabase link` ref before every command), Pitfall 5 (RLS works under anon role — run Security Advisor, test with real JWT), Pitfall 11 (enable Vault BEFORE any Discogs connection), Pitfall 17 (pooler port 6543 + `prepare: false`), Pitfall 18 (pg_cron needs `postgres` role), Pitfall 20 (buckets default Public off), Pitfall 26 (500MB DB ceiling — Pro required before domain goes live)
 **UI hint**: no
 

@@ -103,6 +103,18 @@ Feed and Profile have equal weight — both are primary entry points. Feed-first
 - [x] Email notifications for wantlist matches via Resend (NOTF-02, partial — trade request email in Phase 9)
 - [x] Per-type notification preferences in settings with phase badges for deferred types (NOTF-04)
 
+**Phase 34: Supabase Production Setup** *(2026-04-26)*
+- [x] `digswap-prod` Supabase project provisioned (us-east-1, Free tier — `swyfhpgerzvvmoswkjyt`) (DEP-SB-01)
+- [x] All 35 migrations applied via MCP (path-deviation #1 from CLI — same `supabase_migrations.schema_migrations` table; ADR-003 honored) (DEP-SB-02)
+- [x] Security Advisor green — 0 ERROR, 0 "Tables without RLS" findings; 50 WARN advisory tracked as post-MVP (DEP-SB-03)
+- [x] 2 Edge Functions deployed and ACTIVE: `cleanup-trade-previews` (200 with anon JWT) + `validate-preview` (401 to anon) (DEP-SB-04)
+- [x] 3 active pg_cron jobs under role postgres: recalculate-rankings (15min), trade-preview-cleanup (hourly), purge-soft-deleted-collection-items (daily 3am) (DEP-SB-05)
+- [x] Vault populated: `trade_preview_project_url` + `trade_preview_publishable_key` (legacy anon JWT, gateway-compatible) (DEP-SB-06)
+- [x] `trade-previews` Storage bucket created (public=false, 10 audio MIME types). D-07 CORS task resolved as N/A (path-deviation #2 — per-bucket CORS doesn't exist in modern Supabase Storage; RLS policies on `storage.objects` are the actual security boundary, stronger than CORS) (DEP-SB-07)
+- [x] DATABASE_URL pooler template documented (host `aws-0-us-east-1.pooler.supabase.com:6543`, `?pgbouncer=true`, `prepare: false`) — Phase 35 will paste real password directly to Vercel (DEP-SB-10)
+- [DEFERRED] Supabase Pro tier + auto-pause off (DEP-SB-08) — Free-tier launch (CONTEXT.md D-03)
+- [DEFERRED] PITR + rehearsed restore (DEP-SB-09) — Free-tier launch (CONTEXT.md D-05)
+
 ### Active
 
 **Discovery & Matching**
