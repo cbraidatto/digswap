@@ -1,0 +1,42 @@
+# Phase 34 — Evidence 07c: cleanup-trade-previews curl smoke test
+# Date: 2026-04-26
+# Captured via: bash + curl from local dev environment
+
+## Probe command
+
+PROD_URL="https://swyfhpgerzvvmoswkjyt.supabase.co"
+ANON_JWT="<legacy anon JWT — same as Vault `trade_preview_publishable_key`>"
+
+curl -sS -i -X POST "$PROD_URL/functions/v1/cleanup-trade-previews" \
+  -H "Authorization: Bearer $ANON_JWT" \
+  -H "Content-Type: application/json" \
+  -d '{"source":"phase-34-smoke-test","bucket":"trade-previews"}'
+
+## Response
+
+HTTP/1.1 200 OK
+Date: Sun, 26 Apr 2026 19:11:47 GMT
+Content-Type: application/json
+sb-gateway-version: 1
+sb-project-ref: swyfhpgerzvvmoswkjyt
+x-sb-edge-region: sa-east-1
+x-served-by: supabase-edge-runtime
+Strict-Transport-Security: max-age=31536000; includeSubDomains; preload
+Access-Control-Allow-Origin: *
+
+{"deleted":0,"bucket":"trade-previews","updated":0}
+
+## Acceptance
+
+- [x] HTTP status: 200 ✓
+- [x] Response body matches the must_haves expected shape: `{"deleted":0,"bucket":"trade-previews","updated":0}` ✓
+- [x] sa-east-1 edge served the request (closest to BR users; Supabase handles global routing automatically)
+
+## Initial 401 with sb_publishable_* (documented as Plan 03 correction)
+
+The first attempt used the modern publishable key (`sb_publishable_*`) as Bearer
+and got 401 `UNAUTHORIZED_INVALID_JWT_FORMAT`. The Edge Function gateway with
+`verify_jwt=true` requires JWT format. Replaced the Vault entry with the legacy
+anon JWT and re-ran successfully. See evidence/06-vault-secrets.txt for details.
+
+DEP-SB-04 partial (cleanup): 200 verified.

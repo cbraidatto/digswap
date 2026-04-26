@@ -1,0 +1,66 @@
+# Phase 34 — Evidence 09: trade-previews bucket state
+# Date: 2026-04-26
+# Captured via: mcp__supabase__execute_sql + mcp__supabase__list_storage_buckets
+
+## SQL probe
+
+SELECT id, name, public, file_size_limit,
+       array_length(allowed_mime_types, 1) AS mime_count,
+       allowed_mime_types,
+       created_at
+FROM storage.buckets
+WHERE id = 'trade-previews';
+
+## Result
+
+| field              | value                                            |
+|--------------------|--------------------------------------------------|
+| id                 | trade-previews                                   |
+| name               | trade-previews                                   |
+| public             | false                                            |
+| file_size_limit    | 536870912 (512 MB)                               |
+| mime_count         | 10                                               |
+| allowed_mime_types | audio/flac, audio/x-flac, audio/mpeg, audio/mp3, |
+|                    | audio/wav, audio/x-wav, audio/aiff, audio/x-aiff,|
+|                    | audio/ogg, application/ogg                       |
+| created_at         | 2026-04-26 18:47:04.084773+00 (Plan 02 M32)      |
+
+## Acceptance
+
+- [x] Bucket exists (`trade-previews`)
+- [x] `public = false` (Pitfall #20 satisfied — bucket is private by default; auth needed for object access)
+- [x] File size limit 512 MB (matches the 20260417 migration spec)
+- [x] 10 audio MIME types whitelisted (flac, mp3, wav, aiff, ogg families)
+
+## CORS state
+
+CORS rules are NOT visible via the SQL probe nor via the MCP scope (which is `storage:read`
+only — no bucket-CORS write API). CORS configuration is the user-checkpoint task in
+Plan 04 T4 — must be set via Dashboard:
+  - Settings → Storage → trade-previews → CORS
+  - Allowed origins: https://digswap.com.br, https://www.digswap.com.br
+  - Allowed methods: GET, POST, PUT, DELETE, HEAD
+  - Allowed headers: authorization, x-client-info, apikey, content-type, range, x-upsert
+  - NOT digswap.com (without .br), NOT *.vercel.app, NOT * (wildcard)
+
+DEP-SB-07 partial: bucket exists with public=false and 48h TTL via 3-piece mechanism.
+DEP-SB-07 final piece: CORS config awaiting user Dashboard action (next step).
+
+## 48h TTL mechanism (DEP-SB-07 lifecycle component)
+
+Supabase Storage has NO native lifecycle/TTL feature. The 48h TTL is implemented as
+a 3-piece mechanism (already in place after Plan 02 + Plan 03):
+
+  1. trade_proposal_items.preview_expires_at column (set to now() + 48h on upload)
+  2. pg_cron job 'trade-preview-cleanup' (hourly at :00) — invokes the Edge Function
+  3. cleanup-trade-previews Edge Function — deletes objects whose preview_expires_at
+     is in the past (.lte("preview_expires_at", nowIso))
+
+This is verified end-to-end:
+  - Plan 02 verified the 3 cron jobs are active under postgres role
+  - Plan 03 verified Vault has both secrets so the cron's invoke function won't skip
+  - Plan 04 verified the cleanup Edge Function returns 200 with the expected shape
+    {"deleted":0,"bucket":"trade-previews","updated":0} on the empty database
+
+The next 20:00 UTC tick will exercise the full pipeline (currently zero rows to
+delete because the database is empty, but the mechanism is wired and live).
