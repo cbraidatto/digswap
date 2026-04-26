@@ -4,8 +4,13 @@ import { defineConfig, devices } from "@playwright/test";
  * Playwright E2E test configuration for DigSwap.
  *
  * Uses Chromium only for speed (solo developer workflow).
- * Starts the dev server automatically before running tests.
+ * When PLAYWRIGHT_BASE_URL is set to a remote https URL (e.g. *.vercel.app),
+ * skip the local dev server. When unset or pointing at localhost, auto-start
+ * `pnpm dev` for local development.
  */
+const BASE_URL = process.env.PLAYWRIGHT_BASE_URL ?? "http://localhost:3000";
+const isRemote = BASE_URL.startsWith("https://");
+
 export default defineConfig({
 	testDir: "tests/e2e",
 	timeout: 30_000,
@@ -19,7 +24,7 @@ export default defineConfig({
 	reporter: "html",
 
 	use: {
-		baseURL: "http://localhost:3000",
+		baseURL: BASE_URL,
 		trace: "on-first-retry",
 	},
 
@@ -30,10 +35,15 @@ export default defineConfig({
 		},
 	],
 
-	webServer: {
-		command: "pnpm dev",
-		url: "http://localhost:3000",
-		reuseExistingServer: !process.env.CI,
-		timeout: 120_000,
-	},
+	// Only auto-start dev server when targeting localhost.
+	...(isRemote
+		? {}
+		: {
+				webServer: {
+					command: "pnpm dev",
+					url: "http://localhost:3000",
+					reuseExistingServer: !process.env.CI,
+					timeout: 120_000,
+				},
+			}),
 });
