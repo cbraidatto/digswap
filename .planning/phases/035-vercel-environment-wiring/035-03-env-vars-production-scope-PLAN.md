@@ -217,7 +217,7 @@ NOTES:
     - Log contains exactly 17 lines matching pattern `^[0-9-]+T[0-9:.+]+ (OK|SKIP) [A-Z_]+ production sensitive=(true|false)` (Group A: 7 + Group B: 4 + Group C: 6)
     - Log contains zero `FAIL` entries (or if any, they were retried and have a follow-up `OK retry=N` entry within 5 lines)
     - `vercel env ls production` (after this task) lists at minimum: NEXT_PUBLIC_APP_URL, NEXT_PUBLIC_SITE_URL, NEXT_PUBLIC_SUPABASE_URL, NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY, NEXT_PUBLIC_MIN_DESKTOP_VERSION, STRIPE_SECRET_KEY, STRIPE_WEBHOOK_SECRET, DISCOGS_CONSUMER_KEY, DISCOGS_CONSUMER_SECRET, RESEND_FROM_EMAIL
-    - `vercel env ls production | grep -c '^[[:space:]]*NEXT_PUBLIC_'` returns 7 OR fewer (some empty-string keys may be skipped — that's fine; final check is in Task 4)
+    - `vercel env ls production | grep -c '^[[:space:]]*NEXT_PUBLIC_'` returns 7 (DEP-VCL-05 mandates exact-7; Task 4 audit re-verifies via `vercel env pull`)
     - Log file does NOT contain any string matching `eyJ[A-Za-z0-9_-]{20,}` (no JWT leaked)
     - Log file does NOT contain any string matching `postgres(ql)?://[^"]*:[^@\s]{8,}@` (no DB connection string with password leaked)
     - Log file does NOT contain any string matching `sk_(test|live)_[A-Za-z0-9]{20,}` (no real Stripe key — dummies don't have 20+ alphanumeric chars after the prefix)
@@ -289,4 +289,131 @@ CRITICAL invariants (must hold):
 If `vercel env add` fails mid-pipe (network error), the value is already entropy-spent. Re-run = generate a NEW value (different from the failed attempt). This is FINE — both dev and prod have separate values; no symmetry needed. Phase 35 just needs ONE 32+-char random value per secret.
   </action>
   <verify>
-    <automated>vercel env ls production 2>/dev/null | grep -qE "^[[:space:]]*HANDOFF_HMAC_SECRET[[:space:]]" &amp;&amp; vercel env ls production 2>/dev/null | grep -qE "^[[:space:]]*IMPORT_WORKER_SECRET[[:space:]]" &amp;&amp; grep -q "HANDOFF_HMAC_SECRET production sensitive=true generator=openssl" .planning/phases/035-vercel-environment-wiring/evidence/02-env-add-loop.log &amp;&amp; grep -q "IMPORT_WORKER_SECRET production sensitive=true generator=openssl" .planning/phases/035-vercel-environment-wiring/evidence/02-env-add-loop.log &amp;&amp; echo OK
+    <automated>vercel env ls production 2>/dev/null | grep -qE "^[[:space:]]*HANDOFF_HMAC_SECRET[[:space:]]" &amp;&amp; vercel env ls production 2>/dev/null | grep -qE "^[[:space:]]*IMPORT_WORKER_SECRET[[:space:]]" &amp;&amp; grep -q "HANDOFF_HMAC_SECRET production sensitive=true generator=openssl" .planning/phases/035-vercel-environment-wiring/evidence/02-env-add-loop.log &amp;&amp; grep -q "IMPORT_WORKER_SECRET production sensitive=true generator=openssl" .planning/phases/035-vercel-environment-wiring/evidence/02-env-add-loop.log &amp;&amp; echo OK</automated>
+  </verify>
+  <acceptance_criteria>
+    - `vercel env ls production` lists `HANDOFF_HMAC_SECRET` and `IMPORT_WORKER_SECRET` (both with `[sensitive]` marker)
+    - Log contains: `HANDOFF_HMAC_SECRET production sensitive=true generator=openssl_rand_hex_32` AND `IMPORT_WORKER_SECRET production sensitive=true generator=openssl_rand_hex_32`
+    - Log file does NOT contain any 64-hex-char string matching `[0-9a-f]{64}` (the generated secrets did not leak into the log)
+    - Both secrets are >=32 chars (verified later in Task 4 via `vercel env pull` length check)
+  </acceptance_criteria>
+  <done>
+    HANDOFF_HMAC_SECRET + IMPORT_WORKER_SECRET freshly generated and injected into Vercel Production scope via one-shot openssl pipe. Values never entered a shell variable, never echoed to stdout/stderr, never written to evidence files.
+  </done>
+</task>
+
+<task type="checkpoint:human-action" tdd="false">
+  <name>Task 3: USER provides DATABASE_URL (with prod DB password) + SUPABASE_SERVICE_ROLE_KEY pasted into Production scope</name>
+  <files>.planning/phases/035-vercel-environment-wiring/evidence/02-env-add-loop.log</files>
+  <read_first>
+    - .planning/phases/034-supabase-production-setup/evidence/14-database-url-template.txt (DATABASE_URL pooler format with `<DB_PASSWORD>` placeholder)
+    - .planning/phases/035-vercel-environment-wiring/035-CONTEXT.md D-05 (user-explicit deviation: secrets through Claude OK with mitigations)
+    - apps/web/src/lib/env.ts lines 10-11 (DATABASE_URL min(1), SUPABASE_SERVICE_ROLE_KEY min(1))
+  </read_first>
+  <action>
+This task is `checkpoint:human-action` because the two values must come from the user:
+
+1. **DATABASE_URL** — user composes by interpolating their Supabase prod DB password (only they have it, in their password manager) into the pooler template:
+   `postgresql://postgres.swyfhpgerzvvmoswkjyt:<DB_PASSWORD>@aws-0-us-east-1.pooler.supabase.com:6543/postgres?pgbouncer=true`
+
+2. **SUPABASE_SERVICE_ROLE_KEY** — user copies from Supabase Dashboard → Settings → API → "service_role secret" (long JWT token).
+
+User pastes both values in the Claude chat. Executor receives them as transient shell vars and runs the same `add_if_missing` helper from Task 1, scoped to these two keys with `--sensitive`. After both `vercel env add` complete, executor `unset`s the shell vars and confirms via `vercel env ls production`.
+
+CRITICAL: values NEVER echo to stdout/stderr, NEVER write to log file (only KEY + SCOPE + sensitive flag), NEVER survive the heredoc.
+  </action>
+  <checkpoint_details>
+**Awaiting user input** (paste both as plain text in chat):
+1. Full DATABASE_URL string with prod DB password substituted (template in `evidence/14`)
+2. SUPABASE_SERVICE_ROLE_KEY (service_role secret) from Supabase Dashboard for project `swyfhpgerzvvmoswkjyt`
+
+Executor confirms receipt by length only (no echo), then runs the add_if_missing helper from Task 1 for these 2 keys, then unsets transient vars.
+  </checkpoint_details>
+  <verify>
+    <automated>vercel env ls production 2>/dev/null | grep -qE "^[[:space:]]*DATABASE_URL[[:space:]]" &amp;&amp; vercel env ls production 2>/dev/null | grep -qE "^[[:space:]]*SUPABASE_SERVICE_ROLE_KEY[[:space:]]" &amp;&amp; grep -q "DATABASE_URL production sensitive=true" .planning/phases/035-vercel-environment-wiring/evidence/02-env-add-loop.log &amp;&amp; grep -q "SUPABASE_SERVICE_ROLE_KEY production sensitive=true" .planning/phases/035-vercel-environment-wiring/evidence/02-env-add-loop.log &amp;&amp; echo OK</automated>
+  </verify>
+  <acceptance_criteria>
+    - `vercel env ls production` lists `DATABASE_URL` (`[sensitive]`) AND `SUPABASE_SERVICE_ROLE_KEY` (`[sensitive]`)
+    - Log contains: `DATABASE_URL production sensitive=true` AND `SUPABASE_SERVICE_ROLE_KEY production sensitive=true`
+    - Log file does NOT contain any string matching `postgres(ql)?://[^"]*:[^@\s]{8,}@` (no DB password leak)
+    - Log file does NOT contain any string matching `eyJ[A-Za-z0-9_-]{40,}` (no service_role JWT leak)
+    - After this task, total Production-scope env vars count = 21 (Tasks 1+2+3 = 17+2+2)
+  </acceptance_criteria>
+  <done>
+    DATABASE_URL + SUPABASE_SERVICE_ROLE_KEY added to Production scope with --sensitive. All 21 prod env vars now wired. DEP-VCL-02 satisfied.
+  </done>
+</task>
+
+<task type="auto" tdd="false">
+  <name>Task 4: Production env audit (count, NEXT_PUBLIC_=7, HMAC length, Pitfall #29 diff)</name>
+  <files>.planning/phases/035-vercel-environment-wiring/evidence/03-env-pull-prod-audit.txt</files>
+  <read_first>
+    - .planning/phases/035-vercel-environment-wiring/035-RESEARCH.md §4 (env pull verify strategy)
+    - .planning/phases/035-vercel-environment-wiring/035-RESEARCH.md §14 DEP-VCL-02 + DEP-VCL-05 + DEP-VCL-06 rows
+    - apps/web/.env.local (read for dev HMAC value to do Pitfall #29 diff)
+  </read_first>
+  <action>
+Run `vercel env pull --environment=production <tmp>` to a tmpfile, then produce a sanitized audit report at `evidence/03-env-pull-prod-audit.txt`. Audit checks:
+
+- Total Production keys count (should be ≥21 for DEP-VCL-02 PASS)
+- NEXT_PUBLIC_* count (should be exactly 7 for DEP-VCL-05 PASS — Sentry intentionally excluded per D-08)
+- Key presence map for all 21 expected keys (each as `present` or `missing`)
+- HANDOFF_HMAC_SECRET length (should be ≥32 for DEP-VCL-06 PASS)
+- IMPORT_WORKER_SECRET length (should be ≥32 for DEP-VCL-06 PASS)
+- Pitfall #29 diff: prod HANDOFF_HMAC_SECRET ≠ dev value (compared against `apps/web/.env.local`)
+- Pitfall #29 diff: prod IMPORT_WORKER_SECRET ≠ dev value
+- DEFERRED_PHASE_37 marker presence in Stripe + Discogs dummies
+
+Audit emits `✓ <CHECK> PASS` or `✗ <CHECK> FAIL` per check. Tmpfile is deleted after audit completes (no `.env.production*` ever persisted in repo).
+
+Implementation pattern: same as Plan 04 Task 2 (sanitized audit pattern from RESEARCH §4) but for Production scope. Reuse the structure, swap `--environment=preview` for `--environment=production`, expand checks to include HMAC length + Pitfall #29 diff against dev.
+  </action>
+  <verify>
+    <automated>grep -q "DEP-VCL-02 PASS" .planning/phases/035-vercel-environment-wiring/evidence/03-env-pull-prod-audit.txt &amp;&amp; grep -q "DEP-VCL-05 PASS" .planning/phases/035-vercel-environment-wiring/evidence/03-env-pull-prod-audit.txt &amp;&amp; grep -q "HMAC PASS" .planning/phases/035-vercel-environment-wiring/evidence/03-env-pull-prod-audit.txt &amp;&amp; grep -q "IMPORT_WORKER PASS" .planning/phases/035-vercel-environment-wiring/evidence/03-env-pull-prod-audit.txt &amp;&amp; grep -q "PASS: prod HANDOFF_HMAC_SECRET differs from dev" .planning/phases/035-vercel-environment-wiring/evidence/03-env-pull-prod-audit.txt &amp;&amp; ! grep -qE "^.*FAIL" .planning/phases/035-vercel-environment-wiring/evidence/03-env-pull-prod-audit.txt &amp;&amp; echo OK</automated>
+  </verify>
+  <acceptance_criteria>
+    - File exists, size > 1000 bytes
+    - Contains `DEP-VCL-02 PASS` (≥21 keys total)
+    - Contains `DEP-VCL-05 PASS` (=7 NEXT_PUBLIC_* exactly — NOT "7 OR fewer")
+    - Contains `HMAC PASS` AND `IMPORT_WORKER PASS` (length checks ≥32)
+    - Contains `PASS: prod HANDOFF_HMAC_SECRET differs from dev` AND `PASS: prod IMPORT_WORKER_SECRET differs from dev`
+    - Zero `FAIL` markers
+    - Tmpfile used for env pull was deleted (no `.env.production*` files persisted in `apps/web/`)
+  </acceptance_criteria>
+  <done>
+    DEP-VCL-02, DEP-VCL-05, DEP-VCL-06 all verified passing. Pitfall #29 confirmed protected. Production scope audit complete.
+  </done>
+</task>
+
+</tasks>
+
+<verification>
+After all 4 tasks complete, verify the phase-level invariant:
+```bash
+node "$HOME/.claude/get-shit-done/bin/gsd-tools.cjs" verify key-links .planning/phases/035-vercel-environment-wiring/035-03-env-vars-production-scope-PLAN.md
+```
+to confirm key-links wiring (Vercel Production scope → Supabase prod project + openssl-fresh secrets).
+</verification>
+
+<success_criteria>
+- [ ] 21 env vars in Vercel Production scope (`vercel env ls production` count ≥ 21)
+- [ ] Exactly 7 NEXT_PUBLIC_* (DEP-VCL-05 verified in Task 4 — exact-7, not "≤7")
+- [ ] HANDOFF_HMAC_SECRET + IMPORT_WORKER_SECRET freshly generated, ≥32 chars, differ from dev (Pitfall #29 + DEP-VCL-06)
+- [ ] DATABASE_URL + SUPABASE_SERVICE_ROLE_KEY added with `--sensitive` flag (Task 3)
+- [ ] Stripe + Discogs deferred dummies use `DEFERRED_PHASE_37_*` convention (Task 1)
+- [ ] No secrets leaked to evidence/02-env-add-loop.log (only KEY + SCOPE + sensitive flag)
+- [ ] No transient shell vars survive after Tasks 2+3 (`unset` after pipe)
+</success_criteria>
+
+<output>
+After this plan completes, write `035-03-SUMMARY.md` per the standard SUMMARY template, with frontmatter `requirements_completed: [DEP-VCL-02, DEP-VCL-05, DEP-VCL-06]` and key-links pointing at the Vercel Production → Supabase prod wiring.
+</output>
+
+<halt_on_fail>
+Per RESEARCH §11:
+- Single env-var add fails (network blip) → idempotent retry; the `add_if_missing` helper handles this naturally.
+- Authentication fails ("token expired") → user regenerates `~/.vercel-token` (30-day token); re-run the affected task.
+- DATABASE_URL pasted with typo → `vercel env rm DATABASE_URL production --yes` + re-run Task 3.
+- service_role key pasted wrong → same recovery as DATABASE_URL.
+- Pitfall #29 violated (prod HMAC == dev) → catastrophic; `vercel env rm HANDOFF_HMAC_SECRET production --yes` + re-run Task 2 (fresh openssl).
+</halt_on_fail>
