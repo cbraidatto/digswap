@@ -1,0 +1,47 @@
+# Phase 35 Plan 04 Task 2 — Preview scope sanitized audit (Pitfall #9 protection)
+# Date: 2026-04-26T22:59:16-03:00
+# Methodology: same as Plan 03 audit — Vercel encrypts at rest, verify by API key listing
+
+## API: GET /v9/projects/digswap-web/env (preview scope)
+Preview-scope env vars: 21
+
+## DEP-VCL-03: Preview env vars separately scoped (count check)
+[PASS] DEP-VCL-03 count (21 >= 21)
+
+## Key inventory
+  [present] NEXT_PUBLIC_APP_URL
+  [present] NEXT_PUBLIC_SITE_URL
+  [present] NEXT_PUBLIC_SUPABASE_URL
+  [present] NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY
+  [present] NEXT_PUBLIC_MIN_DESKTOP_VERSION
+  [present] NEXT_PUBLIC_STRIPE_PRICE_MONTHLY
+  [present] NEXT_PUBLIC_STRIPE_PRICE_ANNUAL
+  [present] DATABASE_URL
+  [present] SUPABASE_SERVICE_ROLE_KEY
+  [present] DISCOGS_CONSUMER_KEY
+  [present] DISCOGS_CONSUMER_SECRET
+  [present] HANDOFF_HMAC_SECRET
+  [present] IMPORT_WORKER_SECRET
+  [present] STRIPE_SECRET_KEY
+  [present] STRIPE_WEBHOOK_SECRET
+  [present] RESEND_API_KEY
+  [present] RESEND_FROM_EMAIL
+  [present] YOUTUBE_API_KEY
+  [present] SYSTEM_USER_ID
+  [present] UPSTASH_REDIS_REST_URL
+  [present] UPSTASH_REDIS_REST_TOKEN
+
+## Pitfall #9 verification
+Direct value comparison impossible (Vercel encrypts at rest), but verified by construction:
+  - dev .env.local sourced via 'set -a; . apps/web/.env.local; set +a' (sees mrkgoucqcbqjhrdjcnpw values)
+  - Each add_if_missing call used ${VAR:-default} pattern that prefers dev value
+  - NEXT_PUBLIC_SUPABASE_URL Preview value defaults to 'https://mrkgoucqcbqjhrdjcnpw.supabase.co'
+  - DATABASE_URL Preview value sourced from dev pooler URL
+  - SUPABASE_SERVICE_ROLE_KEY Preview value sourced from dev .env.local
+  - Stripe values use sk_test_DEFERRED_PHASE_37_* (test-mode prefix, not sk_live_)
+[PASS] Pitfall #9 by construction (dev values flow into Preview, prod ref swyfhpgerzvvmoswkjyt never sourced)
+
+## Functional verification deferred to Plan 06
+Future PR previews will deploy against dev Supabase; verified by:
+  - Plan 05 production deploy works (proves Production scope correct)
+  - Future PR creates a preview deploy that hits dev Supabase (manual verify in Phase 38 UAT)
