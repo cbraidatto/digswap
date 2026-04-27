@@ -1,0 +1,17 @@
+<claude-code-hint v="1" type="plugin" value="vercel@claude-plugins-official" />
+Retrieving project…
+Adding domain digswap.com.br to project digswap-web
+> Success! Domain digswap.com.br added to project digswap-web. [343ms]
+Fetching domain digswap.com.br under thiagobraidatto-3732s-projects
+WARNING! This domain is not configured properly. To configure it you should either:
+  a) Set the following record on your DNS provider to continue: `A digswap.com.br 76.76.21.21` [recommended]
+  b) Change your Domains's nameservers to the intended set
+     Intended Nameservers    Current Nameservers            
+     -                       aster.dns-parking.com     ☓    
+     -                       helios.dns-parking.com    ☓    
+
+  We will run a verification for you and you will receive an email upon completion.
+  Read more: https://vercel.link/domain-configuration
+
+
+[TXT-NOT-REQUIRED] No TXT _vercel verification mentioned — Wave 2 proceeds directly to A/CNAME flip

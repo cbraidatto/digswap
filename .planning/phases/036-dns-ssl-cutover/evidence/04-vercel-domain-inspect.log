@@ -1,0 +1,62 @@
+<claude-code-hint v="1" type="plugin" value="vercel@claude-plugins-official" />
+Fetching Domain digswap.com.br under thiagobraidatto-3732s-projects
+> Domain digswap.com.br found under thiagobraidatto-3732s-projects [3s]
+
+  General
+
+    Name			digswap.com.br
+    Registrar			Third Party
+    Expiration Date		-
+    Creator			thiagobraidatto-3732
+    Created At			27 April 2026 12:38:44 [1m ago]
+    Edge Network		yes
+    Renewal Price		-
+
+  Nameservers
+
+    Intended Nameservers    Current Nameservers            
+    ns1.vercel-dns.com      aster.dns-parking.com     ☓    
+    ns2.vercel-dns.com      helios.dns-parking.com    ☓    
+
+WARNING! This Domain is not configured properly. To configure it you should either:
+  a) Set the following record on your DNS provider to continue: `A digswap.com.br 76.76.21.21` [recommended]
+  b) Change your Domains's nameservers to the intended set detailed above.
+
+  We will run a verification for you and you will receive an email upon completion.
+  Read more: https://vercel.link/domain-configuration
+
+
+=== www.digswap.com.br ===
+<claude-code-hint v="1" type="plugin" value="vercel@claude-plugins-official" />
+Fetching Domain www.digswap.com.br under thiagobraidatto-3732s-projects
+> Domain www.digswap.com.br found under thiagobraidatto-3732s-projects [3s]
+
+  General
+
+    Name			digswap.com.br
+    Registrar			Third Party
+    Expiration Date		-
+    Creator			thiagobraidatto-3732
+    Created At			27 April 2026 12:38:44 [1m ago]
+    Edge Network		yes
+    Renewal Price		-
+
+  Nameservers
+
+    Intended Nameservers    Current Nameservers            
+    ns1.vercel-dns.com      aster.dns-parking.com     ☓    
+    ns2.vercel-dns.com      helios.dns-parking.com    ☓    
+
+WARNING! This Domain is not configured properly. To configure it you should either:
+  a) Set the following record on your DNS provider to continue: `A www.digswap.com.br 76.76.21.21` [recommended]
+  b) Change your Domains's nameservers to the intended set detailed above.
+
+  We will run a verification for you and you will receive an email upon completion.
+  Read more: https://vercel.link/domain-configuration
+
+
+[wave-2-handoff] CNAME target Wave 2 will use: ns1.vercel-dns.com.
+[apex-ip-confirmed] 76.76.21.21 surfaced in inspect output for apex AND www — Wave 2 uses A 76.76.21.21 for apex, CNAME ns1.vercel-dns.com. for www
+
+[correction] regex initial match (ns1.vercel-dns.com) was a NAMESERVER not a CNAME target. Vercel's authoritative CNAME target for project-domain CNAMEs is the literal 'cname.vercel-dns.com.' — verified via Vercel docs https://vercel.com/docs/concepts/projects/domains/add-a-domain. Wave 2 uses CNAME www → cname.vercel-dns.com.
+[wave-2-handoff-final] CNAME target Wave 2 will use: cname.vercel-dns.com.
