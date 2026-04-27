@@ -1,0 +1,31 @@
+# Phase 35 Plan 04 Task 1 — Preview-scope env-var add log (v2 with branch arg fix)
+# Date: 2026-04-26T22:57:00-03:00
+# Note: Vercel CLI 52.x requires 3rd positional arg for Preview branch ("" = all branches)
+
+2026-04-26T22:57:00-03:00 SKIP NEXT_PUBLIC_APP_URL preview sensitive=false reason=already_present
+2026-04-26T22:57:02-03:00 OK NEXT_PUBLIC_SITE_URL preview sensitive=false
+2026-04-26T22:57:07-03:00 OK NEXT_PUBLIC_MIN_DESKTOP_VERSION preview sensitive=false
+2026-04-26T22:57:14-03:00 OK NEXT_PUBLIC_SUPABASE_URL preview sensitive=false
+2026-04-26T22:57:19-03:00 OK NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY preview sensitive=false
+2026-04-26T22:57:24-03:00 OK NEXT_PUBLIC_STRIPE_PRICE_MONTHLY preview sensitive=false
+2026-04-26T22:57:29-03:00 OK NEXT_PUBLIC_STRIPE_PRICE_ANNUAL preview sensitive=false
+2026-04-26T22:57:34-03:00 OK DATABASE_URL preview sensitive=true
+2026-04-26T22:57:38-03:00 OK SUPABASE_SERVICE_ROLE_KEY preview sensitive=true
+2026-04-26T22:57:43-03:00 OK HANDOFF_HMAC_SECRET preview sensitive=true
+2026-04-26T22:57:48-03:00 OK IMPORT_WORKER_SECRET preview sensitive=true
+2026-04-26T22:57:53-03:00 OK DISCOGS_CONSUMER_KEY preview sensitive=true
+2026-04-26T22:57:58-03:00 OK DISCOGS_CONSUMER_SECRET preview sensitive=true
+2026-04-26T22:58:03-03:00 OK STRIPE_SECRET_KEY preview sensitive=true
+2026-04-26T22:58:07-03:00 OK STRIPE_WEBHOOK_SECRET preview sensitive=true
+2026-04-26T22:58:13-03:00 OK RESEND_API_KEY preview sensitive=true
+2026-04-26T22:58:18-03:00 OK RESEND_FROM_EMAIL preview sensitive=false
+2026-04-26T22:58:23-03:00 OK YOUTUBE_API_KEY preview sensitive=true
+2026-04-26T22:58:29-03:00 OK SYSTEM_USER_ID preview sensitive=false
+2026-04-26T22:58:34-03:00 OK UPSTASH_REDIS_REST_URL preview sensitive=false
+2026-04-26T22:58:39-03:00 OK UPSTASH_REDIS_REST_TOKEN preview sensitive=true
+
+# Total Preview env vars: 21
+
+# Same fix applied to Preview scope
+2026-04-26T23:06:57-03:00 REPLACE UPSTASH_REDIS_REST_URL preview sensitive=true new_value=https_deferred_post_mvp_invalid
+2026-04-26T23:06:57-03:00 REPLACE UPSTASH_REDIS_REST_TOKEN preview sensitive=true new_value=DEFERRED_POST_MVP

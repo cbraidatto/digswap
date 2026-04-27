@@ -1,0 +1,29 @@
+# Phase 35 Plan 05 Task 4 — HSTS header check
+# Date: 2026-04-26T23:33:31-03:00
+# Target: https://digswap-web.vercel.app
+
+## curl -sI response headers
+HTTP/1.1 200 OK
+Age: 0
+Cache-Control: private, no-cache, no-store, max-age=0, must-revalidate
+Content-Security-Policy: default-src 'self'; script-src 'self' 'nonce-ZDE3ZTE3YTEtN2UyZC00YWQzLTg0MGMtZGJhMWNiMzM4ZTI4' 'strict-dynamic'; style-src 'self' 'nonce-ZDE3ZTE3YTEtN2UyZC00YWQzLTg0MGMtZGJhMWNiMzM4ZTI4' https://fonts.googleapis.com; img-src 'self' data: https://i.discogs.com https://st.discogs.com https://*.supabase.co https://i.ytimg.com; font-src 'self' https://fonts.gstatic.com https://fonts.googleapis.com; connect-src 'self' https://swyfhpgerzvvmoswkjyt.supabase.co wss://swyfhpgerzvvmoswkjyt.supabase.co; media-src 'self'; worker-src 'self'; frame-src 'self' https://www.youtube-nocookie.com https://www.youtube.com; object-src 'none'; base-uri 'self'; frame-ancestors 'none'; form-action 'self'
+Content-Type: text/html; charset=utf-8
+Date: Mon, 27 Apr 2026 02:33:30 GMT
+Link: </_next/static/media/36966cca54120369-s.p.woff2>; rel=preload; as="font"; crossorigin=""; nonce="ZDE3ZTE3YTEtN2UyZC00YWQzLTg0MGMtZGJhMWNiMzM4ZTI4"; type="font/woff2", </_next/static/media/558ca1a6aa3cb55e-s.p.woff2>; rel=preload; as="font"; crossorigin=""; nonce="ZDE3ZTE3YTEtN2UyZC00YWQzLTg0MGMtZGJhMWNiMzM4ZTI4"; type="font/woff2", </_next/static/media/e4af272ccee01ff0-s.p.woff2>; rel=preload; as="font"; crossorigin=""; nonce="ZDE3ZTE3YTEtN2UyZC00YWQzLTg0MGMtZGJhMWNiMzM4ZTI4"; type="font/woff2"
+Permissions-Policy: camera=(), microphone=(), geolocation=()
+Referrer-Policy: strict-origin-when-cross-origin
+Server: Vercel
+Strict-Transport-Security: max-age=300
+Vary: rsc, next-router-state-tree, next-router-prefetch, next-router-segment-prefetch
+X-Content-Type-Options: nosniff
+X-Dns-Prefetch-Control: on
+X-Frame-Options: DENY
+X-Matched-Path: /
+X-Nonce: ZDE3ZTE3YTEtN2UyZC00YWQzLTg0MGMtZGJhMWNiMzM4ZTI4
+X-Vercel-Cache: MISS
+X-Vercel-Enable-Rewrite-Caching: 1
+X-Vercel-Id: gru1::iad1::pjdz8-1777257209395-28252607197f
+
+
+## Strict-Transport-Security: Strict-Transport-Security: max-age=300
+[PASS] DEP-VCL-09 (max-age=300)

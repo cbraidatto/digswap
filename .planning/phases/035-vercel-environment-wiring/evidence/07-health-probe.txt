@@ -1,0 +1,8 @@
+# Phase 35 Plan 05 Task 5 — /api/health probe
+# Date: 2026-04-26T23:33:33-03:00
+# Target: https://digswap-web.vercel.app/api/health
+
+HTTP status: 000
+
+## Verdict
+[FAIL] HTTP 000

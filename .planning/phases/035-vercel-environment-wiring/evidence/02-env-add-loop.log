@@ -1,0 +1,44 @@
+# Phase 35 Plan 03 Task 1 — Production-scope env-var add log
+# Date: 2026-04-26T21:07:16-03:00
+# Format: TIMESTAMP RESULT KEY SCOPE [sensitive=true|false]
+# Values intentionally NOT logged (D-05 mitigation)
+
+2026-04-26T21:07:16-03:00 OK NEXT_PUBLIC_APP_URL production sensitive=false
+2026-04-26T21:07:22-03:00 OK NEXT_PUBLIC_SITE_URL production sensitive=false
+2026-04-26T21:07:27-03:00 OK NEXT_PUBLIC_MIN_DESKTOP_VERSION production sensitive=false
+2026-04-26T21:07:33-03:00 OK NEXT_PUBLIC_SUPABASE_URL production sensitive=false
+2026-04-26T21:07:38-03:00 OK NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY production sensitive=false
+2026-04-26T21:07:43-03:00 OK NEXT_PUBLIC_STRIPE_PRICE_MONTHLY production sensitive=false
+2026-04-26T21:07:48-03:00 OK NEXT_PUBLIC_STRIPE_PRICE_ANNUAL production sensitive=false
+2026-04-26T21:07:54-03:00 OK STRIPE_SECRET_KEY production sensitive=true
+2026-04-26T21:07:59-03:00 OK STRIPE_WEBHOOK_SECRET production sensitive=true
+2026-04-26T21:08:04-03:00 OK DISCOGS_CONSUMER_KEY production sensitive=true
+2026-04-26T21:08:10-03:00 OK DISCOGS_CONSUMER_SECRET production sensitive=true
+2026-04-26T21:08:15-03:00 OK RESEND_API_KEY production sensitive=true
+2026-04-26T21:08:21-03:00 OK RESEND_FROM_EMAIL production sensitive=false
+2026-04-26T21:08:26-03:00 OK YOUTUBE_API_KEY production sensitive=true
+2026-04-26T21:08:32-03:00 OK SYSTEM_USER_ID production sensitive=false
+2026-04-26T21:08:37-03:00 OK UPSTASH_REDIS_REST_URL production sensitive=false
+2026-04-26T21:08:42-03:00 OK UPSTASH_REDIS_REST_TOKEN production sensitive=true
+
+# Group A+B+C complete (17 vars). Tasks 2+3 add 4 more (HMAC + IMPORT_WORKER + DATABASE_URL + service_role).
+
+# Task 2: HANDOFF_HMAC_SECRET + IMPORT_WORKER_SECRET (fresh, openssl one-shot pipe)
+2026-04-26T21:09:09-03:00 OK HANDOFF_HMAC_SECRET production sensitive=true generator=openssl_rand_hex_32
+2026-04-26T21:09:14-03:00 OK IMPORT_WORKER_SECRET production sensitive=true generator=openssl_rand_hex_32
+
+# Task 3: DATABASE_URL + SUPABASE_SERVICE_ROLE_KEY (user-provided, sensitive)
+2026-04-26T22:48:15-03:00 OK DATABASE_URL production sensitive=true
+2026-04-26T22:48:21-03:00 OK SUPABASE_SERVICE_ROLE_KEY production sensitive=true
+
+# Phase 35 deploy gap-fix: UPSTASH_REDIS_REST_URL DEFERRED_POST_MVP failed Redis constructor
+# Root cause: rate-limit.ts gates on length>0 (which DEFERRED_POST_MVP passes), Redis ctor validates startsWith(https://) → throw
+# Fix: replaced URL with https://deferred-post-mvp.invalid (DNS-unresolvable but passes ctor)
+2026-04-26T23:06:57-03:00 REPLACE UPSTASH_REDIS_REST_URL production sensitive=true new_value=https_deferred_post_mvp_invalid
+2026-04-26T23:06:57-03:00 REPLACE UPSTASH_REDIS_REST_TOKEN production sensitive=true new_value=DEFERRED_POST_MVP
+
+# Phase 35 deploy gap-fix #2: DATABASE_URL pooler hostname wrong shard (aws-0 vs aws-1)
+# Found: /api/health returned 503 with database:error in production
+# Diagnosis: pooler responded 'Tenant or user not found' for aws-0-us-east-1.pooler
+# Resolution: this project's pooler tenant lives on aws-1-us-east-1 shard, not aws-0
+2026-04-26T23:40:01-03:00 REPLACE DATABASE_URL production sensitive=true new_pooler_shard=aws-1-us-east-1
