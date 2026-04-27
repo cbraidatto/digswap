@@ -1,0 +1,10 @@
+
+DEP-DNS-05 - CAA audit
+Generated: 2026-04-27T12:47:37Z
+
+[note] Resolve-DnsName CAA query did not return - assuming no CAA records: Não é possível associar o parâmetro 'Type'. Não é possível converter o valor "CAA" para o tipo "Microsoft.DnsClient.Commands.RecordType". Erro: "Não é possível corresponder o nome do identificador CAA a um nome de enumerador válido. Especifique um dos seguintes nomes de enumerador e tente novamente:
+UNKNOWN, A_AAAA, A, NS, MD, MF, CNAME, SOA, MB, MG, MR, NULL, WKS, PTR, HINFO, MINFO, MX, TXT, RP, AFSDB, X25, ISDN, RT, AAAA, SRV, DNAME, OPT, DS, RRSIG, NSEC, DNSKEY, DHCID, NSEC3, NSEC3PARAM, ANY, ALL, WINS"
+DEP-DNS-05 status: PASS (no-records-implicit)
+
+=== Cross-check via dns.google/resolve type=CAA ===
+{"Status":0,"TC":false,"RD":true,"RA":true,"AD":false,"CD":false,"Question":[{"name":"digswap.com.br.","type":257}],"Authority":[{"name":"digswap.com.br.","type":6,"TTL":600,"data":"helios.dns-parking.com. dns.hostinger.com. 2026042702 10000 2400 604800 600"}],"Comment":"Response from 2606:4700:5a::ac40:3546."}

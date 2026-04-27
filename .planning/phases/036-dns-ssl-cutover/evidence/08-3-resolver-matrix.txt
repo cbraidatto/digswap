@@ -1,0 +1,85 @@
+
+DEP-DNS-04 - 3-resolver propagation matrix
+Generated: 2026-04-27T12:47:13Z
+Expected A:     76.76.21.21
+Expected CNAME: cname.vercel-dns.com
+
+=== Resolver 1.1.1.1 - A digswap.com.br ===
+
+
+Name      : digswap.com.br
+Type      : A
+IPAddress : 76.76.21.21
+TTL       : 300
+
+
+
+
+[ok] matched expected A
+=== Resolver 1.1.1.1 - CNAME www.digswap.com.br ===
+
+
+Name     : www.digswap.com.br
+Type     : CNAME
+NameHost : cname.vercel-dns.com
+TTL      : 300
+
+
+
+
+[ok] matched expected CNAME
+
+=== Resolver 8.8.8.8 - A digswap.com.br ===
+
+
+Name      : digswap.com.br
+Type      : A
+IPAddress : 76.76.21.21
+TTL       : 300
+
+
+
+
+[ok] matched expected A
+=== Resolver 8.8.8.8 - CNAME www.digswap.com.br ===
+
+
+Name     : www.digswap.com.br
+Type     : CNAME
+NameHost : cname.vercel-dns.com
+TTL      : 300
+
+
+
+
+[ok] matched expected CNAME
+
+=== Resolver 9.9.9.9 - A digswap.com.br ===
+
+
+Name      : digswap.com.br
+Type      : A
+IPAddress : 76.76.21.21
+TTL       : 300
+
+
+
+
+[ok] matched expected A
+=== Resolver 9.9.9.9 - CNAME www.digswap.com.br ===
+
+
+Name     : www.digswap.com.br
+Type     : CNAME
+NameHost : cname.vercel-dns.com
+TTL      : 300
+
+
+
+
+[ok] matched expected CNAME
+
+
+Resolvers passing A:     3 / 3
+Resolvers passing CNAME: 3 / 3
+DEP-DNS-04 status: PASS

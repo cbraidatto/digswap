@@ -1,0 +1,145 @@
+CONNECTED(000001C4)
+---
+Certificate chain
+ 0 s:CN=www.digswap.com.br
+   i:C=US, O=Let's Encrypt, CN=R12
+   a:PKEY: RSA, 2048 (bit); sigalg: sha256WithRSAEncryption
+   v:NotBefore: Apr 27 14:49:26 2026 GMT; NotAfter: Jul 26 14:49:25 2026 GMT
+-----BEGIN CERTIFICATE-----
+MIIE/zCCA+egAwIBAgISBs7PptWhNxEpkN3OgnTTjD70MA0GCSqGSIb3DQEBCwUA
+MDMxCzAJBgNVBAYTAlVTMRYwFAYDVQQKEw1MZXQncyBFbmNyeXB0MQwwCgYDVQQD
+EwNSMTIwHhcNMjYwNDI3MTQ0OTI2WhcNMjYwNzI2MTQ0OTI1WjAdMRswGQYDVQQD
+ExJ3d3cuZGlnc3dhcC5jb20uYnIwggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEK
+AoIBAQDY4m5Ngub3Fhz1zu4M2ubOnBqJ9A0OTHrdLOa1iBAZrajv+Idyu8h5zdHj
+G7JNcV4zHjU8+CGXlYlWam6m/KfQQTUNTd2UgsWsq+ySuUi8v6xJDg+SGVr2ygQY
+23oer1iLsBVcTmeDiipQxXQVIGopkpTrd41umjxvRexnLIPfqaa2TorbjVWv3ODI
+vh6t1HrqRUzWjrJA1B6VBlYUlq7H+m3Uamn78C74MH/9RcE9i/MD6Sg28O5GgZ1b
+TJDxESw6wd9+NazOGcmrmO8fiIpGCfL1KZLKNIstXbsQLzTgeLj3Fa7IlqqITOo6
+Nzm2B6eauQ9PLldAHgAn9zhzNSwFAgMBAAGjggIhMIICHTAOBgNVHQ8BAf8EBAMC
+BaAwEwYDVR0lBAwwCgYIKwYBBQUHAwEwDAYDVR0TAQH/BAIwADAdBgNVHQ4EFgQU
+O71BT5FJaHWsWG3XVGKPWBm4QqkwHwYDVR0jBBgwFoAUALUp8i2ObzHom0yteD76
+3OkM0dIwMwYIKwYBBQUHAQEEJzAlMCMGCCsGAQUFBzAChhdodHRwOi8vcjEyLmku
+bGVuY3Iub3JnLzAdBgNVHREEFjAUghJ3d3cuZGlnc3dhcC5jb20uYnIwEwYDVR0g
+BAwwCjAIBgZngQwBAgEwLwYDVR0fBCgwJjAkoCKgIIYeaHR0cDovL3IxMi5jLmxl
+bmNyLm9yZy8xMTcuY3JsMIIBDAYKKwYBBAHWeQIEAgSB/QSB+gD4AHYA2AlVO5RP
+ev/IFhlvlE+Fq7D4/F6HVSYPFdEucrtFSxQAAAGdz6A2EwAABAMARzBFAiEAjsWY
+XZ1MQXvW1yknErt2F5DdZ80zrUnZJW684L84KX8CIFENZXWkCeUI5FBM60TaTnEq
+weDX8ap6hsvC/0PVuL+LAH4AJuNkblhpISO8ND9HJDWbN5LNJFqI2BXTkzP9mRir
+RyMAAAGdz6A18QAIAAAFAArPaOcEAwBHMEUCIQDIZwe1rYzPYVOmGVilaBsDg+bw
+eVKWyZKB15MQbuMcYAIgHz2LzgcT12CYc6nzcFYXoxuiHLRaxXBqI+V/WN7Q3bUw
+DQYJKoZIhvcNAQELBQADggEBAKs6nLcWDi9h7/lZB3P+HHwAQP1+PMxI+/9vWoOc
+dCsck11OMxF39RhSXG6U5NpkwSNqh80OaBZS2QDDzOkyd8nOsPfLQCzlEKBSvcrb
+ZTLjOoIjKzoSHrwvNh9TErifhBZ3H7QWHFmZ8+C1fjv3YyF8DVrcFwhm3VwiUVSs
+cHU0JP+qynhHySILZ22SpJCt+B3d9gOEOM1lnWdDf04IRR3SnxYyEvFkirtaF7Fq
+Rs76cO1z+PehaO3NaS/AbMWfz9LiAqlV0m2kvby1Eakfww1kDHYYJBQpS+4KlAIR
+SJZm2MoptHIy78lL9JWe71H3xBzLpg5OOWBNoH4BVIIfexc=
+-----END CERTIFICATE-----
+ 1 s:C=US, O=Let's Encrypt, CN=R12
+   i:C=US, O=Internet Security Research Group, CN=ISRG Root X1
+   a:PKEY: RSA, 2048 (bit); sigalg: sha256WithRSAEncryption
+   v:NotBefore: Mar 13 00:00:00 2024 GMT; NotAfter: Mar 12 23:59:59 2027 GMT
+-----BEGIN CERTIFICATE-----
+MIIFBjCCAu6gAwIBAgIRAMISMktwqbSRcdxA9+KFJjwwDQYJKoZIhvcNAQELBQAw
+TzELMAkGA1UEBhMCVVMxKTAnBgNVBAoTIEludGVybmV0IFNlY3VyaXR5IFJlc2Vh
+cmNoIEdyb3VwMRUwEwYDVQQDEwxJU1JHIFJvb3QgWDEwHhcNMjQwMzEzMDAwMDAw
+WhcNMjcwMzEyMjM1OTU5WjAzMQswCQYDVQQGEwJVUzEWMBQGA1UEChMNTGV0J3Mg
+RW5jcnlwdDEMMAoGA1UEAxMDUjEyMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIB
+CgKCAQEA2pgodK2+lP474B7i5Ut1qywSf+2nAzJ+Npfs6DGPpRONC5kuHs0BUT1M
+5ShuCVUxqqUiXXL0LQfCTUA83wEjuXg39RplMjTmhnGdBO+ECFu9AhqZ66YBAJpz
+kG2Pogeg0JfT2kVhgTU9FPnEwF9q3AuWGrCf4yrqvSrWmMebcas7dA8827JgvlpL
+Thjp2ypzXIlhZZ7+7Tymy05v5J75AEaz/xlNKmOzjmbGGIVwx1Blbzt05UiDDwhY
+XS0jnV6j/ujbAKHS9OMZTfLuevYnnuXNnC2i8n+cF63vEzc50bTILEHWhsDp7CH4
+WRt/uTp8n1wBnWIEwii9Cq08yhDsGwIDAQABo4H4MIH1MA4GA1UdDwEB/wQEAwIB
+hjAdBgNVHSUEFjAUBggrBgEFBQcDAgYIKwYBBQUHAwEwEgYDVR0TAQH/BAgwBgEB
+/wIBADAdBgNVHQ4EFgQUALUp8i2ObzHom0yteD763OkM0dIwHwYDVR0jBBgwFoAU
+ebRZ5nu25eQBc4AIiMgaWPbpm24wMgYIKwYBBQUHAQEEJjAkMCIGCCsGAQUFBzAC
+hhZodHRwOi8veDEuaS5sZW5jci5vcmcvMBMGA1UdIAQMMAowCAYGZ4EMAQIBMCcG
+A1UdHwQgMB4wHKAaoBiGFmh0dHA6Ly94MS5jLmxlbmNyLm9yZy8wDQYJKoZIhvcN
+AQELBQADggIBAI910AnPanZIZTKS3rVEyIV29BWEjAK/duuz8eL5boSoVpHhkkv3
+4eoAeEiPdZLj5EZ7G2ArIK+gzhTlRQ1q4FKGpPPaFBSpqV/xbUb5UlAXQOnkHn3m
+FVj+qYv87/WeY+Bm4sN3Ox8BhyaU7UAQ3LeZ7N1X01xxQe4wIAAE3JVLUCiHmZL+
+qoCUtgYIFPgcg350QMUIWgxPXNGEncT921ne7nluI02V8pLUmClqXOsCwULw+PVO
+ZCB7qOMxxMBoCUeL2Ll4oMpOSr5pJCpLN3tRA2s6P1KLs9TSrVhOk+7LX28NMUlI
+usQ/nxLJID0RhAeFtPjyOCOscQBA53+NRjSCak7P4A5jX7ppmkcJECL+S0i3kXVU
+y5Me5BbrU8973jZNv/ax6+ZK6TM8jWmimL6of6OrX7ZU6E2WqazzsFrLG3o2kySb
+zlhSgJ81Cl4tv3SbYiYXnJExKQvzf83DYotox3f0fwv7xln1A2ZLplCb0O+l/AK0
+YE0DS2FPxSAHi0iwMfW2nNHJrXcY3LLHD77gRgje4Eveubi2xxa+Nmk/hmhLdIET
+iVDFanoCrMVIpQ59XWHkzdFmoHXHBV7oibVjGSO7ULSQ7MJ1Nz51phuDJSgAIU7A
+0zrLnOrAj/dfrlEWRhCvAgbuwLZX1A2sjNjXoPOHbsPiy+lO1KF8/XY7
+-----END CERTIFICATE-----
+---
+Server certificate
+subject=CN=www.digswap.com.br
+issuer=C=US, O=Let's Encrypt, CN=R12
+---
+No client certificate CA names sent
+Peer signing digest: SHA256
+Peer signature type: rsa_pss_rsae_sha256
+Negotiated TLS1.3 group: X25519MLKEM768
+---
+SSL handshake has read 4210 bytes and written 1622 bytes
+Verification: OK
+---
+New, TLSv1.3, Cipher is TLS_AES_128_GCM_SHA256
+Protocol: TLSv1.3
+Server public key is 2048 bit
+This TLS version forbids renegotiation.
+Compression: NONE
+Expansion: NONE
+No ALPN negotiated
+Early data was not sent
+Verify return code: 0 (ok)
+---
+---
+Post-Handshake New Session Ticket arrived:
+SSL-Session:
+    Protocol  : TLSv1.3
+    Cipher    : TLS_AES_128_GCM_SHA256
+    Session-ID: 32FD9B7DD9B47962C4820E14B703BBA7164ADEF650181C8C985F7E0AB32AE90A
+    Session-ID-ctx: 
+    Resumption PSK: 1988B267196E66CA1C45E20C962D2417287A4D579E2B4A52B9EFEABB90A3E1C5
+    PSK identity: None
+    PSK identity hint: None
+    SRP username: None
+    TLS session ticket lifetime hint: 604800 (seconds)
+    TLS session ticket:
+    0000 - 14 c5 d4 d7 24 bc 9e e5-b7 c1 06 5c ff 10 29 a4   ....$......\..).
+    0010 - 46 a7 32 a9 3b 28 d0 d6-95 13 b7 aa 03 b0 6f cf   F.2.;(........o.
+    0020 - e5 b2 6b 5e f2 ba 31 60-27 db 42 a3 f9 ad b7 fd   ..k^..1`'.B.....
+    0030 - 6b 27 6f b3 ac 1d 79 b7-be 79 4c 0b 03 f9 e4 8b   k'o...y..yL.....
+    0040 - d5 44 ad 90 81 58 2b b9-39 40 cf d0 73 98 8e 48   .D...X+.9@..s..H
+    0050 - 43 9d f1 c9 af 8b 2b 81-46 70 ee 2b 5e 19 be 2a   C.....+.Fp.+^..*
+    0060 - b5 c8 fe 41 6d 25 44 4a-bb                        ...Am%DJ.
+
+    Start Time: 1777306428
+    Timeout   : 7200 (sec)
+    Verify return code: 0 (ok)
+    Extended master secret: no
+    Max Early Data: 0
+---
+read R BLOCK
+
+=== www verdict ===
+Generated: 2026-04-27T16:14:10Z
+Status: PASS - www has its own valid Let's Encrypt cert (separate from apex)
+
+Cert: CN=www.digswap.com.br, issuer=Let's Encrypt R12, Verification: OK
+
+=== HTTP redirect functional check ===
+HTTP/1.1 308 Permanent Redirect
+Cache-Control: public, max-age=0, must-revalidate
+Content-Type: text/plain
+Date: Mon, 27 Apr 2026 16:14:10 GMT
+Location: https://digswap.com.br/
+Refresh: 0;url=https://digswap.com.br/
+Server: Vercel
+Strict-Transport-Security: max-age=63072000
+X-Vercel-Id: gru1::xg2mn-1777306450215-da3e9018af7f
+
+
+[ok] D-07 verified live: HTTP/1.1 308 Permanent Redirect, Location: https://digswap.com.br/
+
+[note] www serves HSTS=63072000 (2yr) at Vercel platform layer vs apex=300 (D-18).
+       This is benign — 308 redirect lands users on apex which honors D-18.
+       www HSTS is Vercel auto-redirect default; cannot be lowered without losing platform redirect.
+       Acceptable per CONTEXT D-07 mental model: www is purely a redirect target, never user-facing content.
