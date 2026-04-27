@@ -1,8 +1,12 @@
-# Phase 35 Plan 05 Task 5 — /api/health probe
-# Date: 2026-04-26T23:33:33-03:00
+# Phase 35 Plan 05 Task 5 — /api/health probe (after DATABASE_URL pooler fix)
+# Date: 2026-04-26T23:43:42-03:00
 # Target: https://digswap-web.vercel.app/api/health
 
-HTTP status: 000
-
+## curl response
+HTTP status: 200
+Body:
+{"status":"healthy","checks":{"database":"ok"},"timestamp":"2026-04-27T02:43:41.064Z"}
 ## Verdict
-[FAIL] HTTP 000
+[PASS] /api/health returns 200 + status:healthy
+[PASS] DB connectivity verified (database:ok)
+[PASS] DEP-VCL-10 PARTIAL (Plan 06 adds Playwright suite)
