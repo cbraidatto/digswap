@@ -127,6 +127,21 @@ Feed and Profile have equal weight — both are primary entry points. Feed-first
 - [DEFERRED-Phase-38] Post-build secret grep on `.next/static/` (DEP-VCL-04) — Vercel CLI 52.x encrypts artifacts at rest; needs local `vercel pull && vercel build` orchestration
 - [DEFERRED-post-MVP] Vercel Pro upgrade (DEP-VCL-07) — Free-tier launch (CONTEXT.md D-03); trigger = first paying user
 
+**Phase 36: DNS + SSL Cutover** *(2026-04-27)*
+- [x] Production live on `https://digswap.com.br` — apex A `@` → `76.76.21.21` (Vercel) ttl=300 (DEP-DNS-01)
+- [x] www subdomain on `https://www.digswap.com.br` — CNAME → `cname.vercel-dns.com.` ttl=300 (DEP-DNS-02)
+- [x] Let's Encrypt R12 cert valid on apex AND www (separate certs, both auto-renewed by Vercel; ~30min ACME issuance window from DNS flip per RESEARCH §"Vercel ACME Timing Reality") (DEP-DNS-03)
+- [x] DNS propagation confirmed from 4 independent networks: 1.1.1.1 (Cloudflare) + 8.8.8.8 (Google) + 9.9.9.9 (Quad9) + dns.google HTTP API — D-14 strengthening of ROADMAP "2+" floor (DEP-DNS-04)
+- [x] CAA records audited via Google HTTP DNS — none exist on the zone, default-allow per RFC 8659 → Let's Encrypt unblocked (DEP-DNS-05)
+- [x] TTLs at 300s on cutover records — drives ~5min rollback window (DEP-DNS-06)
+- [x] www → apex 308 permanent redirect configured at Vercel project layer (D-07 verified live via `curl -sI`)
+- [x] HSTS=300 launch-window honored on apex (D-18; bump to 31536000 deferred to Phase 38 + 1w soak)
+- [x] /api/health 200 + database:ok on the new URL; Playwright anon suite IDENTICAL to Phase 35 baseline (16 PASS + 19 SKIP + 5 test-debt FAIL — zero regression from cutover)
+- [x] 1-hour soak: 5/5 probes 200 (D-13)
+- [N/A by D-04] DEP-DNS-07 (preserve MX) — no MX records existed at cutover time (email not yet configured); Phase 37 owns Resend MX/SPF/DKIM/DMARC
+- [DEFERRED] Public announce gate per CONTEXT D-11 — site stays invite-only until Phase 38 UAT clean
+- Path deviations logged: 6 (Vercel CLI single-arg, CNAME target fallback, TTL pre-lower no-op, PowerShell CAA enum gap, dig→nslookup substitution, aggregator grep case-sensitivity)
+
 ### Active
 
 **Discovery & Matching**
@@ -225,7 +240,7 @@ Feed and Profile have equal weight — both are primary entry points. Feed-first
 
 This document evolves at phase transitions and milestone boundaries.
 
-*Last updated: 2026-04-26 — Phase 35 (Vercel + Environment Wiring) complete; production deploy LIVE on https://digswap-web.vercel.app with /api/health 200 + database:ok; Phase 36 (DNS + SSL Cutover) and Phase 39 (Monitoring, parallel track) unblocked*
+*Last updated: 2026-04-27 — Phase 36 (DNS + SSL Cutover) complete; production live on https://digswap.com.br with valid Let's Encrypt R12 cert (apex + www), www→apex 308, HSTS=300 launch-window, 1h soak 5/5 200; Phase 37 (External Integrations — Stripe/OAuth/Resend) and Phase 39 (Monitoring, parallel track) unblocked. Site is in invite-only mode per CONTEXT D-11 until Phase 38 UAT clean.*
 
 **After each phase transition** (via `/gsd:transition`):
 1. Requirements invalidated? → Move to Out of Scope with reason
