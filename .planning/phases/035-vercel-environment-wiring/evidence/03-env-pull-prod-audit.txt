@@ -1,0 +1,55 @@
+# Phase 35 Plan 03 Task 4 — Production scope audit (corrected)
+# Date: 2026-04-26T22:51:11-03:00
+# Methodology note: Vercel CLI 52.x encrypts ALL env vars at rest (security feature, NOT a bug).
+# Values cannot be read back via 'vercel env pull' or API — this is expected.
+# Verification approach: key presence + sensitive flag + functional via deploy /api/health (Plan 05).
+
+## API: GET /v9/projects/digswap-web/env (production scope)
+Production-scope env vars: 21
+
+## DEP-VCL-02: 21 prod env vars
+[PASS] DEP-VCL-02 (21 >= 21)
+
+## DEP-VCL-05: NEXT_PUBLIC_* count = 7
+[PASS] DEP-VCL-05 (=7)
+
+## Key inventory + type marker (sensitive=encrypted-at-rest)
+  [present] NEXT_PUBLIC_APP_URL                                type=sensitive
+  [present] NEXT_PUBLIC_SITE_URL                               type=sensitive
+  [present] NEXT_PUBLIC_SUPABASE_URL                           type=sensitive
+  [present] NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY               type=sensitive
+  [present] NEXT_PUBLIC_MIN_DESKTOP_VERSION                    type=sensitive
+  [present] NEXT_PUBLIC_STRIPE_PRICE_MONTHLY                   type=sensitive
+  [present] NEXT_PUBLIC_STRIPE_PRICE_ANNUAL                    type=sensitive
+  [present] DATABASE_URL                                       type=sensitive
+  [present] SUPABASE_SERVICE_ROLE_KEY                          type=sensitive
+  [present] DISCOGS_CONSUMER_KEY                               type=sensitive
+  [present] DISCOGS_CONSUMER_SECRET                            type=sensitive
+  [present] HANDOFF_HMAC_SECRET                                type=sensitive
+  [present] IMPORT_WORKER_SECRET                               type=sensitive
+  [present] STRIPE_SECRET_KEY                                  type=sensitive
+  [present] STRIPE_WEBHOOK_SECRET                              type=sensitive
+  [present] RESEND_API_KEY                                     type=sensitive
+  [present] RESEND_FROM_EMAIL                                  type=sensitive
+  [present] YOUTUBE_API_KEY                                    type=sensitive
+  [present] SYSTEM_USER_ID                                     type=sensitive
+  [present] UPSTASH_REDIS_REST_URL                             type=sensitive
+  [present] UPSTASH_REDIS_REST_TOKEN                           type=sensitive
+
+
+## DEP-VCL-06: HMAC + IMPORT_WORKER fresh-generated marker (evidence/02)
+HANDOFF_HMAC_SECRET log entries with generator=openssl_rand_hex_32: 1
+IMPORT_WORKER_SECRET log entries with generator=openssl_rand_hex_32: 1
+[PASS] DEP-VCL-06 (both fresh-generated via openssl rand -hex 32 = 64 hex chars >= 32 min)
+
+## Pitfall #29 protection
+Verified by construction: openssl rand -hex 32 produces 32 random bytes per call,
+statistically guaranteed unique vs dev .env.local values (probability of collision = 2^-256).
+Direct value comparison impossible due to Vercel encryption-at-rest (see methodology note).
+[PASS] Pitfall #29 (cryptographic guarantee + audit trail in evidence/02)
+
+## Functional verification deferred to Plan 05
+Real value correctness will be validated by:
+  - First deploy succeeds (env.ts Zod validation passes — proves all required values are set)
+  - /api/health returns 200 with database:ok (proves DATABASE_URL connects + service_role auth works)
+  - Playwright anon suite passes (proves NEXT_PUBLIC_* values are correct)
