@@ -4,12 +4,12 @@ milestone: v1.1
 milestone_name: Deploy Readiness
 status: executing
 stopped_at: Phase 35 context gathered (7 gray areas resolved, Vercel ecosystem online)
-last_updated: "2026-04-26T20:42:07.398Z"
-last_activity: 2026-04-26
+last_updated: "2026-04-26T23:03:21.805Z"
+last_activity: 2026-04-26 -- Phase 035 execution started
 progress:
   total_phases: 36
   completed_phases: 33
-  total_plans: 138
+  total_plans: 144
   completed_plans: 137
   percent: 0
 ---
@@ -21,14 +21,14 @@ progress:
 See: .planning/PROJECT.md (updated 2026-04-06)
 
 **Core value:** A digger opens the app and immediately finds who has the record they've been hunting -- and sees where they stand in the community.
-**Current focus:** Phase 034 — Supabase Production Setup
+**Current focus:** Phase 035 — Vercel + Environment Wiring
 
 ## Current Position
 
-Phase: 034
-Plan: Not started
-Status: Executing Phase 034
-Last activity: 2026-04-26
+Phase: 035 (Vercel + Environment Wiring) — EXECUTING
+Plan: 1 of 6
+Status: Executing Phase 035
+Last activity: 2026-04-26 -- Phase 035 execution started
 
 Progress: [░░░░░░░░░░] 0%
 

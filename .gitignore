@@ -97,3 +97,11 @@ tmp/
 # Phase 33 DEP-AUD-07 — ensure dev-review artifacts + smoke fixtures stay out of git
 .codex-run/
 tmp-phase*-smoke.json
+
+.vercel
+
+# Vercel agent skills + plugins (local tooling, not in repo)
+.agents/
+.claude/skills/
+skills-lock.json
+
