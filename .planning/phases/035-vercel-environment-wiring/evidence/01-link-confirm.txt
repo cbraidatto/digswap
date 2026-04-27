@@ -1,0 +1,33 @@
+# Phase 35 Plan 02 — vercel link + project state
+# Date: 2026-04-26T21:04:12-03:00
+
+## vercel whoami
+<claude-code-hint v="1" type="plugin" value="vercel@claude-plugins-official" />
+thiagobraidatto-3732
+
+## vercel link --repo --yes --project digswap-web
+<claude-code-hint v="1" type="plugin" value="vercel@claude-plugins-official" />
+WARNING! The `--repo` flag is in alpha, please report issues
+Loading scopes…
+Fetching Projects for https://github.com/cbraidatto/digswap.git under thiagobraidatto-3732s-projects…
+> Found 1 Project linked to https://github.com/cbraidatto/digswap.git under thiagobraidatto-3732s-projects
+> Detected 1 new Project that may be created.
+Linked to 1 Project under thiagobraidatto-3732s-projects (created .vercel and added it to .gitignore)
+
+## .vercel/repo.json contents
+{
+  "remoteName": "origin",
+  "projects": [
+    {
+      "id": "prj_PK0FvmB3CI0kgEHlPPljuUfjIyzY",
+      "name": "digswap-web",
+      "directory": "apps/web",
+      "orgId": "team_WuQK7GkPndJ2xH9YKvZTMtB3"
+    }
+  ]
+}
+
+## vercel projects ls (digswap-web row)
+> Projects found under thiagobraidatto-3732s-projects  [843ms]
+  Project Name   Latest Production URL   Updated   Node Version   
+  digswap-web    --                      51s       20.x           

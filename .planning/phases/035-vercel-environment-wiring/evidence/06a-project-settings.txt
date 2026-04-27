@@ -1,0 +1,30 @@
+# Phase 35 Plan 02 Task 3 — Project Settings verification
+# Date: 2026-04-26T21:04:53-03:00
+
+## API response: GET /v9/projects/digswap-web
+name: digswap-web
+id: prj_PK0FvmB3CI0kgEHlPPljuUfjIyzY
+accountId: team_WuQK7GkPndJ2xH9YKvZTMtB3
+framework: nextjs
+rootDirectory: apps/web
+buildCommand: pnpm --filter @digswap/web build
+installCommand: pnpm install --frozen-lockfile
+nodeVersion: 20.x
+git.type: github
+git.repo: digswap
+git.repoOwnerName: cbraidatto
+git.productionBranch: main
+createdAt: 1777247855294
+
+## Acceptance check (D-01/D-02/D-04 + DEP-VCL-01/08)
+  [PASS] name == digswap-web (D-01)
+  [PASS] accountId == team_WuQK7GkPndJ2xH9YKvZTMtB3 (D-02)
+  [PASS] framework == nextjs (DEP-VCL-01)
+  [PASS] rootDirectory == apps/web (D-01)
+  [PASS] buildCommand override (D-01)
+  [PASS] installCommand override (D-01)
+  [PASS] nodeVersion == 20.x (D-04, DEP-VCL-08)
+  [PASS] git.type == github (DEP-VCL-01)
+  [PASS] git.productionBranch == main (D-01)
+
+Pass rate: 9/9
