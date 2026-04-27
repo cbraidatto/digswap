@@ -1,0 +1,9 @@
+DEP-DNS-06 verification - ttl=300 on changed records
+Source: evidence/07b-post-flip-zone.json
+
+[ok]     CNAME www ttl=300 content=['cname.vercel-dns.com.']
+[ok]     A @ ttl=300 content=['76.76.21.21']
+
+PASS records: 2
+FAIL records: 0
+DEP-DNS-06 status: PASS

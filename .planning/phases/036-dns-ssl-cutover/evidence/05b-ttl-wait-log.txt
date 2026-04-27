@@ -1,0 +1,5 @@
+TTL pre-lower skipped
+Date: 2026-04-27T15:43:57Z
+MAX_OLD_TTL_SECONDS=300
+Wait window: 0s (skip)
+Reasoning: pre-cutover zone had max ttl=300 (www CNAME) and ttl=50 (apex A) — already low enough that resolvers will refresh new records within ~5min.

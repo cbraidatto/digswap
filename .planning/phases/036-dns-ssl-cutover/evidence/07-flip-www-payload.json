@@ -1,0 +1,13 @@
+{
+  "overwrite": true,
+  "zone": [
+    {
+      "name": "www",
+      "type": "CNAME",
+      "ttl": 300,
+      "records": [
+        { "content": "cname.vercel-dns.com." }
+      ]
+    }
+  ]
+}

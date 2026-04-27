@@ -1,0 +1,13 @@
+{
+  "overwrite": true,
+  "zone": [
+    {
+      "name": "@",
+      "type": "A",
+      "ttl": 300,
+      "records": [
+        { "content": "76.76.21.21" }
+      ]
+    }
+  ]
+}

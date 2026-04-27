@@ -1,0 +1,1 @@
+[{"name":"www","records":[{"content":"cname.vercel-dns.com.","is_disabled":false}],"ttl":300,"type":"CNAME"},{"name":"@","records":[{"content":"76.76.21.21","is_disabled":false}],"ttl":300,"type":"A"}]
