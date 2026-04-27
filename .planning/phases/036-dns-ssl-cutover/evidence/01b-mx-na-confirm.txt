@@ -1,0 +1,9 @@
+DEP-DNS-07 - MX records preserved
+Date: 2026-04-27T15:35:39Z
+Source: evidence/01-pre-cutover-zone.json
+MX entries found: 0
+
+Status: N/A by construction
+Reasoning (per CONTEXT.md D-04): Email is not configured on digswap.com.br at cutover time.
+  Phase 37 owns Resend MX/SPF/DKIM/DMARC. With zero MX entries to preserve, DEP-DNS-07 is satisfied vacuously.
+  The Wave 2 PUT must NOT introduce MX records.

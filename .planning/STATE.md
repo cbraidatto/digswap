@@ -4,12 +4,12 @@ milestone: v1.1
 milestone_name: Deploy Readiness
 status: executing
 stopped_at: Phase 36 context gathered (19 decisions, 4 areas + Hostinger API research scoped)
-last_updated: "2026-04-27T03:24:05.689Z"
-last_activity: 2026-04-27
+last_updated: "2026-04-27T15:14:39.519Z"
+last_activity: 2026-04-27 -- Phase 036 execution started
 progress:
   total_phases: 37
   completed_phases: 34
-  total_plans: 144
+  total_plans: 149
   completed_plans: 144
   percent: 0
 ---
@@ -21,14 +21,14 @@ progress:
 See: .planning/PROJECT.md (updated 2026-04-06)
 
 **Core value:** A digger opens the app and immediately finds who has the record they've been hunting -- and sees where they stand in the community.
-**Current focus:** Phase 035 — Vercel + Environment Wiring
+**Current focus:** Phase 036 — DNS + SSL Cutover
 
 ## Current Position
 
-Phase: 035
-Plan: Not started
-Status: Executing Phase 035
-Last activity: 2026-04-27
+Phase: 036 (DNS + SSL Cutover) — EXECUTING
+Plan: 1 of 5
+Status: Executing Phase 036
+Last activity: 2026-04-27 -- Phase 036 execution started
 
 Progress: [░░░░░░░░░░] 0%
 

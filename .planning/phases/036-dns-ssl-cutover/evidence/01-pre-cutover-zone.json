@@ -1,0 +1,1 @@
+[{"name":"www","records":[{"content":"digswap.com.br.","is_disabled":false}],"ttl":300,"type":"CNAME"},{"name":"@","records":[{"content":"2.57.91.91","is_disabled":false}],"ttl":50,"type":"A"}]
