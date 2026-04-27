@@ -1,0 +1,10 @@
+<claude-code-hint v="1" type="plugin" value="vercel@claude-plugins-official" />
+Retrieving project…
+WARNING! NEXT_PUBLIC_ variables can be seen by anyone visiting your site
+Retrieving project…
+> Removed trailing newline from stdin input
+Saving
+Added Environment Variable NEXT_PUBLIC_BILLING_ENABLED to Project digswap-web [263ms]
+Common next commands:
+- `vercel env ls`
+- `vercel env pull`

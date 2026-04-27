@@ -52,6 +52,7 @@ const publicSchema = z.object({
 	NEXT_PUBLIC_STRIPE_PRICE_ANNUAL: z.string().optional().default(""),
 	NEXT_PUBLIC_SENTRY_DSN: z.string().optional().default(""),
 	NEXT_PUBLIC_MIN_DESKTOP_VERSION: z.string().optional().default("0.2.0"),
+	NEXT_PUBLIC_BILLING_ENABLED: z.string().optional().default("false"),
 });
 
 function validateEnv() {
@@ -78,6 +79,7 @@ function validatePublicEnv() {
 		NEXT_PUBLIC_STRIPE_PRICE_MONTHLY: process.env.NEXT_PUBLIC_STRIPE_PRICE_MONTHLY,
 		NEXT_PUBLIC_STRIPE_PRICE_ANNUAL: process.env.NEXT_PUBLIC_STRIPE_PRICE_ANNUAL,
 		NEXT_PUBLIC_MIN_DESKTOP_VERSION: process.env.NEXT_PUBLIC_MIN_DESKTOP_VERSION,
+		NEXT_PUBLIC_BILLING_ENABLED: process.env.NEXT_PUBLIC_BILLING_ENABLED,
 	});
 	if (!result.success) {
 		const missing = result.error.issues
