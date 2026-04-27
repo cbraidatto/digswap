@@ -115,6 +115,18 @@ Feed and Profile have equal weight — both are primary entry points. Feed-first
 - [DEFERRED] Supabase Pro tier + auto-pause off (DEP-SB-08) — Free-tier launch (CONTEXT.md D-03)
 - [DEFERRED] PITR + rehearsed restore (DEP-SB-09) — Free-tier launch (CONTEXT.md D-05)
 
+**Phase 35: Vercel + Environment Wiring** *(2026-04-26)*
+- [x] Vercel project `digswap-web` (`prj_PK0FvmB3CI0kgEHlPPljuUfjIyzY`) created, GitHub `cbraidatto/digswap` linked, production branch=main, Node 20.x, framework=nextjs, Root Directory `apps/web` (DEP-VCL-01 + DEP-VCL-08)
+- [x] 21 env vars in Production scope (real prod Supabase URL/keys + DATABASE_URL pooler shard `aws-1-us-east-1` + DEFERRED_PHASE_37 placeholders for Stripe/Discogs/Resend + DEFERRED_POST_MVP for YouTube/Upstash) (DEP-VCL-02)
+- [x] 21 env vars in Preview scope sourced from dev `.env.local` — Pitfall #9 (preview-to-prod bleed) prevented by construction (DEP-VCL-03)
+- [x] Exactly 7 NEXT_PUBLIC_* keys (Sentry intentionally excluded per D-08; Phase 39 owns) (DEP-VCL-05)
+- [x] HANDOFF_HMAC_SECRET + IMPORT_WORKER_SECRET freshly generated via `openssl rand -hex 32 | vercel env add ... --sensitive` one-shot pipe (Pitfall #29) (DEP-VCL-06)
+- [x] HSTS reduced to `max-age=300` for launch window (D-18 trigger to bump to 31536000 = Phase 38 + 1-week soak) (DEP-VCL-09)
+- [x] First production deploy READY on `https://digswap-web.vercel.app` (commit `7ea20b7` via GitHub auto-deploy after 3 ERROR attempts: UPSTASH placeholder URL fix + secret-scan unblock + DATABASE_URL pooler shard correction) — `/api/health` returns `{"status":"healthy","checks":{"database":"ok"}}` (DEP-VCL-10)
+- [x] Playwright anon smoke 16/16 PASS against `*.vercel.app` (5 pre-existing test-debt failures classified, NOT deploy regressions) (DEP-VCL-10)
+- [DEFERRED-Phase-38] Post-build secret grep on `.next/static/` (DEP-VCL-04) — Vercel CLI 52.x encrypts artifacts at rest; needs local `vercel pull && vercel build` orchestration
+- [DEFERRED-post-MVP] Vercel Pro upgrade (DEP-VCL-07) — Free-tier launch (CONTEXT.md D-03); trigger = first paying user
+
 ### Active
 
 **Discovery & Matching**
@@ -213,7 +225,7 @@ Feed and Profile have equal weight — both are primary entry points. Feed-first
 
 This document evolves at phase transitions and milestone boundaries.
 
-*Last updated: 2026-04-23 — Phase 33.1 (Audit Gate Closure) complete; Phase 33 audit gate flips AMBER → GREEN; Phase 34 (Supabase Production Setup) unblocked*
+*Last updated: 2026-04-26 — Phase 35 (Vercel + Environment Wiring) complete; production deploy LIVE on https://digswap-web.vercel.app with /api/health 200 + database:ok; Phase 36 (DNS + SSL Cutover) and Phase 39 (Monitoring, parallel track) unblocked*
 
 **After each phase transition** (via `/gsd:transition`):
 1. Requirements invalidated? → Move to Out of Scope with reason
