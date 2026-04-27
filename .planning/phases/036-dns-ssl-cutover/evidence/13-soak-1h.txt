@@ -1,0 +1,39 @@
+1-hour soak — D-13
+Started: 2026-04-27T16:15:53Z
+Plan: 5 probes at 12-min intervals
+
+=== probe #1 — 2026-04-27T16:15:53Z ===
+{"status":"healthy","checks":{"database":"ok"},"timestamp":"2026-04-27T16:15:52.738Z"}
+HTTP_CODE:200
+TIME_TOTAL:0.326375s
+
+[ok] probe #1 200
+=== probe #2 — 2026-04-27T16:27:53Z ===
+{"status":"healthy","checks":{"database":"ok"},"timestamp":"2026-04-27T16:27:54.800Z"}
+HTTP_CODE:200
+TIME_TOTAL:1.767578s
+
+[ok] probe #2 200
+=== probe #3 — 2026-04-27T16:39:55Z ===
+{"status":"healthy","checks":{"database":"ok"},"timestamp":"2026-04-27T16:39:56.547Z"}
+HTTP_CODE:200
+TIME_TOTAL:1.469820s
+
+[ok] probe #3 200
+=== probe #4 — 2026-04-27T16:51:57Z ===
+{"status":"healthy","checks":{"database":"ok"},"timestamp":"2026-04-27T16:51:59.482Z"}
+HTTP_CODE:200
+TIME_TOTAL:2.682627s
+
+[ok] probe #4 200
+=== probe #5 — 2026-04-27T17:04:00Z ===
+{"status":"healthy","checks":{"database":"ok"},"timestamp":"2026-04-27T17:04:02.217Z"}
+HTTP_CODE:200
+TIME_TOTAL:2.534293s
+
+[ok] probe #5 200
+
+=== verdict ===
+Completed: 2026-04-27T17:04:03Z
+Failures: 0 / 5
+Status: PASS

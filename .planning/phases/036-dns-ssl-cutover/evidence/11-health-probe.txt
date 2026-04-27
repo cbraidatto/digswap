@@ -1,0 +1,33 @@
+/api/health probe — D-16 layer 1
+Generated: 2026-04-27T16:15:37Z
+
+=== curl -fsS https://digswap.com.br/api/health ===
+{"status":"healthy","checks":{"database":"ok"},"timestamp":"2026-04-27T16:15:38.262Z"}
+HTTP_CODE:200
+TIME_TOTAL:1.644406s
+
+=== curl -sI (headers only) ===
+HTTP/1.1 200 OK
+Age: 0
+Cache-Control: public, max-age=0, must-revalidate
+Content-Security-Policy: default-src 'self'; script-src 'self' 'nonce-NTgzMWVkOTEtYWM1Yi00YjE5LWFkNWYtZTI5NTZkZGMyYjY3' 'strict-dynamic'; style-src 'self' 'nonce-NTgzMWVkOTEtYWM1Yi00YjE5LWFkNWYtZTI5NTZkZGMyYjY3' https://fonts.googleapis.com; img-src 'self' data: https://i.discogs.com https://st.discogs.com https://*.supabase.co https://i.ytimg.com; font-src 'self' https://fonts.gstatic.com https://fonts.googleapis.com; connect-src 'self' https://swyfhpgerzvvmoswkjyt.supabase.co wss://swyfhpgerzvvmoswkjyt.supabase.co; media-src 'self'; worker-src 'self'; frame-src 'self' https://www.youtube-nocookie.com https://www.youtube.com; object-src 'none'; base-uri 'self'; frame-ancestors 'none'; form-action 'self'
+Content-Type: application/json
+Date: Mon, 27 Apr 2026 16:15:38 GMT
+Permissions-Policy: camera=(), microphone=(), geolocation=()
+Referrer-Policy: strict-origin-when-cross-origin
+Server: Vercel
+Strict-Transport-Security: max-age=300
+Vary: rsc, next-router-state-tree, next-router-prefetch, next-router-segment-prefetch
+X-Content-Type-Options: nosniff
+X-Dns-Prefetch-Control: on
+X-Frame-Options: DENY
+X-Matched-Path: /api/health
+X-Nonce: NTgzMWVkOTEtYWM1Yi00YjE5LWFkNWYtZTI5NTZkZGMyYjY3
+X-Vercel-Cache: MISS
+X-Vercel-Enable-Rewrite-Caching: 1
+X-Vercel-Id: gru1::iad1::pxw5p-1777306538449-7035912aa65b
+
+
+=== verdict ===
+Status: PASS
+HTTP 200 + database:ok confirmed at 2026-04-27T16:15:39Z

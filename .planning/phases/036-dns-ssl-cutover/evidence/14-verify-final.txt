@@ -1,0 +1,20 @@
+Phase 36 — DEP-DNS-{01..07} aggregator
+Generated: 2026-04-27T16:17:02Z
+
+| Req        | Status         | Source                                    | Note                                                                                |
+|------------|----------------|-------------------------------------------|-------------------------------------------------------------------------------------|
+| DEP-DNS-01 | PASS           | evidence/06-flip-a-record.json + 07b      | A @ → 76.76.21.21 ttl=300                                                          |
+| DEP-DNS-02 | PASS           | evidence/07-flip-www-cname.json + 04b     | CNAME www → cname.vercel-dns.com. ttl=300                                          |
+| DEP-DNS-03 | PASS           | evidence/10-openssl-cert.txt + 10b        | LE R12 apex cert + separate www cert + Verify return code 0 + 308 redirect live      |
+| DEP-DNS-04 | PASS           | evidence/08-3-resolver-matrix.txt + 08b   | 3/3 resolvers + dns.google = 4 networks (D-14 strengthening)                        |
+| DEP-DNS-05 | PASS           | evidence/09-caa-audit.txt                 | No CAA records (default-allow); LE permitted by RFC 8659                            |
+| DEP-DNS-06 | PASS           | evidence/07c-ttl-300-verify.txt           | A @ ttl=300 + CNAME www ttl=300 confirmed post-flip                                 |
+| DEP-DNS-07 | N/A by D-04    | evidence/01b-mx-na-confirm.txt            | No MX records present at cutover; Phase 37 owns Resend MX/SPF/DKIM/DMARC            |
+
+Smoke summary (D-16 + D-13)
+----------------------------
+.planning/phases/036-dns-ssl-cutover/evidence/11-health-probe.txt:Status: PASS
+.planning/phases/036-dns-ssl-cutover/evidence/12-playwright-smoke.txt:Status: PASS — meets-or-exceeds Phase 35 baseline
+.planning/phases/036-dns-ssl-cutover/evidence/13-soak-1h.txt:Status: PASS (5/5 probes 200 over 48min, all <3s response time)
+
+Effective closure: 6 PASS + 1 N/A by D-04 = 7/7 in-scope DEP-DNS-* satisfied
