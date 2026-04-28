@@ -5,14 +5,27 @@ import { env } from "@/lib/env";
 const redisUrl = env.UPSTASH_REDIS_REST_URL;
 const redisToken = env.UPSTASH_REDIS_REST_TOKEN;
 
-const redisAvailable = redisUrl.length > 0 && redisToken.length > 0;
+// Detect Phase 35 D-21 DEFERRED placeholders. When Upstash is intentionally
+// deferred (POST_MVP), the rate limiter should fail-OPEN rather than fail-closed
+// to avoid blocking legitimate users during invite-only soak (CONTEXT 036 D-11).
+// Real Redis errors (DNS resolved + service down) still respect failClosed.
+// POST-LAUNCH TODO: provision Upstash Redis to restore strict brute-force protection.
+const isDeferredPlaceholder =
+	redisUrl === "https://deferred-post-mvp.invalid" ||
+	redisToken === "DEFERRED_POST_MVP" ||
+	redisUrl.length === 0 ||
+	redisToken.length === 0;
+
+const redisAvailable = !isDeferredPlaceholder;
 
 const redis = redisAvailable ? new Redis({ url: redisUrl, token: redisToken }) : null;
 
 /**
  * Safe rate limit wrapper.
  * - If Redis is available: delegates to the real limiter.
- * - If Redis is unavailable:
+ * - If Redis is intentionally deferred (Phase 35 D-21 placeholder): allows the request
+ *   regardless of failClosed (brute-force protection deferred until Upstash provisioned).
+ * - If Redis is unavailable due to a real error:
  *   - failClosed=true  -> denies the request (safe for auth flows)
  *   - failClosed=false -> allows the request (acceptable for lower-risk flows)
  */
@@ -22,6 +35,12 @@ export async function safeLimit(
 	failClosed = true,
 ): Promise<{ success: boolean }> {
 	if (!limiter) {
+		if (isDeferredPlaceholder) {
+			// Phase 35 D-21: Upstash provisioning deferred to POST_MVP.
+			// During invite-only soak, allow requests; brute-force protection restored
+			// when real Upstash credentials replace the DEFERRED placeholders.
+			return { success: true };
+		}
 		if (env.NODE_ENV === "production") {
 			if (failClosed) {
 				console.error("[rate-limit] Redis unavailable - failing closed");
