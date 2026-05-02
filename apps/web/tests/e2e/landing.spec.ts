@@ -14,7 +14,8 @@ test.describe("Landing Page", () => {
 
 	test("homepage has sign in link", async ({ page }) => {
 		await page.goto("/");
-		const link = page.getByRole("link", { name: /sign in|log in/i });
+		// Header + footer both expose Sign In links — strict-mode safe via .first()
+		const link = page.getByRole("link", { name: /sign in|log in/i }).first();
 		await expect(link).toBeVisible();
 	});
 });

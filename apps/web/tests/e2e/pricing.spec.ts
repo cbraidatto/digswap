@@ -58,14 +58,16 @@ test.describe("Pricing page — unauthenticated visitor", () => {
 	});
 
 	test("Free CTA links to /signup for unauthenticated visitor", async ({ page }) => {
-		const freeCtaLink = page.getByRole("link", { name: /GET_STARTED_FREE/i });
+		// Actual rendered text is "Get started free" (sentence case, with spaces).
+		// Earlier SCREAMING_SNAKE regex was a stale assumption from before copy update.
+		const freeCtaLink = page.getByRole("link", { name: /get started free/i });
 		await expect(freeCtaLink).toBeVisible();
 		await expect(freeCtaLink).toHaveAttribute("href", "/signup");
 	});
 
 	test("Premium CTA links to /signup for unauthenticated visitor", async ({ page }) => {
-		// Unauthenticated — premium CTA is an anchor to /signup
-		const premiumCtaLink = page.getByRole("link", { name: /UPGRADE_TO_PREMIUM/i });
+		// Unauthenticated — premium CTA is an anchor to /signup with "Upgrade to Premium" text
+		const premiumCtaLink = page.getByRole("link", { name: /upgrade to premium/i });
 		await expect(premiumCtaLink).toBeVisible();
 		await expect(premiumCtaLink).toHaveAttribute("href", "/signup");
 	});
@@ -83,6 +85,9 @@ test.describe("Pricing page — page structure", () => {
 
 	test("PRICING section label is visible", async ({ page }) => {
 		await page.goto("/pricing");
-		await expect(page.getByText("Pricing")).toBeVisible();
+		// Two elements match "Pricing": page <title> tag + section eyebrow div.
+		// Scope to the visible eyebrow div (mono uppercase letterspaced label).
+		// Strict-mode safe via .first() since both matches are valid prose.
+		await expect(page.getByText("Pricing", { exact: true }).first()).toBeVisible();
 	});
 });
