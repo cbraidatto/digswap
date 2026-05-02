@@ -93,9 +93,19 @@ export default async function RootLayout({
 						},
 					}}
 				/>
-				{/* Phase 39 — Vercel observability. Both auto-disable in dev. */}
-				<Analytics />
-				<SpeedInsights />
+				{/* Phase 39 — Vercel observability. Gated on NEXT_PUBLIC_VERCEL_ANALYTICS_ENABLED
+				    because Web Analytics + Speed Insights require explicit enablement in
+				    the Vercel project dashboard before the script endpoint resolves. Without
+				    enablement, the injected /xxxxx/script.js path 404s and pollutes the console.
+				    Flip env var to "true" once you enable in dashboard:
+				    https://vercel.com/thiagobraidatto-3732s-projects/digswap-web/analytics
+				*/}
+				{process.env.NEXT_PUBLIC_VERCEL_ANALYTICS_ENABLED === "true" && (
+					<>
+						<Analytics />
+						<SpeedInsights />
+					</>
+				)}
 			</body>
 		</html>
 	);
