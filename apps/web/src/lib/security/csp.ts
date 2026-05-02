@@ -25,7 +25,10 @@ export function generateCspHeader(nonce: string, isDev: boolean): string {
 		"style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
 		"img-src 'self' data: https://i.discogs.com https://st.discogs.com https://*.supabase.co https://i.ytimg.com",
 		"font-src 'self' https://fonts.gstatic.com https://fonts.googleapis.com",
-		`connect-src 'self' https://${supabaseHost} wss://${supabaseHost}`,
+		// connect-src: app's own backend + Supabase + Vercel Analytics/Speed Insights beacons
+		// (Phase 39 observability). The Analytics script also fetches its bundle from
+		// va.vercel-scripts.com but that's allowed via 'strict-dynamic' on script-src.
+		`connect-src 'self' https://${supabaseHost} wss://${supabaseHost} https://va.vercel-scripts.com https://vitals.vercel-insights.com`,
 		"media-src 'self'",
 		"worker-src 'self'",
 		"frame-src 'self' https://www.youtube-nocookie.com https://www.youtube.com",
