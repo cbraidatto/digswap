@@ -105,3 +105,4 @@ tmp-phase*-smoke.json
 .claude/skills/
 skills-lock.json
 
+.scratch/
