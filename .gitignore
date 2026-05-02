@@ -106,3 +106,5 @@ tmp-phase*-smoke.json
 skills-lock.json
 
 .scratch/
+
+.vercel
