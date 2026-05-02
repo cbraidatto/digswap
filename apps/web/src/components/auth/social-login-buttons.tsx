@@ -2,6 +2,7 @@
 
 import { Loader2 } from "lucide-react";
 import { useState } from "react";
+import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { createClient } from "@/lib/supabase/client";
@@ -35,13 +36,34 @@ export function SocialLoginButtons() {
 		try {
 			const supabase = createClient();
 			const redirectTo = `${window.location.origin}/api/auth/callback`;
-			await supabase.auth.signInWithOAuth({
+			const { data, error } = await supabase.auth.signInWithOAuth({
 				provider,
 				options: { redirectTo },
 			});
-		} catch {
-			// OAuth redirect will happen; errors are rare here.
-			// If the redirect fails, the user stays on the page.
+
+			if (error) {
+				// Provider not enabled, network failure, or invalid config.
+				// Common case: provider disabled in Supabase Auth settings (Phase 37 owns).
+				const providerLabel = provider === "google" ? "Google" : "GitHub";
+				if (/not enabled|provider/i.test(error.message)) {
+					toast.error(`${providerLabel} sign-in is not available yet. Please use email + password instead.`);
+				} else {
+					toast.error(`Couldn't sign in with ${providerLabel}. Please try again or use email + password.`);
+				}
+				setLoadingProvider(null);
+				return;
+			}
+
+			// On success, supabase-js navigates the browser to data.url. If for some reason
+			// it didn't (older SDK behaviour, or popup-blocked), do it manually as a fallback.
+			if (data?.url) {
+				window.location.href = data.url;
+			}
+		} catch (err) {
+			// Network or unexpected error — show feedback so the click isn't silent.
+			const providerLabel = provider === "google" ? "Google" : "GitHub";
+			toast.error(`Couldn't reach ${providerLabel}. Check your connection and try again.`);
+			console.error(`[oauth:${provider}]`, err);
 			setLoadingProvider(null);
 		}
 	}
