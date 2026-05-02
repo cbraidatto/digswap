@@ -5,9 +5,21 @@ import { z } from "zod";
 import { requireUser } from "@/lib/auth/require-user";
 import { db } from "@/lib/db";
 import { subscriptions } from "@/lib/db/schema/subscriptions";
+import { publicEnv } from "@/lib/env";
 import { getSiteUrl, getStripe, getStripePriceIds } from "@/lib/stripe";
 
 const checkoutPriceSchema = z.string().min(1, "Invalid price.");
+
+/**
+ * Phase 37 D-14 feature flag — when false, Stripe-dependent actions
+ * short-circuit with a friendly error rather than calling Stripe SDK with
+ * the DEFERRED placeholder credentials (which would 401 on first request).
+ *
+ * Flips to "true" in Wave 4 atomic swap after Stripe Live activation.
+ */
+function billingEnabled(): boolean {
+	return publicEnv.NEXT_PUBLIC_BILLING_ENABLED === "true";
+}
 
 async function ensureSubscriptionRecord(userId: string) {
 	const rows = await db
@@ -70,6 +82,9 @@ async function ensureStripeCustomer(userId: string, email: string | undefined) {
 export async function createCheckoutSession(
 	priceId: string,
 ): Promise<{ url: string } | { error: string }> {
+	if (!billingEnabled()) {
+		return { error: "Billing is currently unavailable. Please check back soon." };
+	}
 	try {
 		const user = await requireUser();
 		const parsedPriceId = checkoutPriceSchema.safeParse(priceId);
@@ -110,6 +125,9 @@ export async function createCheckoutSession(
 }
 
 export async function createPortalSession(): Promise<{ url: string } | { error: string }> {
+	if (!billingEnabled()) {
+		return { error: "Billing is currently unavailable. Please check back soon." };
+	}
 	try {
 		const user = await requireUser();
 		const rows = await db

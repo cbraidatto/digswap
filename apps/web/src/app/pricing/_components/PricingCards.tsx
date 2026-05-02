@@ -2,6 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
+import { toast } from "sonner";
 import type { SubscriptionPlan } from "@/lib/stripe";
 
 const MONTHLY_PRICE = "$9.90";
@@ -44,6 +45,9 @@ export function PricingCards({ currentPlan, monthlyPriceId, annualPriceId }: Pro
 			const { createCheckoutSession } = await import("@/actions/stripe");
 			const result = await createCheckoutSession(priceId);
 			if ("error" in result) {
+				// Phase 37 D-14 feature flag is in deferred state OR Stripe is genuinely
+				// unreachable. Either way, show the error so the click isn't silent.
+				toast.error(result.error);
 				return;
 			}
 			router.push(result.url);
@@ -55,6 +59,7 @@ export function PricingCards({ currentPlan, monthlyPriceId, annualPriceId }: Pro
 			const { createPortalSession } = await import("@/actions/stripe");
 			const result = await createPortalSession();
 			if ("error" in result) {
+				toast.error(result.error);
 				return;
 			}
 			router.push(result.url);
