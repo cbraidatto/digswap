@@ -15,7 +15,14 @@ export function generateCspHeader(nonce: string, isDev: boolean): string {
 	const directives = [
 		"default-src 'self'",
 		`script-src 'self' 'nonce-${nonce}' 'strict-dynamic'${isDev ? " 'unsafe-eval'" : ""}`,
-		`style-src 'self' 'nonce-${nonce}' https://fonts.googleapis.com`,
+		// style-src: pragmatic 'unsafe-inline' (no nonce) — modern UI libs (@base-ui/react,
+		// framer-motion, @dnd-kit, sonner) inject runtime inline styles via element.style.X = Y
+		// which CANNOT be nonce-tagged. Per CSP3 spec, when nonce + 'unsafe-inline' coexist,
+		// browsers IGNORE 'unsafe-inline' and runtime injected styles are blocked. Dropping the
+		// nonce here is the canonical fix — CSS-injection XSS is far lower impact than script-src
+		// XSS, and OWASP CSP cheat sheet explicitly accepts 'unsafe-inline' on style-src.
+		// Script-src above keeps nonce + strict-dynamic — script XSS protection unchanged.
+		"style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
 		"img-src 'self' data: https://i.discogs.com https://st.discogs.com https://*.supabase.co https://i.ytimg.com",
 		"font-src 'self' https://fonts.gstatic.com https://fonts.googleapis.com",
 		`connect-src 'self' https://${supabaseHost} wss://${supabaseHost}`,
